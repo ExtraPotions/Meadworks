@@ -11,3 +11,5 @@ The licensed GrindstoneSkills display templates and their translations are also 
 Local Sneak effects (2026-10-15): Soft Steps and Assassin behavior was implemented after reading GrindstoneSkills 0.18 at fdd1e1ad1c0462adb42abf25572cbc8f0245635a. This source-exposed slice uses Saga ownership/CS1 and the existing outgoing dispatcher, retains all prior notices and does not import upstream XP prediction.
 
 Successful-backstab authentication (2026-10-15): the retained SecondaryAttacks BackstabSkillGainSystem.cs notice now represents retired inference code; its implementation and legacy float receiver were replaced by a validated native success insertion, bounded Saga receipt policy and existing Crucible Operations/PeerCommands adapters. All notices remain.
+
+Forsaken power wheel (2026-10-21): the hold-to-choose timing in `src/Saga.Core/Powers/PowerWheel.cs` is adapted from BossRules 1.1.8 `ForsakenPowerShortcutInput` (GPL-3.0, Copyright (C) 2026 sighsorry, snapshot `assets/references/thunderstore-20261019/sighsorry-BossRules-1.1.8`). The wheel is drawn with Crucible.UI. The native Valheim radial renderer is not copied.

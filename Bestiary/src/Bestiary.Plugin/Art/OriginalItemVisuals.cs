@@ -27,6 +27,7 @@ namespace ExtraPotions.Bestiary.Runtime.Prefabs
         static void Apply(ZNetScene scene, MeadworksLog log)
         {
             Applied = 0;
+            if (MeadworksHeadless.IsHeadless) return;
             foreach (var definition in ItemCatalog.All)
             {
                 try
@@ -41,12 +42,18 @@ namespace ExtraPotions.Bestiary.Runtime.Prefabs
                     prefab.GetComponent<ItemDrop>().m_itemData.m_shared.m_icons = new[] { OriginalItemArt.Icon(definition.Prefab) };
                     Applied++;
                 }
-                catch (Exception error) { Native.Adapters.Guard.Report(error, "original item art " + definition.Prefab); }
+                catch (Exception error) { log.Warning("Original item art unavailable for " + definition.Prefab + "; registered prefab retained: " + error.Message); }
             }
-            ReplaceProjectile(scene, "ECP_ArrowBone_projectile", "ECP_ArrowBone", -1.128f);
-            ReplaceProjectile(scene, "ECP_SkeletonArrow_projectile", "ECP_ArrowBone", -1.128f);
-            ReplaceProjectile(scene, "ECP_BoltBoneBlunt_projectile", "ECP_BoltBoneBlunt", -.52f);
+            TryProjectile(scene, "ECP_ArrowBone_projectile", "ECP_ArrowBone", -1.128f, log);
+            TryProjectile(scene, "ECP_SkeletonArrow_projectile", "ECP_ArrowBone", -1.128f, log);
+            TryProjectile(scene, "ECP_BoltBoneBlunt_projectile", "ECP_BoltBoneBlunt", -.52f, log);
             log.Verbose("Bestiary original item models/icons applied: " + Applied);
+        }
+
+        static void TryProjectile(ZNetScene scene, string projectile, string item, float offset, MeadworksLog log)
+        {
+            try { ReplaceProjectile(scene, projectile, item, offset); }
+            catch (Exception error) { log.Warning("Original projectile art unavailable for " + projectile + "; registered prefab retained: " + error.Message); }
         }
 
         static void Replace(ZNetScene scene, GameObject owner, string id, bool held)

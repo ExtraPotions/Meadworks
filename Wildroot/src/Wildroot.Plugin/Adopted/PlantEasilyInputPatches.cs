@@ -1,5 +1,5 @@
-// Adapted from PlantEasily 2.2.2 Patches/InputPatches.cs, commit
-// 1deeb3962eb8681394961b0f35a4dfbc315c6f99. See PlantEasilyInput.PROVENANCE.md in this directory.
+// Adapted from PlantEasily 2.3.0 Patches/InputPatches.cs, commit
+// 864defe2f471f3c10e0ddd8237fc8fee74190433. Bytes match 2.2.2 (1deeb396). See PlantEasilyInput.PROVENANCE.md.
 // SPDX-License-Identifier: GPL-3.0-only
 using HarmonyLib;
 

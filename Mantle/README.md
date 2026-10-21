@@ -1,6 +1,6 @@
 # Mantle
 
-Version 0.1.22. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.23. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 A configurable inventory grid, dedicated gear slots, and wearable backpacks.
 
@@ -42,7 +42,7 @@ A configurable inventory grid, dedicated gear slots, and wearable backpacks.
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.24 or a later 0.3.x, which includes Crucible.UI 0.3.17 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 

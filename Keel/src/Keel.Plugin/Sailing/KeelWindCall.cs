@@ -10,7 +10,8 @@
 // by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See
 // THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt and licenses/GPL-3.0.txt.
 //
-// Changed by expDARE, 2026: one Keel class; the key through Crucible C07 (MeadworksInput) plus Keel's gamepad chord, and
+// Changed by expDARE, 2026: the call is accepted only from the peer who is steering that ship, and that peer's player id
+// is the caller. One Keel class; the key through Crucible C07 (MeadworksInput) plus Keel's gamepad chord, and
 // the settings, levels (CS1), unlock, refusal, cooldown and compass from Keel.Core (AbilityRules, AbilityCooldown,
 // WindCallState); Keel's RPC and ZDO keys (keel_WindCall, keel.wind_dir, keel.wind_until); the announcements are Keel's
 // C05 texts chosen by WindCallState.Announce; PatchGuard replaced by try/catch with a log line; everything acts only
@@ -70,10 +71,12 @@ namespace ExtraPotions.Keel.Runtime
             return Quaternion.Euler(0f, yaw, 0f) * Vector3.forward;
         }
 
-        internal static void Receive(Ship ship, Vector3 direction, long caller)
+        internal static void Receive(Ship ship, long sender, Vector3 direction)
         {
             direction.y = 0f;
             if (ship == null || ship.m_nview == null || !ship.m_nview.IsValid() || !SailingPerks.Active || direction.sqrMagnitude < 0.01f) return;
+            var caller = ShipCallGate.PlayerId(sender);
+            if (!ShipCall.MayCallWind(caller, ShipCallGate.Aboard(ship, caller), ShipCallGate.Controlling(ship, caller))) return;
             direction.Normalize();
             var seconds = Plugin.Settings!.Get(KeelSettings.WindCall.Duration);
             if (ship.m_nview.IsOwner() && ZNet.instance != null)
@@ -115,9 +118,9 @@ namespace ExtraPotions.Keel.Runtime
             {
                 var nview = __instance.m_nview;
                 if (nview == null || nview.GetZDO() == null) return;
-                nview.Register<Vector3, long>(SailingKeys.RpcWindCall, (sender, direction, caller) =>
+                nview.Register<Vector3, long>(SailingKeys.RpcWindCall, (sender, direction, _) =>
                 {
-                    try { Receive(__instance, direction, caller); }
+                    try { Receive(__instance, sender, direction); }
                     catch (Exception error) { KeelShips.Warn("wind call", error); }
                 });
             }

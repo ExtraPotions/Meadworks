@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.11 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- A loot chest that a player has loaded keeps its current items until it unloads. Restock Loaded still lets the delay run while the chest is loaded. The new roll is written on the first check after the loaded copy is gone.
+- A flametal spire that drifts keeps one remembered spot. A missing flametal spot is not grown while any whole spire of that ore remains.
+- A full dungeon reset generates the replacement before it removes the old interior. If generation fails, the new pieces are removed and the old dungeon stays.
+
 ## 0.1.10 (2026-10-19)
 
 - Requires Crucible 0.3.22 / Crucible.UI 0.3.15.

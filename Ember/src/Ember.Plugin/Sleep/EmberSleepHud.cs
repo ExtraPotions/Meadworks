@@ -19,6 +19,7 @@ namespace ExtraPotions.Ember.Runtime
         static KitHudPanel? panel;
         static Transform? owner;
         static TMP_Text? caption;
+        static SleepHudCaption captionCache = new SleepHudCaption();
         static Image? moon, bed;
         static readonly Image[] pillows = new Image[SleepHud.MaxCompactAbove];
         static readonly Image[] chevrons = new Image[3];
@@ -57,7 +58,7 @@ namespace ExtraPotions.Ember.Runtime
             // ExtraRate is the server's actual effective rate; no boost means the label must stay zero.
             var maximum = share > 0 && reading.ExtraRate > 0 ? reading.ExtraRate / share : 0;
             var fraction = SleepHud.BoostFraction(reading.ExtraRate, maximum);
-            caption!.text = EmberText.Format("hud_sleeping", reading.Sleeping, reading.Players) + "   " + SleepHud.Label(100 * fraction);
+            caption!.text = captionCache.Text(EmberText.Text("hud_sleeping"), reading.Sleeping, reading.Players, 100 * fraction);
             for (var i = 0; i < pillows.Length; i++)
             {
                 pillows[i].gameObject.SetActive(i < count);
@@ -67,12 +68,11 @@ namespace ExtraPotions.Ember.Runtime
             bed!.gameObject.SetActive(!boosting);
             bed.rectTransform.anchoredPosition = new Vector2(width - 42, -35);
             var step = SleepHud.ChevronStep(Time.unscaledTime, SleepHud.ChevronStepSeconds(fraction));
-            var lit = SleepHud.ChevronLit(step);
             for (var i = 0; i < chevrons.Length; i++)
             {
                 chevrons[i].gameObject.SetActive(boosting);
                 chevrons[i].rectTransform.anchoredPosition = new Vector2(width - 66 + i * 16, -37);
-                chevrons[i].color = KitAppearance.Color(lit[i] ? KitColorRole.OnPrimary : KitColorRole.Muted);
+                chevrons[i].color = KitAppearance.Color(SleepHud.ChevronLit(step, i) ? KitColorRole.OnPrimary : KitColorRole.Muted);
             }
             var at = DefaultPosition(root, width);
             if (at != lastDefault) panel.SetPosition(at);
@@ -150,6 +150,7 @@ namespace ExtraPotions.Ember.Runtime
         static void Reset()
         {
             panel?.Dispose(); panel = null; owner = null; caption = null; moon = bed = null;
+            captionCache = new SleepHudCaption();
             lastDefault = new Vector2(-1, -1);
             Array.Clear(pillows, 0, pillows.Length); Array.Clear(chevrons, 0, chevrons.Length);
         }

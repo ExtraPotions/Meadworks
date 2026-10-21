@@ -140,5 +140,16 @@ namespace ExtraPotions.Magpie.Loot
                 stacks.Add(Math.Min(size, left));
             return stacks;
         }
+
+        /// <summary>
+        /// Units to give ItemDrop.DropItem after an extra add. Return zero and skip the call:
+        /// a non-positive amount keeps the current stack, and a finished add leaves that stack at the request.
+        /// </summary>
+        public static int OverflowDrop(bool added, int stackLeft)
+        {
+            if (added || stackLeft <= 0)
+                return 0;
+            return stackLeft;
+        }
     }
 }

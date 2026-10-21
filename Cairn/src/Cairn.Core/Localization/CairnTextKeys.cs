@@ -45,6 +45,12 @@ namespace ExtraPotions.Cairn.Localization
 
         /// <summary>Heading under the compass: {0} whole degrees, {1} compass point (CA06b).</summary>
         public const string HudHeading = "hud_heading";
+
+        /// <summary>Next weather on the clock line: {0} name, {1} minutes.</summary>
+        public const string HudForecast = "hud_forecast";
+
+        /// <summary>Next weather on the clock line: {0} name, {1} minutes, {2} wind point and strength.</summary>
+        public const string HudForecastWind = "hud_forecast_wind";
         public const string RadiusLine = "radius_line";
         public const string RadiusInputs = "radius_inputs";
         public const string ImportDone = "import_done";
@@ -90,7 +96,8 @@ namespace ExtraPotions.Cairn.Localization
                 new TextKey(HeldNotice, 0),
                 new TextKey(SkillName, 0), new TextKey(SkillDescription, 0), new TextKey(Vantage, 0),
                 new TextKey(HudDay, 1), new TextKey(SquareComfort, 1), new TextKey(SquareRested, 1), new TextKey(SquareNotRested, 0),
-                new TextKey(HudHeading, 2), new TextKey(RadiusLine, 1), new TextKey(RadiusInputs, 7), new TextKey(ImportDone, 2),
+                new TextKey(HudHeading, 2), new TextKey(HudForecast, 2), new TextKey(HudForecastWind, 3),
+                new TextKey(RadiusLine, 1), new TextKey(RadiusInputs, 7), new TextKey(ImportDone, 2),
                 new TextKey(TidyPinsDescription, 0),
                 new TextKey(TempestWarning, 2), new TextKey(TempestClearing, 1), new TextKey(TempestNotice, 1),
                 new TextKey(TempestEvent(TempestKind.Blizzard), 0), new TextKey(TempestEvent(TempestKind.Thunderstorm), 0),

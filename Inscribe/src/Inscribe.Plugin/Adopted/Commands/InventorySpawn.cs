@@ -1,7 +1,7 @@
 // Portions Copyright (C) 2026 Gerald Glasgow. EliteCrafting 0.7.0 at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1.
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Changed by expDARE, 2026: Inscribe command identity and live permission gates.
-using System;
+// Changed by expDARE, 2026: Inscribe command identity and live permission gates; give drops only what did not arrive.
+using ExtraPotions.Inscribe.Runtime;
 using UnityEngine;
 
 namespace ExtraPotions.Inscribe.Adopted.Commands
@@ -14,27 +14,13 @@ namespace ExtraPotions.Inscribe.Adopted.Commands
     /// </summary>
     internal static class InventorySpawn
     {
-        /// <summary>Adds <paramref name="count"/> of a stackable prefab; returns how many went into the inventory.</summary>
-        public static int GiveStack(Player player, GameObject prefab, int count)
-        {
-            ItemDrop.ItemData template = prefab.GetComponent<ItemDrop>().m_itemData;
-            Inventory inventory = player.GetInventory();
-            int maxStack = Math.Max(1, template.m_shared.m_maxStackSize);
-            int room = inventory.FindFreeStackSpace(template.m_shared.m_name, Game.m_worldLevel) + inventory.GetEmptySlots() * maxStack;
-            int left = Math.Min(count, room);
-            while (left > 0)
-            {
-                int chunk = Math.Min(left, maxStack);
-                if (!inventory.AddItem(prefab, chunk))
-                {
-                    break;
-                }
-                left -= chunk;
-            }
-            int added = Math.Min(count, room) - left;
-            DropStack(player, prefab, count - added);
-            return added;
-        }
+        /// <summary>
+        /// Adds <paramref name="count"/> of a stackable prefab and drops what did not arrive at the player's feet. The
+        /// game's <c>AddItem</c> can fill partial stacks and still answer false, and another mod can refuse it, so what
+        /// arrived is measured by <see cref="SafeInventory.Deliver"/> and only the rest is dropped.
+        /// </summary>
+        public static SafeInventory.Delivery GiveStack(Player player, GameObject prefab, int count) =>
+            SafeInventory.Deliver(player.GetInventory(), prefab, count, FeetOf(player), false);
 
         /// <summary>Adds one prepared item (custom data already written); true = inventory, false = dropped at the feet.</summary>
         public static bool GiveItem(Player player, ItemDrop.ItemData item)
@@ -65,20 +51,6 @@ namespace ExtraPotions.Inscribe.Adopted.Commands
             item.m_equipped = false;
             item.m_customData.Clear();
             return item;
-        }
-
-        private static void DropStack(Player player, GameObject prefab, int count)
-        {
-            ItemDrop.ItemData template = prefab.GetComponent<ItemDrop>().m_itemData;
-            int maxStack = Math.Max(1, template.m_shared.m_maxStackSize);
-            while (count > 0)
-            {
-                int chunk = Math.Min(count, maxStack);
-                ItemDrop.ItemData item = NewItem(prefab);
-                item.m_stack = chunk;
-                ItemDrop.DropItem(item, chunk, FeetOf(player), Quaternion.identity);
-                count -= chunk;
-            }
         }
 
         private static Vector3 FeetOf(Player player) =>

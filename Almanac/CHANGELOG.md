@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.16 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- German, Russian, Chinese and Korean text reviewed: the settings pages use the game's own words.
+
 ## 0.1.15 (2026-10-19)
 
 - Requires Crucible 0.3.22 / Crucible.UI 0.3.15.

@@ -157,7 +157,8 @@ namespace Burrow.Stow
                     Messages.Center(StowWords.Format(StowWords.Salvaged, label));
                 return;
             }
-            inventory.RemoveItem(item, amount);
+            if (!inventory.RemoveItem(item, amount))
+                return;
             if (container != null)
                 ContainerScan.Save(container);
             Messages.Center(StowWords.Format(StowWords.Trashed, label));

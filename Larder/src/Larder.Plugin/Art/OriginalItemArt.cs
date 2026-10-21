@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ExtraPotions.Meadworks.Crucible;
 using UnityEngine;
 using Newtonsoft.Json;
 using Object = UnityEngine.Object;
@@ -48,6 +49,7 @@ namespace ExtraPotions.Meadworks.OriginalArt
 
         internal static Sprite Icon(string prefab)
         {
+            if (MeadworksHeadless.IsHeadless) return null;
             Load();
             if (!ids.TryGetValue(prefab, out string id)) throw new KeyNotFoundException("Original icon missing: " + prefab);
             return bundle.LoadAsset<Sprite>(id + "_icon") ?? throw new InvalidDataException("Original icon sprite missing: " + id);
@@ -55,12 +57,17 @@ namespace ExtraPotions.Meadworks.OriginalArt
 
         internal static GameObject Model(ZNetScene scene, string prefab)
         {
+            if (MeadworksHeadless.IsHeadless) return null;
             var native = scene != null ? scene.GetPrefab("SerpentScale") ?? scene.GetPrefab("TrollHide") : null;
             if (native == null && ObjectDB.instance != null) native = ObjectDB.instance.GetItemPrefab("SerpentScale") ?? ObjectDB.instance.GetItemPrefab("TrollHide");
             return ModelCore(native, prefab, scene);
         }
 
-        internal static GameObject Model(GameObject native, string prefab) => ModelCore(native, prefab, ZNetScene.instance);
+        internal static GameObject Model(GameObject native, string prefab)
+        {
+            if (MeadworksHeadless.IsHeadless) return null;
+            return ModelCore(native, prefab, ZNetScene.instance);
+        }
 
         static bool ActiveBelowRoot(Renderer renderer, Transform root)
         {
@@ -125,12 +132,16 @@ namespace ExtraPotions.Meadworks.OriginalArt
 
         internal static GameObject Instantiate(ZNetScene scene, string prefab, Transform parent)
         {
-            var visual = Object.Instantiate(Model(scene, prefab), parent, false); visual.name = "meadworks_original_model"; visual.SetActive(true); return visual;
+            var model = Model(scene, prefab);
+            if (model == null) return null;
+            var visual = Object.Instantiate(model, parent, false); visual.name = "meadworks_original_model"; visual.SetActive(true); return visual;
         }
 
         internal static GameObject Instantiate(GameObject nativeMaterialItem, string prefab, Transform parent)
         {
-            var visual = Object.Instantiate(Model(nativeMaterialItem, prefab), parent, false); visual.name = "meadworks_original_model"; visual.SetActive(true); return visual;
+            var model = Model(nativeMaterialItem, prefab);
+            if (model == null) return null;
+            var visual = Object.Instantiate(model, parent, false); visual.name = "meadworks_original_model"; visual.SetActive(true); return visual;
         }
 
         internal static void Shutdown()

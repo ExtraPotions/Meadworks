@@ -1,7 +1,10 @@
 // Portions Copyright (C) 2026 Gerald Glasgow. EliteCreaturesPack 0.7.2 at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1.
 // Changed by expDARE, 2026: Bestiary namespace, owned Crucible settings, rebuilt-only bundles and lifecycle adapters.
 // SPDX-License-Identifier: GPL-3.0-or-later
+using System.Reflection;
+using ExtraPotions.Bestiary.Fixes;
 using ExtraPotions.Bestiary.Runtime.Native.Adapters;
+using HarmonyLib;
 using UnityEngine;
 
 namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
@@ -9,8 +12,9 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
     /// <summary>
     /// Turns some crypt chests into mimics. The decision is the chest owner's, once, at the moment the game would first
     /// fill the chest (when the crypt is generated): a listed chest, at the settings' `Chance`, is marked in its ZDO and
-    /// left empty, and on the next frame - after the chest has finished waking - a mimic takes its place, facing the same
-    /// way, and remembers which chest it was (for its loot). The chest is removed. A chest marked but not yet swapped
+    /// left empty. The swap waits until this machine owns the chest and the mimic prefab exists, then a mimic takes its
+    /// place, facing the same way, and remembers which chest it was (for its loot). The chest is removed. If that swap
+    /// is given up, the mark is cleared and the chest fills with its normal loot. A chest marked but not yet swapped
     /// (its owner left) is swapped by whoever owns it next.
     /// </summary>
     public static class CryptSwap
@@ -21,10 +25,13 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
         /// <summary>The pending key's hash, made once: every chest that loads anywhere asks for it.</summary>
         private static readonly int PendingHash = PendingKey.GetStableHashCode();
 
+        /// <summary>Set while a given-up swap runs the chest's own fill, so that fill is not claimed again.</summary>
+        internal static bool AllowFill;
+
         /// <summary>OWNER, first fill. True when the chest becomes a mimic, so it must not be filled.</summary>
         public static bool Claim(Container chest)
         {
-            if (!MimicSettings.On || !IsListed(chest) || Random.value >= MimicSettings.Chance)
+            if (AllowFill || !MimicSettings.On || !IsListed(chest) || Random.value >= MimicSettings.Chance)
             {
                 return false;
             }
@@ -44,33 +51,103 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
             }
         }
 
+        /// <summary>The pending mark is no longer a mimic. The chest can keep whatever it already holds.</summary>
+        public static void Clear(ZDO zdo)
+        {
+            if (zdo != null)
+            {
+                zdo.Set(PendingHash, false);
+            }
+        }
+
         private static bool IsListed(Container chest) =>
             MimicSettings.Listed(Utils.GetPrefabName(chest.gameObject));
     }
 
-    /// <summary>Swaps its chest for a mimic on its first frame, while this machine still owns the chest.</summary>
+    /// <summary>
+    /// Swaps its chest for a mimic once this machine owns the chest and the prefab exists. Until then it stays
+    /// enabled. A swap that is given up clears the mark and fills the chest instead of leaving it empty.
+    /// </summary>
     public class CryptSwapper : MonoBehaviour
     {
-        private void Update()
-        {
-            enabled = false;
-            Guard.Run("CryptSwapper.Swap", Swap);
-        }
+        private static readonly MethodInfo? FillItems = AccessTools.Method(typeof(Container), "AddDefaultItems");
 
-        private void Swap()
+        private void Update() => Guard.Run("CryptSwapper.Swap", Step);
+
+        private void Step()
         {
             ZNetView chest = GetComponent<ZNetView>();
-            GameObject prefab = ZNetScene.instance.GetPrefab(MimicPrefabs.Creature);
-            if (chest == null || !chest.IsValid() || !chest.IsOwner() || prefab == null)
+            Container container = GetComponent<Container>();
+            bool valid = chest != null && chest.IsValid();
+            if (valid && HasItems(container))
+            {
+                if (chest!.IsOwner())
+                {
+                    CryptSwap.Clear(chest.GetZDO());
+                }
+                enabled = false;
+                return;
+            }
+            GameObject? prefab = ZNetScene.instance != null ? ZNetScene.instance.GetPrefab(MimicPrefabs.Creature) : null;
+            CryptSwapStep step = CryptSwapRules.Next(
+                valid, valid && chest!.IsOwner(), prefab != null, MimicPrefabs.Settled, MimicSettings.On);
+            if (step == CryptSwapStep.Retry)
             {
                 return;
             }
+            if (step == CryptSwapStep.Fill)
+            {
+                Fill(container, chest!);
+                return;
+            }
+            Spawn(chest!, prefab!);
+        }
+
+        /// <summary>The chest already holds loot. Destroying it for a mimic would drop that roll.</summary>
+        private static bool HasItems(Container? container)
+        {
+            if (container == null || container.m_inventory == null)
+            {
+                return false;
+            }
+            foreach (ItemDrop.ItemData item in container.m_inventory.GetAllItems())
+            {
+                if (item != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void Fill(Container? container, ZNetView chest)
+        {
+            if (container == null || FillItems == null)
+            {
+                return;
+            }
+            CryptSwap.AllowFill = true;
+            try
+            {
+                FillItems.Invoke(container, null);
+            }
+            finally
+            {
+                CryptSwap.AllowFill = false;
+            }
+            CryptSwap.Clear(chest.GetZDO());
+            enabled = false;
+        }
+
+        private void Spawn(ZNetView chest, GameObject prefab)
+        {
             GameObject mimic = Instantiate(prefab, transform.position, transform.rotation);
             ZNetView view = mimic.GetComponent<ZNetView>();
             if (view != null && view.GetZDO() != null)
             {
                 view.GetZDO().Set(CryptSwap.ChestKey, Utils.GetPrefabName(gameObject));
             }
+            enabled = false;
             ZNetScene.instance.Destroy(gameObject);
         }
     }

@@ -1,11 +1,11 @@
 {
   "name": "Threshold",
-  "version_number": "0.3.9",
+  "version_number": "0.3.10",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Threshold",
   "description": "Meadworks portals: pick any portal from a list and the map, named hubs, access modes, favorites, optional fuel, quick jumps and sea gates for ships (off by default). Required on all peers.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.24"
+    "expDARE-Crucible-0.3.26"
   ]
 }

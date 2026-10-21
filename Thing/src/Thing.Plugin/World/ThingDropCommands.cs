@@ -138,7 +138,7 @@ namespace ExtraPotions.Thing.Runtime
             if (!player || player.GetPlayerID() == 0 || !Finite(player.transform.position)) return "drops_unavailable";
             var role = net.IsDedicated() ? ThingRole.DedicatedServer : net.GetPeers().Count > 0 ? ThingRole.Host : ThingRole.SinglePlayer;
             var admin = caller.IsLocal || (caller.ContextAdmin && net.IsAdmin(caller.Actor.Id));
-            var verdict = AdminCheck.Decide(ThingAction.RemoveDrops, new RequestFacts(role, caller.IsLocal, admin, false), Plugin.Settings.Rules());
+            var verdict = AdminCheck.Decide(ThingAction.RemoveDrops, new RequestFacts(role, caller.IsLocal, admin, false, granted: admin ? AdminRight.None : ThingAccess.Of(caller.Actor.Id)), Plugin.Settings.Rules());
             if (!AdminCheck.Permits(verdict)) return AdminCheck.TextKey(verdict);
             if (expected != null && (expected.Generation != caller.Generation || !ReferenceEquals(caller.Peer, expected.Peer) || player.GetPlayerID() != expected.PlayerId
                 || Plugin.Settings.Get(ThingSettings.World.RemoveDropsRadius) != expected.Radius || Vector3.Distance(player.transform.position, expected.Center) > 2)) return "drops_expired";

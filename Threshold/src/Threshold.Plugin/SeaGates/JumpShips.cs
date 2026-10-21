@@ -48,7 +48,7 @@ namespace ExtraPotions.Threshold.Runtime.SeaGates
             if (view == null || view.GetZDO() == null)
                 return;
             Ship ship = __instance;
-            view.Register<int, long>(SeaGateFields.LandedRpc, (sender, jumpId, playerId) => ShipJump.OnLanded(ship, jumpId, playerId));
+            view.Register<int, long>(SeaGateFields.LandedRpc, (sender, jumpId, playerId) => ShipJump.OnLanded(ship, sender, jumpId, playerId));
             view.Register<int, long>(SeaGateFields.PickRpc, (sender, stopId, gateId) => JumpChoice.OnPick(ship, sender, stopId, gateId));
             JumpShips.Add(ship);
             ShipFreeze.KnowShip(view.GetZDO());

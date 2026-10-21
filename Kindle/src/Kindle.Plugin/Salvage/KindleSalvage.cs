@@ -33,6 +33,10 @@ namespace ExtraPotions.Kindle.Runtime
         static readonly Color BlockedName=new Color(0.6f,0.6f,0.6f,1f);
         static int drawGeneration=1;
         static readonly HashSet<string> warned = new HashSet<string>();
+        // Rows of gear in nearby chests (Burrow): the chest each listed item is in.
+        static readonly Dictionary<ItemDrop.ItemData,Container> chestOf = new Dictionary<ItemDrop.ItemData,Container>();
+        // Burrow's Reach color for what comes from containers, so a chest row reads like a chest amount in the crafting panel.
+        const string ChestColour="#6fc3ff";
         public static bool Ready => initialized && Plugin.GameplayAvailable && Plugin.AllowsUi && SalvageYaml.Ready
             && CruciblePlugin.IsReady && CruciblePlugin.Session.WorldId != 0 && ZNet.instance != null
             && Player.m_localPlayer != null && !Player.m_localPlayer.IsDead() && !Player.m_localPlayer.IsTeleporting();
@@ -70,9 +74,23 @@ namespace ExtraPotions.Kindle.Runtime
             favouriteStamp=stamp;
             return changed;
         }
+        static int chestStamp;
+        static float nextChestCheck;
+        /// <summary>A chest item taken, added or moved (by anyone) shows in the open tab within half a second; read only while it is open.</summary>
+        static bool ChestsChanged()
+        {
+            float now=Time.unscaledTime;
+            if (wasActive && now<nextChestCheck) return false;
+            nextChestCheck=now+0.5f;
+            int stamp=SalvageChests.Stamp();
+            bool changed=wasActive && stamp!=chestStamp;
+            chestStamp=stamp;
+            return changed;
+        }
         public static void Tick()
         {
             if (!initialized) return;
+            SalvageChests.Tick();
             SalvageYaml.Tick();
             if (!Plugin.AllowsUi || Plugin.SteppedAside) return;
             Ensure(InventoryGui.instance);
@@ -85,7 +103,8 @@ namespace ExtraPotions.Kindle.Runtime
             if (!enabled && tab.Selected) Leave();
             SalvageTabCapability.Active=Active && InventoryGui.IsVisible();
             bool favourites=SalvageTabCapability.Active && FavouritesChanged();
-            if (SalvageTabCapability.Active && (!wasActive || configurationDirty || favourites)) { configurationDirty=false;drawGeneration++;Rebuild(); }
+            bool chests=SalvageTabCapability.Active && ChestsChanged();
+            if (SalvageTabCapability.Active && (!wasActive || configurationDirty || favourites || chests)) { configurationDirty=false;drawGeneration++;Rebuild(); }
             wasActive=SalvageTabCapability.Active;
         }
         public static void Ensure(InventoryGui instance)
@@ -151,34 +170,45 @@ namespace ExtraPotions.Kindle.Runtime
             foreach (var item in Player.m_localPlayer.GetInventory().GetAllItemsInGridOrder())
             {
                 if (!SalvageInterop.ListedCell(Player.m_localPlayer,item)) continue;
-                // Gear with a recipe that cannot be salvaged now is listed dimmed with the reason, so it is never silently missing.
-                string blocked=SalvageActions.WhyNot(item);
-                if (blocked!=null && (blocked==SalvageWords.Off || blocked==SalvageWords.Cannot || blocked==SalvageWords.NoRecipe)) continue;
-                var row=Object.Instantiate(gui.m_recipeElementPrefab,gui.m_recipeListRoot);
-                row.name="Kindle_SalvageRow";row.SetActive(true);
-                var icon=row.transform.Find("icon")?.GetComponent<Image>();
-                if (icon != null) { icon.sprite=item.GetIcon();icon.color=Color.white;SalvageRarity.Apply(icon.gameObject,item); }
-                var name=row.transform.Find("name")?.GetComponent<TMP_Text>();
-                if (name != null) { name.text=ItemNames.DisplayName(item)+(item.m_stack>1?" ×"+item.m_stack:"");name.color=blocked==null?Color.white:BlockedName; }
-                var quality=row.transform.Find("QualityLevel")?.GetComponent<TMP_Text>();
-                if (quality != null) { quality.gameObject.SetActive(item.m_shared.m_maxQuality>1);quality.text=item.m_quality.ToString(); }
-                var bar=row.transform.Find("Durability")?.GetComponent<GuiBar>();
-                if (bar != null) { bool worn=item.m_shared.m_useDurability && item.m_durability<item.GetMaxDurability();bar.gameObject.SetActive(worn);if(worn)bar.SetValue(item.GetDurabilityPercentage()); }
-                var button=row.GetComponent<Button>();
-                int index=rows.Count;
-                if (button != null) { button.onClick=new Button.ButtonClickedEvent();button.onClick.AddListener(()=>Choose(index,false)); }
-                string tip=ItemDrop.ItemData.GetTooltip(item,item.m_quality,false,Game.m_worldLevel);
-                KitTooltip.Set(row,ItemNames.DisplayName(item),blocked==null?tip:"<color=#FF6A5A>"+blocked+"</color>\n\n"+tip);
-                rows.Add(new KeyValuePair<ItemDrop.ItemData,GameObject>(item,row));
+                AddRow(item,SalvageActions.WhyNot(item),null);
             }
+            // Gear in the nearby chests Burrow lets this player craft from, nearest chest first (Salvage / Nearby Chests).
+            foreach (var pair in SalvageChests.Items())
+                if (!chestOf.ContainsKey(pair.Value))
+                    AddRow(pair.Value,SalvageRules.Blocker(Player.m_localPlayer,pair.Value,pair.Key.GetInventory()),pair.Key);
             if (layout != null) { layout.View=KitTileView.List;layout.Arrange(rows.Select(r=>r.Value.transform as RectTransform).ToList()); }
             int restore=rows.FindIndex(r=>r.Key==selected);
             Choose(restore>=0?restore:Mathf.Clamp(selectedIndex,0,rows.Count-1),center);
         }
+        static void AddRow(ItemDrop.ItemData item,string blocked,Container chest)
+        {
+            // Gear with a recipe that cannot be salvaged now is listed dimmed with the reason, so it is never silently missing.
+            if (blocked!=null && (blocked==SalvageWords.Off || blocked==SalvageWords.Cannot || blocked==SalvageWords.NoRecipe)) return;
+            var row=Object.Instantiate(gui.m_recipeElementPrefab,gui.m_recipeListRoot);
+            row.name="Kindle_SalvageRow";row.SetActive(true);
+            var icon=row.transform.Find("icon")?.GetComponent<Image>();
+            if (icon != null) { icon.sprite=item.GetIcon();icon.color=Color.white;SalvageRarity.Apply(icon.gameObject,item); }
+            var name=row.transform.Find("name")?.GetComponent<TMP_Text>();
+            if (name != null) { name.text=ItemNames.DisplayName(item)+(item.m_stack>1?" ×"+item.m_stack:"")+ChestLabel(chest);name.color=blocked==null?Color.white:BlockedName; }
+            var quality=row.transform.Find("QualityLevel")?.GetComponent<TMP_Text>();
+            if (quality != null) { quality.gameObject.SetActive(item.m_shared.m_maxQuality>1);quality.text=item.m_quality.ToString(); }
+            var bar=row.transform.Find("Durability")?.GetComponent<GuiBar>();
+            if (bar != null) { bool worn=item.m_shared.m_useDurability && item.m_durability<item.GetMaxDurability();bar.gameObject.SetActive(worn);if(worn)bar.SetValue(item.GetDurabilityPercentage()); }
+            var button=row.GetComponent<Button>();
+            int index=rows.Count;
+            if (button != null) { button.onClick=new Button.ButtonClickedEvent();button.onClick.AddListener(()=>Choose(index,false)); }
+            string tip=ItemDrop.ItemData.GetTooltip(item,item.m_quality,false,Game.m_worldLevel);
+            if (chest != null) tip="<color="+ChestColour+">"+SalvageWords.FromChest+"</color>\n\n"+tip;
+            KitTooltip.Set(row,ItemNames.DisplayName(item),blocked==null?tip:"<color=#FF6A5A>"+blocked+"</color>\n\n"+tip);
+            rows.Add(new KeyValuePair<ItemDrop.ItemData,GameObject>(item,row));
+            if (chest != null) chestOf[item]=chest;
+        }
+        /// <summary>"From a chest", small and in the Reach container color, after the name of a chest row; empty otherwise.</summary>
+        static string ChestLabel(Container chest) => chest==null?"":"  <size=80%><color="+ChestColour+">"+SalvageWords.FromChest+"</color></size>";
         static void Clear()
         {
             foreach (var row in rows) if (row.Value != null) { row.Value.SetActive(false);Object.Destroy(row.Value); }
-            rows.Clear();
+            rows.Clear();chestOf.Clear();
         }
         static void Choose(int index,bool center)
         {
@@ -204,7 +234,9 @@ namespace ExtraPotions.Kindle.Runtime
             if(!Active)return true;
             if(instance.m_craftTimer>=0f || selected==null)return false;
             var actor=Player.m_localPlayer;
-            SalvageActions.Confirm(actor,selected,()=> { if(instance!=null && actor==Player.m_localPlayer && Ready) { instance.m_craftItemEffects.Create(actor.transform.position,Quaternion.identity);instance.UpdateCraftingPanel(); } });
+            Action done=()=> { if(instance!=null && actor==Player.m_localPlayer && Ready) { instance.m_craftItemEffects.Create(actor.transform.position,Quaternion.identity);instance.UpdateCraftingPanel(); } };
+            if(chestOf.TryGetValue(selected,out var chest))SalvageChests.Confirm(actor,chest,selected,done);
+            else SalvageActions.Confirm(actor,selected,done);
             return false;
         }
         // Shift, Ctrl and Alt count only when both the game's input and Unity's old Input say held: either can keep a
@@ -253,7 +285,9 @@ namespace ExtraPotions.Kindle.Runtime
         {
             if(!Active || player==null || instance==null || instance.m_craftTimer>=0f)return;
             var item=selected;
-            bool present=item!=null && player.GetInventory().ContainsItem(item);
+            Container chest=null;
+            bool fromChest=item!=null && chestOf.TryGetValue(item,out chest);
+            bool present=item!=null && (fromChest?chest && chest.GetInventory().ContainsItem(item):player.GetInventory().ContainsItem(item));
             var key=new DrawKey(present?item:null,player.GetCurrentCraftingStation(),present?item.m_stack:0,present?item.m_quality:0,
                 KindleBatch.InventoryChanges,(int)Time.fixedTime,drawGeneration);
             // Inscribe's UpdateRecipe postfix still runs while the game's update is skipped and, with no recipe selected, clears the
@@ -271,7 +305,7 @@ namespace ExtraPotions.Kindle.Runtime
                 KitTooltip.Set(instance.m_craftButton.gameObject,SalvageWords.Salvage,"");return;
             }
             instance.m_recipeIcon.enabled=true;instance.m_recipeIcon.sprite=item.GetIcon();SalvageRarity.Apply(instance.m_recipeIcon.gameObject,item);
-            instance.m_recipeName.enabled=true;instance.m_recipeName.text=ItemNames.DisplayName(item)+(item.m_stack>1?" ×"+item.m_stack:"");
+            instance.m_recipeName.enabled=true;instance.m_recipeName.text=ItemNames.DisplayName(item)+(item.m_stack>1?" ×"+item.m_stack:"")+ChestLabel(fromChest?chest:null);
             instance.m_recipeDecription.enabled=true;instance.m_recipeDecription.text=KitLocalize.Text(ItemDrop.ItemData.GetTooltip(item,item.m_quality,false,Game.m_worldLevel));
             var returns=SalvageActions.Returns(item);var slots=instance.m_recipeRequirementList;
             int start=slots.Length>0 && returns.Count>slots.Length?(int)Time.fixedTime%Mathf.CeilToInt(returns.Count/(float)slots.Length)*slots.Length:0;
@@ -283,8 +317,10 @@ namespace ExtraPotions.Kindle.Runtime
                 name.text=KitLocalize.Text(entry.Name);amount.text=entry.IsCertain?entry.Amount.ToString():SalvageActions.Percent(entry.Chance);amount.color=Color.white;KitTooltip.Set(root.gameObject,name.text,"");
             }
             for(;shown<slots.Length;shown++)InventoryGui.HideRequirement(slots[shown].transform);
-            string blocker=SalvageRules.Blocker(player,item);if(blocker==null && returns.Count==0)blocker=SalvageWords.Nothing;
-            if(blocker==null && !SalvageInventory.Fits(player.GetInventory(),item,returns))blocker=SalvageWords.NoFit;
+            string blocker=SalvageRules.Blocker(player,item,fromChest?chest.GetInventory():null);if(blocker==null && returns.Count==0)blocker=SalvageWords.Nothing;
+            // A chest item has no room check: what does not fit drops at the player's feet.
+            if(blocker==null && !fromChest && !SalvageInventory.Fits(player.GetInventory(),item,returns))blocker=SalvageWords.NoFit;
+            if(blocker==null && fromChest && SalvageChests.Busy)blocker=SalvageWords.ChestWait;
             instance.m_craftButton.interactable=blocker==null;KitTooltip.Set(instance.m_craftButton.gameObject,SalvageWords.Salvage,blocker??"");
         }
         /// <summary>What the skipped game update keeps right on the Salvage tab: the station header, and no leftover craft-recipe parts.</summary>
@@ -312,7 +348,7 @@ namespace ExtraPotions.Kindle.Runtime
             configurationDirty=false;
             patches?.UnpatchSelf();patches=null;
             layout?.Forget();layout=null;tab?.Dispose();tab=null;
-            SalvageYaml.Shutdown();SalvageRarity.Shutdown();selected=null;warning=null;warned.Clear();
+            SalvageYaml.Shutdown();SalvageRarity.Shutdown();SalvageChests.Shutdown();selected=null;warning=null;warned.Clear();
             if(active && gui!=null && Player.m_localPlayer!=null)gui.OnTabCraftPressed();
             gui=null;
         }

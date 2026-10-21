@@ -87,8 +87,10 @@ namespace ExtraPotions.Wildblood.Adopted.Adapters
                         if (RuleState.Active.IsEnabled(mutation)) enabled |= 1 << (int)mutation;
                 int cap = CoreTraits.Modifiers.Count(ExtraPotions.Wildblood.Runtime.Plugin.Settings?.Get(WildbloodSettings.Traits.CreatureModifiers) ?? CoreTraits.ModifierCap.Off);
                 // This data contract has no body/prefab argument; Apply filters the actual newborn's body afterward.
+                bool mutationsKept = ExtraPotions.Wildblood.Runtime.Plugin.Settings == null
+                    || ExtraPotions.Wildblood.Runtime.Plugin.Settings.Get(WildbloodSettings.Traits.TamedKeepTraits);
                 var inherited = CoreTraits.TraitInheritance.Inherit(mother, sire, mutationChance, enabled, 0,
-                    _ => WildbloodModules.Active(WildbloodModule.Traits) && cap > 0, new SeededDice(seed));
+                    _ => WildbloodModules.Active(WildbloodModule.Traits) && cap > 0, new SeededDice(seed), mutationsKept);
                 CoreTraits.TraitBlob.TryDecode(inherited, out var traits);
                 return CoreTraits.TraitBlob.Encode(new CoreTraits.TraitSet(traits.Mutations,
                     traits.Modifiers.GroupBy(CoreTraits.Modifiers.GroupOf).Select(group => group.First()).Take(cap), traits.Biome));

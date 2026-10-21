@@ -21,19 +21,21 @@ namespace ExtraPotions.Saga.Config
     {
         private static readonly IReadOnlyList<string> NoChoices = Array.Empty<string>();
 
-        private protected SagaSetting(string section, string key, SettingScope scope, string description, IReadOnlyList<string>? choices, bool hidden)
+        private protected SagaSetting(string section, string key, SettingScope scope, string description, IReadOnlyList<string>? choices, bool hidden, bool shortcut = false)
         {
             if (string.IsNullOrWhiteSpace(section) || section.Trim() != section) throw new ArgumentException("Expected a trimmed section name.", nameof(section));
             if (string.IsNullOrWhiteSpace(key) || key.Trim() != key) throw new ArgumentException("Expected a trimmed key.", nameof(key));
             if (!Enum.IsDefined(typeof(SettingScope), scope)) throw new ArgumentException("Unknown scope.", nameof(scope));
             if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Expected a description.", nameof(description));
             if (hidden && scope == SettingScope.Cheat) throw new ArgumentException(section + "." + key + ": a cheat cannot be hidden; cheats stay visible for review.", nameof(hidden));
+            if (shortcut && hidden) throw new ArgumentException(section + "." + key + ": a key bind stays visible so clashes can be seen.", nameof(shortcut));
             Section = section;
             Key = key;
             Scope = scope;
             Description = description;
             Choices = choices ?? NoChoices;
             Hidden = hidden;
+            IsShortcut = shortcut;
         }
 
         public string Section { get; }
@@ -52,6 +54,9 @@ namespace ExtraPotions.Saga.Config
 
         /// <summary>Product-managed entry that configuration UIs do not list (bound through C01 <c>BindHidden</c>).</summary>
         public bool Hidden { get; }
+
+        /// <summary>Stored as text here and bound as a keyboard shortcut by the plugin. Empty means unbound.</summary>
+        public bool IsShortcut { get; }
 
         public abstract Type ValueType { get; }
 
@@ -96,6 +101,16 @@ namespace ExtraPotions.Saga.Config
             if (normalize == null) throw new ArgumentNullException(nameof(normalize));
             return new SagaSetting<string>(section, key, scope, description, defaultValue, null, null, normalize, null, hidden);
         }
+
+        /// <summary>A local keyboard shortcut. Empty and "None" are unbound. The plugin binds it as a real shortcut so clash warnings can see it.</summary>
+        public static SagaSetting<string> Shortcut(string section, string key, string description) =>
+            new SagaSetting<string>(section, key, SettingScope.Local, description, "", null, null, NormalizeChord, null, false, true);
+
+        static string NormalizeChord(string value)
+        {
+            var text = (value ?? "").Trim();
+            return text.Length == 0 || string.Equals(text, "None", StringComparison.OrdinalIgnoreCase) ? "" : text;
+        }
     }
 
     public sealed class SagaSetting<T> : SagaSetting
@@ -105,8 +120,8 @@ namespace ExtraPotions.Saga.Config
         private readonly (T Min, T Max)? range;
 
         internal SagaSetting(string section, string key, SettingScope scope, string description, T defaultValue, object? safe, (T, T)? range,
-            Func<T, T> normalize, IReadOnlyList<string>? choices = null, bool hidden = false)
-            : base(section, key, scope, description, choices, hidden)
+            Func<T, T> normalize, IReadOnlyList<string>? choices = null, bool hidden = false, bool shortcut = false)
+            : base(section, key, scope, description, choices, hidden, shortcut)
         {
             this.normalize = normalize ?? throw new ArgumentNullException(nameof(normalize));
             this.range = range;

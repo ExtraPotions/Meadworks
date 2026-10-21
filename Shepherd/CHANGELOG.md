@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.15 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Dedicated servers register troughs without loading original art or reading materials. Trough recipes, containers and saved food continue to load.
+- Seasonal Breeding (on by default, set by the host or server): while Solstice seasons are on, tame breeding uses that season's published rate. Spring is faster, winter is slower, and a rate of zero starts no new pregnancies. A pregnancy already underway still finishes. Off, or without Solstice, breeding stays as it is. Feeding and troughs are unchanged.
+- Tamed Stars in Shepherd's config is ignored. Wildblood decides whether a new birth inherits stars. Without Wildblood, or when Wildblood's Tamed Stars is off, a newborn keeps its mother's level, as the game does, and Better Offspring and Birth Star Chance add nothing. The old key stays in the config file and does not change this.
+- A trough keeps its food when the animal cannot be fed. A lost reply is asked again with the same request, so a second food is not taken.
+
 ## 0.1.14 (2026-10-19)
 
 - Requires Crucible 0.3.22 / Crucible.UI 0.3.15.

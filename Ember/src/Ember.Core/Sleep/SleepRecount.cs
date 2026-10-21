@@ -23,8 +23,12 @@ namespace ExtraPotions.Ember.Sleep
 
         /// <summary>Game seconds the partial boost has added in this world (station timers, wire version 2).</summary>
         public double BoostTotal { get; }
+        public StationBoostTotals? StationTotals { get; }
 
         public SleepState(bool windowOpen, int players, int sleeping, double extraRate, bool boosting, bool fullSkip, double boostTotal = 0.0)
+            : this(windowOpen, players, sleeping, extraRate, boosting, fullSkip, boostTotal, null) { }
+
+        public SleepState(bool windowOpen, int players, int sleeping, double extraRate, bool boosting, bool fullSkip, double boostTotal, StationBoostTotals? stationTotals)
         {
             WindowOpen = windowOpen;
             Players = players;
@@ -33,12 +37,14 @@ namespace ExtraPotions.Ember.Sleep
             Boosting = boosting;
             FullSkip = fullSkip;
             BoostTotal = boostTotal;
+            StationTotals = stationTotals;
         }
 
         public SleepState WithBoostTotal(double boostTotal) => new SleepState(WindowOpen, Players, Sleeping, ExtraRate, Boosting, FullSkip, boostTotal);
+        public SleepState WithStationTotals(double boostTotal, StationBoostTotals totals) => new SleepState(WindowOpen, Players, Sleeping, ExtraRate, Boosting, FullSkip, boostTotal, totals);
 
         public bool Equals(SleepState o) => WindowOpen == o.WindowOpen && Players == o.Players && Sleeping == o.Sleeping
-            && ExtraRate.Equals(o.ExtraRate) && Boosting == o.Boosting && FullSkip == o.FullSkip && BoostTotal.Equals(o.BoostTotal);
+            && ExtraRate.Equals(o.ExtraRate) && Boosting == o.Boosting && FullSkip == o.FullSkip && BoostTotal.Equals(o.BoostTotal) && Nullable.Equals(StationTotals, o.StationTotals);
         public override bool Equals(object? obj) => obj is SleepState o && Equals(o);
         public override int GetHashCode() => (Players * 397) ^ (Sleeping * 31) ^ ExtraRate.GetHashCode() ^ (WindowOpen ? 1 : 0) ^ (Boosting ? 2 : 0) ^ (FullSkip ? 4 : 0) ^ BoostTotal.GetHashCode();
         public override string ToString() => $"window={WindowOpen} {Sleeping}/{Players} rate={ExtraRate} boosting={Boosting} skip={FullSkip} boostTotal={BoostTotal}";

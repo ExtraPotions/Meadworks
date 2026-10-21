@@ -1,6 +1,18 @@
 {
   "schema": 1,
   "strings": {
+    "cfg_seasons_heading": "Seasons",
+    "cfg_seasons__night_length_name": "Night Length",
+    "cfg_seasons__night_length_help": "Host or server: use Solstice's seasonal dawn and nightfall live, with nights limited to 10-50% of a day. Requires Ember's active Sleep module with Use Vanilla Sleep Window off. World day length and day counting stay unchanged. Off, missing Solstice or disabled seasons keeps Ember's usual timing.",
+    "cfg_seasons__fuel_burn_name": "Fuel Burn",
+    "cfg_seasons__fuel_burn_help": "Host or server: use Solstice's held-torch durability drain, limited to 0.1-5 per second. Requires Ember's Torches module; Fuel Free Fires and allowed Endless Torches keep priority. Solstice already controls seasonal placed-fire fuel use. Off, missing Solstice or disabled seasons keeps Ember's configured held-torch rate.",
+    "cfg_seasons__torch_heat_name": "Torch Heat",
+    "cfg_seasons__torch_heat_help": "Host or server: let Solstice decide whether Ember's torches provide warmth this season. Does not enable the Torches module or Held Torch Warms. Off, missing Solstice or disabled seasons keeps configured warmth.",
+    "preset_locked": "Set by the server: a door preset member is locked. Change the host's locked values to apply a group preset.",
+    "cfg_sleep__preset_name": "Preset",
+    "cfg_sleep__preset_help": "Host or server: applies sleep window, partial boost, both rate factors, fade and morning wake rules live. MeadWorksDefault: noon start, 0.6 x 20 rate, 3-second fade. Vanilla: native sleep window and no partial boost. Relaxed: noon start, 1 x 30 rate, 5-second fade. Custom keeps individual values; editing a member selects Custom. Saved values are preserved on load.",
+    "cfg_doors__preset_name": "Preset",
+    "cfg_doors__preset_help": "Each player: applies automatic-door enable and all per-kind open/close distances live. MeadWorksDefault: enabled, doors 1.5/2.25 m and drawbridges 3/4 m. Vanilla: automatic doors off. Relaxed: enabled, doors 3/4.5 m and drawbridges 6/8 m. Mechanics and key checks stay as configured. Custom keeps individual values; editing a member selects Custom. Server locks take priority; saved values are preserved on load.",
     "step_aside_sleep": "Ember sleep is off: {0} is installed.",
     "step_aside_torches": "Ember torches are off: {0} is installed.",
     "step_aside_doors": "Ember automatic doors are off: {0} is installed.",

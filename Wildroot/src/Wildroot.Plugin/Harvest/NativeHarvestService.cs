@@ -37,6 +37,11 @@ namespace ExtraPotions.Wildroot.Runtime {
    if(!scope.Requested)throw new InvalidOperationException("HarvestNotRequested");
    return new NativeHarvestRequest(requesterRadius,primaryOrigin){Root=Guid.NewGuid().ToString("N"),Actor=actor.GetPlayerID().ToString(CultureInfo.InvariantCulture),World=session.WorldId,Session=session.SessionId,Target=view.GetZDO().m_uid,Bonus=scope.Bonus};
   }
+  internal NativeHarvestRequest PrepareSingle(Pickable source,Player actor,ZDOID id,int bonus){
+   var session=CruciblePlugin.Session;
+   if(!session.AuthorityReady||session.WorldId!=NativeWorld.CurrentUid()||id==ZDOID.None)throw new InvalidOperationException("HarvestSessionUnavailable");
+   return new NativeHarvestRequest(0f,source.transform.position){Root=Guid.NewGuid().ToString("N"),Actor=actor.GetPlayerID().ToString(CultureInfo.InvariantCulture),World=session.WorldId,Session=session.SessionId,Target=id,Bonus=bonus};
+  }
   /// <summary>True while bulk harvest runs a native Interact on this thread; that pick's extras wait for the owner's receipt.</summary>
   internal static bool Dispatching=>dispatch!=null;
   internal static bool CaptureDispatch(ZNetView view,string method,object[] arguments){
@@ -160,7 +165,7 @@ namespace ExtraPotions.Wildroot.Runtime {
   public void Dispose(){if(disposed)return;disposed=true;operation.Dispose();command.Dispose();forwarded.Clear();}
  }
  [HarmonyPatch(typeof(ZNetView),nameof(ZNetView.InvokeRPC),new[]{typeof(string),typeof(object[])})]
- static class NativeHarvestDispatchPatch {static bool Prefix(ZNetView __instance,string __0,object[] __1)=>!NativeHarvestService.CaptureDispatch(__instance,__0,__1);}
+ static class NativeHarvestDispatchPatch {static bool Prefix(ZNetView __instance,string __0,object[] __1)=>!NativeHarvestService.CaptureDispatch(__instance,__0,__1)&&!FarmingPick.CaptureDispatch(__instance,__0,__1);}
   [HarmonyPatch(typeof(ItemDrop),nameof(ItemDrop.CanPickup))]
   static class NativeHarvestPickupPatch {static bool Prefix(ItemDrop __instance,ref bool __result){if(NativeHarvestService.PickupAllowed(__instance))return true;__result=false;return false;}}
   [HarmonyPatch(typeof(ItemDrop),"AutoStackItems")]

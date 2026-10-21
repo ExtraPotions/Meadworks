@@ -46,6 +46,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters
             Prefabs.PrefabClones.Install(harmony, log, () => !BestiaryIntegration.ProductYields);
             Prefabs.OriginalItemVisuals.Install(harmony, log);
             Settings.Changed += RefreshOwned;
+            Settings.Changed += SharedItemLink.Refresh;
             NetPrefabs.OnSceneAwake(harmony, _ => RefreshOwned());
         }
         internal static void Tick()

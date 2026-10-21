@@ -30,6 +30,9 @@ namespace ExtraPotions.Saga.Config
         private static SagaSetting<bool> LocalToggle(string section, string key, bool value, string description) =>
             SagaSetting.Toggle(section, key, value, Local, description);
 
+        private static SagaSetting<SagaPreset> Preset(string section, string key, string description) =>
+            SagaSetting.Choice(section, key, SagaPreset.MeadWorksDefault, ServerAuthoritative, description);
+
         private const string LevelNote = " A level above 100 turns it off.";
 
         public static class General
@@ -67,6 +70,16 @@ namespace ExtraPotions.Saga.Config
             public static readonly SagaSetting<bool> SkillBook = LocalToggle(Section, "Skill Book", true, "The Skills window gets an info pane with each skill's page.");
             public static readonly SagaSetting<SkillGainNotices> SkillGainNotices = SagaSetting.Choice(Section, "Skill Gain Notices", Config.SkillGainNotices.Off, Local,
                 "Show experience gains: Off, SagaSkills (Defense, Sneak, gathering) or All skills.");
+            public static readonly SagaSetting<SagaPreset> ExperiencePreset = Preset(Section, "Experience Preset",
+                "Host or server. Takes effect immediately. Sets Defense, Woodcutting, Mining and Fishing experience multipliers, Foraging experience per pick, the Woodcutting and Foraging discovery multipliers, and the Mining, Fishing and new-size discovery bonuses. MeadWorksDefault keeps Saga's rates. Vanilla uses multipliers 0.5, 1 experience per pick, discovery multipliers 1 and discovery bonuses 0. Relaxed uses multipliers 2, 6 experience per pick, discovery multipliers 5 and double the discovery bonuses. Custom keeps individual values; editing a member selects Custom. Loading never replaces saved values. Planted Pickable Foraging XP stays as configured.");
+            public static readonly SagaSetting<SagaPreset> PerkThresholds = Preset(Section, "Perk Threshold Preset",
+                "Host or server. Takes effect immediately. Sets the 14 perk unlock levels. MeadWorksDefault keeps Saga's levels. Vanilla sets each level to 101, which turns that perk off. Relaxed opens each perk earlier: Defense 10, 25, 50 and 75; Unbroken 75; Read The Rock 10 and Echo 25; Sweep 10; Grace 50; Legendary and Double Bonus 25; Species Sense, Size Sense and Water Sense 10, 25 and 50. Custom keeps individual levels; editing one selects Custom. Loading never replaces saved levels.");
+            public static readonly SagaSetting<SagaPreset> PerkStrength = Preset(Section, "Perk Strength Preset",
+                "Host or server. Takes effect immediately. Sets the At 100 perk strengths for Defense, Defense Guard, Felling, Chopping, Mining perks, Foraging, Fishing tackle and bite chance. MeadWorksDefault keeps Saga's strengths. Vanilla sets each to 0. Relaxed raises each by half, up to its own maximum. Custom keeps individual values; editing one selects Custom. Loading never replaces saved values.");
+            public static readonly SagaSetting<SagaPreset> DeathPreset = Preset(Section, "Death Preset",
+                "Host or server. Takes effect immediately. Sets Skill Loss On Death, Lose Progress On Death and Catch Up. MeadWorksDefault keeps 5 percent loss, lost progress and Catch Up. Vanilla keeps 5 percent loss and lost progress, and turns Catch Up off. Relaxed keeps skills and level progress, with Catch Up on. Custom keeps individual values; editing one selects Custom. Loading never replaces saved values. Skill Loss Overrides stays as configured.");
+            public static readonly SagaSetting<SagaPreset> FindsPreset = Preset(Section, "Finds Preset",
+                "Host or server. Takes effect immediately. Sets wood and mine find chances, snag chances, big-fish and legendary chances, and the three vein star shares. MeadWorksDefault keeps Saga's chances. Vanilla sets them to 0. Relaxed raises wood finds to 5 and 30, mine finds to 1 and 3, snags to 5 and 12, big-fish chance to 50, the night bonus to 100, legendary chance to 2, and vein shares to 40, 20 and 10, which total 70. Custom keeps individual values; editing one selects Custom. Loading never replaces saved values.");
         }
 
         public static class Powers
@@ -83,6 +96,11 @@ namespace ExtraPotions.Saga.Config
                 "How several attunements share the power HUD: Stacked, Mixed, Compact, Icons or NewestOnly.");
             public static readonly SagaSetting<int> FullPowerDisplays = SagaSetting.Integer(Section, "Full Power Displays", 2, 1, 8, Local, "Attunements shown with the full power display.");
             public static readonly SagaSetting<int> DisplaySpacing = SagaSetting.Integer(Section, "Power Display Spacing", 4, 0, 32, Local, "Pixels between power display rows.");
+            public static readonly SagaSetting<bool> ActivateAllAttuned = T(Section, "Activate All Attuned Powers", true, "On: one activation runs every attuned power, and the power wheel stays hidden. Off: one activation runs only the power chosen on the wheel. Host or server. Takes effect immediately.");
+            public static readonly SagaSetting<string> PowerWheelKey = SagaSetting.Shortcut(Section, "Power Wheel Key", "Key held to show the wheel of your attuned powers. Unbound by default, so it does not take a game key or another MeadWorks key. Bind one the game and your other MeadWorks mods leave free. Almanac warns when that key is already used. Your own control. The wheel stays hidden while Activate All Attuned Powers is on.");
+            public static readonly SagaSetting<PowerWheelPad> PowerWheelGamepad = SagaSetting.Choice(Section, "Power Wheel Gamepad", PowerWheelPad.Unbound, Local, "Gamepad button held to show the same wheel. Unbound by default. Aim with the right stick or the D-pad, release the button to choose, or press A. B or Escape cancels. Your own control. The wheel stays hidden while Activate All Attuned Powers is on.");
+            public static readonly SagaSetting<SagaPreset> PowerStrength = Preset(Section, "Power Strength Preset",
+                "Host or server. Takes effect immediately. Sets every boss power feature. MeadWorksDefault keeps Saga's feature values. Vanilla sets numbers to 0, switches off and resistances to Normal. Relaxed moves each number 50 percent further from 0, within its range, and raises each resistance one step. Switches stay as they are. Custom keeps individual values; editing one selects Custom. Loading never replaces saved values. While Advanced Power Config is on, Saga.Powers.yml replaces the features it lists.");
         }
 
         public static class Defense
@@ -238,6 +256,7 @@ namespace ExtraPotions.Saga.Config
             public static readonly SagaSetting<float> ExperiencePerPick = N(Section, "Experience Per Pick", 3f, 0f, 50f, "Foraging experience per wild pick, before the item and biome factors.");
             public static readonly SagaSetting<float> BiomeStep = N(Section, "Experience Per Biome Step", 25f, 0f, 200f, "Percent more experience per biome step.");
             public static readonly SagaSetting<float> DiscoveryMultiplier = N(Section, "Discovery Multiplier", 3f, 1f, 20f, "The first pick of each kind earns this many times as much.");
+            public static readonly SagaSetting<float> PlantedExperience = N(Section, "Planted Pickable Foraging XP", 10f, 0f, 100f, "Percent of the normal Foraging experience for picking a pickable a player planted, such as cultivator stones, berries or mushrooms. Wild plants give full experience; yields and crops are unchanged.");
 
             public static readonly SagaSetting<float> ExtraYieldChanceAt100 = N(Perks, "Extra Yield Chance At 100", 50f, 0f, 100f, "Percent chance at level 100 of an extra item (replaces the game's 25 percent for these picks).");
             public static readonly SagaSetting<int> SweepLevel = I(Perks, "Sweep Level", 25, 0, 101, "Level that unlocks sweep picking around the plant." + LevelNote);
@@ -260,6 +279,8 @@ namespace ExtraPotions.Saga.Config
             public static readonly SagaSetting<float> DiscoveryExperience = N(Section, "Discovery Experience", 30f, 0f, 1000f, "Experience for the first catch of a species.");
             public static readonly SagaSetting<float> NewSizeExperience = N(Section, "New Size Experience", 10f, 0f, 1000f, "Experience for the first catch of a new size of a known species.");
 
+            public static readonly SagaSetting<SagaPreset> FightPreset = Preset(Fight, "Preset",
+                "Host or server. Takes effect immediately. Sets the line tension bar, tension build and ease, strike windows, the perfect strike, tiring, thrashes, spent reel speed and grace seconds. MeadWorksDefault keeps the bar and Saga's timing. Vanilla turns the bar off and keeps the timing numbers. Relaxed keeps the bar, builds tension at 40 and 20 percent, eases it at 80 percent, opens strike windows to 1 and 1.5 seconds with a 0.35 second perfect strike, tires 25 percent per thrash after 2 thrashes, reels a spent fish 80 percent faster and allows 8 seconds of grace. Custom keeps individual values; editing one selects Custom. Loading never replaces saved values. Grace Level stays on the perk threshold preset.");
             public static readonly SagaSetting<bool> LineTension = T(Fight, "Line Tension", true, "Fights have a line tension bar.");
             public static readonly SagaSetting<float> TensionBuildAt0 = N(Fight, "Tension Build At 0", 60f, 1f, 500f, "Percent tension build rate at level 0.");
             public static readonly SagaSetting<float> TensionBuildAt100 = N(Fight, "Tension Build At 100", 30f, 1f, 500f, "Percent tension build rate at level 100.");
@@ -399,8 +420,10 @@ namespace ExtraPotions.Saga.Config
             General.Enabled, General.PowersEnabled, General.DefenseEnabled, General.SneakEnabled, General.WoodcuttingEnabled, General.MiningEnabled,
             General.ForagingEnabled, General.DodgingEnabled, General.WeaponMasteryEnabled, General.SwimmingEnabled, General.RidingEnabled, General.JumpingEnabled, General.RunningEnabled, General.FishingEnabled, General.CraftingEnabled,
             Progression.SkillLossOnDeath, Progression.LoseProgressOnDeath, Progression.SkillLossOverrides, Progression.CatchUp, Progression.WeaponSwitch, Progression.SkillBook, Progression.SkillGainNotices,
+            Progression.ExperiencePreset, Progression.PerkThresholds, Progression.PerkStrength, Progression.DeathPreset, Progression.FindsPreset,
             Powers.MaxAttunedPowers, Powers.KillCreditRange, Powers.BlockPowerActivation, Powers.AdvancedPowerConfig, Powers.ShowLockedFeatures,
             Powers.ShowPassiveInStatusBar, Powers.DisplayMode, Powers.FullPowerDisplays, Powers.DisplaySpacing,
+            Powers.ActivateAllAttuned, Powers.PowerWheelKey, Powers.PowerWheelGamepad, Powers.PowerStrength,
         }
         .Concat(PowerCatalog.Features.Select(PowerFeature))
         .Concat(new SagaSetting[]
@@ -431,11 +454,11 @@ namespace ExtraPotions.Saga.Config
             Mining.EchoRadius, Mining.EchoCooldown,
             Mining.ExtraOreChanceAt100, Mining.PickaxeWearReductionAt100, Mining.SplashDamageAt100,
             Mining.FindChanceAt0, Mining.FindChanceAt100,
-            Foraging.ShowCallouts, Foraging.ExperiencePerPick, Foraging.BiomeStep, Foraging.DiscoveryMultiplier,
+            Foraging.ShowCallouts, Foraging.ExperiencePerPick, Foraging.BiomeStep, Foraging.DiscoveryMultiplier, Foraging.PlantedExperience,
             Foraging.ExtraYieldChanceAt100, Foraging.SweepLevel, Foraging.SweepRadiusAt100,
             Fishing.ShowCallouts, Fishing.ExperienceMultiplier, Fishing.EmptyReelExperience, Fishing.FightExperience, Fishing.CatchExperience,
             Fishing.SizeBonus, Fishing.DiscoveryExperience, Fishing.NewSizeExperience,
-            Fishing.LineTension, Fishing.TensionBuildAt0, Fishing.TensionBuildAt100, Fishing.TensionEase, Fishing.StrikeWindowAt0,
+            Fishing.FightPreset, Fishing.LineTension, Fishing.TensionBuildAt0, Fishing.TensionBuildAt100, Fishing.TensionEase, Fishing.StrikeWindowAt0,
             Fishing.StrikeWindowAt100, Fishing.PerfectStrikeWindow, Fishing.TiringPerThrash, Fishing.ThrashesToTire, Fishing.SpentReelSpeed,
             Fishing.GraceLevel, Fishing.GraceSeconds,
             Bites.BiteChanceAt100, Bites.DawnAndDuskBonus, Bites.RainBonus, Bites.ChumItems, Bites.ChumBonus,

@@ -6,8 +6,6 @@ using CruciblePlugin = ExtraPotions.Meadworks.Crucible.Plugin;
 
 namespace ExtraPotions.Meadworks.Crucible.UI
 {
-    public enum KitNoticeKind { TopLeft, Center, Unlock, Biome }
-
     /// <summary>One local notice delivery. A provider owns presentation; this service owns fallback and journaling.</summary>
     public sealed class KitNotice
     {
@@ -66,22 +64,35 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 return false;
             }
             if (Hud.IsUserHidden() && !notice.ShowWhenHidden) return true;
-            if (!dispatching && CruciblePlugin.IsReady && provider.TryGet(CruciblePlugin.Services.Capabilities, out var current))
+            // One registered provider owns presentation. None registered: the built-in stack takes TopLeft and Center.
+            // Two providers still fail closed onto MessageHud, because TryResolve refuses an ambiguous capability.
+            // A provider that calls Show again is already past this block (dispatching), so it reaches MessageHud.
+            if (!dispatching)
             {
-                bool accepted = false;
-                dispatching = true;
-                try { accepted = current.TryShow(source, notice); }
-                catch (Exception error) { CrucibleUiPlugin.Log?.Warning("Notice provider declined after " + error.GetType().Name); }
-                finally { dispatching = false; }
-                if (accepted)
+                bool claimed = CruciblePlugin.IsReady && CruciblePlugin.Services.Capabilities.Any(CapabilityId);
+                if (claimed && provider.TryGet(CruciblePlugin.Services.Capabilities, out var current))
                 {
-                    if (notice.Log && notice.Kind != KitNoticeKind.Biome)
+                    bool accepted = false;
+                    dispatching = true;
+                    try { accepted = current.TryShow(source, notice); }
+                    catch (Exception error) { CrucibleUiPlugin.Log?.Warning("Notice provider declined after " + error.GetType().Name); }
+                    finally { dispatching = false; }
+                    if (accepted)
                     {
-                        string entry = notice.Kind == KitNoticeKind.Unlock ? notice.Title + ": " + notice.RawText : notice.Text;
-                        try { if (MessageHud.instance != null) Native.Journal(MessageHud.instance, entry); }
-                        catch (Exception error) { CrucibleUiPlugin.Log?.Warning("Accepted notice journal failed: " + error.GetType().Name); }
+                        Journal(notice);
+                        return true;
                     }
-                    return true;
+                }
+                else if (!claimed)
+                {
+                    bool stacked = false;
+                    try { stacked = KitNoticePanel.TryShow(notice); }
+                    catch (Exception error) { CrucibleUiPlugin.Log?.Warning("Notice stack declined after " + error.GetType().Name); }
+                    if (stacked)
+                    {
+                        Journal(notice);
+                        return true;
+                    }
                 }
             }
             try
@@ -110,5 +121,13 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         }
 
         internal static string Localize(string value) => Localization.instance != null ? Localization.instance.Localize(value) : value;
+
+        static void Journal(KitNotice notice)
+        {
+            if (!notice.Log || notice.Kind == KitNoticeKind.Biome) return;
+            string entry = notice.Kind == KitNoticeKind.Unlock ? notice.Title + ": " + notice.RawText : notice.Text;
+            try { if (MessageHud.instance != null) Native.Journal(MessageHud.instance, entry); }
+            catch (Exception error) { CrucibleUiPlugin.Log?.Warning("Accepted notice journal failed: " + error.GetType().Name); }
+        }
     }
 }

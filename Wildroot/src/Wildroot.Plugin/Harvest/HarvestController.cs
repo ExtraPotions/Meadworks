@@ -24,23 +24,25 @@ namespace ExtraPotions.Wildroot.Runtime {
   bool ActorReady()=>settings.Active&&actor&&actor==Player.m_localPlayer&&!actor.IsDead()&&!actor.IsTeleporting()&&NativeWorld.IsCurrent(world);
   bool Active()=>ActorReady()&&settings.Get("Harvest.Enabled",true);
   /// <summary>A job may continue: bulk jobs need Harvest.Enabled; a Farming auto-replant job (#108) only needs Wildroot.</summary>
-  bool Allowed(Job job)=>job.AutoReplant?ActorReady():Active();
-  bool OnlyAutoReplants(){if(queue.Count>0)return false;foreach(var job in awaiting)if(!job.AutoReplant)return false;return true;}
+  bool Allowed(Job job)=>job.AutoReplant||job.Single?ActorReady():Active();
+  bool ReplantEnabled(Job job)=>job.Single?FarmingPerks.AutoReplants(FarmingState.Rules,FarmingState.Level(actor)):settings.Get("Harvest.Replant",false)||job.AutoReplant;
+  bool OnlyAutoReplants(){if(queue.Count>0)return false;foreach(var job in awaiting)if(!job.AutoReplant&&!job.Single)return false;return true;}
   /// <summary>Handle of the last single-pick auto replant, for diagnostics and tests.</summary>
   public HarvestBatchHandle? LastAutoReplant{get;private set;}
-  /// <summary>
-  /// Farming auto replant after a single pick (#108): a harvest job already confirmed by the game's own pick, with no
-  /// drops to collect, that replants through the same paid placement path as harvest replant.
-  /// </summary>
-  /// <remarks>The owner's pick has already destroyed the source's network view, so its id is taken before the pick.</remarks>
-  internal bool SubmitAutoReplant(Component source,ZDOID uid){
-   var player=Player.m_localPlayer;if(!player||(object)source==null||uid==ZDOID.None||!settings.Active||!ZNet.instance)return false;
-   string id=uid.ToString();if(reserved.Contains(id)||jobs.ContainsKey(id))return false;
+  /// <summary>Captures an ordinary native pick; only a matching owner receipt can grant its Farming perks.</summary>
+  internal bool SubmitSingle(Pickable source,Player player,ZDOID uid,int bonus){
+   if(!player||player!=Player.m_localPlayer||!source||uid==ZDOID.None||!settings.Active||!ZNet.instance)return false;
    long currentWorld=NativeWorld.CurrentUid();if(currentWorld==0)return false;if(actor!=player||world!=currentWorld)CancelAll();actor=player;world=currentWorld;
-   string sourceName=source.name.Replace("(Clone)","");var original=catalog.Definitions.Values.FirstOrDefault(p=>p.Kind==PlantKind.Crop&&p.GrownPrefab==sourceName);if(original==null)return false;
+   string id=uid.ToString();if(reserved.Contains(id)||jobs.ContainsKey(id))return true;
+   var crop=CropIndex.OfPickable(PlacementBackend.PrefabName(source.gameObject));if(crop==null)return false;
+   NativeHarvestRequest request;try{request=native.PrepareSingle(source,player,uid,bonus);}catch{return false;}
+   string sourceName=source.name.Replace("(Clone)","");var original=catalog.Definitions.Values.FirstOrDefault(p=>p.Kind==PlantKind.Crop&&p.GrownPrefab==sourceName);
    var handle=new HarvestBatchHandle{Pending=1};
-   var job=new Job(0f,source.transform.position){Id=id,Target=source,Batch=handle,QueuedAt=Time.unscaledTime,Position=source.transform.position,Rotation=source.transform.rotation,Original=original.Id,Selected=Plugin.Instance?.Controls?.LastSelectedPlant??"",Resource=Resource(source),Confirmed=true,ConfirmedAt=Time.unscaledTime,AutoReplant=true};
-   reserved.Add(id);jobs.Add(id,job);awaiting.Add(job);LastAutoReplant=handle;return true;
+   var job=new Job(0f,source.transform.position){Id=id,Target=source,Batch=handle,QueuedAt=Time.unscaledTime,Started=Time.unscaledTime,Position=source.transform.position,Rotation=source.transform.rotation,Original=original?.Id??"",Selected=Plugin.Instance?.Controls?.LastSelectedPlant??"",Resource=Resource(source),Single=true,AutoReplant=FarmingPerks.AutoReplants(FarmingState.Rules,FarmingState.Level(player)),Crop=crop,Request=request};
+   reserved.Add(id);jobs.Add(id,job);awaiting.Add(job);if(job.AutoReplant)LastAutoReplant=handle;
+   try{job.Harvest=CruciblePlugin.RequestClient.InvokeAsync<NativeHarvestRequest,NativeHarvestReceipt>(NativeHarvestWire.Operation,request,job.Cancellation.Token);}
+   catch(Exception error){awaiting.Remove(job);Complete(job,false,"HarvestOutcomeUnknown");log.LogWarning("Ordinary harvest request failed: "+error.GetBaseException().GetType().Name);}
+   return true;
   }
   public HarvestBatchHandle? Submit(Component target){
    LastSubmission=null;
@@ -68,16 +70,18 @@ namespace ExtraPotions.Wildroot.Runtime {
      if(result.State!=OperationState.Succeeded||receipt==null||job.Request==null||!receipt.Matches(job.Request)){awaiting.RemoveAt(i);Complete(job,false,result.State==OperationState.RecoveryRequired?"HarvestOutcomeUnknown":result.Code);continue;}
      if(!receipt.Harvested){awaiting.RemoveAt(i);Complete(job,false,receipt.Reason);continue;}
      job.Confirmed=true;job.ConfirmedAt=Time.unscaledTime;job.Drops.AddRange(receipt.Drops);
-     // Seed return (#12) for a confirmed bulk pick: the requester makes the seed and collects it with the harvest's drops.
-     if(job.Crop!=null){var seed=FarmingSeeds.Roll(FarmingState.Rules,FarmingState.Level(actor),job.Crop,job.Position);var seedView=seed?seed!.GetComponent<ZNetView>():null;if(seedView&&seedView!.IsValid())job.Drops.Add(new NativeHarvestDrop{Id=seedView.GetZDO().m_uid,Amount=seed!.m_itemData.m_stack});}
+     if(job.Crop!=null){var seed=FarmingSeeds.Roll(FarmingState.Rules,FarmingState.Level(actor),job.Crop,job.Position);var seedView=seed?seed!.GetComponent<ZNetView>():null;if(!job.Single&&seedView&&seedView!.IsValid())job.Drops.Add(new NativeHarvestDrop{Id=seedView.GetZDO().m_uid,Amount=seed!.m_itemData.m_stack});}
     }
     if(job.Confirmed){if(Time.unscaledTime-job.ConfirmedAt<0.5f)continue;for(int d=job.Drops.Count-1;d>=0;d--){var expected=job.Drops[d];var obj=ZNetScene.instance?ZNetScene.instance.FindInstance(expected.Id):null;var drop=obj?obj.GetComponent<ItemDrop>():null;
      // Missing replicas or externally consumed drops are unresolved, never evidence of this actor collecting them.
-     if(!drop)continue;drop.Load();var view=drop.GetComponent<ZNetView>();if(!view||!view.IsValid()||drop.m_itemData.m_stack!=expected.Amount||!PrivateArea.CheckAccess(drop.transform.position,0,false,true))continue;
+     if(!drop)continue;var view=drop.GetComponent<ZNetView>();
+     // Ordinary picks leave native drops on the ground; release only after their replicas and transferred ownership arrive.
+     if(job.Single){if(view&&view.IsValid()&&view.IsOwner()){NativeHarvestService.Release(expected.Id);job.Drops.RemoveAt(d);}continue;}
+     drop.Load();if(!view||!view.IsValid()||drop.m_itemData.m_stack!=expected.Amount||!PrivateArea.CheckAccess(drop.transform.position,0,false,true))continue;
      if(!view.IsOwner()){drop.RequestOwn();continue;}
      int collected=NativeHarvestService.Collect(actor!,drop,out int remaining);job.Batch.Collected+=collected;expected.Amount=remaining;if(remaining==0)job.Drops.RemoveAt(d);}
      if(job.Drops.Count>0&&Time.unscaledTime-job.ConfirmedAt<15)continue;
-     bool replant=settings.Get("Harvest.Replant",false)||job.AutoReplant;
+     bool replant=ReplantEnabled(job);
      // Cancellation is a decision, not a transient setting: toggling on again must not revive an older hold.
      if(!replant)job.ReplantAsync?.Cancel();
      if((replant||job.ReplantAsync!=null)&&!TryReplant(job))continue;
@@ -100,13 +104,14 @@ namespace ExtraPotions.Wildroot.Runtime {
    // the first settles) and the later one could time out as insufficient while seeds exist. The rest wait their turn, unpaid.
    if(ReplantInFlight(job)&&ExtraPotions.Meadworks.Crucible.Plugin.Services.Capabilities.TryResolve<IAsyncResourceProvider>("meadworks.resources.async",new System.Version(2,0),out _))return false;
    job.ReplantAttempted=true;if(!Allowed(job)||!Permission(job.Position)||Location.IsInsideNoBuildLocation(job.Position))return true;
+   if(job.Single)LastAutoReplant=job.Batch;
    if(!NativePlanting.ReplantClear(job.Position,job.Id)){job.Batch.Record(job.Id+":ReplantOccupied");return true;}
    var context=PlacementController.Context(actor!,job.Batch.Id+":"+job.Id+":replant");var resources=planting.Resources(actor!);
    ExtraPotions.Meadworks.Crucible.Plugin.Services.Capabilities.TryResolve<IAsyncResourceProvider>("meadworks.resources.async",new System.Version(2,0),out var shared);
    var choice=ReplantPlanner.Choose(new ReplantContext(job.Original,job.Selected,settings.Get("Harvest.ReplantTarget","Original")=="Selected",item=>shared!=null?int.MaxValue:resources.GetAvailable(context,item)),new CatalogSnapshot(catalog.Definitions.Values.ToArray()));
    if(choice.Plant==null){job.Batch.Record(job.Id+":ReplantInsufficientResources");return true;}
    var prefab=ZNetScene.instance.GetPrefab(choice.Plant.Prefab);var piece=prefab?prefab.GetComponent<Piece>():null;if(!piece){job.Batch.Record(job.Id+":ReplantPrefabUnavailable");return true;}
-   var operation=new PlacementOperation(context,choice.Plant.Costs,()=>Allowed(job)&&(job.AutoReplant||settings.Get("Harvest.Replant",false)&&settings.Get("Harvest.Enabled",true))&&PrivateArea.CheckAccess(job.Position,0,false,true)&&!Location.IsInsideNoBuildLocation(job.Position));
+   var operation=new PlacementOperation(context,choice.Plant.Costs,()=>Allowed(job)&&ReplantEnabled(job)&&PrivateArea.CheckAccess(job.Position,0,false,true)&&!Location.IsInsideNoBuildLocation(job.Position));
    if(shared!=null){job.ReplantAsync=planting.BeginReplant(actor!,piece,job.Position,job.Rotation,operation,shared,job.Id);return false;}
    var synchronous=job.Batch.ReplantTransactions.Execute(operation,new PlacementBackend(actor!,piece,job.Position,job.Rotation,harvestedSource:job.Id),resources);job.Batch.Record(job.Id+":Replant"+synchronous.Kind);if(synchronous.Kind==PlacementResultKind.Committed)job.Batch.Replanted++;if(synchronous.Kind==PlacementResultKind.RecoveryRequired)log.LogError("Replant needs recovery: "+job.Id);return true;
   }
@@ -118,10 +123,14 @@ namespace ExtraPotions.Wildroot.Runtime {
    }
    job.Cancellation.Dispose();reserved.Remove(job.Id);jobs.Remove(job.Id);job.Batch.Record(job.Id+":"+reason);job.Batch.Pending--;if(harvested)job.Batch.Harvested++;else job.Batch.Cancelled++;
   }
-  public void CancelPendingReplants(){foreach(var job in awaiting){if(job.AutoReplant)continue;job.ReplantAttempted=true;job.ReplantAsync?.Cancel();}}
+  public void CancelPendingReplants(){foreach(var job in awaiting){if(job.Single||job.AutoReplant)continue;job.ReplantAttempted=true;job.ReplantAsync?.Cancel();}}
+  internal void CancelBulk(){
+   while(queue.Count>0)Complete(queue.Dequeue(),false);
+   for(int i=awaiting.Count-1;i>=0;i--){var job=awaiting[i];if(job.Single)continue;job.Cancellation.Cancel();job.ReplantAsync?.Cancel();awaiting.RemoveAt(i);Complete(job,false);}
+  }
   internal void CancelAll(){while(queue.Count>0)Complete(queue.Dequeue(),false);foreach(var job in awaiting){job.Cancellation.Cancel();job.ReplantAsync?.Cancel();Complete(job,false);}awaiting.Clear();reserved.Clear();jobs.Clear();actor=null;world=0;}
   public void Dispose(){CancelAll();native.Dispose();}
-  sealed class Job {public readonly float RequesterRadius;public readonly Vector3 PrimaryOrigin;public Job(float requesterRadius,Vector3 primaryOrigin){RequesterRadius=requesterRadius;PrimaryOrigin=primaryOrigin;}public string Id="";public Component Target=null!;public HarvestBatchHandle Batch=null!;public float Started,QueuedAt,ConfirmedAt;public bool Confirmed,ReplantAttempted,AutoReplant;public CropInfo? Crop;public Vector3 Position;public Quaternion Rotation;public string Original="",Selected="",Resource="";public AsyncPlacementJob? ReplantAsync;public NativeHarvestRequest? Request;public Task<OperationResult<NativeHarvestReceipt>>? Harvest;public readonly CancellationTokenSource Cancellation=new CancellationTokenSource();public readonly List<NativeHarvestDrop> Drops=new List<NativeHarvestDrop>();}
+  sealed class Job {public readonly float RequesterRadius;public readonly Vector3 PrimaryOrigin;public Job(float requesterRadius,Vector3 primaryOrigin){RequesterRadius=requesterRadius;PrimaryOrigin=primaryOrigin;}public string Id="";public Component Target=null!;public HarvestBatchHandle Batch=null!;public float Started,QueuedAt,ConfirmedAt;public bool Confirmed,ReplantAttempted,AutoReplant,Single;public CropInfo? Crop;public Vector3 Position;public Quaternion Rotation;public string Original="",Selected="",Resource="";public AsyncPlacementJob? ReplantAsync;public NativeHarvestRequest? Request;public Task<OperationResult<NativeHarvestReceipt>>? Harvest;public readonly CancellationTokenSource Cancellation=new CancellationTokenSource();public readonly List<NativeHarvestDrop> Drops=new List<NativeHarvestDrop>();}
  }
  [HarmonyPatch]
  static class HarvestInteractionPatch {

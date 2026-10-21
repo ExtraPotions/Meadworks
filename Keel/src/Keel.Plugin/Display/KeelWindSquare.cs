@@ -18,6 +18,11 @@ namespace ExtraPotions.Keel.Runtime
     {
         static readonly KitColumnSquare square = new KitColumnSquare(WindSquare.Rank, WindSquare.Id);
         static Sprite? source, light;
+        static int shownPercent = int.MinValue;
+        static string shownLanguage = "";
+        static string shownValue = "";
+        static string shownTopic = "";
+        static string shownTip = "";
 
         internal static KitColumnSquare Square => square;
 
@@ -32,10 +37,20 @@ namespace ExtraPotions.Keel.Runtime
             if (!show) { square.Hide(); return; }
             var wind = env!.GetWindDir();
             var forward = player!.transform.forward;
-            var strength = WindSquare.Strength(env.GetWindIntensity());
+            var intensity = env.GetWindIntensity();
+            var percent = WindSquare.Percent(intensity);
+            var language = LanguageNow();
+            if (percent != shownPercent || language != shownLanguage)
+            {
+                shownPercent = percent;
+                shownLanguage = language;
+                shownValue = WindSquare.Strength(intensity);
+                shownTopic = KeelText.Text(KeelTextKeys.SquareWind);
+                shownTip = KeelText.Format(KeelTextKeys.SquareWindText, shownValue);
+            }
             var native = hud!.m_shipWindIcon;
             var arrow = native != null ? Light(native.sprite) : null;
-            square.Draw(true, arrow, strength, KeelText.Text(KeelTextKeys.SquareWind), KeelText.Format(KeelTextKeys.SquareWindText, strength));
+            square.Draw(true, arrow, shownValue, shownTopic, shownTip);
             if (square.Icon != null)
                 // The game turns its arrow inside a rotated root; its own local turn is added so the arrow points as the game's does.
                 square.Icon.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -WindSquare.RelativeAngle(forward.x, forward.z, wind.x, wind.z) + native!.rectTransform.localEulerAngles.z);
@@ -71,6 +86,12 @@ namespace ExtraPotions.Keel.Runtime
             light = Sprite.Create(copy, new Rect(0, 0, width, height), new Vector2(sprite.pivot.x / sprite.rect.width, sprite.pivot.y / sprite.rect.height), sprite.pixelsPerUnit);
             light.name = sprite.name;
             return light;
+        }
+
+        static string LanguageNow()
+        {
+            var localization = global::Localization.instance;
+            return localization != null ? localization.GetSelectedLanguage() ?? "" : "";
         }
 
         static void DropLight()

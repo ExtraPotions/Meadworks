@@ -7,11 +7,9 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
 {
     /// <summary>
     /// Putting raw food on a cooking station or the oven. Every way of doing it (Interact, using an item on the
-    /// station, the oven's add-food switch) ends in CookingStation.CookItem on the cook's client: it claims an unowned
-    /// station, refuses incompatible and unknown items and a full station, removes one item from the inventory and
-    /// sends "RPC_AddItem" to the owner. At a kitchen the prefix runs the same steps in the same order and sends
-    /// <see cref="StationRpc"/>'s add instead, which carries the cook's level; the return value is the game's. Other
-    /// stations (the FrostFoundry) keep the game's own method.
+    /// station, the oven's add-food switch) ends in CookingStation.CookItem on the cook's client. Kitchens reserve
+    /// one ingredient in a saved escrow until the owner confirms placement or rejection. Other stations keep the
+    /// game's own method.
     /// </summary>
     [HarmonyPatch(typeof(CookingStation), nameof(CookingStation.CookItem))]
     public static class StationPlacement
@@ -27,18 +25,15 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
 
         private static bool Cook(CookingStation station, Humanoid user, ItemDrop.ItemData item)
         {
-            string prefab = item.m_dropPrefab.name;
             ZNetView nview = station.m_nview;
+            if (nview == null || !nview.IsValid()) return false;
             if (!nview.HasOwner())
                 nview.ClaimOwnership();
             if (RefuseIncompatible(station, user, item))
                 return true;
             if (!station.IsItemAllowed(item) || station.GetFreeSlot() == -1)
                 return false;
-            bool cheated = item.m_cheated;
-            user.GetInventory().RemoveOneItem(item);
-            StationRpc.SendAdd(nview, prefab, cheated);
-            return true;
+            return StationAddTransactions.Begin(station, user, item);
         }
 
         /// <summary>The game's message for an item this station never takes; true when the item is one of those.</summary>

@@ -1,31 +1,37 @@
-using System;
+using Mantle.Compatibility;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace ExtraPotions.Mantle.Embedded.Charter;
 
 /// <summary>
-/// The join check of the lead copy: the server sends its family registry to a new peer, the player answers with
-/// its own, both compare. The server refuses a mismatching peer with a refusal code and disconnects it a second
-/// later; the player refuses itself when the server lacks a mod it requires; a peer that never answers is
-/// re-greeted every five seconds and refused only once twenty seconds have passed without a reply, when any of
-/// the server's mods is mandatory.
+/// The join check of the lead copy: the player sends its family registry the moment it connects, before the server's
+/// data can crowd the line, and the server sends its own when the game accepts the peer (the player answers that
+/// too, for servers older than the early send); both compare. The server refuses a mismatching peer with a refusal
+/// code and disconnects it a second later; the player refuses itself when the server lacks a mod it requires. A
+/// peer that never answers is re-greeted every five seconds and, when any of the server's mods is mandatory,
+/// refused once its line has been clear for a minute without a reply: the game sends at most 150 KB a second to a
+/// player, so on a large mod list the greeting can wait minutes behind other mods' data, and while it does the wait
+/// starts over (up to five minutes in all).
 /// </summary>
 internal static class FamilyRpc
 {
 	private const string FamilyName = "Charter_Family";
 	private const string RefuseName = "Charter_Refuse";
 	private const float RetryInterval = 5f;
-	private const float MaxWait = 20f;
 	private const float Grace = 1f;
 
 	private sealed class Waiting
 	{
+		public float Greeted;
 		public float NextRetry;
 		public float Deadline;
+		public bool SlowLogged;
 	}
 
 	private static readonly Dictionary<ZNetPeer, Waiting> awaiting = new();
+	private static readonly ConditionalWeakTable<ZNetPeer, object> answered = new();
 	private static readonly Dictionary<ZNetPeer, float> leaving = new();
 	private static readonly List<ZNetPeer> due = new();
 	private static readonly List<ZNetPeer> gone = new();
@@ -46,13 +52,20 @@ internal static class FamilyRpc
 		ServerRegistry = null;
 		peer.m_rpc.Register<ZPackage>(FamilyName, OnServerRegistry);
 		peer.m_rpc.Register<ZPackage>(RefuseName, OnRefused);
+		SendFamily(peer);
 	}
 
-	/// <summary>Server: sends the registry to a peer the game just accepted and starts waiting for the answer.</summary>
+	/// <summary>
+	/// Server: sends the registry to a peer the game just accepted and, unless the peer's early registry already came,
+	/// starts waiting for the answer.
+	/// </summary>
 	public static void Greet(ZNetPeer peer)
 	{
 		SendFamily(peer);
-		awaiting[peer] = new Waiting { NextRetry = now + RetryInterval, Deadline = now + MaxWait };
+		if (!answered.TryGetValue(peer, out _))
+		{
+			awaiting[peer] = new Waiting { Greeted = now, NextRetry = now + RetryInterval, Deadline = now + SlowJoinWait.QuietSeconds };
+		}
 	}
 
 	private static void SendFamily(ZNetPeer peer)
@@ -94,6 +107,11 @@ internal static class FamilyRpc
 		}
 	}
 
+	/// <summary>
+	/// While the line to the peer is busy the last greeting has not left the server, so the player cannot have answered
+	/// yet: the wait starts over and nothing more is queued behind it. The first time that wait passes twenty seconds,
+	/// one warning is written.
+	/// </summary>
 	private static void TickPeer(ZNetPeer peer, Waiting waiting)
 	{
 		if (!Side.IsPresent(peer))
@@ -101,18 +119,35 @@ internal static class FamilyRpc
 			awaiting.Remove(peer);
 			return;
 		}
-		if (now >= waiting.Deadline)
+		waiting.NextRetry = now + RetryInterval;
+		int queued = peer.m_socket != null ? peer.m_socket.GetSendQueueSize() : 0;
+		SlowJoinWait.Step step = SlowJoinWait.Advance(waiting.Greeted, waiting.Deadline, now, queued, waiting.SlowLogged);
+		waiting.Deadline = step.Deadline;
+		if (step.LogSlow)
 		{
-			awaiting.Remove(peer);
-			List<FamilyEntry> mine = Family.Entries();
-			if (mine.Any(e => e.Mandatory))
-			{
-				Refuse(peer, FamilyCheck.Compare(mine, new List<FamilyEntry>()));
-			}
+			waiting.SlowLogged = true;
+			Journal?.Warning($"{Side.NameOf(peer)} is still joining after {SlowJoinWait.FormerTimeoutSeconds:0} s because the send queue has not drained.");
+		}
+		if (step.Holding)
+		{
+			return;
+		}
+		if (step.GiveUp)
+		{
+			GiveUp(peer, waiting);
 			return;
 		}
 		SendFamily(peer);
-		waiting.NextRetry = now + RetryInterval;
+	}
+
+	private static void GiveUp(ZNetPeer peer, Waiting waiting)
+	{
+		awaiting.Remove(peer);
+		List<FamilyEntry> mine = Family.Entries();
+		if (mine.Any(e => e.Mandatory))
+		{
+			Refuse(peer, FamilyCheck.NoAnswer(mine, now - waiting.Greeted));
+		}
 	}
 
 	private static void TickLeaving()
@@ -143,10 +178,11 @@ internal static class FamilyRpc
 	{
 		ZNetPeer? peer = Side.PeerOf(rpc);
 		List<FamilyEntry>? theirs = FamilyEntry.Read(pkg);
-		if (peer == null || theirs == null)
+		if (peer == null || theirs == null || answered.TryGetValue(peer, out _))
 		{
 			return;
 		}
+		answered.Add(peer, theirs);
 		awaiting.Remove(peer);
 		List<string> lines = FamilyCheck.Compare(Family.Entries(), theirs);
 		if (lines.Count > 0)

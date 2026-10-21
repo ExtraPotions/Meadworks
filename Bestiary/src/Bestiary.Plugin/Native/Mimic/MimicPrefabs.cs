@@ -28,11 +28,35 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
         /// <summary>The prefabs, built on the first ZNetScene wake and kept (on the prefab bench) for every later one.</summary>
         private static GameObject? creature, bite, corpse;
 
-        /// <summary>Registers on every ZNetScene wake; a rule reload puts the new bite numbers on every mimic at once.</summary>
+        /// <summary>True after a ZNetScene wake has tried to build the mimic. A missing prefab after that is not "not ready yet".</summary>
+        public static bool Settled { get; private set; }
+
+        /// <summary>Registers on every ZNetScene wake; a rule reload puts the new bite numbers and pace on every mimic at once.</summary>
         public static void Install(Harmony harmony)
         {
-            NetPrefabs.OnSceneAwake(harmony, scene => Guard.Run("MimicPrefabs.Build", () => Build(scene, harmony)));
-            Settings.Changed += () => SafeCall.Run("mimic settings", MimicBite.ApplySettings);
+            NetPrefabs.OnSceneAwake(harmony, scene =>
+            {
+                Guard.Run("MimicPrefabs.Build", () => Build(scene, harmony));
+                Settled = true;
+            });
+            Settings.Changed += () => SafeCall.Run("mimic settings", ApplyLive);
+        }
+
+        /// <summary>Bite numbers, and the run speed on the prefab and on mimics already in the world.</summary>
+        private static void ApplyLive()
+        {
+            MimicBite.ApplySettings();
+            if (creature != null)
+            {
+                MimicDisguise.ApplyPace(creature.GetComponent<Humanoid>());
+            }
+            foreach (Character character in Character.GetAllCharacters())
+            {
+                if (character != null && character.GetComponent<MimicDisguise>() != null)
+                {
+                    MimicDisguise.ApplyPace(character as Humanoid);
+                }
+            }
         }
 
         private static void Build(ZNetScene scene, Harmony harmony)

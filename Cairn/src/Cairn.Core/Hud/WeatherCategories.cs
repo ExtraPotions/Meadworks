@@ -20,14 +20,30 @@ namespace ExtraPotions.Cairn.Hud
         public static IReadOnlyDictionary<string, WeatherCategory> Known => Table;
 
         /// <summary>
-        /// The category of the current environment. Inside a dungeon or cave it is Indoors; an unknown (modded) environment
-        /// is Cloudy when it is foggy or rainy, else Clear.
+        /// The category of the current environment. Inside a dungeon or cave it is Indoors. A published Solstice seasonal
+        /// name uses its base environment. An unknown environment is Cloudy when it is foggy or rainy, else Clear.
         /// </summary>
         public static WeatherCategory Of(string? environment, float fogDensity, bool rainy, bool interior = false)
         {
             if (interior) return WeatherCategory.Indoors;
-            if (environment != null && Table.TryGetValue(environment.Trim(), out var known)) return known;
+            if (!string.IsNullOrWhiteSpace(environment))
+            {
+                var name = environment.Trim();
+                if (Table.TryGetValue(name, out var known)) return known;
+                if (Aliases.TryGetValue(name, out var source) && Table.TryGetValue(source, out known)) return known;
+            }
             return rainy || fogDensity >= CloudyFogDensity ? WeatherCategory.Cloudy : WeatherCategory.Clear;
+        }
+
+        /// <summary>The 23 Solstice names and the vanilla environment each copies. Names only: no Solstice or Tempest reference.</summary>
+        public static IReadOnlyDictionary<string, string> SeasonalAliases => Aliases;
+
+        /// <summary>The vanilla environment a published seasonal name copies, or the trimmed name when it is not one of those 23.</summary>
+        public static string BaseName(string? environment)
+        {
+            if (string.IsNullOrWhiteSpace(environment)) return "";
+            var name = environment.Trim();
+            return Aliases.TryGetValue(name, out var source) ? source : name;
         }
 
         /// <summary>Tempest's event environments (Tempest EnvironmentPlan names) and the event token each belongs to. Names
@@ -60,6 +76,21 @@ namespace ExtraPotions.Cairn.Hud
             Add(WeatherCategory.AshRain, "Ashrain", "Ashlands_ashrain", "Ashlands_CinderRain", "Ashlands_meteorshower", "Tempest_AshStorm", "Tempest_MeteorShower");
             Add(WeatherCategory.Boss, "Eikthyr", "Eikthyr_no_lightning", "GDKing", "Bonemass", "Moder", "GoblinKing", "Queen", "Fader", "DN_Bossroom");
             Add(WeatherCategory.Indoors, "Caves", "CavesHildir", "Crypt", "CryptHildir", "SunkenCrypt", "InfectedMine");
+            return t;
+        }
+
+        // Solstice's published variants only (the same 23 as Tempest's alias table). Another mod's season suffix is not an alias.
+        // Swamp Summer copies Swamp, which is not a vanilla environment, so that one name still uses the fog and rain fallback.
+        private static readonly Dictionary<string, string> Aliases = BuildAliases();
+
+        private static Dictionary<string, string> BuildAliases()
+        {
+            var t = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            void Add(string suffix, params string[] names) { foreach (var name in names) t.Add(name + suffix, name); }
+            Add(" Summer", "Clear", "Misty", "DeepForest Mist", "Mistlands_clear", "Heath clear", "SwampRain", "Swamp");
+            Add(" Fall", "ThunderStorm", "SwampRain");
+            Add(" Winter", "Rain", "LightRain", "ThunderStorm", "Clear", "Misty", "DeepForest Mist", "SwampRain",
+                "Mistlands_clear", "Mistlands_rain", "Mistlands_thunder", "Heath clear", "Snow", "SnowStorm", "Darklands_dark");
             return t;
         }
     }

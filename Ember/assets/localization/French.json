@@ -1,6 +1,18 @@
 {
   "schema": 1,
   "strings": {
+    "cfg_seasons_heading": "Saisons",
+    "cfg_seasons__night_length_name": "Durée de la nuit",
+    "cfg_seasons__night_length_help": "Hôte ou serveur : applique immédiatement l'aube et le crépuscule saisonniers de Solstice, avec des nuits limitées à 10-50 % d'une journée. Nécessite le module Sommeil d'Ember actif et Utiliser la plage de sommeil d'origine désactivé. La durée et le décompte des jours du monde restent inchangés. Désactivé, sans Solstice ou saisons désactivées : conserve les horaires habituels d'Ember.",
+    "cfg_seasons__fuel_burn_name": "Consommation de combustible",
+    "cfg_seasons__fuel_burn_help": "Hôte ou serveur : utilise l'usure des torches tenues de Solstice, limitée à 0,1-5 par seconde. Nécessite le module Torches d'Ember ; Feux sans combustible et Torches infinies, si autorisées, sont prioritaires. Solstice contrôle déjà la consommation saisonnière des feux placés. Désactivé, sans Solstice ou saisons désactivées : conserve l'usure configurée dans Ember.",
+    "cfg_seasons__torch_heat_name": "Chaleur des torches",
+    "cfg_seasons__torch_heat_help": "Hôte ou serveur : laisse Solstice décider si les torches d'Ember réchauffent pendant cette saison. N'active ni le module Torches ni La torche tenue réchauffe. Désactivé, sans Solstice ou saisons désactivées : conserve la chaleur configurée.",
+    "preset_locked": "Défini par le serveur : un réglage du profil de portes est verrouillé. Modifiez les valeurs verrouillées de l'hôte pour appliquer un profil de groupe.",
+    "cfg_sleep__preset_name": "Préréglage",
+    "cfg_sleep__preset_help": "Hôte ou serveur : applique immédiatement la plage de sommeil, l'accélération partielle, les deux facteurs, l'atténuation et le réveil. MeadWorksDefault (par défaut) : dès midi, 0,6 x 20, atténuation de 3 s. Vanilla (jeu d'origine) : plage native sans accélération partielle. Relaxed (souple) : dès midi, 1 x 30, 5 s. Custom (personnalisé) conserve les valeurs individuelles ; en modifier une sélectionne Custom. Les valeurs enregistrées sont conservées au chargement.",
+    "cfg_doors__preset_name": "Préréglage",
+    "cfg_doors__preset_help": "Chaque joueur : applique immédiatement l'ouverture automatique et les distances par type. MeadWorksDefault (par défaut) : activé, portes 1,5/2,25 m et ponts-levis 3/4 m. Vanilla (jeu d'origine) : portes automatiques désactivées. Relaxed (souple) : activé, portes 3/4,5 m et ponts 6/8 m. Les règles et vérifications des clés restent inchangées. Custom (personnalisé) conserve les valeurs individuelles ; en modifier une sélectionne Custom. Les verrouillages du serveur priment. Valeurs conservées au chargement.",
     "step_aside_sleep": "Le sommeil d'Ember est désactivé : {0} est installé.",
     "step_aside_torches": "Les torches d'Ember sont désactivées : {0} est installé.",
     "step_aside_doors": "Les portes automatiques d'Ember sont désactivées : {0} est installé.",

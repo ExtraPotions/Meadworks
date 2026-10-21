@@ -1,7 +1,7 @@
-PlantEasily 2.2.2 native input adoption
+PlantEasily 2.3.0 native input adoption
 
 Source repository: https://github.com/AdvizeGH/Advize_ValheimMods
-Source commit: 1deeb3962eb8681394961b0f35a4dfbc315c6f99
+Source commit: 864defe2f471f3c10e0ddd8237fc8fee74190433
 Source file: Advize_PlantEasily/Patches/InputPatches.cs
 Adapted file: src/Wildroot.Plugin/Adopted/PlantEasilyInputPatches.cs
 Native key-read adaptation: src/Wildroot.Plugin/InputController.cs
@@ -12,5 +12,14 @@ PlantEverything-GPL-3.0.txt. The original Wildroot portions' later-version optio
 does not extend the upstream grant. Source provenance and adaptation limits are
 recorded in src/Wildroot.Plugin/Adopted/PlantEasilyInput.PROVENANCE.md in the
 source archive.
+
+InputPatches.cs is byte-identical at 1deeb3962eb8681394961b0f35a4dfbc315c6f99
+(PlantEasily 2.2.2). The 2.3.0 grow-space fix is not in that file. Wildroot's
+grid check uses the same prepared layers as ModUtils.PlantCollisionMask
+(Default, static_solid, Default_small, piece, piece_nonsolid) in
+src/Wildroot.Core/Planting/PlantingGeometry.cs. That list is not a copy of
+ModUtils.cs. ConditionalConfigSync, added in 2.3.0, is not adopted.
+UseStamina and UseDurability stay server-owned through Wildroot's existing
+settings.
 
 Wildroot product author: expDARE.

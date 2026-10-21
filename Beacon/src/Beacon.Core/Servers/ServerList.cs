@@ -46,6 +46,7 @@ namespace ExtraPotions.Beacon.Servers
     {
         readonly List<ServerEntry> entries = new List<ServerEntry>();
         readonly Func<string> newReference;
+        int revision;
 
         /// <param name="newReference">Creates a fresh secret reference; the default uses random GUID text (not a secret itself).</param>
         public ServerList(Func<string>? newReference = null)
@@ -56,6 +57,9 @@ namespace ExtraPotions.Beacon.Servers
         public IReadOnlyList<ServerEntry> Entries => entries;
 
         public int Count => entries.Count;
+
+        /// <summary>Advances when the saved list changes. Reading the list does not.</summary>
+        public int Revision => revision;
 
         public ServerEntry? Default => entries.FirstOrDefault(e => e.IsDefault);
 
@@ -82,20 +86,25 @@ namespace ExtraPotions.Beacon.Servers
             if (entries.Any(e => e.SecretRef == reference)) throw new ArgumentException("Duplicate secret reference.", nameof(secretRef));
             var entry = new ServerEntry(trimmed, address, others.AsReadOnly(), reference);
             entries.Add(entry);
+            revision++;
             return entry;
         }
 
         public bool Remove(string name)
         {
             var entry = FindByName(name);
-            return entry != null && entries.Remove(entry);
+            if (entry == null || !entries.Remove(entry)) return false;
+            revision++;
+            return true;
         }
 
         public ServerRemoval? RemoveForUndo(string name)
         {
             var entry = FindByName(name); if (entry == null) return null;
             var removal = new ServerRemoval(entry, entries.IndexOf(entry));
-            entries.Remove(entry); return removal;
+            entries.Remove(entry);
+            revision++;
+            return removal;
         }
 
         /// <summary>Restores only if names, addresses and references are still free; a newer chosen default wins.</summary>
@@ -124,6 +133,7 @@ namespace ExtraPotions.Beacon.Servers
                 throw new ArgumentException("Address already belongs to another server.", nameof(address));
             var replacement = new ServerEntry(trimmed, address, others.AsReadOnly(), original.SecretRef) { IsDefault = original.IsDefault };
             entries[entries.IndexOf(original)] = replacement;
+            revision++;
             return replacement;
         }
 
@@ -132,6 +142,7 @@ namespace ExtraPotions.Beacon.Servers
             var entry = name == null ? null : FindByName(name);
             if (name != null && entry == null) throw new ArgumentException("No saved server named '" + name + "'.", nameof(name));
             foreach (var e in entries) e.IsDefault = ReferenceEquals(e, entry);
+            revision++;
         }
 
         public void Move(string name, int index)
@@ -139,6 +150,7 @@ namespace ExtraPotions.Beacon.Servers
             var entry = FindByName(name) ?? throw new ArgumentException("No saved server named '" + name + "'.", nameof(name));
             entries.Remove(entry);
             entries.Insert(Math.Max(0, Math.Min(entries.Count, index)), entry);
+            revision++;
         }
 
         string NewUniqueReference()

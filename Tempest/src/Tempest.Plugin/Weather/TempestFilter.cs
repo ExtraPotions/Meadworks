@@ -8,6 +8,7 @@
 // EnvMan fields became direct access through the publicized game assembly; dynamic switch registration (Awake,
 // AppendEnvironment) is replaced by the Disabled Environments list; the hooks act only while Tempest's Filter module is
 // active (not while NoFogBruh is installed) and never remove the environment Tempest itself is applying.
+// Seasonal aliases share their base switch; optional server weights multiply copied list entries after Solstice's rules.
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks). This file as a whole: SPDX-License-Identifier: GPL-3.0-or-later
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,7 @@ namespace ExtraPotions.Tempest.Runtime
                 names = setup?.m_environments?.Where(e => e != null).Select(e => e.m_environment);
             }
             var name = WeatherFilter.Fallback(names, n => envMan.GetEnv(n) != null, envMan.GetDefaultEnv()?.m_name);
+            name = TempestSeasons.EventEnvironment(name, n => envMan.GetEnv(n) != null);
             return name == null ? null : envMan.GetEnv(name);
         }
 
@@ -94,11 +96,27 @@ namespace ExtraPotions.Tempest.Runtime
         [HarmonyPatch(typeof(EnvMan), nameof(EnvMan.GetAvailableEnvironments))]
         static class GetAvailableEnvironmentsPatch
         {
+            [HarmonyAfter("com.extrapotions.solstice")]
             static void Postfix(EnvMan __instance, BiomeSector biome, ref List<EnvEntry> __result)
             {
-                if (__result == null || __result.Count == 0 || Current == null) return;
-                if (__result.All(e => e == null || Allows(e.m_environment))) return;
-                var kept = __result.Where(e => e != null && Allows(e.m_environment)).ToList();
+                var filter = Current;
+                if (__result == null || __result.Count == 0 || filter == null) return;
+                if (__result.All(e => e == null || (Allows(e.m_environment) && filter.Weight(e.m_environment) == 1))) return;
+                var kept = new List<EnvEntry>(__result.Count);
+                foreach (var entry in __result)
+                {
+                    if (entry == null || !Allows(entry.m_environment)) continue;
+                    var weight = filter.Weight(entry.m_environment);
+                    // Never mutate EnvMan's biome entries or Solstice's cached sources.
+                    kept.Add(weight == 1 ? entry : new EnvEntry
+                    {
+                        m_environment = entry.m_environment,
+                        m_env = entry.m_env,
+                        m_weight = entry.m_weight * weight,
+                        m_ashlandsOverride = entry.m_ashlandsOverride,
+                        m_deepnorthOverride = entry.m_deepnorthOverride,
+                    });
+                }
                 if (kept.Count == 0)
                 {
                     var fallback = Fallback(__instance, biome);

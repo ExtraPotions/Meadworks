@@ -8,7 +8,7 @@ All original Tempest code, including Tempest.Core, is GPL-3.0-or-later. Copyrigh
 
 ## Original artwork and documentation
 
-Original documentation and artwork use CC BY-NC-SA 4.0, with complete terms in licenses/CC-BY-NC-SA-4.0.txt; see LICENSE-ASSETS.md. Tempest ships no image, model or sound.
+Original documentation and artwork use CC BY-NC-SA 4.0, with complete terms in licenses/CC-BY-NC-SA-4.0.txt; see LICENSE-ASSETS.md. Tempest ships one image, its approved original Meadworks product icon (`icon.png`, CC BY-NC-SA 4.0; provenance in `docs/art-provenance.md`), and no model or sound.
 
 ## Adopted sources and preserved notices
 

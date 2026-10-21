@@ -60,6 +60,9 @@ namespace ExtraPotions.Ember.Config
         {
             public const string Section = "Sleep";
 
+            public static readonly EmberSetting<SettingsPreset> Preset = EmberSetting.Choice(Section, "Preset", SettingsPreset.MeadWorksDefault, ServerAuthoritative,
+                "Host or server: applies sleep window, partial boost, both rate factors, fade and morning wake rules live. MeadWorksDefault: noon start, 0.6 x 20 rate, 3-second fade. Vanilla: native sleep window and no partial boost. Relaxed: noon start, 1 x 30 rate, 5-second fade. Custom keeps individual values; editing a member selects Custom. Saved values are preserved on load.");
+
             public static readonly EmberSetting<bool> Enabled = EmberSetting.Toggle(Section, "Enabled", true, ServerAuthoritative,
                 "Ember's multiplayer sleep. Off: the game's own sleep and no sleep HUD.");
             public static readonly EmberSetting<bool> UseVanillaSleepWindow = EmberSetting.Toggle(Section, "Use Vanilla Sleep Window", false, ServerAuthoritative,
@@ -173,9 +176,24 @@ namespace ExtraPotions.Ember.Config
                 "While looking at a scheduled torch, keep it lit or return it to the night schedule. Requires ward access. Empty disables the key.", t => (t ?? "").Trim());
         }
 
+        public static class Seasons
+        {
+            public const string Section = "Seasons";
+
+            public static readonly EmberSetting<bool> NightLength = EmberSetting.Toggle(Section, "Night Length", true, ServerAuthoritative,
+                "Host or server: use Solstice's seasonal dawn and nightfall live, with nights limited to 10-50% of a day. Requires Ember's active Sleep module with Use Vanilla Sleep Window off. World day length and day counting stay unchanged. Off, missing Solstice or disabled seasons keeps Ember's usual timing.");
+            public static readonly EmberSetting<bool> FuelBurn = EmberSetting.Toggle(Section, "Fuel Burn", true, ServerAuthoritative,
+                "Host or server: use Solstice's held-torch durability drain, limited to 0.1-5 per second. Requires Ember's Torches module; Fuel Free Fires and allowed Endless Torches keep priority. Solstice already controls seasonal placed-fire fuel use. Off, missing Solstice or disabled seasons keeps Ember's configured held-torch rate.");
+            public static readonly EmberSetting<bool> TorchHeat = EmberSetting.Toggle(Section, "Torch Heat", true, ServerAuthoritative,
+                "Host or server: let Solstice decide whether Ember's torches provide warmth this season. Does not enable the Torches module or Held Torch Warms. Off, missing Solstice or disabled seasons keeps configured warmth.");
+        }
+
         public static class Doors
         {
             public const string Section = "Doors";
+
+            public static readonly EmberSetting<SettingsPreset> Preset = EmberSetting.Choice(Section, "Preset", SettingsPreset.MeadWorksDefault, Local,
+                "Each player: applies automatic-door enable and all per-kind open/close distances live. MeadWorksDefault: enabled, doors 1.5/2.25 m and drawbridges 3/4 m. Vanilla: automatic doors off. Relaxed: enabled, doors 3/4.5 m and drawbridges 6/8 m. Mechanics and key checks stay as configured. Custom keeps individual values; editing a member selects Custom. Server locks take priority; saved values are preserved on load.");
 
             public static readonly EmberSetting<bool> AutoDoorsAllowed = EmberSetting.Toggle(Section, "Auto Doors Allowed", true, ServerAuthoritative,
                 "Off turns automatic doors off for every player.");
@@ -202,7 +220,7 @@ namespace ExtraPotions.Ember.Config
         private static readonly Lazy<EmberSetting[]> all = new Lazy<EmberSetting[]>(() =>
             new EmberSetting[]
             {
-                Sleep.Enabled, Sleep.UseVanillaSleepWindow, Sleep.SleepStart, Sleep.PartialSleepBoost, Sleep.BonusMultiplier,
+                Sleep.Preset, Sleep.Enabled, Sleep.UseVanillaSleepWindow, Sleep.SleepStart, Sleep.PartialSleepBoost, Sleep.BonusMultiplier,
                 Sleep.BonusIncrementScale, Sleep.BoostFadeSeconds, Sleep.WakeAtWindowEnd, Sleep.SleepInAnyBed, Sleep.StandUpOnRespawn, Sleep.NearestOwnedBedRespawn, Sleep.QuickRespawn, Sleep.OwnedBedMapPins, Sleep.SleepAnyTime, Sleep.TestingMode,
                 Sleep.FakeTotalPlayers, Sleep.SimulatePlayersInBed,
                 Hud.Show, Hud.CompactAbove,
@@ -213,7 +231,8 @@ namespace ExtraPotions.Ember.Config
                 Torches.Enabled, Torches.FirePieces, Torches.HeldTorchWarms, Torches.EnvironmentAffectsTorch,
                 Torches.ColdBiomeAffectsTorch, Torches.BurnRate, Torches.EndlessTorches, Torches.FuelFreeFires, Torches.SmokelessFires,
                 Torches.TorchesNightOnly, Torches.TorchPieces, Torches.TorchMargin, Torches.TorchSwitchKey,
-                Doors.AutoDoorsAllowed, Doors.EnableAutoDoor, Doors.KeepOpenWhileOthersNear, Doors.ToggleKey,
+                Seasons.NightLength, Seasons.FuelBurn, Seasons.TorchHeat,
+                Doors.Preset, Doors.AutoDoorsAllowed, Doors.EnableAutoDoor, Doors.KeepOpenWhileOthersNear, Doors.ToggleKey,
             }
             .Concat(DoorKinds.All.SelectMany(k => doors.Value[k].Entries()))
             .Concat(new EmberSetting[] { Server.LockedPlayerSettings })

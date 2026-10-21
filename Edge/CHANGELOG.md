@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.11 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Smoked monsters are cleared only by the peer that owns them. If another player takes the monster, it can pick a target again until ownership comes back.
+- A character's shield number is written only by the peer that owns that character.
+- Secondary-attack preset choices are compared without building a text key every frame. A rejected apply still waits for a real change before it tries again.
+
 ## 0.2.10 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

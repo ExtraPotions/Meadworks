@@ -2,6 +2,7 @@
 // Meadworks-original: the `thing` console command (design 7). On the authority (single player, host) verbs run locally. A
 // remote client sends them through the temporary remote admin path (ThingRemoteCommands, user decision 2026-10-08) until
 // Crucible's CS-D1 relay lands; the server re-checks the caller's admin status and runs the same code with the caller as admin.
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExtraPotions.Meadworks.Crucible;
@@ -20,7 +21,7 @@ namespace ExtraPotions.Thing.Runtime
     {
         public override string Name => CommandParser.Name;
 
-        public override string Help => "Thing server administration: help, status, kick, ban, tempban, unban, warn, mute, unmute, say, saytop, shutdown, cancelshutdown, save, permitted [offset], permit <platform id>, unpermit <platform id>, admins [offset], admin add|remove <platform id>, seed, time <HH:mm|preset> [freeze], resumetime, ward [on|off], terrain <radius>, terrain confirm, terrain cancel, drops, drops confirm, drops cancel, pickup <1-10|reset>, regenerate nature, resetresources.";
+        public override string Help => "Thing server administration: help, status, kick, ban, tempban, unban, warn, mute, unmute, freeze <player>, unfreeze <player>, say, saytop, shutdown, cancelshutdown, save, permitted [offset], permit <platform id>, unpermit <platform id>, admins [offset], admin add|remove <platform id>, grant self, grant <platform id> <world|spawn|teleport|freeze|inventory|ward> <on|off>, seed, time <HH:mm|preset> [freeze], resumetime, ward [on|off], terrain <radius>, terrain confirm, terrain cancel, drops, drops confirm, drops cancel, pickup <1-10|reset>, regenerate nature, resetresources.";
 
         public override void Run(string[] args)
         {
@@ -70,7 +71,22 @@ namespace ExtraPotions.Thing.Runtime
                 yield return ThingText.Text(AdminCheck.TextKey(Verdict.NeedsRelay));
                 yield break;
             }
-            var facts = new RequestFacts(Role(), fromLocalAuthority, requesterIsAdmin, delvePresent: ThingDelve.Present);
+            if (parsed.Kind == CommandKind.Action && parsed.Action == ThingAction.GrantEdit && parsed.Text == "self")
+            {
+                var fullAdmin = fromLocalAuthority || requesterIsAdmin;
+                yield return AdminPermissions.Wire(fullAdmin, fullAdmin ? AdminRight.All : ThingAccess.Of(admin.Id));
+                yield break;
+            }
+            var playerPage = !fromLocalAuthority && !requesterIsAdmin && parsed.Kind == CommandKind.Status && args.Count >= 2
+                && string.Equals(args[0], "ui-read", StringComparison.OrdinalIgnoreCase) && string.Equals(args[1], "players", StringComparison.OrdinalIgnoreCase)
+                && ThingAccess.Has(admin.Id, AdminRight.Inventory);
+            if (playerPage && ThingUiQueries.TryRead(args, admin, fromLocalAuthority, requesterIsAdmin, out var grantedPage, playersOnly: true))
+            {
+                foreach (var line in grantedPage) yield return line;
+                yield break;
+            }
+            var facts = new RequestFacts(Role(), fromLocalAuthority, requesterIsAdmin, delvePresent: ThingDelve.Present,
+                granted: fromLocalAuthority || requesterIsAdmin ? AdminRight.None : ThingAccess.Of(admin.Id));
             if (!ActionCatalog.Visible(parsed.Action, ThingModules.StepAside.AdminToolLoaded))
             {
                 yield return ThingText.Text(AdminCheck.TextKey(Verdict.ProductOff));
@@ -120,6 +136,9 @@ namespace ExtraPotions.Thing.Runtime
                 case ThingAction.AdminListEdit:
                     foreach (var line in ThingLists.Run(parsed, admin, fromLocalAuthority)) yield return line;
                     yield break;
+                case ThingAction.GrantEdit:
+                    foreach (var line in ThingAccess.Edit(parsed, admin)) yield return line;
+                    yield break;
                 case ThingAction.MessageOfTheDay:
                 case ThingAction.Announcements:
                     if (parsed.Message == null) { yield return ThingText.Text("message_invalid"); yield break; }
@@ -161,6 +180,13 @@ namespace ExtraPotions.Thing.Runtime
                     var duration = parsed.UntilLifted ? (System.TimeSpan?)null : parsed.Duration
                         ?? System.TimeSpan.FromMinutes(settings.Get(ThingSettings.Moderation.MuteDefaultMinutes));
                     yield return MuteReply(ThingServer.Mute(target.Value, admin, parsed.Text, duration), parsed.Action, target.Value.Actor);
+                    yield break;
+                case ThingAction.FreezePlayer:
+                case ThingAction.UnfreezePlayer:
+                    if (!target.HasValue) { yield return ThingText.Format(ThingTextKeys.CommandUnknownPlayer, parsed.Target); yield break; }
+                    yield return ThingServer.SetFrozen(target.Value, admin, parsed.Action == ThingAction.FreezePlayer)
+                        ? ThingText.Text("ui_pending")
+                        : ThingText.Format(ThingTextKeys.CommandFailed, ActionCatalog.Info(parsed.Action).Verb + " " + target.Value.Actor.Id);
                     yield break;
                 case ThingAction.Unmute:
                     var mutedActor = target?.Actor ?? (LooksLikeId(parsed.Target) ? new Actor(parsed.Target, "") : (Actor?)null);

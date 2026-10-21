@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.4 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Thrifty Hands gives back the quality of ingredient that was used. A free craft that spent quality 2 or 3 eggs returns those eggs at that quality.
+- Rune stones that do not fit when a payment is returned are dropped at the player's feet.
+- Dedicated servers register runes, gems, the Dvergr Chisel and legacy scrolls without loading original item art or materials. Missing client art logs a warning while keeping the item registered.
+- Rune Table labels, item classes, inscriptions, gems and the other adopted words now ship in Spanish, French, German, Russian, Chinese and Korean. A line that is missing from a language list still shows the English word. A personal `Inscribe.translations.<Language>.yml` still overrides the shipped words.
+- Rune Table sacrifice banks essence only for trophies that left the inventory. A refused removal leaves the trophies and the essence pool as they were, with no sacrifice message.
+- A rune, gem, or chisel writes the item only after the full cost has left the carried stack or the Rune Table. A short payment leaves the item unchanged. A refused item write puts that cost back. A recovered gem is given only after the write.
+- Thrifty Hands returns each inventory's free share to that inventory. Materials taken from a shared chest go back to the chest, and the crafter is refunded only what left their own inventory.
+
+## 0.2.3 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- The admin `inscribe give` command no longer drops extra runes when an add stops part-way (for example the inventory filling up while topping up a partial stack, or an inventory layout mod keeping cells for itself). It measures what actually arrived and drops only the rest at your feet; the reply lists the counts that went into the inventory and that were dropped.
+
 ## 0.2.2 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

@@ -111,6 +111,12 @@ namespace ExtraPotions.Wildblood.Adopted.Rules {
             }
             var decision = MeadworksAuthority.Decide(RootPlugin.Guid, ConfigScope.ServerAuthoritative);
             if (!decision.ProductActive) return;
+            // A saved local snapshot is not the server's rules. Adopting it here rolls and scales before the package arrives.
+            if (!ExtraPotions.Wildblood.Stars.TamedStars.MayAdoptRules(
+                CruciblePlugin.Session.Role == SessionRole.RemoteClient, CruciblePlugin.Session.AuthorityReady)) {
+                nextPoll = 0;
+                return;
+            }
             try {
                 if (OwnsAuthority()) {
                     if (!File.Exists(path)) {

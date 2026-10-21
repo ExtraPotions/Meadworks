@@ -31,7 +31,7 @@ namespace Burrow
     {
         public const string PluginGuid = "com.meadworks.burrow";
         public const string PluginName = "Burrow";
-        public const string PluginVersion = "0.3.20";
+        public const string PluginVersion = "0.3.24";
         public static ManualLogSource Log { get; private set; }
         public static SyncedConfiguration Synced { get; private set; }
         public static ConfigEntry<bool> LockConfiguration { get; private set; }
@@ -83,6 +83,7 @@ namespace Burrow
             registration.AddCapability<ExtraPotions.Meadworks.Contracts.IAsyncResourceProvider>("meadworks.resources.async",new System.Version(2,0),Resources);
             registration.AddCapability<Func<object,bool>>("meadworks.burrow.inventory_hold",new System.Version(1,0),Burrow.Resources.NativeInventoryGuards.OwnHeld);
             Integration.IntegrationLinks.Register(registration);
+            Integration.ChestSalvageLink.Register(registration, () => Resources);
             Integration.StowRowYield.Initialize(Info.Metadata, Logger);
             harmony = new Harmony(PluginGuid);
             StacksModule.HookSpawns(harmony);

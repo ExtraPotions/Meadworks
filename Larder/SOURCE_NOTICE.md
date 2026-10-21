@@ -2,7 +2,7 @@
 
 Product author: expDARE.
 
-Larder.Core retains 18 recorded portable adaptations from FeastMaster 4.7.4 and GrindstoneSkills 0.14.1. The native plugin adopts the corresponding food/mead, eating, recovery, exertion, kitchen, Cooking experience and HUD source modules. The reference pin is `9da28eb58adbe065be1e4baef779a448acd38e0f` (GrindstoneSkills 0.16.0); files the item-star removal did not touch keep their recorded ancestor revision `ad278ecf323901c3645eb1f9f6fac6833a0f8cb1`. Larder has no dish or item stars since 0.2.0.
+Larder.Core retains 19 recorded portable adaptations from FeastMaster 4.7.4, GrindstoneSkills 0.14.1 and RecipeCounts at GrindstoneSkills 0.19.0 (`7c710ed119b547783812e8171c86f31ce1f7ea50`). The native plugin adopts the corresponding food/mead, eating, recovery, exertion, kitchen, Cooking experience and HUD source modules. The reference pin is `9da28eb58adbe065be1e4baef779a448acd38e0f` (GrindstoneSkills 0.16.0); files the item-star removal did not touch keep their recorded ancestor revision `ad278ecf323901c3645eb1f9f6fac6833a0f8cb1`. Larder has no dish or item stars since 0.2.0. Starred eggs still count for recipes that need every ingredient, because the hen's stars are stored as item quality.
 
 Larder distinguishes adapted portable/native code, the namespace-adapted ItemCopies library, original lifecycle/configuration/presentation adapters, English source strings, six original translation catalogs and the unchanged Cooking skill icon. These are selective module adoptions, not a whole upstream plugin fork. Original adapters may list behavior references without claiming copied construction.
 
@@ -14,7 +14,7 @@ FeastMaster's configuration settings are adopted with Crucible binding/read-at-u
 
 Preserved notices are `THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt` and `THIRD_PARTY_NOTICES/ValheimModLibs-GPL-3.0-or-later.txt`, byte-identical to the respective pinned license blobs. See `LICENSE_SCOPE.md` for the code/content/art distinctions.
 
-The optional fermenter countdown is original expDARE code from the approved feature description. No fermenter timer source was found in the approved aedenthorn pin and none was adopted. `Larder.Core/Cooking/FermentCountdown.cs` formats the remaining world seconds; the existing adopted FermenterHover, FermenterSpeed and FeastMaster Fermenting seams supply access visibility, native elapsed time, skill speed and effective duration. The original additions are separate from the retained source-star hover and brewing algorithms.
+The optional fermenter countdown is original expDARE code from the approved feature description. No fermenter timer source was found in the approved aedenthorn pin and none was adopted. `Larder.Core/Cooking/FermentCountdown.cs` formats the remaining world seconds. `KitchenHover` adds that line when Fermenter Timer is on, the barrel is sheltered and fermenting, and the hover already names the contents. `FermenterSpeed` and FeastMaster Fermenting supply the skill speed and effective duration. The GrindstoneSkills `FermenterHover.cs` adoption is retired: upstream removed that file in 0.15.0 with item stars and did not add a countdown. The Fermenter Timer setting key and default are unchanged.
 
 The Corresponding Source for this version is at https://github.com/ExtraPotions/Meadworks/tree/main/Larder.
 

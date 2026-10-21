@@ -48,6 +48,8 @@ internal static partial class TheftTransfers
     internal static Func<TheftRequest,long>? Probe;
     /// <summary>Synchronized world time in seconds (ZNet.GetTimeSeconds), stamped on each ask.</summary>
     internal static Func<double>? Clock;
+    /// <summary>Removes the requester's own world row for a theft whose history was cleaned up; true when a row was removed.</summary>
+    internal static Func<TheftRequest,bool>? ReleaseRow;
     static readonly Dictionary<string,double> nextProbe=new(StringComparer.Ordinal);
     const double ProbeInterval=5;
     static partial void Bind();
@@ -80,7 +82,9 @@ internal static partial class TheftTransfers
         try {
             opening=true;
             string identity=TheftMetadata.Hash(System.Text.Encoding.UTF8.GetBytes(world.ToString(CultureInfo.InvariantCulture)+"\n"+actor.ToString(CultureInfo.InvariantCulture)));
-            var opened=ledger=new TheftClientLedger(Path.Combine(Paths.BepInExRootPath,"Wildblood.transactions",identity));
+            string directory=Path.Combine(Paths.BepInExRootPath,"Wildblood.transactions",identity);
+            Cleanup(directory);
+            var opened=ledger=new TheftClientLedger(directory);
             foreach(var intent in opened.All)
                 if(intent.Request.World!=world||intent.Request.Actor!=actor)throw new InvalidDataException("Theft journal actor/world mismatch.");
             // Hold only for an intent that still needs reconciliation. Settled history (anyone who ever stole) holds nothing at spawn.
@@ -89,6 +93,22 @@ internal static partial class TheftTransfers
         }
         catch(Exception error){fault=true;Warn("Wildblood theft recovery unavailable: "+error.GetType().Name);return false;}
         finally{opening=false;}
+    }
+    // Runs while the journal folder is closed and before reconciliation, so nothing is in flight. Journal rows go first;
+    // receipt keys follow only for roots no journal holds any more (see TheftJournalCleanup). A failed recovery throws to
+    // Open, which then keeps the inventory held instead of opening a journal that is not consistent.
+    static void Cleanup(string directory)
+    {
+        Bind();
+        var data=player!.m_customData;
+        var result=TheftJournalCleanup.Run(directory,source=>data.TryGetValue(NativeTheftInventory.ReceiptKey(source),out var saved)&&saved=="1");
+        if(result.Error!=null){Warn("Wildblood theft history cleanup skipped: "+result.Error);return;}
+        int keys=0,rows=0;
+        foreach(string root in result.ReceiptRoots)foreach(string source in TheftJournalCleanup.Sources(root))if(data.Remove(NativeTheftInventory.ReceiptKey(source)))keys++;
+        foreach(var request in result.Pruned)
+            try{if(ReleaseRow?.Invoke(request)==true)rows++;}catch(Exception error){Warn("Wildblood theft world row kept: "+error.GetType().Name);}
+        if(result.Pruned.Count!=0||result.Rows!=0||keys!=0)
+            Plugin.NativeLogger?.LogInfo($"Wildblood theft history cleanup: removed {result.Pruned.Count} settled thefts ({result.Rows} journal records, {keys} character receipts, {rows} world rows); kept {result.Kept} recent.");
     }
     internal static int Hold(Inventory inventory,ItemDrop.ItemData item,ZNetView source,long owner)
     {

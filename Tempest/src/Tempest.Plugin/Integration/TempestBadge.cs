@@ -6,6 +6,7 @@ using ExtraPotions.Meadworks.Crucible.UI;
 using ExtraPotions.Tempest.Config;
 using ExtraPotions.Tempest.Events;
 using ExtraPotions.Tempest.Integration;
+using ExtraPotions.Tempest.Localization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,7 +33,9 @@ namespace ExtraPotions.Tempest.Runtime
         static KitMeter? meter;
         static Image? icon;
         static bool warnedDisplay;
-        static string? shown;
+        static string? shownTitle, shownLine;
+        static EventPhase shownPhase;
+        static long shownWhole = long.MinValue;
         static bool warnedSound;
         static MeadworksLog? log;
 
@@ -68,13 +71,20 @@ namespace ExtraPotions.Tempest.Runtime
             if (panel == null && !Build(root!)) return;
             // Two centered lines: the glyph and event name, then the phase countdown ("Time remaining 29:37").
             var title = Badge.Title(state, TempestText.Text);
-            var line = Badge.Detail(state, (key, value) => TempestText.Format(key, value));
-            if (title + "\n" + line != shown)
+            var whole = TempestTextKeys.WholeSeconds(state.SecondsLeft);
+            if (shownTitle == null || title != shownTitle || state.Phase != shownPhase || whole != shownWhole)
             {
-                shown = title + "\n" + line;
-                label!.text = title;
-                detail!.text = line;
-                Fit();
+                var line = Badge.Detail(state, (key, value) => TempestText.Format(key, value));
+                if (title != shownTitle || line != shownLine)
+                {
+                    label!.text = title;
+                    detail!.text = line;
+                    Fit();
+                }
+                shownTitle = title;
+                shownLine = line;
+                shownPhase = state.Phase;
+                shownWhole = whole;
             }
             meter!.Set((float)state.Fraction, 1f);
             icon!.sprite = KitGlyphSprites.Of(GlyphOf(state.Kind));
@@ -149,7 +159,8 @@ namespace ExtraPotions.Tempest.Runtime
                 Reset();
                 return false;
             }
-            shown = null;
+            shownTitle = shownLine = null;
+            shownWhole = long.MinValue;
             return true;
         }
 
@@ -247,7 +258,8 @@ namespace ExtraPotions.Tempest.Runtime
             label = null;
             detail = null;
             icon = null;
-            shown = null;
+            shownTitle = shownLine = null;
+            shownWhole = long.MinValue;
         }
     }
 }

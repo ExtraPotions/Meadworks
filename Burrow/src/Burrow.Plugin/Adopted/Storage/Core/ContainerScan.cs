@@ -71,6 +71,15 @@ namespace Burrow.Core
             return PassesRules(container);
         }
 
+        /// <summary>Permission and product rules for readiness classification only; never authorizes an inventory read or claim.</summary>
+        internal static bool MayBecomeUsable(Container container, ContainerUse use)
+        {
+            if (container == null || container.m_inventory == null || container.m_nview == null || !container.m_nview.IsValid()
+                || ContainerClaim.VehicleOfAnother(container)) return false;
+            if (use == ContainerUse.Reach && Burrow.Integration.IntegrationLinks.IsFeedContainer(container)) return false;
+            return PassesRules(container);
+        }
+
         /// <summary>
         /// A chest the Shared module may change through requests: <c>Shared Chests</c> is <c>Full</c>, another
         /// player is using it, and every other usability rule (loaded, access, ward, switches, prefab) passes.

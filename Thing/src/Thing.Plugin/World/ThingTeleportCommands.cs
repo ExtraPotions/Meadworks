@@ -73,13 +73,15 @@ namespace ExtraPotions.Thing.Runtime
             caller = target = null; var net = ZNet.instance;
             if (!Active || !ThingServer.CurrentAuthority || net == null || grant.Generation != CruciblePlugin.Session.Generation) return false;
             if (!grant.Local && (grant.Caller == null || !grant.Caller.IsReady() || grant.Caller.m_rpc == null || !grant.Caller.m_rpc.IsConnected()
-                || !net.GetPeers().Any(p => ReferenceEquals(p, grant.Caller)) || grant.Caller.m_socket?.GetHostName() != grant.CallerId || !net.IsAdmin(grant.CallerId))) return false;
+                || !net.GetPeers().Any(p => ReferenceEquals(p, grant.Caller)) || grant.Caller.m_socket?.GetHostName() != grant.CallerId
+                || !net.IsAdmin(grant.CallerId) && !ThingAccess.Has(grant.CallerId, AdminRight.Teleport))) return false;
             if (!grant.Target.Peer.IsReady() || grant.Target.Peer.m_rpc == null || !grant.Target.Peer.m_rpc.IsConnected() || !net.GetPeers().Any(p => ReferenceEquals(p, grant.Target.Peer))
                 || grant.Target.Peer.m_socket?.GetHostName() != grant.Target.Actor.Id) return false;
             var action = grant.Verb == "goto" ? ThingAction.TeleportTo : ThingAction.Bring;
             var role = net.IsDedicated() ? ThingRole.DedicatedServer : ThingRole.Host;
+            var allowed = grant.Local || net.IsAdmin(grant.CallerId);
             if (!ActionCatalog.Visible(action, ThingModules.StepAside.AdminToolLoaded)
-                || !AdminCheck.Permits(AdminCheck.Decide(action, new RequestFacts(role, grant.Local, true, false), Plugin.Settings!.Rules()))) return false;
+                || !AdminCheck.Permits(AdminCheck.Decide(action, new RequestFacts(role, grant.Local, allowed, false, granted: allowed ? AdminRight.None : ThingAccess.Of(grant.CallerId)), Plugin.Settings!.Rules()))) return false;
             if (!Character(grant.Caller, grant.Local, out caller) || !Character(grant.Target.Peer, false, out target)) return false;
             return caller!.m_uid.ToString() == grant.CallerCharacter && target!.m_uid.ToString() == grant.TargetCharacter;
         }
@@ -100,7 +102,8 @@ namespace ExtraPotions.Thing.Runtime
             }
             if (request.Count != 2 || (request[0] != "goto" && request[0] != "bring") || CommandParser.Parse(request).Kind != CommandKind.Action) return Reply("teleport_usage");
             var id = context.IsLocal ? "host" : incoming?.m_socket.GetHostName() ?? "";
-            if (!context.IsLocal && (incoming == null || !context.IsAdmin || !ZNet.instance.IsAdmin(id))) return Reply("refused_not_admin");
+            var allowedCaller = context.IsLocal || context.IsAdmin && incoming != null && ZNet.instance.IsAdmin(id);
+            if ((!context.IsLocal && incoming == null) || (!allowedCaller && !ThingAccess.Has(id, AdminRight.Teleport))) return Reply("refused_not_admin");
             var online = ThingServer.Online(); var found = PlayerMatch.Find(request[1].Trim(), online.Select(p => p.Actor));
             if (!found.HasValue) return Reply("teleport_unavailable");
             var selected = online.First(p => p.Actor.Id == found.Value.Id);

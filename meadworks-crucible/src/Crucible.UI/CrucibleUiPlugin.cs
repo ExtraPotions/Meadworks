@@ -22,7 +22,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
     {
         public const string Guid = "com.meadworks.crucible.ui";
         public const string Name = "ExtraPotions Meadworks: Crucible UI";
-        public const string Version = "0.3.17";
+        public const string Version = "0.3.19";
         public const string Product = KitText.Product;
 
         internal static MeadworksLog Log { get; private set; }
@@ -42,6 +42,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 return;
             }
             KitLook.Bind(Config);
+            KitNoticePanel.Bind(Config);
             MeadworksPauseMenu.Bind(Config);
             harmony = new Harmony(Guid);
             harmony.PatchAll(typeof(CrucibleUiPlugin).Assembly);
@@ -92,6 +93,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 KitTextField.LateTick();
                 KitHudLayout.Tick();
                 KitNativeNotices.Tick();
+                KitNoticePanel.Tick();
                 KitNativeMenus.LateTickNotices();
             }
         }
@@ -100,12 +102,14 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         {
             KitTooltip.Prune();
             KitForged.Prune();
+            KitNoticePanel.Reset();
         }
 
         private void OnDestroy()
         {
             SceneManager.sceneUnloaded -= SceneUnloaded;
             Active = false;
+            KitNoticePanel.Reset();
             KitHudLayout.Shutdown();
             KitDialogs.Shutdown();
             KitNativeMenus.Shutdown();

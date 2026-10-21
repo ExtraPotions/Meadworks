@@ -126,8 +126,12 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         /// when the salvage succeeded. Without the popup, refuse; no unconfirmed item mutation.
         /// </summary>
         public static void Confirm(Player player, ItemDrop.ItemData item, Action afterwards)
+            => Ask(player, item, null, () => Accept(player, item, afterwards));
+
+        /// <summary>The yes/no question of <see cref="Confirm"/>; <paramref name="chest"/> is the inventory of a chest item.</summary>
+        internal static void Ask(Player player, ItemDrop.ItemData item, Inventory chest, Action accept)
         {
-            string blocker = SalvageRules.Blocker(player, item);
+            string blocker = SalvageRules.Blocker(player, item, chest);
             if (blocker != null)
             {
                 Messages.Center(blocker);
@@ -138,17 +142,17 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
                 Messages.Center(SalvageWords.Cannot);
                 return;
             }
-            string text = AskText(item);
+            string text = AskText(item, chest != null);
             var source = Plugin.Source;
             if (source != null && source.IsActive && CrucibleUiPlugin.Active)
             {
-                if (KitDialogs.Confirm(source, SalvageWords.Salvage, text, () => Accept(player, item, afterwards)) != null) return;
+                if (KitDialogs.Confirm(source, SalvageWords.Salvage, text, accept) != null) return;
             }
             bool answered = false;
             UnifiedPopup.Push(new YesNoPopup(SalvageWords.Salvage, text, () =>
             {
                 if (answered) return;
-                answered = true; UnifiedPopup.Pop(); Accept(player, item, afterwards);
+                answered = true; UnifiedPopup.Pop(); accept();
             }, () => { if (answered) return; answered = true; UnifiedPopup.Pop(); }));
         }
 
@@ -158,12 +162,14 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
                 afterwards?.Invoke();
         }
 
-        private static string AskText(ItemDrop.ItemData item)
+        private static string AskText(ItemDrop.ItemData item, bool fromChest)
         {
             StringBuilder text = new StringBuilder();
             text.Append(ItemNames.DisplayName(item));
             if (item.m_stack > 1)
                 text.Append(" ×").Append(item.m_stack);
+            if (fromChest)
+                text.Append('\n').Append(SalvageWords.FromChest);
             string decoration=InscribeDetails.Lines(item);
             if(decoration.Length>0)text.Append('\n').Append(decoration);
             text.Append("\n\n").Append(SalvageWords.Ask).Append('\n').Append(ReturnList(Returns(item)));

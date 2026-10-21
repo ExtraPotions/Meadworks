@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Gerald Glasgow. SPDX-License-Identifier: GPL-3.0-or-later
 // Changed by expDARE, 2026: Saga namespace, configuration, CS1 and ownership boundaries.
 using System.Collections.Generic;
+using ExtraPotions.Saga.Skills;
 using UnityEngine;
 
 namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
@@ -34,7 +35,7 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
         {
             MineRock5 chunks = view.GetComponent<MineRock5>();
             if (chunks != null) {
-                view.Register<int, ZDOID>(Keys.RpcCleanStrike, (sender, area, miner) => Receive(chunks, area, miner));
+                view.Register<int, ZDOID>(Keys.RpcCleanStrike, (sender, area, miner) => Receive(chunks, sender, area, miner));
                 NativeRpcCleanup.Track(view, Keys.RpcCleanStrike);
             }
         }
@@ -62,13 +63,19 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
         public static bool Take(RockBreak broken) =>
             broken != null && broken.Miner != null && broken.Chunk >= 0 && Take(broken.RockId, broken.Chunk, broken.Miner.Attacker);
 
-        private static void Receive(MineRock5 chunks, int area, ZDOID miner) =>
-            HookGuard.Run("clean strike mark", () => Keep(chunks, area, miner));
+        private static void Receive(MineRock5 chunks, long sender, int area, ZDOID miner) =>
+            HookGuard.Run("clean strike mark", () => Keep(chunks, sender, area, miner));
 
-        private static void Keep(MineRock5 chunks, int area, ZDOID miner)
+        private static void Keep(MineRock5 chunks, long sender, int area, ZDOID miner)
         {
             ZNetView view = chunks != null ? chunks.m_nview : null;
-            if (!PickSkill.Active || view == null || !view.IsValid() || !view.IsOwner() || miner.IsNone())
+            bool ownsRock = view != null && view.IsValid() && view.IsOwner();
+            ZDO minerZdo = null;
+            if (!miner.IsNone() && ZDOMan.instance != null) minerZdo = ZDOMan.instance.GetZDO(miner);
+            bool minerPresent = minerZdo != null && minerZdo.IsValid();
+            bool senderOwns = false;
+            if (minerPresent) senderOwns = minerZdo.GetOwner() == sender;
+            if (!CleanStrikeRules.Keep(PickSkill.Active, ownsRock, minerPresent, senderOwns, area) || view == null)
                 return;
             Prune();
             if (Marks.Count >= MaxMarks)

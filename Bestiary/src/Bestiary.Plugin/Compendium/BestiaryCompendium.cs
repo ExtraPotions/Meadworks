@@ -14,6 +14,7 @@ namespace ExtraPotions.Bestiary.Runtime.Compendium;
 internal static class BestiaryCompendium
 {
     private static readonly Dictionary<TextsDialog, HashSet<TextsDialog.TextInfo>> owned = new();
+    private static readonly List<TextsDialog> dropped = new();
     private static bool Enabled => Plugin.AllowsUi && Native.Adapters.NativeConfiguration.Active
         && Plugin.Settings?.Flag(BestiarySettings.General + ".Compendium Pages") == true;
     private static void Postfix(TextsDialog __instance)
@@ -45,13 +46,17 @@ internal static class BestiaryCompendium
     }
     internal static void Clear()
     {
-        foreach (var dialog in owned.Keys.ToArray()) if (dialog != null) Remove(dialog);
+        dropped.Clear();
+        foreach (var pair in owned) dropped.Add(pair.Key);
+        for (int i = 0; i < dropped.Count; i++) if (dropped[i] != null) Remove(dropped[i]);
         owned.Clear();
     }
     internal static void Tick()
     {
-        if (owned.Count == 0) return; // nothing to prune or clear; skips the per-frame ToArray
-        foreach (var dialog in owned.Keys.Where(d => d == null).ToArray()) owned.Remove(dialog);
+        if (owned.Count == 0) return;
+        dropped.Clear();
+        foreach (var pair in owned) if (pair.Key == null) dropped.Add(pair.Key);
+        for (int i = 0; i < dropped.Count; i++) owned.Remove(dropped[i]);
         if (!Enabled) Clear();
     }
 }

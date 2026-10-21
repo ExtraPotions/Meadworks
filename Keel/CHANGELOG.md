@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.13 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- German, Russian, Chinese and Korean sailing text uses the game's words for ship health, the Karve, sailing, recipes and the hold. Paddle force is the oars. Typed config tokens are unchanged.
+- Wind Call and Lookout ignore a networked call unless the sender is a player on that ship. Wind Call also requires that player to be the one steering, and the announcement names that player rather than the id in the packet.
+- The wind square keeps its strength text until the strength or the language changes. The arrow still turns every frame.
+
 ## 0.1.12 (2026-10-19)
 
 - Requires Crucible 0.3.22 / Crucible.UI 0.3.15.

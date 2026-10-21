@@ -5,6 +5,7 @@
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes. SPDX-License-Identifier: GPL-3.0-or-later
 using System;
 using System.Collections.Generic;
+using ExtraPotions.Threshold.SeaGates;
 using UnityEngine;
 
 namespace ExtraPotions.Threshold.Runtime.SeaGates
@@ -128,11 +129,16 @@ namespace ExtraPotions.Threshold.Runtime.SeaGates
         /// <summary>Owner side of <see cref="SeaGateFields.LandedRpc"/>: a crew member landed, was set ashore, or will not
         /// come. Counts once per player and only for the jump under way, by a record in the ship's ZDO, so a report sent
         /// again (<see cref="CrewReport"/>) or reaching the next owner after a handover never counts twice. A report
-        /// that reaches a machine that is no longer the owner is dropped; the crew client sends it again.</summary>
-        public static void OnLanded(Ship ship, int jumpId, long playerId)
+        /// that reaches a machine that is no longer the owner is dropped; the crew client sends it again. The sender
+        /// must own that player, or be the server: another client cannot mark the rest of the crew as landed.</summary>
+        public static void OnLanded(Ship ship, long sender, int jumpId, long playerId)
         {
             ZNetView view = ship != null ? ship.m_nview : null;
             if (view == null || !view.IsValid() || !view.IsOwner() || jumpId == 0)
+                return;
+            Player crew = Player.GetPlayer(playerId);
+            long owner = crew != null ? crew.GetOwner() : 0L;
+            if (!SeaGateAuthority.AcceptsLanding(SenderIdentity.IsFromServer(sender), sender, SenderIdentity.PlayerId(sender), playerId, owner))
                 return;
             ZDO zdo = view.GetZDO();
             int record = LandedRecord(playerId);

@@ -37,6 +37,7 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
             log = logger;
             configuration = new NativeConfiguration(file);
             ShepherdSettings.Initialize(configuration);
+            ShepherdSettings.NoteIgnoredStars(log);
             HusbandrySettings.Initialize(configuration);
             HoneyProduction.Initialize();
             if (ExtraPotions.Meadworks.Crucible.Plugin.Services.StepAside.Declared(SourceId).Count == 0)

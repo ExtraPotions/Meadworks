@@ -22,6 +22,7 @@ namespace ExtraPotions.Thing.Runtime
         public static string DataFolder => Path.Combine(Paths.ConfigPath, "Meadworks", "thing");
         public static string LedgerFile => Path.Combine(DataFolder, "ledger.txt");
         public static string AnnouncementsFile => Path.Combine(DataFolder, ThingSettings.AnnouncementsFile);
+        public static string PermissionsFile => Path.Combine(DataFolder, "permissions.txt");
     }
 
     /// <summary>An online player on the server: platform ID and name, and the peer.</summary>
@@ -52,6 +53,10 @@ namespace ExtraPotions.Thing.Runtime
         static readonly ShutdownCountdown countdown = new ShutdownCountdown();
         static readonly HashSet<long> greeted = new HashSet<long>();
         static readonly List<(long Uid, double At)> pendingKicks = new List<(long, double)>();
+        static readonly PlayerFreezeSet frozen = new PlayerFreezeSet();
+        static readonly Dictionary<string, ZNetPeer> freezeConnections = new Dictionary<string, ZNetPeer>(StringComparer.Ordinal);
+        static readonly Dictionary<long, (PlayerFreezeUpdate Update, Actor Admin, Actor Target, double At)> pendingFreezes
+            = new Dictionary<long, (PlayerFreezeUpdate, Actor, Actor, double)>();
         static readonly Stopwatch clock = new Stopwatch();
         static double lastSecond = -1;
         static double lastAnnouncement;
@@ -82,6 +87,7 @@ namespace ExtraPotions.Thing.Runtime
             try
             {
                 LiftExpired();
+                SyncFreezes(now);
                 Announce(now);
                 Countdown(now);
                 Greet();
@@ -168,6 +174,57 @@ namespace ExtraPotions.Thing.Runtime
             return saved ? MuteWriteResult.Saved : MuteWriteResult.LiveOnly;
         }
 
+        /// <summary>Freezes or unfreezes one connected peer for this connection only. Nothing is written to the ledger.</summary>
+        internal static bool SetFrozen(OnlinePlayer target, Actor admin, bool on)
+        {
+            if (!CurrentAuthority || target.Peer == null || target.Peer.m_uid == 0) return false;
+            if (!Online().Any(player => ReferenceEquals(player.Peer, target.Peer) && player.Actor.Id == target.Actor.Id)) return false;
+            RetainFreezeConnections();
+            if (!frozen.TrySet(target.Actor.Id, target.Peer.m_uid, on, out var update)) return false;
+            pendingFreezes.Add(update.Revision, (update, admin, target.Actor, clock.Elapsed.TotalSeconds));
+            try { ThingPlayerFreeze.Push(update); }
+            catch (Exception error) { log?.Warning("Thing freeze notice failed: " + error.GetType().Name); }
+            return true;
+        }
+
+        internal static void AcknowledgeFreeze(long peer, long revision, bool on)
+        {
+            if (!CurrentAuthority || !pendingFreezes.TryGetValue(revision, out var pending)) return;
+            if (!Online().Any(player => player.Peer.m_uid == peer && player.Actor.Id == pending.Target.Id)) return;
+            RetainFreezeConnections();
+            if (!frozen.Acknowledge(peer, revision, on)) return;
+            pendingFreezes.Remove(revision);
+            Audit(pending.Admin, on ? ThingAction.FreezePlayer : ThingAction.UnfreezePlayer, pending.Target, AuditOutcome.Done,
+                "client acknowledged; clears on disconnect; local input enforcement");
+        }
+
+        static void SyncFreezes(double now)
+        {
+            RetainFreezeConnections();
+            foreach (var pair in pendingFreezes.ToArray())
+            {
+                var pending = pair.Value;
+                if (frozen.IsCurrent(pending.Update) && now - pending.At < 10) continue;
+                pendingFreezes.Remove(pair.Key);
+                Audit(pending.Admin, pending.Update.Frozen ? ThingAction.FreezePlayer : ThingAction.UnfreezePlayer, pending.Target,
+                    AuditOutcome.Failed, "not acknowledged: disconnected, superseded or timed out; current state continues to retry");
+            }
+            foreach (var update in frozen.Due(now))
+                try { ThingPlayerFreeze.Push(update); }
+                catch (Exception error) { log?.Warning("Thing freeze retry failed: " + error.GetType().Name); }
+        }
+
+        static void RetainFreezeConnections()
+        {
+            var online = Online();
+            foreach (var player in online)
+                if (freezeConnections.TryGetValue(player.Actor.Id, out var previous) && !ReferenceEquals(previous, player.Peer))
+                    frozen.Disconnect(player.Actor.Id);
+            freezeConnections.Clear();
+            foreach (var player in online) freezeConnections[player.Actor.Id] = player.Peer;
+            frozen.Retain(online.Select(player => new KeyValuePair<string, long>(player.Actor.Id, player.Peer.m_uid)));
+        }
+
         internal static MuteWriteResult Unmute(Actor target, OnlinePlayer? online, Actor admin)
         {
             if (!CurrentAuthority) return MuteWriteResult.Refused;
@@ -239,7 +296,11 @@ namespace ExtraPotions.Thing.Runtime
             countdown.Cancel();
             greeted.Clear();
             pendingKicks.Clear();
+            frozen.ClearAll();
+            freezeConnections.Clear();
+            pendingFreezes.Clear();
             clock.Reset();
+            ThingAccess.Clear();
         }
 
         static void Load(ZNet current)
@@ -262,6 +323,7 @@ namespace ExtraPotions.Thing.Runtime
                 var parsed = Announcements.Parse(File.ReadAllText(ThingPaths.AnnouncementsFile));
                 announcements = parsed.Entries;
                 foreach (var problem in parsed.Problems) log?.Warning(ThingSettings.AnnouncementsFile + " " + problem);
+                ThingAccess.Bind(current.GetWorldUID());
                 log?.Verbose("Thing server data loaded: " + ledger.Bans.Count + " bans, " + ledger.Mutes.Count + " mutes, " + announcements.Count + " announcements.");
             }
             catch (Exception error)

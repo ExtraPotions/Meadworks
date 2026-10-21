@@ -18,7 +18,9 @@ namespace ExtraPotions.Magpie.Runtime.Adopted.FloatingItems
         private static readonly HashSet<Floating> Added = new HashSet<Floating>();
         private static readonly AccessTools.FieldRef<ItemDrop, Floating> CachedFloat = AccessTools.FieldRefAccess<ItemDrop, Floating>("m_floating");
         private static readonly List<ItemDrop> Instances = (List<ItemDrop>)AccessTools.Field(typeof(ItemDrop), "s_instances").GetValue(null);
-        private static string? lastState;
+        private static bool seen;
+        private static bool lastOn;
+        private static string? lastExcluded;
 
         internal static void Track(Floating floating) { if (floating != null) Added.Add(floating); }
 
@@ -30,10 +32,12 @@ namespace ExtraPotions.Magpie.Runtime.Adopted.FloatingItems
         {
             if (MagpieRuntime.Settings == null) return;
             bool on = MagpieRuntime.ModuleOn(MagpieModule.Float);
-            var state = on + "|" + MagpieRuntime.Settings.Get<string>(MagpieSettings.ExcludedItems);
-            if (state == lastState) return;
-            bool first = lastState == null;
-            lastState = state;
+            string excluded = MagpieRuntime.Settings.Get<string>(MagpieSettings.ExcludedItems);
+            if (seen && on == lastOn && excluded == lastExcluded) return;
+            bool first = !seen;
+            seen = true;
+            lastOn = on;
+            lastExcluded = excluded;
             Added.RemoveWhere(f => f == null);
             if (first || !on || Instances == null) return;
             foreach (var drop in Instances)

@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.26 (2026-10-21)
+
+- Includes Crucible.UI 0.3.19.
+- A required mod's version check uses the server's peer class. A joining client that marks that mod server-only in its answer is still refused when the major.minor does not match, and still admitted when it does. Strict admission, the Crucible hello, and the Jotunn mod-list check are unchanged. A slow join still waits on a busy send queue, then 60 seconds, and never longer than 5 minutes.
+- The vanilla refusal and welcome notices now include German, Russian, Chinese, and Korean on the same literal line as English, Spanish, and French. A vanilla client still has no Meadworks localization tokens. The server sends one center message.
+- A notice stack taller than the open gap between the compass and the hotbar shows only the cards that fit, and the rest wait with their timers held. The stack stays off the hotbar. A card wider than the screen shrinks to the side margins.
+
+- A slow join is no longer dropped while its first data is still queued. The server waits until that peer's send queue drops to 64 KB, then allows 60 seconds for the Meadworks answer, and never waits longer than 5 minutes from the greeting. A peer that never answers is still refused. One warning is written when the wait passes the old 30 second limit. The check that a client sent Jotunn's mod list or Crucible's hello before it spawns is unchanged.
+- Crucible.UI: MeadWorks TopLeft and Center notices stack in a Timber or Brown panel (newest on top, repeats collapsed with a count, overflow queued, each card fading on its own timer). The stack stays off the compass, the status-effect row and the hotbar, and it hides while a player window is open. Unlock and biome banners, the game's own messages, and other mods' UI are unchanged. Local settings, section Notices: Stacked Notices, Position, Duration and Maximum Visible. A mod that registers IKitNoticeProvider still owns presentation.
+
+## 0.3.25 (2026-10-20)
+
+- Includes Crucible.UI 0.3.18.
+- Crucible.UI: faster inventory and crafting window. The screen layout no longer moves the crafting panel and the character header every frame. The inventory screen's animator puts their x back after every move, so the layout's x was never drawn and both panels, with every row and frame under them, were rebuilt each frame. An axis found back where it was is now left to the game until the inventory closes; the other axis is still placed. What is drawn is unchanged, apart from an occasional one-frame 24-unit jump at 1920x1080, which no longer happens.
+- Test bridge: the FPS bench's dirty tracker also records transform writes on the inventory screen's panels with their callers, and where the crafting panel and header are when the canvases render.
+
 ## 0.3.24 (2026-10-20)
 
 - Includes Crucible.UI 0.3.17.

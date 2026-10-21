@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.8 (2026-10-21)
+
+- Dependency pins refreshed to the October 21 sixth release: Crucible 0.3.26 (Crucible.UI 0.3.19) and every product: Almanac 0.1.16, Beacon 0.1.13, Bestiary 0.1.15, Burrow 0.3.24, Cairn 0.1.16, Delve 0.1.11, Edge 0.2.11, Ember 0.5.6, Hex 0.1.16, Inscribe 0.2.4, Keel 0.1.13, Kindle 0.1.22, Larder 0.2.12, Magpie 0.1.12, Mantle 0.1.23, Saga 0.1.14, Shepherd 0.1.15, Tempest 0.1.12, Thing 0.1.10, Threshold 0.3.10, Timber 0.2.1, Wayfarer 0.5.12, Wildblood 0.5.4, Wildroot 0.1.18.
+- Installer: What's new summaries and player notes for all 25 new versions.
+
+## 0.1.7 (2026-10-21)
+
+- Dependency pins refreshed to the October 21 fifth release: Burrow 0.3.23, Kindle 0.1.21, Saga 0.1.13 and Wildroot 0.1.17.
+- Installer: What's new entries use the full width of the tab, aligned with the Mods table, and the four license-only releases (Bestiary 0.1.14, Cairn 0.1.15, Hex 0.1.15, Tempest 0.1.11) get a player note, so every changelog sits behind its Full changelog button.
+
+## 0.1.6 (2026-10-20)
+
+- Dependency pins refreshed to the October 20 fourth release: Burrow 0.3.22 and Wildroot 0.1.16.
+
+## 0.1.5 (2026-10-20)
+
+- Dependency pins refreshed to the October 20 third release: Crucible 0.3.25 (Crucible.UI 0.3.18), Beacon 0.1.12, Bestiary 0.1.14, Burrow 0.3.21, Cairn 0.1.15, Hex 0.1.15, Inscribe 0.2.3, Tempest 0.1.11, Wildblood 0.5.3 and Wildroot 0.1.15.
+- Installer: fits the screen at 200% scaling and follows per-monitor DPI changes, gives screen readers a name, role and state for every control, and explains on the Backups tab that only Setup's own backups are listed.
+- The installer no longer copies Crucible's AssetWorkshop-LICENSE.txt into the Crucible plugin folder. It covers only development test-tool files that no released DLL contains; the notice stays in Crucible's repository and source archive.
+
 ## 0.1.4 (2026-10-20)
 
 - Dependency pins refreshed to the October 20 follow-up release: Crucible 0.3.24 (Crucible.UI 0.3.17), Burrow 0.3.20, Cairn 0.1.14, Edge 0.2.10, Inscribe 0.2.2, Kindle 0.1.20, Mantle 0.1.22, Threshold 0.3.9, Wildblood 0.5.2 and Wildroot 0.1.14.

@@ -32,7 +32,7 @@ namespace ExtraPotions.Thing.UI
         ThingUiPage(string page, int offset, int total, IReadOnlyList<ThingUiRow> rows, string version = "")
         { Page = page; Offset = offset; Total = total; Rows = rows; Version = version; }
 
-        public static bool Known(string page) => page == "players" || page == "moderation" || page == "audit" || page == "permitted" || page == "admins" || page == "announcements" || page == "delve" || page == "delve_actions" || page == "delve_due" || page == "delve_nearest" || page == "delve_nature" || page == "config_files" || page == "config_entries";
+        public static bool Known(string page) => page == "players" || page == "moderation" || page == "audit" || page == "permitted" || page == "admins" || page == "grants" || page == "announcements" || page == "delve" || page == "delve_actions" || page == "delve_due" || page == "delve_nearest" || page == "delve_nature" || page == "config_files" || page == "config_entries";
         public static bool AdminReadPage(string page) => Known(page) && page != "announcements" && page != "delve" && page != "delve_actions" && page != "delve_due" && page != "delve_nearest" && page != "delve_nature" && page != "config_files" && page != "config_entries";
         public static bool PlatformId(string id) => !string.IsNullOrWhiteSpace(id) && Encoding.UTF8.GetByteCount(id) <= 256
             && id.All(c => char.IsLetterOrDigit(c) || c == '_' || c == '-' || c == ':' || c == '.');

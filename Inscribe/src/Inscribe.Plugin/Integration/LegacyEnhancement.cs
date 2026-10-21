@@ -318,10 +318,20 @@ namespace ExtraPotions.Inscribe.Runtime
                 shared.m_maxStackSize = 50;
                 shared.m_weight = 0.1f;
                 shared.m_value = 0;
-                Sprite? icon = Plugin.AllowsUi ? ExtraPotions.Meadworks.OriginalArt.OriginalItemArt.Icon(copy.name) : null;
-                if (icon != null) shared.m_icons = new[] { icon };
                 drop.m_itemData.m_dropPrefab = copy;
                 Scrolls[tier] = copy;
+                if (Plugin.AllowsUi)
+                {
+                    try
+                    {
+                        Sprite? icon = ExtraPotions.Meadworks.OriginalArt.OriginalItemArt.Icon(copy.name);
+                        if (icon != null) shared.m_icons = new[] { icon };
+                    }
+                    catch (Exception error)
+                    {
+                        Adopted.Core.Log.Warn($"Original item art unavailable for {copy.name}; keeping the registered scroll: {error.Message}");
+                    }
+                }
             }
         }
 

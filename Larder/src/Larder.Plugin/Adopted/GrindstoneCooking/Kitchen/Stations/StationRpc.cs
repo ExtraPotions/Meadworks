@@ -2,17 +2,19 @@
 // Adopted from ValheimMods 9da28eb58adbe065be1e4baef779a448acd38e0f: GrindstoneSkills/GrindstoneSkills/Kitchen/Stations/StationRpc.cs
 // Changed by expDARE, 2026: namespace, Crucible configuration/lifecycle, owned keys and Larder-only feature dispatch.
 using HarmonyLib;
+using System;
 
 namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
 {
     /// <summary>
-    /// GrindstoneSkills' add RPC on cooking stations and the oven (<see cref="Keys.RpcAddItem"/>). The game's CookItem, on
+    /// Legacy GrindstoneSkills add RPC on cooking stations and the oven (<see cref="Keys.RpcAddItem"/>). The game's CookItem, on
     /// the cook's client, removes the raw item and sends "RPC_AddItem"(item, cheated) to the station's ZDO owner, which
     /// puts it into the first free slot (GetFreeSlot) with SetSlot, shows it to everybody and plays the add effect. Our
     /// RPC carries the same two values plus the cook's level. The owner runs the game's own RPC_AddItem unchanged, then
     /// stores the level in the slot it filled (<see cref="StationSlots"/>). A plain "RPC_AddItem" (a vanilla client,
     /// another mod) takes the same path with level 0. Registered on every CookingStation where the game registers its
-    /// own RPCs (Awake, when the ZDO exists), so a kitchen always has it.
+    /// own RPCs (Awake, when the ZDO exists), so a kitchen always has it. Current Larder placement uses
+    /// StationAddTransactions and ApplyAdd to settle escrow from the actual owner-written slot result.
     /// </summary>
     public static class StationRpc
     {
@@ -70,6 +72,24 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
 
         /// <summary>A level that came over the network, trusted like every skill level but never negative, NaN or infinite.</summary>
         private static float Sane(float value) => float.IsNaN(value) || float.IsInfinity(value) || value < 0f ? 0f : value;
+
+        internal static void ApplyAdd(CookingStation station, long sender, string prefab, bool cheated, float level, Action<bool> settle)
+        {
+            int slot = station.IsItemAllowed(prefab) ? station.GetFreeSlot() : -1;
+            if (slot < 0) { settle(false); return; }
+            pendingStation = station;
+            pendingLevel = Sane(level);
+            try { station.RPC_AddItem(sender, prefab, cheated); }
+            finally
+            {
+                pendingStation = null;
+                // Native effects can throw after SetSlot. The stored slot, not normal return, determines payment.
+                station.GetSlot(slot, out string placed, out _, out _, out _);
+                bool accepted = placed == prefab;
+                if (accepted) StationSlots.Write(station.m_nview.GetZDO(), slot, Sane(level));
+                settle(accepted);
+            }
+        }
 
         /// <summary>Finds the slot the game's RPC_AddItem fills (free before, holding the item after) and stores the level there.</summary>
         [HarmonyPatch(typeof(CookingStation), nameof(CookingStation.RPC_AddItem))]

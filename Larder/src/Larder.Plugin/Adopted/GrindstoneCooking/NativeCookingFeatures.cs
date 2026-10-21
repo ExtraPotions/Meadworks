@@ -18,6 +18,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         private static MeadworksLog log;
         private static IDisposable experience, page, icon;
         private static Sprite cookingIcon;
+        private static readonly Type[] dataRoots = { typeof(StationXp), typeof(CraftXp), typeof(FermenterXp) };
         public static bool Active => data != null && NativeCooking.Active;
 
         public static void Initialize(MeadworksLog logger)
@@ -40,13 +41,13 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         {
             if (data == null) return;
             bool active = NativeCooking.Active;
-            Switch(data, ref dataOn, active, typeof(StationXp), typeof(CraftXp), typeof(FermenterXp));
+            Switch(data, ref dataOn, active, dataRoots);
             uiOn = active && MeadworksHeadless.AllowsUi;
             if (uiOn && icon == null) icon = MeadworksSkills.RegisterIcon("com.meadworks.larder", CookLevel.Skill, Icon);
             if (!uiOn && icon != null) { icon.Dispose(); icon = null; }
         }
 
-        private static void Switch(Harmony harmony, ref bool installed, bool wanted, params Type[] roots)
+        private static void Switch(Harmony harmony, ref bool installed, bool wanted, Type[] roots)
         {
             if (installed == wanted) return;
             harmony.UnpatchSelf();
@@ -78,7 +79,8 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         {
             if (!NativeCooking.Active || !MeadworksHeadless.AllowsUi) return null;
             if (cookingIcon != null) return cookingIcon;
-            cookingIcon = OriginalItemArt.Icon("larder_cooking");
+            try { cookingIcon = OriginalItemArt.Icon("larder_cooking"); }
+            catch (Exception error) { Warn("Cooking icon art", error); }
             return cookingIcon;
         }
 

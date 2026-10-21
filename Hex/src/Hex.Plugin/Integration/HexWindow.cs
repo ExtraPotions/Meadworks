@@ -31,6 +31,7 @@ internal static partial class HexWindow
     static bool dirty, focusTabAfterDraw;
     static Player? actor;
     static long session = -1;
+    static int debugRadius = 50;
     static readonly List<Button> tabs = new();
     static readonly List<string> keys = new();
     static readonly Dictionary<RectTransform, List<Action>> cleanup = new();
@@ -150,7 +151,8 @@ internal static partial class HexWindow
         if (tab == "debug")
         {
             SpawnProtectionRow(rows);
-            foreach (var action in new[] { "fly", "build", "kill", "drops" })
+            rows.Add(new KitVirtualRow("debug:radius", 90, BindRadius, Unbind));
+            foreach (var action in new[] { "fly", "build", "kill", "drops", "tame", "event" })
             {
                 var name = action;
                 ActionRow(rows, "debug_" + name, HexText.Text("debug_" + name), () => DebugAction(name));
@@ -275,19 +277,35 @@ internal static partial class HexWindow
         updates[rect] = () => { number.Set(Current().ToString("0.###", CultureInfo.InvariantCulture)); number.SetUsable(Plugin.Settings!.Enabled.Value && Plugin.Settings.SkillEditor.Value && HexMovement.Owned(Player.m_localPlayer) && MeadworksMischief.Decide(Plugin.Guid, MischiefCategory.Progress).Allowed); NumberHelp(number, row.Name, HexText.Text("skill_editor"), MeadworksMischief.Decide(Plugin.Guid, MischiefCategory.Progress).Allowed ? "" : MeadworksBlockedOptions.Reason(MeadworksMischief.Decide(Plugin.Guid, MischiefCategory.Progress).Reason)); };
         updates[rect](); Focus(rect, "skill:" + (int)row.Type);
     }
+    static void BindRadius(RectTransform rect)
+    {
+        cleanup[rect] = new List<Action>();
+        KitAlmanacDialog.Label(rect, "Label", HexText.Text("debug_radius"), Vector2.zero, new Vector2(350, 40), 16);
+        var number = KitAlmanacNumber.Create(rect, "Radius", new Vector2(380, 0), new Vector2(280, 75), debugRadius.ToString(CultureInfo.InvariantCulture),
+            text => int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) && value >= 5 && value <= 1000,
+            text => { if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) && value >= 5 && value <= 1000) debugRadius = value; },
+            direction => Mathf.Clamp(debugRadius + direction * 5, 5, 1000).ToString(CultureInfo.InvariantCulture),
+            5, 1000, 5, serialize: value => Mathf.Clamp(Mathf.RoundToInt((float)value), 5, 1000).ToString(CultureInfo.InvariantCulture));
+        cleanup[rect].Add(number.Dispose);
+        NumberHelp(number, HexText.Text("debug_radius"), HexText.Text("debug_radius_hint"));
+        updates[rect] = () => number.Set(debugRadius.ToString(CultureInfo.InvariantCulture));
+        updates[rect]();
+        Focus(rect, "debug:radius");
+    }
     internal static string DebugAction(string action)
     {
         var native = ZNet.instance != null && ZNet.instance.IsServer();
-        if (action != "kill" && action != "drops") return HexDebug.Execute(action);
+        if (action != "kill" && action != "drops" && action != "tame" && action != "event") return HexDebug.Execute(action);
         if (!HexDebug.Tools) return HexText.Text("debug_unavailable");
         if (KitAlmanacDialog.Active != null) return HexText.Text("actions_unavailable");
         Open();
         var capturedActor = actor; var capturedSession = session; var capturedNet = ZNet.instance;
-        KitAlmanacTextEditor.Confirm(window, HexText.Text("debug_" + action), HexText.Text(native ? "debug_confirm_" + action + "_body" : "debug_confirm_remote_" + action + "_body"), () =>
+        var body = action == "event" ? "debug_confirm_event_body" : native ? "debug_confirm_" + action + "_body" : "debug_confirm_remote_" + action + "_body";
+        KitAlmanacTextEditor.Confirm(window, HexText.Text("debug_" + action), HexText.Text(body), () =>
         {
             if (actor == capturedActor && capturedActor == Player.m_localPlayer && session == capturedSession
                 && capturedSession == CruciblePlugin.Session.Generation && capturedNet == ZNet.instance)
-                Result(HexDebug.Execute(action, true));
+                Result(action == "event" ? HexDebug.Execute(action, true) : HexDebug.Execute(action, true, debugRadius));
         });
         return "";
     }
@@ -314,7 +332,7 @@ internal static partial class HexWindow
             cleanup[rect] = new List<Action>();
             var button = KitButton.Create(rect, "Action", title, () => Result(action()), Vector2.zero, new Vector2(700, 34));
             Help(button.gameObject, title, ActionHelp(id));
-            MischiefCategory? category = id == "debug_build" ? MischiefCategory.Economy : id == "debug_kill" || id == "debug_drops" ? MischiefCategory.World
+            MischiefCategory? category = id == "debug_build" ? MischiefCategory.Economy : id == "debug_kill" || id == "debug_drops" || id == "debug_tame" || id == "debug_event" ? MischiefCategory.World
                 : id == "debug_fly" || id.StartsWith("time_", StringComparison.Ordinal) ? MischiefCategory.Personal : id == "power" ? MischiefCategory.Progress : id == "heal" || id == "rested" ? MischiefCategory.Personal
                 : id == "reveal" || id == "reset" || id == "seed" || id == "poi" || id == "estimatepoi" ? MischiefCategory.Information : (MischiefCategory?)null;
             if (category.HasValue) updates[rect] = () =>

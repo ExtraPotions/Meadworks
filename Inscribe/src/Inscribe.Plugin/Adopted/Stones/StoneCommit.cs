@@ -5,13 +5,15 @@
 using ExtraPotions.Inscribe.Adopted.Affixes;
 using ExtraPotions.Inscribe.Adopted.Core;
 using ExtraPotions.Inscribe.Adopted.Text;
+using ExtraPotions.Inscribe.Runtime;
 using UnityEngine;
 
 namespace ExtraPotions.Inscribe.Adopted.Stones
 {
     /// <summary>
-    /// Pipeline step 14 (applying-stones.md section 3), in one frame on the owning client: write the dry-run state
-    /// (one write), take the cost from the carried stack, keep the rest of the stack on the cursor, then the feedback. An equipped target needs nothing more here: the write raises
+    /// Pipeline step 14 (applying-stones.md section 3), in one frame on the owning client: take the whole cost, and only
+    /// then write the dry-run state. A short payment writes nothing. A refused write puts the cost back. Keep the rest of
+    /// the stack on the cursor, then the feedback. An equipped target needs nothing more here: the write raises
     /// <see cref="ItemStateCache.Written"/>, which the effects area listens to for its rebuild.
     /// <para>
     /// Multiplayer: nothing is sent anywhere. The new state lives in the item's <c>m_customData</c>, which the game
@@ -27,6 +29,10 @@ namespace ExtraPotions.Inscribe.Adopted.Stones
             {
                 return;   // a refusal or a socket still to pick: nothing to write
             }
+            if (!Pay(job))
+            {
+                return;
+            }
             bool written;
             using (ItemChanges.Because(ItemChanges.Rune(job.Def?.Id)))
             {
@@ -34,10 +40,11 @@ namespace ExtraPotions.Inscribe.Adopted.Stones
             }
             if (!written)
             {
-                Log.Error($"rune '{job.Def?.Id}' passed every check but the item state write was refused; nothing consumed");
+                Log.Error($"rune '{job.Def?.Id}' passed every check but the item state write was refused; the cost was put back");
+                Undo(job);
                 return;
             }
-            Pay(job);
+            job.Supply?.NoteUsed(job);
             if (result.ReturnedGem != null)
             {
                 Runtime.GemRecoveryRuntime.Give(job.Player, result.ReturnedGem);   // after the write: never a copy without the swap
@@ -46,19 +53,62 @@ namespace ExtraPotions.Inscribe.Adopted.Stones
             StoneFeedback.Success(job.Player, result);
         }
 
-        // The cost leaves the carried stack in the same frame as the write, so no use can ever land without being paid for.
-        // A rune taken from an open chest is paid from the chest, which saves itself (this client owns it while it is open);
-        // at the Rune Table the table's supply pays (its store first, then the inventory, and the essence).
-        private static void Pay(StoneJob job)
+        // The whole cost leaves before the write. A carried stack is paid from the inventory that holds it (the player's,
+        // or the open chest this client owns). At the Rune Table the supply pays its runes and its essence.
+        private static bool Pay(StoneJob job)
         {
             if (job.Supply != null)
             {
-                job.Supply.Pay(job);
+                return job.Supply.Pay(job);
+            }
+            if (job.Cost <= 0)
+            {
+                return true;
+            }
+            Inventory? source = job.StoneSource;
+            if (source == null)
+            {
+                return false;
+            }
+            int removed = SafeInventory.RemoveFrom(source, job.Stone, job.Cost);
+            if (removed == job.Cost)
+            {
+                return true;
+            }
+            Restore(source, job.Stone, removed, job.Player);
+            return false;
+        }
+
+        private static void Undo(StoneJob job)
+        {
+            if (job.Supply != null)
+            {
+                job.Supply.Refund(job);
                 return;
             }
-            if (job.Cost > 0)
+            if (job.Cost > 0 && job.StoneSource != null)
             {
-                job.StoneSource!.RemoveItem(job.Stone, job.Cost);
+                Restore(job.StoneSource, job.Stone, job.Cost, job.Player);
+            }
+        }
+
+        // A short removal, or a write that was refused after a full removal, puts those stones back on the same stack.
+        // What does not fit is dropped at the player's feet.
+        private static void Restore(Inventory inventory, ItemDrop.ItemData stone, int count, Player player)
+        {
+            if (count <= 0)
+            {
+                return;
+            }
+            if (inventory.ContainsItem(stone))
+            {
+                stone.m_stack += count;
+                return;
+            }
+            stone.m_stack = count;
+            if (!inventory.AddItem(stone))
+            {
+                SafeInventory.AddOrDrop(inventory, stone, SafeInventory.AtFeet(player));
             }
         }
 

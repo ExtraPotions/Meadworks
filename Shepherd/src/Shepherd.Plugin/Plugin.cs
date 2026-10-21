@@ -66,6 +66,7 @@ namespace ExtraPotions.Shepherd.Runtime
                 husbandry = ExtraPotions.Shepherd.Runtime.Skills.HusbandrySkill.Register();
                 Husbandry = husbandry;
                 NativeHusbandry.Initialize(Config, log);
+                ShepherdSeasons.Initialize(Config);
                 ShepherdSources.Initialize();
                 sourceImport = new ShepherdImport(Config, log);
                 NativeFeeding.Initialize(log);
@@ -98,6 +99,7 @@ namespace ExtraPotions.Shepherd.Runtime
         private void Update()
         {
             if (!Ready) return;
+            NativeHusbandry.Run("season facts", ShepherdSeasons.Tick);
             NativeHusbandry.Run("Husbandry lifecycle", NativeHusbandry.Tick);
             NativeHusbandry.Run("source compatibility", ShepherdSources.Tick);
             NativeFeeding.Run("Feeding lifecycle", NativeFeeding.Tick);
@@ -116,6 +118,7 @@ namespace ExtraPotions.Shepherd.Runtime
         private void Shutdown()
         {
             Ready = false;
+            ShepherdSeasons.Shutdown();
             UI.HerdBook.Shutdown();
             UI.TroughHeader.Shutdown();
             Pens.LandPenPieces.Shutdown();

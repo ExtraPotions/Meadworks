@@ -18,8 +18,14 @@ namespace ExtraPotions.Inscribe.Adopted.Stones
         /// <summary>Why this use cannot be paid besides the rune count (no essence, the table lost), or null.</summary>
         StoneMessage? Shortfall(StoneJob job);
 
-        /// <summary>Takes the cost: the runes and the essence. Called once, right after the item was written.</summary>
-        void Pay(StoneJob job);
+        /// <summary>Takes the whole cost. False when any of it did not leave, and a false return keeps nothing.</summary>
+        bool Pay(StoneJob job);
+
+        /// <summary>Puts back a cost <see cref="Pay"/> already took, when the item write is refused.</summary>
+        void Refund(StoneJob job);
+
+        /// <summary>The use stuck. Called only after the item write.</summary>
+        void NoteUsed(StoneJob job);
 
         /// <summary>The inscriptions the chosen essence guarantees (only these are drawn); null = a plain roll.</summary>
         ISet<string>? Favoured { get; }

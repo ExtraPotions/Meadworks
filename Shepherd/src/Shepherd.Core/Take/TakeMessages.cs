@@ -14,7 +14,7 @@ namespace ExtraPotions.Shepherd.Take
         /// <summary>Trough owner to the animal's current owner: the item was removed, apply the meal.</summary>
         public const string MealRpc = "shepherd.meal";
 
-        /// <summary>The animal owner drops a pending request after this long and searches again; it never resends it.</summary>
+        /// <summary>The animal owner asks again with the same id after this long. A new id is not issued.</summary>
         public const double ReplyTimeoutSeconds = 10.0;
 
         /// <summary>A trough owner refuses a request id it saw within this window.</summary>

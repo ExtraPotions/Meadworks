@@ -181,7 +181,8 @@ namespace ExtraPotions.Meadworks.Crucible {
     /// Roster peer-class rules for one server and one client product set (major.minor must match). Required products
     /// the client lacks or runs at another major.minor refuse the join with what to install; required products the
     /// server lacks turn off on the client for the session; client-optional products always join; server-only
-    /// products are ignored on clients. Results are ordered by product id.
+    /// products are ignored on clients. The server's registered peer class decides each product, including the version
+    /// check. Results are ordered by product id.
     /// </summary>
     public static class PeerClassPolicy {
         public static PeerClassVerdict Evaluate(IEnumerable<PeerProduct> server,IEnumerable<PeerProduct> client){
@@ -199,7 +200,6 @@ namespace ExtraPotions.Meadworks.Crucible {
         static PeerProductResult? ServerSide(PeerProduct s,PeerProduct? c){
             if(s.PeerClass==PeerClass.ServerOnly)return c==null?null:new PeerProductResult(s,c,PeerProductOutcome.ServerOnlyIgnored,null);
             if(c==null)return s.PeerClass==PeerClass.RequiredOnAllPeers?new PeerProductResult(s,null,PeerProductOutcome.MissingOnClient,"This server requires "+s.Name+" "+s.VersionText+". Install "+s.Name+" "+s.VersionText+" to join."):null;
-            if(c.PeerClass==PeerClass.ServerOnly)return new PeerProductResult(s,c,PeerProductOutcome.ServerOnlyIgnored,null);
             if(s.Legacy||c.Legacy)return new PeerProductResult(s,c,PeerProductOutcome.VersionUnverified,null);
             if(s.Version==c.Version)return new PeerProductResult(s,c,PeerProductOutcome.Match,null);
             var have="This server runs "+s.Name+" "+s.VersionText+"; you have "+c.VersionText+". ";

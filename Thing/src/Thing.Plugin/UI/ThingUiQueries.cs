@@ -14,18 +14,18 @@ namespace ExtraPotions.Thing.Runtime
 {
     public static class ThingUiQueries
     {
-        public static bool TryRead(IReadOnlyList<string> args, Actor admin, bool fromLocalAuthority, bool requesterIsAdmin, out IReadOnlyList<string> lines)
+        public static bool TryRead(IReadOnlyList<string> args, Actor admin, bool fromLocalAuthority, bool requesterIsAdmin, out IReadOnlyList<string> lines, bool playersOnly = false)
         {
             lines = Array.Empty<string>();
             if (args.Count == 0 || !string.Equals(args[0], "ui-read", StringComparison.OrdinalIgnoreCase)) return false;
             if (ZNet.instance == null || !ZNet.instance.IsServer() || !ThingServer.Active || !ThingModules.ProductActive(out _))
             { lines = new[] { ThingText.Text("refused_product_off") }; return true; }
             // Remote callers have already passed the relay's live platform-ID/adminlist check; do not read first.
-            if (!fromLocalAuthority && !requesterIsAdmin)
+            if (!fromLocalAuthority && !requesterIsAdmin && !playersOnly)
             { lines = new[] { ThingText.Text("refused_not_admin") }; return true; }
             if (args.Count != 3 || !ThingUiPage.AdminReadPage(args[1]) || !int.TryParse(args[2], NumberStyles.None, CultureInfo.InvariantCulture, out var offset)
-                || offset < 0 || offset >= ThingUiPage.MaxTotal)
-            { lines = new[] { ThingText.Text("ui_read_invalid") }; return true; }
+                || offset < 0 || offset >= ThingUiPage.MaxTotal || playersOnly && args[1] != "players")
+            { lines = new[] { ThingText.Text(playersOnly && args.Count == 3 && args[1] != "players" ? "refused_not_admin" : "ui_read_invalid") }; return true; }
             try
             {
                 IEnumerable<ThingUiRow> rows;
@@ -39,10 +39,11 @@ namespace ExtraPotions.Thing.Runtime
                             r.AtUtc.ToString("u", CultureInfo.InvariantCulture) + " | " + (r.ExpiresUtc?.ToString("u", CultureInfo.InvariantCulture) ?? "-") + " | " + r.Reason));
                 else if (args[1] == "permitted" || args[1] == "admins")
                     rows = ThingLists.Read(args[1] == "admins").Select(id => new ThingUiRow(args[1] == "admins" ? "admin" : "permit", id, id, ""));
+                else if (args[1] == "grants") rows = ThingAccess.Rows();
                 else rows = AuditTail();
                 lines = ThingUiPage.Encode(args[1], offset, rows);
                 var action = args[1] == "admins" ? ThingAction.AdminListView : args[1] == "permitted" ? ThingAction.PermitListView
-                    : args[1] == "players" ? ThingAction.ListPlayers : ThingAction.AuditView;
+                    : args[1] == "grants" ? ThingAction.GrantEdit : args[1] == "players" ? ThingAction.ListPlayers : ThingAction.AuditView;
                 ThingServer.Audit(admin, action, default, AuditOutcome.Done, "UI page " + args[1] + " offset " + offset.ToString(CultureInfo.InvariantCulture));
             }
             catch { lines = new[] { ThingText.Text("ui_read_failed") }; }

@@ -121,7 +121,7 @@
     "cfg_chests__reset_opened_name": "Reset Opened",
     "cfg_chests__reset_opened_help": "On: an opened chest refills after the delay even with leftovers inside, which are replaced. Off: only empty chests are on a clock.",
     "cfg_chests__restock_loaded_name": "Restock Loaded",
-    "cfg_chests__restock_loaded_help": "Refill chests a player has loaded too, unless someone has the chest open. Chests near a base are loaded most of the time.",
+    "cfg_chests__restock_loaded_help": "On: the delay keeps running while a player has the chest loaded, and the new contents are written on the first check after the chest unloads. Off: a loaded chest is left alone until it unloads, and the delay starts then. Contents are never replaced while a loaded copy is still in memory.",
     "cfg_chests__chest_dry_run_name": "Chest Dry Run",
     "cfg_chests__chest_dry_run_help": "On: only report what would come back; change nothing.",
     "cfg_chests__exclude_name": "Exclude",

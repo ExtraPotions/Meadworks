@@ -176,17 +176,19 @@ namespace ExtraPotions.Meadworks.Crucible {
         internal static void MarkCrucible(ZNetPeer? peer){if(harmony!=null&&peer!=null)MeadworksAdmission.Peers.Answered(peer.m_uid);}
 
         /// <summary>
-        /// Server, once a second: peers that neither answered the greeting nor sent any Crucible frame within
-        /// <see cref="MeadworksAdmission.AnswerTimeoutSeconds"/> are vanilla. Unless AllowVanilla is effective they are
-        /// refused with a native center message and the native version error, then disconnected after the grace second;
-        /// effective AllowVanilla admits them with a native notice. Installed (with the greeting) only while the
-        /// handshake flag is on.
+        /// Server, once a second: peers that neither answered the greeting nor sent any Crucible frame before their
+        /// quiet wait ends are vanilla. The quiet wait does not run while the peer's send queue is above
+        /// <see cref="PeerPresenceTracker.SendBacklogBytes"/>, and it never runs past the ceiling measured from the
+        /// greeting. Unless AllowVanilla is effective they are refused with a native center message and the native
+        /// version error, then disconnected after the grace second; effective AllowVanilla admits them with a native
+        /// notice. The peer-info gate is unchanged. Installed (with the greeting) only while the handshake flag is on.
         /// </summary>
         static void CheckSilentPeers(ZNet? net,double now){
             var peers=MeadworksAdmission.Peers;
             if(net==null||!net.IsServer()){if(peers.PendingCount+peers.VanillaCount>0)MeadworksAdmission.Reset();return;}
             var connected=net.GetPeers();
             peers.Retain(connected.Select(p=>p.m_uid));
+            HoldBusyQueues(connected,now);
             var silent=peers.Expire(now);if(silent.Count==0)return;
             var decision=MeadworksAdmission.Report();
             foreach(var uid in silent){
@@ -198,10 +200,24 @@ namespace ExtraPotions.Meadworks.Crucible {
                     continue;
                 }
                 var code=RefusalCodes.New();LastRefusalCode=code;
-                Log.Error("Refusing peer "+name+": no Meadworks answer within "+MeadworksAdmission.AnswerTimeoutSeconds.ToString(CultureInfo.InvariantCulture)+" s (vanilla client, or a client with Network.PeerClassHandshake off). "+decision.Summary+" Refusal code "+code+".");
+                Log.Error("Refusing peer "+name+": no Meadworks answer within "+peers.Waited(uid,now).ToString("0",CultureInfo.InvariantCulture)+" s (vanilla client, or a client with Network.PeerClassHandshake off). "+decision.Summary+" Refusal code "+code+".");
                 MeadworksServerNotices.TrySend(Plugin.Guid,uid,AdmissionPolicy.VanillaRefusalNotice);
                 try{peer.m_rpc.Invoke("Error",(int)ZNet.ConnectionStatus.ErrorVersion);}catch(Exception e){Log.Warning("Sending the native refusal failed: "+e.GetType().Name);}
                 leaving[peer]=now+Grace;
+            }
+        }
+
+        static void HoldBusyQueues(IEnumerable<ZNetPeer> connected,double now){
+            var peers=MeadworksAdmission.Peers;
+            foreach(var peer in connected){
+                if(peer==null||peers.KindOf(peer.m_uid)!=PeerKind.Pending)continue;
+                int queued;
+                try{queued=peer.m_socket!=null?peer.m_socket.GetSendQueueSize():0;}
+                catch(Exception e){Log.Warning("Reading the send queue for peer "+peer.m_uid.ToString(CultureInfo.InvariantCulture)+" failed: "+e.GetType().Name);continue;}
+                if(queued<=PeerPresenceTracker.SendBacklogBytes)continue;
+                peers.Extend(peer.m_uid,now);
+                if(!peers.NoteSlow(peer.m_uid,now,MeadworksAdmission.FormerAnswerTimeoutSeconds))continue;
+                Log.Warning("Peer "+peer.m_uid.ToString(CultureInfo.InvariantCulture)+" is still joining after "+MeadworksAdmission.FormerAnswerTimeoutSeconds.ToString("0",CultureInfo.InvariantCulture)+" s because "+queued.ToString(CultureInfo.InvariantCulture)+" bytes are still queued. The wait continues until the queue drains or "+peers.CeilingSeconds.ToString("0",CultureInfo.InvariantCulture)+" s.");
             }
         }
 

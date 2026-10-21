@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.22 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Salvage materials that have already merged into the inventory stay there if adding the stack fails part way. Only the units that did not land drop at your feet.
+
+- German, Russian, Chinese and Korean text on the crafting screen uses the game's own words for recipes, stations, repair, inventory, chests and the related controls.
+
+## 0.1.21 (2026-10-21)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- Salvage tab: also lists gear in nearby chests, marked "From a chest" in Burrow's container color (needs Burrow). It uses the chests Burrow's Reach crafting uses: the same range, wards, privacy, chest allow/deny lists and per-player Reach toggle; chests another player has open and chests held by another transfer are skipped. Favorites, equipped items and every other salvage rule are refused as for carried gear; the hotbar rule still applies only to your own inventory. Salvaging a chest item takes it out through Burrow's durable chest hold (the chest is claimed or handed over by its owner first, the slot must still hold the listed item, and nothing changes if it moved). The materials go into your inventory, and what does not fit drops at your feet. Without Burrow, Kindle lists only your inventory, as before.
+- New setting Salvage / Nearby Chests (default on; host value applies on a server, your own in single player). English, Spanish and French text.
+
 ## 0.1.20 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

@@ -1,6 +1,6 @@
 // Portions Copyright (C) 2026 Gerald Glasgow. EliteCrafting 0.7.0 at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1.
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Changed by expDARE, 2026: Inscribe namespace; Crucible configuration, session and lifecycle boundaries; essence names in Spanish and French.
+// Changed by expDARE, 2026: Inscribe namespace; Crucible configuration, session and lifecycle boundaries; shipped word lists for Spanish, French, German, Russian, Chinese and Korean.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,9 +16,11 @@ namespace ExtraPotions.Inscribe.Adopted.Text
     /// <summary>
     /// Every player-facing word (localization.md). English ships embedded as flat YAML maps, one file per feature area:
     /// <c>translations/English.&lt;area&gt;.yml</c> (key without <c>$</c> → text), all loaded, so each area adds its
-    /// own words in its own file and nobody edits another's. A player's <c>Inscribe.translations.&lt;Language&gt;.yml</c>
-    /// in the config folder overrides English per key. Handed to the game's localization on every language setup and
-    /// at plugin Awake; the game's cache (which also stores misses) is evicted afterwards.
+    /// own words in its own file and nobody edits another's. The other six languages ship as
+    /// <c>translations/&lt;Language&gt;.yml</c> and replace only the keys they list, so a missing line stays English.
+    /// A player's <c>Inscribe.translations.&lt;Language&gt;.yml</c> in the config folder overrides both. Handed to the
+    /// game's localization on every language setup and at plugin Awake; the game's cache (which also stores misses) is
+    /// evicted afterwards.
     /// </summary>
     public static class Words
     {
@@ -70,10 +72,14 @@ namespace ExtraPotions.Inscribe.Adopted.Text
             return words.Length == 0 ? loc.Localize(text) : loc.Localize(text, words);
         }
 
-        /// <summary>Installs English, then the player's own file for the language, into the game's localization.</summary>
+        /// <summary>Installs English, then the shipped words for that language, then the player's own file.</summary>
         internal static void Install(global::Localization loc, string language)
         {
             foreach (KeyValuePair<string, string> word in English)
+            {
+                loc.AddWord(word.Key, word.Value);
+            }
+            foreach (KeyValuePair<string, string> word in ShippedFile(language))
             {
                 loc.AddWord(word.Key, word.Value);
             }
@@ -110,6 +116,25 @@ namespace ExtraPotions.Inscribe.Adopted.Text
             {
                 Log.Error($"a Words.Changed handler threw: {e}");
             }
+        }
+
+        /// <summary>
+        /// Embedded words for one supported language. Keys the file does not list stay English.
+        /// English itself is already installed. An unsupported language normalizes to English and adds nothing.
+        /// </summary>
+        private static Dictionary<string, string> ShippedFile(string language)
+        {
+            Dictionary<string, string> words = new Dictionary<string, string>(StringComparer.Ordinal);
+            string canonical = ExtraPotions.Meadworks.Crucible.MeadworksLanguages.Normalize(language);
+            if (canonical == "English")
+            {
+                return words;
+            }
+            foreach (string resource in Embedded.Names("Inscribe.translations." + canonical + ".", ".yml"))
+            {
+                Merge(words, Embedded.Text(resource) ?? "", resource);
+            }
+            return words;
         }
 
         private static Dictionary<string, string> PlayerFile(string language)

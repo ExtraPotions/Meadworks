@@ -68,7 +68,10 @@ internal static class HexSpawnAuthority
         }
         if (!long.TryParse(context.SenderId, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var uid)) return false;
         var peer = net.GetPeers().FirstOrDefault(p => p != null && p.IsReady() && p.m_uid == uid && p.m_rpc != null && p.m_rpc.IsConnected());
-        if (peer == null || !MeadworksMischief.DecideForPeer(peer.m_rpc, MischiefCategory.Economy).Allowed || ZNetScene.instance == null) return false;
+        if (peer == null || ZNetScene.instance == null) return false;
+        var platform = peer.m_socket?.GetHostName() ?? "";
+        var decision = MeadworksMischief.DecideForPeer(peer.m_rpc, MischiefCategory.Economy);
+        if (!HexToolAccess.Allows(platform.Length > 0 && net.IsAdmin(platform), AdminPermissionLink.Has(platform, "spawn"), decision.Allowed, decision.Reason == ConfigBlockReason.NotAdmin, false)) return false;
         auditActor = peer.m_socket?.GetHostName() ?? "";
         var zdo = ZDOMan.instance?.GetZDO(peer.m_characterID);
         if (zdo == null || zdo.m_uid != peer.m_characterID || zdo.GetBool(ZDOVars.s_dead, false)) return false;

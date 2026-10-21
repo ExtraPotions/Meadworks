@@ -144,6 +144,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             appliedScale = 1f;
             lastCrafting = KitVector.Zero;
             KitScreen.Registry.HideAll();
+            Contested.Reset();
             if (scaledPlayer && gui != null && gui.m_player != null)
                 gui.m_player.localScale = Vector3.one;
             scaledPlayer = false;
@@ -163,8 +164,50 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             Vector3 local = panel.parent.InverseTransformPoint(world);
             Vector2 size = Vector2.Scale(panel.rect.size, new Vector2(Mathf.Abs(panel.localScale.x), Mathf.Abs(panel.localScale.y)));
             Vector3 at = new Vector3(local.x - (corner.x - panel.pivot.x) * size.x, local.y - (corner.y - panel.pivot.y) * size.y, panel.localPosition.z);
+            at = Contested.For(panel).Yield(panel.localPosition, at);
             if ((panel.localPosition - at).sqrMagnitude > 0.0025f)
                 panel.localPosition = at;
+        }
+
+        /// <summary>
+        /// An axis the game writes back after every placement. The inventory screen's animator sets the crafting panel's and the
+        /// header's x after Update on every frame the window is open, so the placed x was never drawn: writing it each frame only
+        /// moved both panels twice a frame and rebuilt their layout and canvas (FPS bench 2026-10-20, about 24 units at
+        /// 1920x1080). Once an axis is found back at the value it had before the last write, that axis is left to its writer
+        /// until the inventory closes; the other axis is still placed. What is drawn does not change.
+        /// </summary>
+        private sealed class Contested
+        {
+            private const float Epsilon = 0.05f;
+            private static readonly System.Collections.Generic.Dictionary<int, Contested> panels = new System.Collections.Generic.Dictionary<int, Contested>();
+            private bool wrote, yieldX, yieldY;
+            private Vector3 before, written;
+
+            public static Contested For(RectTransform panel)
+            {
+                int id = panel.GetInstanceID();
+                if (!panels.TryGetValue(id, out Contested state))
+                    panels[id] = state = new Contested();
+                return state;
+            }
+
+            public static void Reset() => panels.Clear();
+
+            public Vector3 Yield(Vector3 now, Vector3 at)
+            {
+                if (wrote)
+                {
+                    // Written last frame, and found where it was before that write: someone else owns the axis.
+                    if (Mathf.Abs(written.x - before.x) > Epsilon && Mathf.Abs(now.x - before.x) <= Epsilon) yieldX = true;
+                    if (Mathf.Abs(written.y - before.y) > Epsilon && Mathf.Abs(now.y - before.y) <= Epsilon) yieldY = true;
+                }
+                if (yieldX) at.x = now.x;
+                if (yieldY) at.y = now.y;
+                wrote = (now - at).sqrMagnitude > 0.0025f;
+                before = now;
+                written = at;
+                return at;
+            }
         }
     }
 }

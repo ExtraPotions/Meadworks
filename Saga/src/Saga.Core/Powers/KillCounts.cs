@@ -43,4 +43,13 @@ namespace ExtraPotions.Saga.Powers {
             return result;
         }
     }
+
+    /// <summary>Who may grant a boss kill. Health in the packet is not a fact: the server reads the ZDO, and a client trusts only the server.</summary>
+    public static class BossKillRules {
+        public static bool ServerAccepts(bool senderOwnsBoss, bool knownPrefab, bool dead, bool first) =>
+            senderOwnsBoss && knownPrefab && dead && first;
+
+        public static bool ClientAccepts(bool senderIsServer, bool knownBoss, bool inRange, bool first) =>
+            senderIsServer && knownBoss && inRange && first;
+    }
 }

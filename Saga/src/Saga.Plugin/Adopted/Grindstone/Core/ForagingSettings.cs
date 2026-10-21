@@ -21,6 +21,7 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
         public static NativeSetting<float> ExperiencePerPick { get; private set; }
         public static NativeSetting<float> BiomeStep { get; private set; }
         public static NativeSetting<float> DiscoveryMultiplier { get; private set; }
+        public static NativeSetting<float> PlantedExperience { get; private set; }
 
         public static void Initialize(NativeConfiguration config)
         {
@@ -49,6 +50,9 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
             DiscoveryMultiplier = config.Bind(Section, "Discovery Multiplier", 3f,
                 "The first pick of each kind of forage earns this many times the experience. Each character discovers each kind once. 1 turns it off.",
                 acceptableValues: new AcceptableValueRange<float>(1f, 20f));
+            PlantedExperience = config.Bind(Section, "Planted Pickable Foraging XP", 10f,
+                "Percent of the normal Foraging experience for picking a pickable a player planted (cultivator stones, berries, mushrooms and the like). Wild plants give full experience. Yields, extra yield and sweep picking are unchanged; crops train Farming as before. Pickables planted before this setting existed count as planted when the game recorded their builder.",
+                acceptableValues: Settings.UpTo(100f));
         }
     }
 }

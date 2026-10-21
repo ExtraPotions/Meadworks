@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.16 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Debug kill, remove drops and tame take a radius from 5 to 1000 meters. Tame affects wild creatures in that radius. Stop event ends the current event and does not use the radius. Kill still skips players and tames.
+- Routed debug kill, drops, tame, and stop event, and spawn, accept a Thing per-player grant when the only mischief refusal is that the player is not an admin. Nobody and any other block still refuse. If Thing is not installed, this behavior is unchanged.
+
+## 0.1.15 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- License text: LICENSE-ASSETS.md now says Hex ships its approved original icon.png (CC BY-NC-SA 4.0) instead of "no image".
+
 ## 0.1.14 (2026-10-20)
 
 - Requires Crucible 0.3.23 / Crucible.UI 0.3.16.

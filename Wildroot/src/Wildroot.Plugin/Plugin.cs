@@ -17,7 +17,7 @@ namespace ExtraPotions.Wildroot.Runtime {
  [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod,VersionStrictness.Minor)]
  public sealed class Plugin:BaseUnityPlugin {
   public const string Guid=WildrootSettings.ProductId;
-  public const string Version="0.1.14";
+  public const string Version="0.1.18";
   ProductRegistration? registration;
   Harmony? harmony;
   readonly int unityThread=Thread.CurrentThread.ManagedThreadId;
@@ -46,6 +46,7 @@ namespace ExtraPotions.Wildroot.Runtime {
    try{
     if(!CruciblePlugin.IsReady)throw new InvalidOperationException("Required Crucible is not ready");
     Settings=new WildrootConfig(Config,AssetDirectory);if(Settings.ShortcutUpgradeNote!=null)Logger.LogInfo(Settings.ShortcutUpgradeNote);
+    Logger.LogInfo("Wildroot retains but ignores obsolete configuration keys: "+string.Join(", ",WildrootPresets.Retired)+".");
     localization=new LocalizationLoader(Settings,AssetDirectory,Info.Metadata,Logger);
     registration=CruciblePlugin.Services.Register(new ProductMetadata(Guid,WildrootSettings.ProductName,new System.Version(Version),new System.Version(0,1),new System.Version(0,1),MultiplayerPolicy.RequiredOnAllPeers,"Hearth"));
     if(!CruciblePlugin.Services.StepAside.Declared(Guid).Any())MeadworksStepAside.Declare(Guid,WildrootSettings.ProductName,ReferenceImport.Sources.Select(s=>s.Mod));
@@ -76,10 +77,12 @@ namespace ExtraPotions.Wildroot.Runtime {
   void OnSettingChanged(string id){
    if(id=="Import.ImportReferenceSettings"&&Settings?.ImportReferenceSettings.Value==true)importRequested=true;
    if(id=="Harvest.Replant"&&Settings?.Get(id,false)==false)Harvesting?.CancelPendingReplants();
-   if((id=="General.Enabled"||id=="Harvest.Enabled")&&Settings?.Get(id,true)==false)Harvesting?.CancelAll();
+   if(id=="General.Enabled"&&Settings?.Get(id,true)==false)Harvesting?.CancelAll();
+   if(id=="Harvest.Enabled"&&Settings?.Get(id,true)==false)Harvesting?.CancelBulk();
   }
   void Update(){
    if(!Ready)return;
+   try{Settings!.ApplyPendingPresets();}catch(Exception error){Logger.LogWarning("Wildroot preset could not be saved: "+error.GetType().Name+": "+error.Message);}
    if(importRequested){importRequested=false;RunImport();}
    bool active=Settings!.Active;
    if(wasActive&&!active){Planting?.CancelAll();Harvesting?.CancelAll();}
@@ -121,7 +124,7 @@ namespace ExtraPotions.Wildroot.Runtime {
    var safetyOwnership=NativePlacementReceipts.PreservePendingSafety(ownerContext&&world!=0&&session.Length>0);
    harmony?.UnpatchSelf();harmony=null;Instance=null;
    // Dispose restores every native prefab value Wildroot changed.
-   catalog?.Dispose();catalog=null;registration?.Dispose();registration=null;if(Settings!=null)Settings.Changed-=OnSettingChanged;Settings=null;
+   catalog?.Dispose();catalog=null;registration?.Dispose();registration=null;if(Settings!=null){Settings.Changed-=OnSettingChanged;Settings.Dispose();}Settings=null;
    _ = ReleaseSafetyAfterRetirement(retirement??Task.CompletedTask,planting,context,world,session,safetyOwnership);
   }
   async Task ReleaseSafetyAfterRetirement(Task retirement,PlacementController? planting,SynchronizationContext? context,long world,string session,object? safetyOwnership){

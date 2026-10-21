@@ -5,51 +5,72 @@ using Burrow.Core;
 
 namespace Burrow.Reach
 {
-    /// <summary>
-    /// Paying from containers. The game pays a recipe, an upgrade or a piece through
-    /// <c>Inventory.RemoveItem(name, amount, quality, worldLevel)</c> on the player's inventory, either from
-    /// <c>Player.ConsumeResources</c> or, for single ingredient recipes, straight from <c>InventoryGui.DoCrafting</c>.
-    /// Both callers open a payment window; inside it a prefix on that <c>RemoveItem</c> takes the shortfall
-    /// (amount minus what the inventory holds) from the reachable containers, nearest first, and then lets the
-    /// game remove what the inventory has. The inventory therefore always pays first with the game's own code.
-    /// Nothing can be lost: the game calls RemoveItem only after the crafted item or the piece exists, the
-    /// containers give up exactly the shortfall, and the inventory part is the game's untouched path. If a
-    /// container vanished since counting the shortfall is paid short and logged; the player gained, not lost.
-    /// </summary>
+    /// <summary>Funds native actions before they create output; the game consumes the resulting local materials.</summary>
     public static class ReachPayment
     {
-        private static int depth;
-        private static ReachMode mode;
-
-        public static bool Open => depth > 0;
-
-        public static void Begin(ReachMode paymentMode)
+        public static bool PrepareCraft(InventoryGui gui, Player player)
         {
-            if (depth == 0)
-                mode = paymentMode;
-            depth++;
+            if (player == null || player != Player.m_localPlayer || gui.m_craftRecipe == null)
+                return true;
+            int quality = gui.m_craftUpgradeItem == null ? 1 : gui.m_craftUpgradeItem.m_quality + 1;
+            if (!ReachRules.Active(ReachRules.FromQuality(quality)) || player.NoCostCheat()
+                || ZoneSystem.instance.GetGlobalKey(GlobalKeys.NoCraftCost))
+                return true;
+            if (Resources.NativeInventoryGuards.Held(player.GetInventory()))
+                return false;
+            Recipe recipe = gui.m_craftRecipe;
+            int multiplier = gui.m_multiCrafting ? gui.m_multiCraftAmount : 1;
+            if (!player.HaveRequirements(recipe, false, quality, multiplier))
+                return false;
+            if (recipe.m_requireOnlyOneIngredient)
+            {
+                recipe.GetAmount(quality, out int need, out ItemDrop.ItemData single, multiplier);
+                return single != null && Pull(player.GetInventory(), single.m_shared.m_name, need, single.m_quality);
+            }
+            return Prepare(player, recipe.m_resources, quality, multiplier);
         }
 
-        public static void End()
+        public static bool PreparePiece(Player player, Piece piece)
         {
-            if (depth > 0)
-                depth--;
+            if (player == null || player != Player.m_localPlayer || piece == null || !ReachRules.Active(ReachMode.Building)
+                || player.m_noPlacementCost || ZoneSystem.instance.GetGlobalKey(piece.FreeBuildKey()))
+                return true;
+            return !Resources.NativeInventoryGuards.Held(player.GetInventory())
+                && player.HaveRequirements(piece, Player.RequirementMode.CanBuild)
+                && Prepare(player, piece.m_resources, 0, 1);
         }
 
-        /// <summary>The RemoveItem prefix: takes from storage what the local player's inventory cannot pay.</summary>
-        public static void PayShortfall(Inventory inventory, string name, int amount, int quality, bool worldLevel)
+        private static bool Prepare(Player player, Piece.Requirement[] requirements, int quality, int multiplier)
         {
-            Player player = Player.m_localPlayer;
-            if (!Open || player == null || inventory != player.GetInventory() || !ReachRules.Active(mode))
-                return;
-            int shortfall = amount - inventory.CountItems(name, quality, worldLevel);
+            var costs = new Dictionary<string, int>();
+            CraftingStation station = player.GetCurrentCraftingStation();
+            foreach (Piece.Requirement requirement in requirements)
+            {
+                if (Requirements.Skipped(station, requirement))
+                    continue;
+                int need = checked(requirement.GetAmount(quality) * multiplier);
+                if (need <= 0)
+                    continue;
+                string name = Requirements.Name(requirement);
+                costs.TryGetValue(name, out int previous);
+                costs[name] = checked(previous + need);
+            }
+            foreach (KeyValuePair<string, int> cost in costs)
+                if (!Pull(player.GetInventory(), cost.Key, cost.Value, -1))
+                    return false;
+            return true;
+        }
+
+        private static bool Pull(Inventory inventory, string name, int amount, int quality)
+        {
+            int shortfall = amount - inventory.CountItems(name, quality, true);
             if (shortfall <= 0)
-                return;
-            int taken = TakeFromContainers(name, shortfall, quality, worldLevel);
-            if (taken > 0)
+                return true;
+            int moved = ReachPull.Move(inventory, item => ReachCount.Matches(item, name, quality, true), shortfall);
+            if (moved > 0)
                 ReachFlash.Mark(name);
-            if (taken < shortfall)
-                Plugin.Log.LogWarning($"Burrow: {shortfall - taken} of {name} could not be taken from storage while paying; the containers changed since counting");
+            // A refused/short transfer leaves any moved materials in the player, as with explicit Pull.
+            return inventory.CountItems(name, quality, true) >= amount;
         }
 
         /// <summary>Removes up to amount items of a shared name from the reachable containers, nearest first. Returns what was removed.</summary>
@@ -90,40 +111,21 @@ namespace Burrow.Reach
         }
     }
 
-    /// <summary>Opens the payment window around the game's consume path (quality 0 = piece, 1 = craft, more = upgrade).</summary>
-    [HarmonyPatch(typeof(Player), nameof(Player.ConsumeResources))]
-    public static class ConsumeResourcesWindow
-    {
-        [HarmonyPrefix]
-        public static void Prefix(int qualityLevel) => ReachPayment.Begin(ReachRules.FromQuality(qualityLevel));
-
-        [HarmonyFinalizer]
-        public static void Finalizer() => ReachPayment.End();
-    }
-
-    /// <summary>Opens the payment window around crafting, which pays single ingredient recipes without ConsumeResources.</summary>
     [HarmonyPatch(typeof(InventoryGui), nameof(InventoryGui.DoCrafting))]
     public static class CraftingWindow
     {
         [HarmonyPrefix]
-        public static void Prefix(InventoryGui __instance)
-        {
-            ReachPayment.Begin(__instance.m_craftUpgradeItem == null ? ReachMode.Crafting : ReachMode.Upgrading);
-        }
-
-        [HarmonyFinalizer]
-        public static void Finalizer() => ReachPayment.End();
+        [HarmonyPriority(Priority.Last)]
+        public static bool Prefix(InventoryGui __instance, Player player, bool __runOriginal)
+            => __runOriginal && ReachPayment.PrepareCraft(__instance, player);
     }
 
-    /// <summary>Inside a payment window the shortfall comes from storage before the game removes the inventory part.</summary>
-    [HarmonyPatch(typeof(Inventory), nameof(Inventory.RemoveItem), new[] { typeof(string), typeof(int), typeof(int), typeof(bool) })]
-    public static class InventoryRemovePatch
+    [HarmonyPatch(typeof(Player), nameof(Player.TryPlacePiece))]
+    public static class PlacementWindow
     {
         [HarmonyPrefix]
-        public static void Prefix(Inventory __instance, string name, int amount, int itemQuality, bool worldLevelBased)
-        {
-            if (ReachPayment.Open)
-                ReachPayment.PayShortfall(__instance, name, amount, itemQuality, worldLevelBased);
-        }
+        [HarmonyPriority(Priority.Last)]
+        public static bool Prefix(Player __instance, Piece piece, bool __runOriginal)
+            => __runOriginal && ReachPayment.PreparePiece(__instance, piece);
     }
 }

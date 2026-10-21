@@ -68,7 +68,7 @@ public sealed class Plugin : BaseUnityPlugin
         }
         catch (Exception error) { Logger.LogError("Hex native hooks refused: " + error); Shutdown(); }
     }
-    private void Update() { if (Ready) { HexText.Tick(); Settings?.Tick(); HexPauseMenu.Tick(); Native.HexDebug.Tick(); Native.HexRemoteDebug.Tick(); Native.HexEsp.Tick(); if (Active) { HexWindow.Tick(); Native.HexPresets.Tick(); Native.HexPoi.Tick(); Native.HexSpawn.Tick(); Native.HexModes.Tick(); Native.HexGhost.Tick(); Native.HexDeath.Tick(); Native.HexMarks.Tick(); Native.HexBounce.Tick(); Native.HexParty.Tick(); Native.HexSize.Tick(); } } }
+    private void Update() { if (Ready) { HexText.Tick(); Settings?.Tick(); HexPauseMenu.Tick(); Native.HexDebug.Tick(); Native.HexGrantHint.Tick(); Native.HexRemoteDebug.Tick(); Native.HexEsp.Tick(); if (Active) { HexWindow.Tick(); Native.HexPresets.Tick(); Native.HexPoi.Tick(); Native.HexSpawn.Tick(); Native.HexModes.Tick(); Native.HexGhost.Tick(); Native.HexDeath.Tick(); Native.HexMarks.Tick(); Native.HexBounce.Tick(); Native.HexParty.Tick(); Native.HexSize.Tick(); } } }
     private void LateUpdate() { if (Ready) Native.HexSpawnProtection.Tick(); }
     private void FixedUpdate() { if (Ready && Active) Native.HexMovement.ApplyGravity(); }
     private void OnDestroy() => Shutdown();

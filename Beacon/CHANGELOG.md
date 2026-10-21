@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.13 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- The server list refreshes when the saved list, the password store, or the language changes, including a lock icon after a password is stored. It no longer writes the whole list to text four times a second to decide.
+
+## 0.1.12 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- Moving a favorite up or down on the Join Game list while a filter is typed now swaps the selected server with the one shown next to it. The game used the row number in the filtered list on the full favorites list, so it could swap two other servers. Favorites hidden by the filter keep their places; unfiltered moves are unchanged.
+
 ## 0.1.11 (2026-10-20)
 
 - Requires Crucible 0.3.23 / Crucible.UI 0.3.16.

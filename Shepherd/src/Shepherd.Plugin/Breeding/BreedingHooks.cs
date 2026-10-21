@@ -5,7 +5,7 @@
 // Pin: ad278ecf323901c3645eb1f9f6fac6833a0f8cb1
 // Changed by expDARE, 2026: one Procreate prefix/postfix/finalizer for pace, birth plan and twins; decisions in the
 // portable Shepherd.Breeding core (BreedingPace, BirthPlanner, ClaimSlot, Carry, SireCapture, TwinRules); Shepherd
-// pen-scoped count lifetime, temporary capacity and moving-ship pause; lineage keys and egg record with optional Wildblood trait transport; twins due after Twin Delay; external inheritance yields its level/trait/egg writers while lineage continues; Mutation Chance passed to the trait provider.
+// pen-scoped count lifetime, temporary capacity and moving-ship pause; lineage keys and egg record with optional Wildblood trait transport; twins due after Twin Delay; external inheritance yields its level/trait/egg writers while lineage continues; Mutation Chance passed to the trait provider; seasonal breed rate composed after pace.
 // SPDX-License-Identifier: GPL-3.0-or-later
 using System;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
     /// <list type="bullet">
     /// <item>Conception (<c>Procreation.MakePregnant</c> postfix): the nearest ready tame of the partner prefab within the
     /// partner range becomes the pending sire.</item>
-    /// <item>Procreate prefix: pace edits (breeding speed, contentment, herd room) and, when a birth is due, the birth plan
+    /// <item>Procreate prefix: pace edits (breeding speed, contentment, herd room), then the optional season rate, and, when a birth is due, the birth plan
     /// (inheritance, lineage, egg record) armed in the claim slot for the offspring prefab. The newborn (Character or egg
     /// ItemDrop) claims it while the game instantiates it; the postfix writes level, lineage or egg data on it, clears
     /// the pending sire and conceives a twin that is due Twin Delay seconds later. The finalizer restores every field
@@ -69,6 +69,9 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             public BirthPlan? Plan;
             public bool OwnInheritance;
             public bool ExternalStar;
+            public bool RestoreRanges;
+            public float PartnerRange;
+            public float TotalRange;
         }
 
         private static bool Owned(ZNetView view) => view != null && view.IsValid() && view.IsOwner();
@@ -115,6 +118,11 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
                         __instance.m_pregnancyChance = (float)original.PregnancyChance;
                         __instance.m_maxCreatures = original.MaxCreatures;
                     }
+                    if (__state != null && __state.RestoreRanges)
+                    {
+                        __instance.m_partnerCheckRange = __state.PartnerRange;
+                        __instance.m_totalCheckRange = __state.TotalRange;
+                    }
                     if (__state != null) { __instance.m_maxCreatures=__state.OriginalMax; __state.PenScope?.Dispose(); }
                 }
                 finally
@@ -128,9 +136,10 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
         private static Call Begin(Procreation parent)
         {
             var duration=parent.m_pregnancyDuration;var chance=parent.m_pregnancyChance;var maximum=parent.m_maxCreatures;
+            var partner=parent.m_partnerCheckRange;var total=parent.m_totalCheckRange;
             var scope=LivestockPens.EnterCount(parent);
             try { var call=BeginCore(parent);call.PenScope=scope;call.OriginalMax=maximum;return call; }
-            catch { parent.m_pregnancyDuration=duration;parent.m_pregnancyChance=chance;parent.m_maxCreatures=maximum;scope.Dispose();throw; }
+            catch { parent.m_pregnancyDuration=duration;parent.m_pregnancyChance=chance;parent.m_maxCreatures=maximum;parent.m_partnerCheckRange=partner;parent.m_totalCheckRange=total;scope.Dispose();throw; }
         }
         private static Call BeginCore(Procreation parent)
         {
@@ -149,6 +158,8 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
                 parent.m_maxCreatures = call.Pace.Fields.MaxCreatures;
             }
             parent.m_maxCreatures=maximum;
+            // The game checks a due birth before the skip chance, so a rate of zero still lets that birth finish.
+            ApplySeason(parent, call);
             if (!NativeBreeding.Active || !parent.IsPregnant() || !parent.IsDue() || parent.m_offspring == null)
                 return call;
             ZDO zdo = parent.m_nview.GetZDO();
@@ -162,16 +173,34 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             var input = new BirthInput(InstanceToken.New().Value, MotherRecord(parent), NameOf(mother), mother != null ? mother.GetLevel() : 1,
                 BreedingStore.ReadPendingSire(store), parent.m_minOffspringLevel, level, EnvMan.instance != null ? EnvMan.instance.GetDay() : 0,
                 BreederName(parent.transform.position), ShepherdSettings.RecordLineage.Value, "");
-            BirthPlan plan = BirthPlanner.Plan(input, call.OwnInheritance ? NativeBreeding.Inheritance()
+            bool stars = WildbloodOffspringStars.Allow();
+            BirthPlan plan = BirthPlanner.Plan(input, call.OwnInheritance ? NativeBreeding.Inheritance(stars)
                 : new InheritanceSettings(InheritanceMode.Vanilla, 0, 10, 0, 0), Dice);
             var traits = WildbloodTraitsCapability.Current;
             call.Plan = call.OwnInheritance ? traits.Inherit(plan, traits.Read(mother, BreedingStore.GetTraits(store)),
                 input.Sire?.Traits ?? "", input.Token.GetStableHashCode(), ShepherdSettings.MutationChance.Value) : plan;
-            if (!call.OwnInheritance && NativeHusbandry.Active && HusbandryShare.Rolls(HusbandryBreedingSettings.BetterOffspring.Value, level, Dice))
+            if (!call.OwnInheritance && stars && NativeHusbandry.Active && HusbandryShare.Rolls(HusbandryBreedingSettings.BetterOffspring.Value, level, Dice))
                 call.ExternalStar = EcrOffspringStar.Begin(parent);
             try { Births.Arm(call.Plan, parent.m_offspring.name); }
             catch { EcrOffspringStar.End(parent, call.ExternalStar); throw; }
             return call;
+        }
+
+        private static void ApplySeason(Procreation parent, Call call)
+        {
+            var edit = SeasonBreeding.Edit(parent.m_pregnancyDuration, parent.m_pregnancyChance, parent.m_partnerCheckRange,
+                parent.m_totalCheckRange, ShepherdSeasons.Breeding(ShepherdSettings.SeasonalBreeding.Value));
+            if (!edit.Changed) return;
+            if (call.Pace == null || !call.Pace.Paced)
+                call.Pace = new PacedCall(true, new PaceFields(parent.m_pregnancyDuration, parent.m_pregnancyChance, parent.m_maxCreatures),
+                    new PaceFields(parent.m_pregnancyDuration, parent.m_pregnancyChance, parent.m_maxCreatures));
+            call.RestoreRanges = true;
+            call.PartnerRange = parent.m_partnerCheckRange;
+            call.TotalRange = parent.m_totalCheckRange;
+            parent.m_pregnancyDuration = (float)edit.Duration;
+            parent.m_pregnancyChance = (float)edit.Chance;
+            parent.m_partnerCheckRange = (float)edit.PartnerRange;
+            parent.m_totalCheckRange = (float)edit.TotalRange;
         }
 
         private static void After(Procreation parent, Call call)

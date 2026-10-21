@@ -71,11 +71,11 @@ namespace ExtraPotions.Meadworks.Crucible {
         public const AdmissionMode DefaultMode=AdmissionMode.Strict;
         /// <summary>
         /// Literal text for the native center message before a vanilla client is refused. The server cannot read a vanilla
-        /// client's language, so one line carries English, Spanish and French.
+        /// client's language, so one line carries English, Spanish, French, German, Russian, Chinese and Korean.
         /// </summary>
-        public const string VanillaRefusalNotice="This server requires the Meadworks mod pack. Install it to join. / Este servidor requiere el paquete de mods Meadworks. Instálalo para unirte. / Ce serveur nécessite le pack de mods Meadworks. Installez-le pour rejoindre la partie.";
-        /// <summary>Literal text for the native center message a vanilla client receives once admitted.</summary>
-        public const string VanillaWelcomeNotice="This server runs Meadworks in server-only mode. Install the mod pack for the full experience.";
+        public const string VanillaRefusalNotice="This server requires the Meadworks mod pack. Install it to join. / Este servidor requiere el paquete de mods Meadworks. Instálalo para unirte. / Ce serveur nécessite le pack de mods Meadworks. Installez-le pour rejoindre la partie. / Dieser Server erfordert die Meadworks-Mods. Installiere sie, um beizutreten. / Для этого сервера нужен набор модов Meadworks. Установите его, чтобы присоединиться. / 此服务器需要 Meadworks 模组包。请安装后再加入。 / 이 서버는 Meadworks 모드 팩이 필요합니다. 참가하려면 설치하세요.";
+        /// <summary>Literal text for the native center message a vanilla client receives once admitted. One line, same seven languages.</summary>
+        public const string VanillaWelcomeNotice="This server runs Meadworks in server-only mode. Install the mod pack for the full experience. / Este servidor usa Meadworks solo en el servidor. Instala el paquete de mods para la experiencia completa. / Ce serveur utilise Meadworks uniquement sur le serveur. Installez le pack de mods pour l'expérience complète. / Dieser Server führt Meadworks nur auf dem Server aus. Installiere die Mods für das volle Spiel. / На этом сервере Meadworks работает только на сервере. Установите моды, чтобы получить все возможности. / 此服务器仅在服务器端运行 Meadworks。安装模组包即可获得完整体验。 / 이 서버는 서버에서만 Meadworks를 실행합니다. 전체 내용을 보려면 모드 팩을 설치하세요.";
 
         /// <summary>
         /// The support a product effectively offers: its explicit declaration, else server-only products are capable,
@@ -141,18 +141,38 @@ namespace ExtraPotions.Meadworks.Crucible {
 
     /// <summary>
     /// Server-side record of which connected peers run Crucible, from the join greeting: a greeted peer is pending until
-    /// it answers (Crucible) or the answer timeout passes (vanilla). A late answer never upgrades a vanilla verdict.
-    /// Main thread only.
+    /// it answers (Crucible) or its quiet wait passes (vanilla). A busy send queue restarts that wait
+    /// (<see cref="Extend"/>), and the wait never runs past <see cref="CeilingSeconds"/> from the greeting.
+    /// A late answer never upgrades a vanilla verdict. Main thread only.
     /// </summary>
     public sealed class PeerPresenceTracker {
-        sealed class Entry { internal PeerKind Kind; internal double Due; }
+        /// <summary>Five minutes from the greeting. A peer that has not answered by then is vanilla.</summary>
+        public const double DefaultCeilingSeconds=300;
+        /// <summary>Above this many unsent bytes the greeting may still be queued, so the quiet wait has not started.</summary>
+        public const int SendBacklogBytes=64*1024;
+        sealed class Entry { internal PeerKind Kind; internal double Due; internal double Greeted; internal bool SlowNoted; }
         readonly Dictionary<long,Entry> peers=new Dictionary<long,Entry>();
         public double AnswerTimeoutSeconds { get; }
-        public PeerPresenceTracker(double answerTimeoutSeconds){
+        public double CeilingSeconds { get; }
+        public PeerPresenceTracker(double answerTimeoutSeconds,double ceilingSeconds=DefaultCeilingSeconds){
             if(double.IsNaN(answerTimeoutSeconds)||double.IsInfinity(answerTimeoutSeconds)||answerTimeoutSeconds<=0)throw new ArgumentException("Expected a positive finite timeout.",nameof(answerTimeoutSeconds));
-            AnswerTimeoutSeconds=answerTimeoutSeconds;
+            if(double.IsNaN(ceilingSeconds)||double.IsInfinity(ceilingSeconds)||ceilingSeconds<=0)throw new ArgumentException("Expected a positive finite ceiling.",nameof(ceilingSeconds));
+            AnswerTimeoutSeconds=answerTimeoutSeconds;CeilingSeconds=ceilingSeconds;
         }
-        public void Greeted(long peerId,double now){if(!peers.ContainsKey(peerId))peers[peerId]=new Entry{Kind=PeerKind.Pending,Due=now+AnswerTimeoutSeconds};}
+        public void Greeted(long peerId,double now){if(!peers.ContainsKey(peerId))peers[peerId]=new Entry{Kind=PeerKind.Pending,Greeted=now,Due=now+AnswerTimeoutSeconds};}
+        /// <summary>The send queue is still busy, so the quiet wait starts again from <paramref name="now"/> unless the ceiling has been reached.</summary>
+        public bool Extend(long peerId,double now){
+            if(!peers.TryGetValue(peerId,out var e)||e.Kind!=PeerKind.Pending||now>=e.Greeted+CeilingSeconds)return false;
+            var due=Math.Max(e.Due,now+AnswerTimeoutSeconds);if(due==e.Due)return false;
+            e.Due=due;return true;
+        }
+        /// <summary>True once, the first time a pending peer has waited longer than <paramref name="formerTimeoutSeconds"/>.</summary>
+        public bool NoteSlow(long peerId,double now,double formerTimeoutSeconds){
+            if(!peers.TryGetValue(peerId,out var e)||e.Kind!=PeerKind.Pending||e.SlowNoted||!(now-e.Greeted>formerTimeoutSeconds))return false;
+            e.SlowNoted=true;return true;
+        }
+        /// <summary>Seconds from the greeting to <paramref name="now"/>, or the quiet wait when the peer was never greeted.</summary>
+        public double Waited(long peerId,double now)=>peers.TryGetValue(peerId,out var e)?Math.Max(0,now-e.Greeted):AnswerTimeoutSeconds;
         /// <summary>
         /// Records that the peer runs Crucible (an answer or any Crucible frame, possibly before the greeting); false when it
         /// was already known as Crucible or already judged vanilla.
@@ -164,7 +184,7 @@ namespace ExtraPotions.Meadworks.Crucible {
         }
         /// <summary>Pending peers whose answer is overdue become vanilla; returns them once, ordered by id.</summary>
         public IReadOnlyList<long> Expire(double now){
-            var due=peers.Where(p=>p.Value.Kind==PeerKind.Pending&&now>=p.Value.Due).Select(p=>p.Key).OrderBy(i=>i).ToList();
+            var due=peers.Where(p=>p.Value.Kind==PeerKind.Pending&&(now>=p.Value.Due||now>=p.Value.Greeted+CeilingSeconds)).Select(p=>p.Key).OrderBy(i=>i).ToList();
             foreach(var id in due)peers[id].Kind=PeerKind.Vanilla;
             return due.AsReadOnly();
         }

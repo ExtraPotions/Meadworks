@@ -61,6 +61,8 @@ namespace Burrow.Reach
 
         public static int CountIn(Container container, string name, int quality, bool worldLevel)
         {
+            if (!Ready(container))
+                return 0;
             // The same count as CountIn(container, item => Matches(...)) without a closure per call (every row, every frame).
             ContainerRule rule = ReachRules.RuleFor(container);
             int sum = 0;
@@ -83,6 +85,8 @@ namespace Burrow.Reach
 
         public static int CountIn(Container container, Func<ItemDrop.ItemData, bool> wanted)
         {
+            if (!Ready(container))
+                return 0;
             ContainerRule rule = ReachRules.RuleFor(container);
             int sum = 0;
             foreach (ItemDrop.ItemData item in container.GetInventory().GetAllItems())
@@ -108,6 +112,8 @@ namespace Burrow.Reach
         /// <summary>The first stack the container holds that the caller wants and the prefab's lists allow.</summary>
         public static ItemDrop.ItemData FirstIn(Container container, Func<ItemDrop.ItemData, bool> wanted)
         {
+            if (!Ready(container))
+                return null;
             ContainerRule rule = ReachRules.RuleFor(container);
             foreach (ItemDrop.ItemData item in container.GetInventory().GetAllItems())
             {
@@ -115,6 +121,15 @@ namespace Burrow.Reach
                     return item;
             }
             return null;
+        }
+
+        private static bool Ready(Container container)
+        {
+            if (ContainerScan.CanClaimNow(container))
+                return true;
+            // Remote stock stays unavailable until the owner hands over its current inventory.
+            ContainerScan.Claim(container);
+            return false;
         }
     }
 }

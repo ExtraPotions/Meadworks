@@ -14,10 +14,11 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
     /// <see cref="TakeServer"/>:
     /// <list type="number">
     /// <item>The animal owner sends <c>shepherd.take</c> on the source's view; the game routes it to the source owner.</item>
-    /// <item>The source owner decides (exists, owner, dedupe, enabled, allowed, present), removes one item through the
-    /// inventory's own save path and answers <c>shepherd.meal</c> routed to whoever owns the animal now.</item>
+    /// <item>The source owner decides, and removes one item only when the meal can be sent. It then answers
+    /// <c>shepherd.meal</c> routed to whoever owns the animal now. A grant that cannot be sent leaves the food in
+    /// the trough. A request already paid for is sent again and does not take a second item.</item>
     /// <item>That machine applies the meal once per request id through <c>m_onConsumedItem</c>, the consume effects
-    /// and the <c>consume</c> trigger. No reply within 10 s: the request is dropped and never resent.</item>
+    /// and the <c>consume</c> trigger. After 10 s the same request is sent again.</item>
     /// </list>
     /// Shepherd never claims ownership of a source or an animal. Handlers are registered only where no foreign handler
     /// exists and are removed when the feeding patches stop.
@@ -27,6 +28,7 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
         private static readonly int TakeHash = TakeProtocol.TakeRpc.GetStableHashCode();
         private static readonly int MealHash = TakeProtocol.MealRpc.GetStableHashCode();
         private static readonly List<Lease> Leases = new List<Lease>();
+        private static readonly Dictionary<TakeRequestId, WeakReference<Container>> Sources = new Dictionary<TakeRequestId, WeakReference<Container>>();
         private static readonly TakeServer Server = new TakeServer();
         private static TakeRequester? requester;
         private static long requesterSession;
@@ -55,7 +57,7 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
             return new NetObjectId(id.UserID, id.ID);
         }
 
-        public static bool HasPending(ZNetView animal) => animal != null && animal.IsValid() && Requester.HasPending(IdOf(animal));
+        public static bool HasPending(ZNetView animal) => animal != null && animal.IsValid() && Requester.IsBlocking(IdOf(animal), Now);
 
         /// <summary>On a container that woke: answer take requests while this machine owns it.</summary>
         public static void RegisterSource(Container container) =>
@@ -83,11 +85,22 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
             if (animal == null || !animal.IsValid() || !animal.IsOwner() || !FeedSources.IsUsable(source)) return false;
             TakeRequest? request = Requester.TryBegin(IdOf(animal), food.gameObject.name, Now);
             if (request == null) return false;
-            ZNetView view = source.m_nview;
+            Container target = source;
+            if (Sources.TryGetValue(request.Id, out WeakReference<Container>? remembered) && remembered != null
+                && remembered.TryGetTarget(out Container? prior) && prior != null)
+                target = prior;
+            else
+                Sources[request.Id] = new WeakReference<Container>(source);
+            ZNetView? view = target.m_nview;
+            if (view == null)
+            {
+                NativeFeeding.Verbose("take not sent: source has no view");
+                return true;
+            }
             switch (TakeRouting.ForTake(view.IsValid(), view.GetZDO().GetOwner(), LocalPeer))
             {
                 case TakeRoute.Local:
-                    Serve(source, request);
+                    Serve(target, request);
                     break;
                 case TakeRoute.Remote:
                     view.InvokeRPC(TakeProtocol.TakeRpc, TakeCodec.Encode(request));
@@ -104,7 +117,7 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
             if (TakeCodec.TryDecodeTake(payload, out TakeRequest? request) && request != null) Serve(source, request);
         }
 
-        /// <summary>Steps 3 and 4 on the source owner.</summary>
+        /// <summary>Steps 3 and 4 on the source owner. Food leaves the trough only when the meal can be sent.</summary>
         private static void Serve(Container source, TakeRequest request)
         {
             ItemDrop food = FoodPrefab(request.ItemName);
@@ -115,39 +128,105 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
                 && (TroughPieces.IsTrough(source) || (ShepherdSettings.ContainerFeeding.Value && FeedSources.IsFeedContainer(source)));
             var facts = new TroughFacts(exists, owner, enabled, exists && FeedSources.Holds(source, shared), NativeFeeding.FoodDisallowed(request.ItemName));
             TakeVerdict verdict = Server.Decide(request, facts, Now);
+            if (verdict == TakeVerdict.Resend)
+            {
+                if (!Dispatch(request))
+                    NativeFeeding.Verbose("meal " + request.Id + " resend waiting: animal not reachable");
+                return;
+            }
             if (!TakeVerdicts.RemovesItem(verdict))
             {
                 NativeFeeding.Verbose("take " + request.Id + " refused: " + verdict);
                 return;
             }
-            source.GetInventory().RemoveItem(shared, 1, -1, false);
+            if (!Reachable(request))
+            {
+                Server.Release(request.Id);
+                NativeFeeding.Verbose("take " + request.Id + " kept: animal not reachable");
+                return;
+            }
+            Inventory? inventory = source.GetInventory();
+            int before = Stacks(inventory, shared);
+            if (inventory == null || before < 1)
+            {
+                Server.Release(request.Id);
+                NativeFeeding.Verbose("take " + request.Id + " kept: food was not removed");
+                return;
+            }
+            inventory.RemoveItem(shared, 1, -1, false);
+            if (Stacks(inventory, shared) >= before)
+            {
+                Server.Release(request.Id);
+                NativeFeeding.Verbose("take " + request.Id + " kept: food was not removed");
+                return;
+            }
+            Server.Commit(request.Id);
             NativeFeeding.Verbose("take " + request.Id + " granted: one " + request.ItemName + " from " + global::Utils.GetPrefabName(source.gameObject));
-            SendMeal(request);
+            if (!Dispatch(request))
+            {
+                Server.Release(request.Id);
+                if (food != null) Refund(source, food, request);
+                else NativeFeeding.Warn("take " + request.Id + " refund failed; one " + request.ItemName + " was removed");
+                return;
+            }
             // Informational source history records dispatch, not an unacknowledged remote animal meal.
             try { source.m_nview.GetZDO().Set(UI.TroughHeader.LastFeed, Herd.Now.Ticks); }
             catch (Exception error) { NativeFeeding.Warn("feed display timestamp: " + error.GetType().Name); }
         }
 
-        private static void SendMeal(TakeRequest request)
+        private static bool Reachable(TakeRequest request)
+        {
+            var id = new ZDOID(request.Animal.User, request.Animal.Id);
+            ZDO? zdo = ZDOMan.instance != null ? ZDOMan.instance.GetZDO(id) : null;
+            TakeRoute route = TakeRouting.ForMeal(zdo != null, zdo != null ? zdo.GetOwner() : 0, LocalPeer);
+            if (route == TakeRoute.Remote) return true;
+            if (route != TakeRoute.Local || zdo == null || ZNetScene.instance == null) return false;
+            ZNetView? view = ZNetScene.instance.FindInstance(zdo);
+            return view != null && view.GetComponent<MonsterAI>() != null;
+        }
+
+        private static int Stacks(Inventory inventory, string shared)
+        {
+            if (inventory == null || string.IsNullOrEmpty(shared)) return 0;
+            int count = 0;
+            foreach (ItemDrop.ItemData item in inventory.GetAllItems())
+                if (item != null && item.m_shared != null && item.m_shared.m_name == shared) count += item.m_stack;
+            return count;
+        }
+
+        /// <summary>Sends the meal. False when the animal is gone, ownerless, or not loaded on this machine.</summary>
+        private static bool Dispatch(TakeRequest request)
         {
             var meal = new MealMessage(request.Id, request.ItemName);
             var id = new ZDOID(request.Animal.User, request.Animal.Id);
-            ZDO zdo = ZDOMan.instance != null ? ZDOMan.instance.GetZDO(id) : null!;
+            ZDO? zdo = ZDOMan.instance != null ? ZDOMan.instance.GetZDO(id) : null;
             switch (TakeRouting.ForMeal(zdo != null, zdo != null ? zdo.GetOwner() : 0, LocalPeer))
             {
                 case TakeRoute.Local:
-                    ZNetView view = ZNetScene.instance != null ? ZNetScene.instance.FindInstance(zdo) : null!;
-                    MonsterAI ai = view != null ? view.GetComponent<MonsterAI>() : null!;
-                    if (ai != null) Apply(ai, meal);
-                    else NativeFeeding.Verbose("meal " + request.Id + " lost: animal not loaded");
-                    break;
+                    ZNetView? view = zdo != null && ZNetScene.instance != null ? ZNetScene.instance.FindInstance(zdo) : null;
+                    MonsterAI? ai = view != null ? view.GetComponent<MonsterAI>() : null;
+                    if (ai == null) return false;
+                    Apply(ai, meal);
+                    return true;
                 case TakeRoute.Remote:
                     ZRoutedRpc.instance.InvokeRoutedRPC(zdo!.GetOwner(), id, TakeProtocol.MealRpc, TakeCodec.Encode(meal));
-                    break;
+                    return true;
                 default:
-                    NativeFeeding.Verbose("meal " + request.Id + " lost: animal gone");
-                    break;
+                    return false;
             }
+        }
+
+        private static void Refund(Container source, ItemDrop food, TakeRequest request)
+        {
+            Inventory? inventory = source != null ? source.GetInventory() : null;
+            if (inventory == null || food == null || food.m_itemData == null) return;
+            ItemDrop.ItemData clone = food.m_itemData.Clone();
+            clone.m_dropPrefab = food.gameObject;
+            clone.m_stack = 1;
+            if (inventory.AddItem(clone))
+                NativeFeeding.Verbose("take " + request.Id + " refunded: animal was not reachable");
+            else
+                NativeFeeding.Warn("take " + request.Id + " refund failed; one " + request.ItemName + " was removed");
         }
 
         private static void ReceiveMeal(MonsterAI ai, string payload)
@@ -162,6 +241,7 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
             ZNetView view = ai.m_nview;
             if (view == null || !view.IsValid()) return;
             if (Requester.OnMeal(meal, IdOf(view), view.IsOwner(), Now) != MealDecision.Apply) return;
+            Sources.Remove(meal.Id);
             ItemDrop food = FoodPrefab(meal.ItemName);
             if (food == null) return;
             // An already-paid late/new-owner receipt still applies; pacing only gates the next request.
@@ -179,12 +259,11 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
             return prefab != null ? prefab.GetComponent<ItemDrop>() : null!;
         }
 
-        /// <summary>Drops overdue requests (logged at Verbose); they are never resent.</summary>
+        /// <summary>The reply window does not drop a request. The next ask sends the same id.</summary>
         public static void Expire()
         {
             if (requester == null) return;
-            foreach (TakeRequest overdue in requester.Expire(Now))
-                NativeFeeding.Verbose("take " + overdue.Id + " timed out");
+            requester.Expire(Now);
         }
 
         public static void Release()
@@ -194,6 +273,7 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
                 if (lease.View.TryGetTarget(out ZNetView view) && view != null && view.m_functions.TryGetValue(lease.Hash, out var handler)
                     && ReferenceEquals(handler, lease.Handler)) view.m_functions.Remove(lease.Hash);
             Leases.Clear();
+            Sources.Clear();
             requester = null;
         }
 

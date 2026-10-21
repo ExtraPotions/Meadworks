@@ -1,4 +1,5 @@
 using System;
+using ExtraPotions.Burrow;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,6 +41,14 @@ internal static class FamilyCheck
 	public static bool ServerLacksMandatory(List<FamilyEntry> server, List<FamilyEntry> client)
 	{
 		return client.Any(c => c.Mandatory && server.All(s => s.Guid != c.Guid));
+	}
+
+	/// <summary>The lines for a player that never answered, in all seven languages. Changed by expDARE, 2026.</summary>
+	public static List<string> NoAnswer(List<FamilyEntry> server, float seconds)
+	{
+		List<string> lines = new(SlowJoinWait.NoAnswerLines(seconds));
+		lines.AddRange(server.Where(e => e.Mandatory).Select(e => SlowJoinWait.ServerRuns(e.Title, e.Version)));
+		return lines;
 	}
 
 	public static string Message(List<string> lines, string id)

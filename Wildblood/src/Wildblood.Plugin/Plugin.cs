@@ -81,6 +81,7 @@ namespace ExtraPotions.Wildblood.Runtime
                     ExtraPotions.Meadworks.Contracts.FeatureOwnerContract.ContractVersion, () => Running);
                 AllowsUi = MeadworksHeadless.AllowsUi;
                 Settings = WildbloodConfig.Bind(Config, log);
+                WildbloodSeasons.Initialize(Config);
                 WildbloodText.Initialize(Info.Metadata, Logger);
                 NativeRaidChestPrefab.Initialize();
                 Ready = true;
@@ -107,6 +108,7 @@ namespace ExtraPotions.Wildblood.Runtime
                 modifierRules = AdoptedCm.NativeModifierRuleAuthority.Register(nativeRules);
                 karmaRules = AdoptedCm.NativeKarmaRuleAuthority.Register(nativeRules);
                 Adopted.Adapters.NativeTraitsCapability.Register(registration);
+                Adopted.Adapters.OffspringStarsCapability.Register(registration);
                 Adopted.Adapters.NativeLootCapability.Register(registration);
                 Adopted.Transfers.TheftInventoryGuards.Initialize();
                 registration.AddCapability<Func<object, bool>>("meadworks.wildblood.inventory_hold", new System.Version(1, 0), Adopted.Transfers.TheftInventoryGuards.Export);
@@ -143,6 +145,7 @@ namespace ExtraPotions.Wildblood.Runtime
             if (Adopted.Transfers.TheftInventoryGuards.DeferredRemovals != 0)
                 AdoptedLibs.PatchGuard.Guard.Run("Wildblood kept inventory removals", Adopted.Transfers.TheftInventoryGuards.DrainRemovals);
             if (!Ready) return;
+            AdoptedLibs.PatchGuard.Guard.Run("Wildblood season facts", WildbloodSeasons.Tick);
             WildbloodText.Tick();
             nativeRules?.Tick();
             if (started && log != null)
@@ -181,6 +184,7 @@ namespace ExtraPotions.Wildblood.Runtime
             PouchDropOwner.Reset();
             Ready = false;
             started = false;
+            WildbloodSeasons.Shutdown();
             WildbloodMenu.Shutdown();
             WildbloodRecap.Reset();
             Adopted.Patches.EnemyHudPatch.Reset();

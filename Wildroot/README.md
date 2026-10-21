@@ -1,12 +1,13 @@
 # Wildroot
 
-Version 0.1.14. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.18. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Gardening for Valheim: plant in grids, harvest in bulk, replant automatically and plant more of the world's flora.
 
 ## Features
 
-- The Meadworks menu (F8 or Esc > Meadworks) opens Wildroot's settings: on/off, grid planting, rows, columns, snapping, bulk harvest, replanting and Farming perks. Every other setting is in Almanac. Its own toggle key (`General.ToggleKey`) is unbound by default (PlantEasily used F8, which now opens the Meadworks menu).
+- The Meadworks menu (F8 or Esc > Meadworks) opens Wildroot's settings: on/off, grid planting, snapping, bulk harvest, replanting, Farming perks and the presets below. Individual numbers, including rows and columns, remain in Almanac. Its own toggle key (`General.ToggleKey`) is unbound by default (PlantEasily used F8, which now opens the Meadworks menu).
+- Presets: Grid / SizePreset, Grid / SpacingPreset, Planting / EffortPreset, Farming / ProgressionPreset and Growth.Crops / OverridePreset. Each is Vanilla, MeadWorksDefault, Relaxed or Custom. Choosing one writes that group's values immediately. Editing a member selects Custom. Loading does not replace saved values. Grid size and extra spacing are yours. Cultivator effort, Farming progression and crop overrides belong to the host or server, and joining clients keep their own saved preferences. [Preset values](docs/settings-presets.md).
 - Grid planting: plant a whole grid of crops at once, paying the normal planting materials. The grid is at most 10 x 10. Resize it with Right Ctrl + arrow keys (or left bumper + D-pad on a controller) while a plant is selected; a small display shows the grid size and your shortcuts.
 - Snapping: new plants line up with the plants next to them. Turn it on or off in the settings, or hold the controller modifier and click the right stick; `Grid.SnapKey` is unbound by default.
 - Bulk harvest and automatic replanting. Hold the harvest modifier (`Input.KeyboardHarvestModifierKey`, or the controller modifier) when you pick to harvest everything nearby; a plain pick takes one plant. Turn replanting on or off in the settings (`Harvest.ReplantToggleKey` is unbound by default); you can replant the original crop or the crop you have selected. Without seeds, nothing is replanted.
@@ -14,6 +15,8 @@ Gardening for Valheim: plant in grids, harvest in bulk, replant automatically an
 - Farming skill: the game's own Farming skill grows from planting and picking crops, scaled by `Farming.ExperienceMultiplier`, by how rich the crop is (`Farming.TierScaling`) and a first-pick bonus for each kind of crop (`Farming.DiscoveryMultiplier`). Its skill page lists your perks; death costs Farming levels like any other skill.
 - Farming perks, from the level of whoever planted or picked: plants grow up to 40% faster and need up to 40% less room, rain speeds planted crops up by 50% while it falls, picking gives the bonus crop up to 50% of the time (the game's own 25%) and gives a seed back up to 30% of the time.
 - High Farming levels: from level 75 your crops grow in the Ashlands without a shield; from level 100 Meadows crops also grow in the Mountain and Deep North.
+- Restrictions / AshlandsCrops (host or server, on by default): carrots, onions, turnips, oats, poteitr, kale and their seed crops can grow in the Ashlands, as in the game. They still need a shield there until the planter's Farming level reaches HeatToleranceLevel. Barley and flax stay Plains-only. Magecap and Jotun puffs stay Mistlands-only. The Timberwood sapling keeps the game's biomes and does not grow in the Ashlands. Ashlands plants keep the game's own rules. Turning AshlandsCrops off restores the earlier farmland-only masks, including for crops already planted. Saves are unchanged.
+- Grid placement checks nearby plants for grow space, so a dense grid does not ignore plants already standing there. Extra crop and sapling spacing stay on SpacingPreset and the extra-spacing settings.
 - Rows and auto replant: planting one crop at a time (a 1 x 1 grid, or grid planting off) plants a row of three from Farming level 25 and five from level 50; hold the alternate place key to plant one.
 - Auto replant: from level 50 a picked crop is planted again in the same spot, paid from your inventory (`Farming.RowPlanting` and `Farming.AutoReplant` are your own switches). A larger grid is your own choice and stays as it is.
 - Seed crafting: at a workbench, one carrot, turnip, onion, kale or poteitr makes two of its seeds. The recipe shows once you have held the crop (`SeedCrafting.Enabled`).
@@ -24,7 +27,7 @@ Gardening for Valheim: plant in grids, harvest in bulk, replant automatically an
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.24 or a later 0.3.x, which includes Crucible.UI 0.3.17 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 
@@ -50,7 +53,7 @@ Gardening for Valheim: plant in grids, harvest in bulk, replant automatically an
 
 - Steps aside: with PlantEasily or PlantEverything installed, Wildroot stays off and says so.
 - Converter: imports PlantEasily and PlantEverything settings (see Configuration).
-- Meadworks: with Burrow installed, planting and replanting can take materials from nearby storage; otherwise your inventory pays.
+- Meadworks: with Burrow installed, planting and replanting can take materials from nearby storage; otherwise your inventory pays. A pickable you plant is marked for Saga's Planted Pickable Foraging XP. Wildroot's own harvest is unchanged.
 
 ## Notes
 

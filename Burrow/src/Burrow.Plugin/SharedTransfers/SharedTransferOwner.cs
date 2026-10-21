@@ -67,6 +67,8 @@ namespace Burrow.SharedTransfers {
                 byte[] image=NativeBundleStore.Bytes(chest.GetInventory());using(var sha=SHA256.Create())if(!sha.ComputeHash(image).SequenceEqual(request.Expected))return OperationExecution<TransferReceipt>.Success(TransferReceipt.Denied(request,"stale"));
                 var beforeImage=new NativeImage{Id="chest:"+NativeChestIdentity.Ensure(chest.m_nview.GetZDO()),Width=chest.GetInventory().GetWidth(),Height=chest.GetInventory().GetHeight(),Data=image};
                 plan=new PlanScope{Chest=chest,Inventory=beforeImage.Load(),Request=request};
+                // A chest the game cannot load back to the same bytes (a stack above the stack size, an unknown prefab) is refused before any hold.
+                if(!NativeBundleStore.Bytes(plan.Inventory).SequenceEqual(image)){plan=null;return OperationExecution<TransferReceipt>.Success(TransferReceipt.Denied(request,"busy"));}
                 TransferReceipt receipt;byte[] after;
                 try{
                     var packet=new ZPackage(request.Body);

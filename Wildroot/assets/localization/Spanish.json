@@ -591,6 +591,16 @@
     "cfg_farming__autoreplant_help": "Tu propio interruptor para la ventaja de replantado automático.",
     "cfg_seedcrafting_heading": "Fabricación de semillas",
     "cfg_seedcrafting__enabled_name": "Activado",
-    "cfg_seedcrafting__enabled_help": "Recetas de banco de trabajo que convierten una zanahoria, un nabo, una cebolla, una col rizada o un poteitr en dos de sus semillas."
+    "cfg_seedcrafting__enabled_help": "Recetas de banco de trabajo que convierten una zanahoria, un nabo, una cebolla, una col rizada o un poteitr en dos de sus semillas.",
+    "cfg_grid__sizepreset_name": "Preajuste del tamaño de la cuadrícula",
+    "cfg_grid__sizepreset_help": "Tu tamaño de cuadrícula. Vanilla: 1 × 1; MeadWorksDefault: 2 × 2; Relaxed: 4 × 4. Custom conserva tus números. Elegir un preajuste cambia Rows y Columns al instante; editar cualquiera selecciona Custom. Al cargar no se sustituyen los números guardados.",
+    "cfg_grid__spacingpreset_name": "Preajuste de separación de plantas",
+    "cfg_grid__spacingpreset_help": "Tu separación adicional. Vanilla y MeadWorksDefault: sin separación adicional; Relaxed: 0,5 metros para cultivos y 1 metro para árboles jóvenes. Custom conserva tus números. Se aplica al instante; editar una separación selecciona Custom. Al cargar no se sustituyen los números guardados.",
+    "cfg_planting__effortpreset_name": "Preajuste del esfuerzo del cultivador",
+    "cfg_planting__effortpreset_help": "Esfuerzo del cultivador controlado por el anfitrión. Vanilla y MeadWorksDefault: costes normales de aguante y durabilidad, plantación parcial permitida y omisión de celdas adicionales no válidas. Relaxed: sin coste de aguante ni durabilidad, con las mismas comprobaciones. Custom conserva tus elecciones. Se aplica al instante; editar un miembro selecciona Custom. Al cargar no se sustituyen las elecciones guardadas.",
+    "cfg_farming__progressionpreset_name": "Preajuste de progresión de Agricultura",
+    "cfg_farming__progressionpreset_help": "Progresión de Agricultura controlada por el anfitrión. Vanilla desactiva las ventajas de Wildroot y su experiencia adicional. MeadWorksDefault restaura los valores de crecimiento, cosecha, semillas, lluvia, niveles y experiencia de Wildroot. Relaxed acelera el crecimiento, aumenta cosechas y semillas, adelanta ventajas y multiplica la experiencia por 1,5. Custom conserva tus valores. Se aplica al instante; editar un miembro selecciona Custom. La carga conserva tus valores y tus interruptores RowPlanting y AutoReplant.",
+    "cfg_growth_crops__overridepreset_name": "Preajuste de crecimiento de cultivos",
+    "cfg_growth_crops__overridepreset_help": "Crecimiento de cultivos controlado por el anfitrión. Vanilla y MeadWorksDefault desactivan las modificaciones y fijan la escala en 0,9-1,1, el crecimiento en 4000-5000 segundos y el espacio en 0,5 metros. Relaxed activa las modificaciones con 2000-2500 segundos, la misma escala y espacio. Custom conserva tus valores. Se aplica al instante; editar un miembro selecciona Custom. Al cargar no se sustituyen los valores guardados. Se conservan las condiciones de crecimiento."
   }
 }

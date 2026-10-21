@@ -4,6 +4,7 @@
 // where they took hold (no walking to the string), turned by the game to face where it points.
 // SPDX-License-Identifier: GPL-3.0-or-later
 using System.Text;
+using ExtraPotions.Bestiary.Fixes;
 using ExtraPotions.Bestiary.Runtime.Native.Core;
 using ExtraPotions.Bestiary.Runtime.Prefabs;
 using UnityEngine;
@@ -17,11 +18,13 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Ballista
     /// shoots (<see cref="BallistaOperator"/>) and writes what everyone draws. The holder controls it through the game's
     /// doodad control (a ship's helm): movement keys do nothing, the mouse aims, attack shoots (<see cref="BallistaControls"/>),
     /// the use key, jump or dodge let go. Held, the player's hand items are put away and come back on letting go.
+    /// The owner grants the request only when the sender is that player and they stand where it can be used.
+    /// A grant is ignored on a client that did not ask.
     /// </summary>
     public sealed class BallistaControl : MonoBehaviour, Interactable, Hoverable, IDoodadController
     {
         private const string Request = "ecp_bal_request", Release = "ecp_bal_release", Answer = "ecp_bal_answer";
-        private const float UseRange = 3.5f, HolderRange = 6f, Behind = 0f;
+        private const float HolderRange = 6f;
 
         public ZNetView Net { get; private set; } = null!;
         public BallistaParts? Parts { get; private set; }
@@ -30,6 +33,9 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Ballista
         public float Yaw, Pitch;
 
         private bool holding;
+
+        /// <summary>This client has asked for the ballista and is waiting for the owner's answer.</summary>
+        private bool asked;
 
         private void Awake()
         {
@@ -77,35 +83,42 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Ballista
                 player.StopDoodadControl();
                 return true;
             }
-            if (Vector3.Distance(player.transform.position, transform.position) > UseRange)
+            if (Vector3.Distance(player.transform.position, transform.position) > BallistaGrant.UseRange)
             {
                 return false;
             }
-            if (transform.InverseTransformPoint(player.transform.position).z > Behind)
+            if (transform.InverseTransformPoint(player.transform.position).z > BallistaGrant.Behind)
             {
                 player.Message(MessageHud.MessageType.Center, "$msg_ecp_bal_behind");
                 return false;
             }
+            asked = true;
             Net.InvokeRPC(Request, player.GetPlayerID());
             return true;
         }
 
         public bool UseItem(Humanoid user, ItemDrop.ItemData item) => false;
 
-        /// <summary>The owner: the ballista goes to the asker when nobody valid holds it, the ZDO with it.</summary>
+        /// <summary>The owner: the ballista goes to the asker when that peer is the player, they are at it, and nobody valid holds it.</summary>
         private void RPC_Request(long sender, long playerID)
         {
             if (!Net.IsOwner())
             {
                 return;
             }
+            long senderPlayer = SenderPlayerId(sender);
             long user = Net.GetZDO().GetLong(BallistaKeys.User, 0L);
-            if (user != playerID && ValidUser(user))
+            bool blocked = user != playerID && ValidUser(user);
+            if (!TryPosition(sender, senderPlayer, out Vector3 at)
+                || !BallistaGrant.AcceptRequest(senderPlayer, playerID, Vector3.Distance(at, transform.position), transform.InverseTransformPoint(at).z, blocked))
             {
-                Net.InvokeRPC(sender, Answer, false);
+                if (senderPlayer != 0L && senderPlayer == playerID)
+                {
+                    Net.InvokeRPC(sender, Answer, false);
+                }
                 return;
             }
-            Net.GetZDO().Set(BallistaKeys.User, playerID);
+            Net.GetZDO().Set(BallistaKeys.User, senderPlayer);
             ZDOMan.instance.ForceSendZDO(sender, Net.GetZDO().m_uid);
             Net.GetZDO().SetOwner(sender);
             Net.InvokeRPC(sender, Answer, true);
@@ -113,6 +126,11 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Ballista
 
         private void RPC_Answer(long sender, bool granted)
         {
+            if (!BallistaGrant.AcceptGrant(asked))
+            {
+                return;
+            }
+            asked = false;
             Player? player = Player.m_localPlayer;
             if (player == null)
             {
@@ -129,13 +147,78 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Ballista
             player.HideHandItems(false, false);
         }
 
-        /// <summary>The owner (whoever has the ZDO now): the holder lets go.</summary>
+        /// <summary>The owner (whoever has the ZDO now): the holder lets go. The sender must be that holder.</summary>
         private void RPC_Release(long sender, long playerID)
         {
-            if (Net.IsOwner() && Net.GetZDO().GetLong(BallistaKeys.User, 0L) == playerID)
+            if (!Net.IsOwner())
+            {
+                return;
+            }
+            long holder = Net.GetZDO().GetLong(BallistaKeys.User, 0L);
+            if (BallistaGrant.AcceptRelease(SenderPlayerId(sender), playerID, holder))
             {
                 BallistaOperator.LetGo(this);
             }
+        }
+
+        /// <summary>The player id of the peer who sent the RPC. A call this machine routed to itself is the local player.</summary>
+        private static long SenderPlayerId(long sender)
+        {
+            if (ZNet.instance != null)
+            {
+                ZNetPeer? peer = ZNet.instance.GetPeer(sender);
+                if (peer != null)
+                {
+                    if (peer.m_playerID != 0L)
+                    {
+                        return peer.m_playerID;
+                    }
+                    if (ZDOMan.instance != null && !peer.m_characterID.IsNone())
+                    {
+                        ZDO? character = ZDOMan.instance.GetZDO(peer.m_characterID);
+                        if (character != null)
+                        {
+                            long id = character.GetLong(ZDOVars.s_playerID, 0L);
+                            if (id != 0L)
+                            {
+                                return id;
+                            }
+                        }
+                    }
+                }
+            }
+            if (ZRoutedRpc.instance != null && sender == ZRoutedRpc.instance.m_id && Player.m_localPlayer != null)
+            {
+                return Player.m_localPlayer.GetPlayerID();
+            }
+            return 0L;
+        }
+
+        /// <summary>Where that player is standing. The loaded player wins; otherwise the peer's reference position.</summary>
+        private static bool TryPosition(long sender, long playerId, out Vector3 position)
+        {
+            Player? player = Player.GetPlayer(playerId);
+            if (player != null)
+            {
+                position = player.transform.position;
+                return true;
+            }
+            if (ZNet.instance != null)
+            {
+                ZNetPeer? peer = ZNet.instance.GetPeer(sender);
+                if (peer != null)
+                {
+                    position = peer.m_refPos;
+                    return true;
+                }
+            }
+            if (Player.m_localPlayer != null && Player.m_localPlayer.GetPlayerID() == playerId)
+            {
+                position = Player.m_localPlayer.transform.position;
+                return true;
+            }
+            position = default;
+            return false;
         }
 
         /// <summary>A holder who is still in the world, alive and at the ballista.</summary>

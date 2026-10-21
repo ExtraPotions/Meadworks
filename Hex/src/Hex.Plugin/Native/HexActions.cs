@@ -1,6 +1,7 @@
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks). SPDX-License-Identifier: GPL-3.0-or-later
 // Original native API implementation. VAT is a behavior only design reference; no source or assemblies accessed.
 using System;
+using System.Globalization;
 using System.Linq;
 using ExtraPotions.Meadworks.Crucible;
 
@@ -33,8 +34,16 @@ internal static class HexActions
     {
         if (args.Length == 0 || args[0].Equals("help", StringComparison.OrdinalIgnoreCase)) return HexText.Text("actions_help");
         if (args[0].Equals("debug", StringComparison.OrdinalIgnoreCase))
-            return args.Length == 2 ? HexDebug.Execute(args[1].ToLowerInvariant())
-                : args.Length == 3 && args[2].Equals("confirm", StringComparison.OrdinalIgnoreCase) ? HexDebug.Execute(args[1].ToLowerInvariant(), true) : HexText.Text("debug_help");
+        {
+            if (args.Length == 2) return HexDebug.Execute(args[1].ToLowerInvariant());
+            var name = args.Length >= 2 ? args[1].ToLowerInvariant() : "";
+            if (args.Length == 3 && name == "event" && args[2].Equals("confirm", StringComparison.OrdinalIgnoreCase)) return HexDebug.Execute("event", true);
+            if (args.Length == 4 && args[2].Equals("confirm", StringComparison.OrdinalIgnoreCase)
+                && (name == "kill" || name == "drops" || name == "tame")
+                && float.TryParse(args[3], NumberStyles.Float, CultureInfo.InvariantCulture, out var radius))
+                return HexDebug.Execute(name, true, radius);
+            return HexText.Text("debug_help");
+        }
         if (args[0].Equals("spawn", StringComparison.OrdinalIgnoreCase)) return HexSpawn.Execute(args);
         if (args[0].Equals("protection", StringComparison.OrdinalIgnoreCase))
             return args.Length == 1 ? HexSpawnProtection.Toggle() : HexText.Text("actions_help");

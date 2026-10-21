@@ -17,18 +17,19 @@ namespace ExtraPotions.Ember.Runtime
     [HarmonyPatch]
     internal static class StationTimerPatches
     {
-        static readonly int FermenterMarker = "meadworks.ember.fermenter_boost".GetStableHashCode();
-        static readonly int PlantMarker = "meadworks.ember.plant_boost".GetStableHashCode();
-        static readonly int PickableMarker = "meadworks.ember.pickable_boost".GetStableHashCode();
+        // Old markers count every boost interval; first use of the protected totals only establishes a baseline.
+        static readonly int FermenterMarker = "meadworks.ember.fermenter_protected_boost".GetStableHashCode();
+        static readonly int PlantMarker = "meadworks.ember.plant_protected_boost".GetStableHashCode();
+        static readonly int PickableMarker = "meadworks.ember.pickable_protected_boost".GetStableHashCode();
 
         /// <summary>Moves the owned timer's start forward by the boost added since its marker, then advances the marker.</summary>
-        static void ShiftStart(ZNetView? nview, int timeKey, int markerKey, bool requireStart)
+        static void ShiftStart(ZNetView? nview, int timeKey, int markerKey, bool requireStart, EmberSetting<bool> setting)
         {
             if (nview == null || !nview.IsValid() || !nview.IsOwner()) return;
             var zdo = nview.GetZDO();
             if (zdo == null) return;
             if (requireStart && zdo.GetLong(timeKey, 0L) == 0L) return;
-            if (!SleepRuntime.TryBoostTotal(out var total)) return;
+            if (!SleepRuntime.TryStationBoostTotal(setting, out var total)) return;
             var decision = StationTimers.Shift(StationTimers.ToTicks(total), zdo.GetLong(markerKey, -1L));
             if (decision.Shift > 0L)
             {
@@ -55,22 +56,36 @@ namespace ExtraPotions.Ember.Runtime
         [HarmonyPatch(typeof(Fermenter), nameof(Fermenter.GetFermentationTime)), HarmonyPrefix]
         static void Fermentation(Fermenter __instance)
         {
-            if (__instance != null && SleepRuntime.StationsOn(EmberSettings.Stations.ProtectMeadTimers))
-                ShiftStart(__instance.m_nview, ZDOVars.s_startTime, FermenterMarker, requireStart: true);
+            if (__instance != null)
+                ShiftStart(__instance.m_nview, ZDOVars.s_startTime, FermenterMarker, requireStart: true, EmberSettings.Stations.ProtectMeadTimers);
+        }
+
+        [HarmonyPatch(typeof(Fermenter), nameof(Fermenter.RPC_AddItem)), HarmonyPrefix]
+        static void BeforeFermenterAdd(Fermenter __instance, out long __state) =>
+            __state = __instance?.m_nview?.GetZDO()?.GetLong(ZDOVars.s_startTime, 0L) ?? 0L;
+
+        [HarmonyPatch(typeof(Fermenter), nameof(Fermenter.RPC_AddItem)), HarmonyPostfix]
+        static void FermenterAdded(Fermenter __instance, long __state)
+        {
+            var view = __instance?.m_nview;
+            if (view == null || !view.IsValid() || !view.IsOwner()) return;
+            var zdo = view.GetZDO();
+            var start = zdo?.GetLong(ZDOVars.s_startTime, 0L) ?? 0L;
+            if (start > 0L && start != __state)
+                zdo!.Set(FermenterMarker, SleepRuntime.TryStationBoostTotal(EmberSettings.Stations.ProtectMeadTimers, out var total) ? StationTimers.ToTicks(total) : -1L);
         }
 
         [HarmonyPatch(typeof(Plant), nameof(Plant.TimeSincePlanted)), HarmonyPrefix]
         static void Planted(Plant __instance)
         {
-            if (__instance != null && SleepRuntime.StationsOn(EmberSettings.Stations.ProtectCropTimers))
-                ShiftStart(__instance.m_nview, ZDOVars.s_plantTime, PlantMarker, requireStart: false);
+            if (__instance != null)
+                ShiftStart(__instance.m_nview, ZDOVars.s_plantTime, PlantMarker, requireStart: false, EmberSettings.Stations.ProtectCropTimers);
         }
 
         static void PickableShift(Pickable pickable)
         {
-            if (pickable == null || pickable.m_respawnTimeMinutes <= 0f || !pickable.GetPicked() ||
-                !SleepRuntime.StationsOn(EmberSettings.Stations.ProtectPickableTimers)) return;
-            ShiftStart(pickable.m_nview, ZDOVars.s_pickedTime, PickableMarker, requireStart: false);
+            if (pickable == null || pickable.m_respawnTimeMinutes <= 0f || !pickable.GetPicked()) return;
+            ShiftStart(pickable.m_nview, ZDOVars.s_pickedTime, PickableMarker, requireStart: false, EmberSettings.Stations.ProtectPickableTimers);
         }
 
         [HarmonyPatch(typeof(Pickable), nameof(Pickable.ShouldRespawn)), HarmonyPrefix]
@@ -83,11 +98,10 @@ namespace ExtraPotions.Ember.Runtime
         [HarmonyPatch(typeof(Pickable), nameof(Pickable.SetPicked)), HarmonyPostfix]
         static void Picked(Pickable __instance, bool picked)
         {
-            if (!picked || __instance == null || __instance.m_respawnTimeMinutes <= 0f ||
-                !SleepRuntime.StationsOn(EmberSettings.Stations.ProtectPickableTimers)) return;
+            if (!picked || __instance == null || __instance.m_respawnTimeMinutes <= 0f) return;
             var nview = __instance.m_nview;
-            if (nview == null || !nview.IsValid() || !nview.IsOwner() || !SleepRuntime.TryBoostTotal(out var total)) return;
-            nview.GetZDO()?.Set(PickableMarker, StationTimers.ToTicks(total));
+            if (nview == null || !nview.IsValid() || !nview.IsOwner()) return;
+            nview.GetZDO()?.Set(PickableMarker, SleepRuntime.TryStationBoostTotal(EmberSettings.Stations.ProtectPickableTimers, out var total) ? StationTimers.ToTicks(total) : -1L);
         }
     }
 }

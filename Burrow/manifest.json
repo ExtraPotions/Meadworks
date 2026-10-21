@@ -1,11 +1,11 @@
 {
   "name": "Burrow",
-  "version_number": "0.3.20",
+  "version_number": "0.3.24",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Burrow",
   "description": "Meadworks storage: craft and build from nearby chests, chest previews, bigger chests, sorting, quick stack, restocking, routing and multi-user chests. Required on all peers.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.24"
+    "expDARE-Crucible-0.3.26"
   ]
 }

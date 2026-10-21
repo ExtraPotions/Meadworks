@@ -31,7 +31,7 @@ namespace ExtraPotions.Shepherd.Breeding
     /// <summary>The breeding settings inheritance reads (design 4.5), validated to their ranges.</summary>
     public sealed class InheritanceSettings
     {
-        public InheritanceSettings(InheritanceMode mode, int maxAboveBestParent, int maxOffspringLevel, double betterOffspringAt100, double birthStarChance)
+        public InheritanceSettings(InheritanceMode mode, int maxAboveBestParent, int maxOffspringLevel, double betterOffspringAt100, double birthStarChance, bool tamedStars = true)
         {
             if (!Enum.IsDefined(typeof(InheritanceMode), mode)) throw new ArgumentOutOfRangeException(nameof(mode));
             if (maxAboveBestParent < 0 || maxAboveBestParent > 2) throw new ArgumentOutOfRangeException(nameof(maxAboveBestParent), "0 to 2");
@@ -43,6 +43,7 @@ namespace ExtraPotions.Shepherd.Breeding
             MaxOffspringLevel = maxOffspringLevel;
             BetterOffspringAt100 = betterOffspringAt100;
             BirthStarChance = birthStarChance;
+            TamedStars = tamedStars;
         }
 
         /// <summary>Design defaults: ParentMean, one above the best parent, level 3 (two stars), 25 percent, 0 percent.</summary>
@@ -53,6 +54,8 @@ namespace ExtraPotions.Shepherd.Breeding
         public int MaxOffspringLevel { get; }
         public double BetterOffspringAt100 { get; }
         public double BirthStarChance { get; }
+        /// <summary>False: a newborn keeps its mother's level and takes no bonus stars. Existing animals are not rewritten.</summary>
+        public bool TamedStars { get; }
     }
 
     /// <summary>One birth's facts: levels (1 = no star), sire level 0 when there is no sire, the best keeper's level.</summary>
@@ -111,6 +114,11 @@ namespace ExtraPotions.Shepherd.Breeding
             if (random == null) throw new ArgumentNullException(nameof(random));
             int mother = input.MotherLevel;
             int sire = input.HasSire ? input.SireLevel : mother;
+            if (!settings.TamedStars)
+            {
+                int game = Math.Max(1, mother);
+                return new InheritanceResult(game, Math.Max(mother, sire), game, game, false, false);
+            }
             int best = Math.Max(mother, sire);
             int floor = Math.Max(1, input.MinOffspringLevel);
             int cap = Math.Max(floor, Math.Min(best + settings.MaxAboveBestParent, settings.MaxOffspringLevel));

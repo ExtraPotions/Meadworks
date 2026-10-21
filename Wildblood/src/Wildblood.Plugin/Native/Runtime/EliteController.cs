@@ -128,7 +128,7 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
         /// <summary>Owner rolls if unrolled; every machine then loads. False when a non-owner meets it before the roll.</summary>
         private bool TryResolve()
         {
-            // Both adopted sections must be committed for this exact session before any first roll or migration.
+            // Sections must be committed for this session. A remote client also waits until its server rules are adopted.
             if (!RuntimeAvailable) return false;
             ZDO zdo = _nview.GetZDO();
             if (zdo == null)
@@ -140,6 +140,11 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
                 // Loot is an independent module: read native identity, never roll/migrate or apply creature stats.
                 RefreshLootIdentity();
                 return true;
+            }
+            // An owner does not roll until a snapshot is adopted. Clients stay pending at RuntimeAvailable above.
+            if (_nview.IsOwner() && !ExtraPotions.Wildblood.Runtime.Plugin.NativeRulesReady)
+            {
+                return false;
             }
             if (_nview.IsOwner())
             {
@@ -156,6 +161,7 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
             Traits = TraitStore.Load(zdo);
             if (_nview.IsOwner())
             {
+                TameGameLevel.Release(zdo);
                 PublishNativeLevel(zdo);
                 ExtraPotions.Wildblood.AdoptedCm.CreatureLevelManager.SynchronizePreservedNativeState(_character, zdo);
                 ExtraPotions.Wildblood.AdoptedCm.CreatureModifierManager.TryRollModifiers(_character);
@@ -207,9 +213,7 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
                 TraitStore.SetDistanceScaling(zdo, distanceDamage, distanceHealth);
             }
             if (StarsActive && !KeepsNativeLevel && !RuleState.Active.KeepsLevel(fresh.Stars, _isBoss))
-            {
                 _character.SetLevel(Mathf.Clamp(fresh.Stars, 0, 8) + 1);
-            }
             FreshlyResolved = true;
             _forced = null;
             _forcedDraw = null;

@@ -2,13 +2,15 @@
 
 Item rarity, inscriptions, runes that reshape your gear, gems and sockets.
 
-Version 0.2.2. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.4. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
 - Item rarity with inscriptions: equipment can roll a rarity with extra stats.
-- Five runes that reshape equipment: Ascension (one rarity step, Common to Uncommon to Rare to Epic; Legendary comes only from bosses and raids), Recasting, Honing (one inscription a tier up), Cleansing and the Sealed (Serpent) Rune. Destructive runes ask you to hold Shift to confirm (configurable). The Awakening and Tempering Runes of earlier builds became Ascension and Honing; owned ones convert one for one.
-- Gems and sockets: the Dvergr Chisel cuts up to three sockets in weapons, staves, armor, shields and backpacks, and eleven gems fill them.
+- Five runes that reshape equipment: Ascension (one rarity step, Common to Uncommon to Rare to Epic on a full inscription pool), Recasting, Honing (one inscription a tier up), Cleansing and the Sealed (Serpent) Rune. Destructive runes ask you to hold Shift to confirm (configurable). The Awakening and Tempering Runes of earlier builds became Ascension and Honing; owned ones convert one for one. Boss and raid drops remain the source of Legendary gear for classes with a full pool.
+- A rune on a pickaxe, tool or fishing rod moves prefix slots that pool cannot fill onto suffixes, so Ascension can reach Epic and Legendary on those items. Dropped gear keeps its own limits.
+- Gems and sockets: the Dvergr Chisel cuts up to three sockets in weapons, pickaxes, staves, armor, shields and backpacks, and eleven gems fill them. A gem in a pickaxe gives its weapon stat. Other tools, fishing rods and torches take no sockets.
+- Worn items in the inventory and hotbar show a thin parchment ring at the cell edge. While Inscribe is drawing item rarity, the game's blue equipped fill is hidden, so a worn magic item keeps its rarity color and a worn ordinary item does not look Rare. When that display is not drawn, the blue fill comes back.
 - Rune Table: a buildable table that stores runes, turns trophies into essence and applies runes; an essence chooses what the Ascension Rune adds.
 - Enhancement levels (+1 to +20) and enhancement scrolls were removed in 0.2.0. Existing enhanced items and scrolls convert once, when carried or when their chest is opened: each enhancement level becomes Honing steps that raise the item's inscriptions (up to what the item's level allows), and the rest becomes Honing Runes; scrolls become Honing Runes and Essence. The old item data is kept.
 - Creatures and bosses can drop runes and magic equipment; world chests can hold runes and magic equipment.
@@ -21,7 +23,7 @@ Version 0.2.2. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CH
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.24 or a later 0.3.x, which includes Crucible.UI 0.3.17 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.12 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- A merge that removes a source stack saves that fact on the target before the source is deleted. Reloading does not take those items back, and the removal is not applied twice. If the source is lost before that removal, a target that was already partly picked up is not reduced below its count from before the merge.
+- A loot extra that only partly fits drops the leftover count once. Units that already merged into a stack are not spawned again.
+- German, Russian, Chinese and Korean pickup text uses the game's words for pickup, floating loot, graves, chests and crafting stations.
+- A ground merge that loses the source stack before that stack is shrunk or removed takes the extra items back off the target. The picked-up stack is not duplicated. A merge that already finished keeps its result.
+- Float settings no longer build a comparison string every frame. What floats does not change.
+
 ## 0.1.11 (2026-10-19)
 
 - Requires Crucible 0.3.22 / Crucible.UI 0.3.15.

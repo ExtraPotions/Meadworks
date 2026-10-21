@@ -1,6 +1,6 @@
 # Shepherd
 
-Version 0.1.14. Requires Crucible 0.3.22 / Crucible.UI 0.3.15. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.15. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Animal keeping as part of your base: feed troughs, a Husbandry skill, and breeding with sires, star inheritance, twins, herd limits and lineage.
 
@@ -14,7 +14,8 @@ Animal keeping as part of your base: feed troughs, a Husbandry skill, and breedi
 - Honey production (native/off by default): Honey Per Day sets a bounded daily rate; Honey Per Player Online replaces it with the actual online player count. Native hive conditions and capacity still apply. Existing extra-honey skill rewards happen separately at harvest.
 - Husbandry skill: levels as you tame, feed, pet and breed animals, and gives faster taming, animals that stay fed longer, calmer animals, more butcher yield and produce, and tougher tamed companions.
 - Follow and stay for supported tames: Use on a tamed boar, lox, hen or other tame that supports commands toggles the game's own follow/stay command. Summons and unsupported tameables stay unchanged.
-- Breeding: the father (sire) is recorded at conception, newborn stars are inherited from both parents (configurable), a flat birth star chance, twins, and lineage records (parents, generation, birth day and breeder).
+- Breeding: the father (sire) is recorded at conception, twins, and lineage records (parents, generation, birth day and breeder). Newborn stars follow Wildblood. When Wildblood is installed and its Tamed Stars is on, stars are inherited from both parents (Star Inheritance), with Better Offspring and Birth Star Chance. Off, or without Wildblood, a newborn keeps its mother's level, as the game does, and those bonuses add nothing. Shepherd's own Tamed Stars setting is ignored. The old key stays in the config file and does not change a birth.
+- Seasonal Breeding (on by default, host or server): while Solstice seasons are on, tame breeding uses that season's rate. Spring is faster, winter is slower, and a rate of zero starts no new pregnancies. A pregnancy already underway still finishes. Off, or without Solstice, breeding stays as it is. Feeding and troughs are unchanged.
 - Herd limits: an optional strict herd limit delays births while a herd is over its limit. A buildable land pen sets its own herd capacity, and breeding can pause on moving ship pens.
 - Herd book: a shared book listing nearby animals with their lineage, opened from the Meadworks menu (F8 or Esc > Meadworks), the trough header, or a key or gamepad chord (unbound by default), within 50 m. Tames can be renamed.
 - Animal lore lines on hover (compact or full).
@@ -24,7 +25,7 @@ Animal keeping as part of your base: feed troughs, a Husbandry skill, and breedi
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.22 or a later 0.3.x, which includes Crucible.UI 0.3.15 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 
@@ -51,7 +52,7 @@ Animal keeping as part of your base: feed troughs, a Husbandry skill, and breedi
 - Steps aside: with AutoFeedRedux installed, Shepherd's feeding turns off. With GrindstoneSkills installed and its Husbandry enabled, Shepherd's Husbandry and feeding turn off. With EliteCreaturesReborn installed and its breeding enabled, Shepherd's star inheritance turns off. With OpenKeep installed and its pet option enabled, Shepherd's container feeding turns off.
 - Converter imports: AutoFeedRedux, GrindstoneSkills and EliteCreaturesReborn (see Configuration).
 - With Burrow: Burrow's container tags mark feed sources.
-- With Wildblood: newborns inherit Wildblood traits (with a mutation chance), and young and eggs keep them as they grow or hatch.
+- With Wildblood: Wildblood's Tamed Stars decides whether a new birth inherits stars. Taming does not remove stars. Newborns inherit Wildblood traits (with a mutation chance), and young and eggs keep them as they grow or hatch.
 - With Keel: breeding pauses in livestock pens on a moving ship (`Pause Breeding On Moving Ships`, on by default).
 
 ## Notes

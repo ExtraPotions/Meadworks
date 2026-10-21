@@ -22,5 +22,6 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         internal static readonly SalvageValue<bool> RequireStation = Read(KindleSettings.Salvage.RequireStation);
         internal static readonly SalvageValue<bool> SkipModData = Read(KindleSettings.Salvage.SkipItemsWithModData);
         internal static readonly SalvageValue<string> ModDataPrefixes = Read(KindleSettings.Salvage.ModDataPrefixes);
+        internal static readonly SalvageValue<bool> NearbyChests = Read(KindleSettings.Salvage.NearbyChests);
     }
 }

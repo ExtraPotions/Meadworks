@@ -18,34 +18,58 @@ namespace Mantle.Crafting
     {
         public const string BaseItem = "TrollHide";
 
-        public static GameObject Build(GameObject hide, GameObject model, CraftedKind kind)
+        public static GameObject Build(GameObject hide, CraftedKind kind)
         {
             GameObject item = PrefabBench.Copy(hide, kind.Id);
-            Transform old = item.transform.Find("model");
-            if (old != null)
-                Object.DestroyImmediate(old.gameObject);
-            foreach (Collider collider in item.GetComponentsInChildren<Collider>(true))
-                Object.DestroyImmediate(collider);
-            Fit(item, model);
             Describe(item.GetComponent<ItemDrop>().m_itemData.m_shared, kind);
             return item;
         }
 
-        /// <summary>The model under the item, centred on it, inside a box collider and in the item's LOD group.</summary>
-        private static void Fit(GameObject item, GameObject model)
+        public static void Dress(GameObject item, GameObject model)
         {
-            model.transform.SetParent(item.transform, false);
-            Bounds bounds = MeshBounds(model, item.transform);
-            model.transform.localPosition -= bounds.center;
-            item.AddComponent<BoxCollider>().size = bounds.size;
-            LODGroup group = item.GetComponent<LODGroup>();
-            if (group == null)
-                return;
-            LOD[] lods = group.GetLODs();
-            if (lods.Length == 0)
-                return;
-            lods[0].renderers = model.GetComponentsInChildren<Renderer>(true);
-            group.SetLODs(lods);
+            Transform old = item.transform.Find("model");
+            Collider[] oldColliders = item.GetComponentsInChildren<Collider>(true);
+            BoxCollider box = null;
+            LODGroup group = null;
+            LOD[] previousLods = null;
+            try
+            {
+                model.SetActive(false);
+                model.transform.SetParent(item.transform, false);
+                Bounds bounds = MeshBounds(model, item.transform);
+                model.transform.localPosition -= bounds.center;
+                box = item.AddComponent<BoxCollider>();
+                box.enabled = false;
+                box.size = bounds.size;
+                group = item.GetComponent<LODGroup>();
+                if (group != null)
+                {
+                    previousLods = group.GetLODs();
+                    if (previousLods.Length > 0)
+                    {
+                        LOD[] lods = (LOD[])previousLods.Clone();
+                        lods[0].renderers = model.GetComponentsInChildren<Renderer>(true);
+                        group.SetLODs(lods);
+                    }
+                }
+                model.SetActive(true);
+                box.enabled = true;
+            }
+            catch
+            {
+                if (box != null) Object.DestroyImmediate(box);
+                Object.DestroyImmediate(model);
+                if (group != null && previousLods != null)
+                {
+                    try { group.SetLODs(previousLods); }
+                    catch (Exception error) { Plugin.Log.LogWarning("The native item LOD could not be restored: " + error.Message); }
+                }
+                throw;
+            }
+            if (old != null)
+                Object.DestroyImmediate(old.gameObject);
+            foreach (Collider collider in oldColliders)
+                Object.DestroyImmediate(collider);
         }
 
         private static void Describe(ItemDrop.ItemData.SharedData shared, CraftedKind kind)
@@ -66,6 +90,7 @@ namespace Mantle.Crafting
         /// <summary>The embedded icon, or null (the Troll hide's icon stays) when it is missing or cannot be read.</summary>
         private static Sprite Icon(CraftedKind kind)
         {
+            if (ExtraPotions.Meadworks.Crucible.MeadworksHeadless.IsHeadless) return null;
             try
             {
                 if (typeof(CraftedItem).Assembly.GetManifestResourceInfo(kind.IconResource) != null)

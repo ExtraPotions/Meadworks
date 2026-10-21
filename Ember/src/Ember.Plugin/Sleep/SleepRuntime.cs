@@ -32,6 +32,10 @@ namespace ExtraPotions.Ember.Runtime
     public sealed class SleepPing
     {
         public static readonly SleepPing Instance = new SleepPing();
+        public static readonly SleepPing Legacy = new SleepPing(false);
+        public bool StationTotals { get; }
+        public SleepPing() : this(true) { }
+        public SleepPing(bool stationTotals) { StationTotals = stationTotals; }
     }
 
     /// <summary>Wire codec of meadworks.ember.sleep.bed_changed and meadworks.ember.sleep.state (Ember.Core SleepCommands).</summary>
@@ -41,14 +45,14 @@ namespace ExtraPotions.Ember.Runtime
 
         public SleepCodec(bool bedChanged) { this.bedChanged = bedChanged; }
 
-        public byte[] EncodeRequest(SleepPing request) => bedChanged ? SleepCommands.EncodeBedChanged() : SleepCommands.EncodeStateRequest();
+        public byte[] EncodeRequest(SleepPing request) => bedChanged ? SleepCommands.EncodeBedChanged(request.StationTotals) : SleepCommands.EncodeStateRequest(request.StationTotals);
 
         public SleepPing DecodeRequest(byte[] bytes)
         {
             string? error;
             var ok = bedChanged ? SleepCommands.TryDecodeBedChanged(bytes, out error) : SleepCommands.TryDecodeStateRequest(bytes, out error);
             if (!ok) throw new FormatException(error);
-            return SleepPing.Instance;
+            return bytes.Length == 2 ? SleepPing.Instance : SleepPing.Legacy;
         }
 
         public byte[] EncodeReply(SleepState reply) => SleepCommands.EncodeState(reply);
@@ -89,12 +93,15 @@ namespace ExtraPotions.Ember.Runtime
         static long authorityGeneration = -1, authorityWorld;
         static string? authoritySession;
         static double boostTotal;
+        static StationBoostTotals stationTotals;
+        static bool legacyAuthority;
         static bool boostDirty;
 
         static void ResetAuthority()
         {
             SaveBoostTotal();
             boostTotal = 0.0;
+            stationTotals = default;
             Current = default;
             tickTimer = 0;
             throttle.Reset();
@@ -132,6 +139,7 @@ namespace ExtraPotions.Ember.Runtime
             authorityWorld = session.WorldId;
             authoritySession = session.SessionId;
             boostTotal = LoadBoostTotal(session.WorldId);
+            stationTotals = LoadStationTotals(session.WorldId, boostTotal);
             try { Recount(force: true); }
             catch { ResetAuthority(); throw; }
             return true;
@@ -183,6 +191,7 @@ namespace ExtraPotions.Ember.Runtime
             pollTimer = 0;
             polledSession = -1;
             Received = null;
+            legacyAuthority = false;
         }
 
         static bool PrepareClient()
@@ -235,7 +244,7 @@ namespace ExtraPotions.Ember.Runtime
         {
             var s = Plugin.Settings;
             if (env == null || s == null) return false;
-            return SleepWindow.IsOpen(env.GetDayFraction(), s.Get(EmberSettings.Sleep.SleepStart), env.IsTimeSkipping(), s.SleepAnyTime);
+            return SleepWindow.IsOpen(EmberSeasons.SleepFraction(env), s.Get(EmberSettings.Sleep.SleepStart), env.IsTimeSkipping(), s.SleepAnyTime);
         }
 
         static BoostSettings Boost()
@@ -298,17 +307,17 @@ namespace ExtraPotions.Ember.Runtime
             }
         }
 
-        static OperationExecution<SleepState> OnBedChanged(AuthorityContext context, SleepPing _)
+        static OperationExecution<SleepState> OnBedChanged(AuthorityContext context, SleepPing request)
         {
             if (!PrepareAuthority()) return OperationExecution<SleepState>.Rejected("SleepOff");
             if (throttle.Admit(context.IsLocal ? "local" : context.SenderId, verified: true, UnityEngine.Time.realtimeSinceStartup)) Recount(force: false);
-            return OperationExecution<SleepState>.Success(Reply());
+            return OperationExecution<SleepState>.Success(Reply(request.StationTotals));
         }
 
-        static OperationExecution<SleepState> OnStateRequest(AuthorityContext context, SleepPing _) =>
-            PrepareAuthority() ? OperationExecution<SleepState>.Success(Reply()) : OperationExecution<SleepState>.Rejected("SleepOff");
+        static OperationExecution<SleepState> OnStateRequest(AuthorityContext context, SleepPing request) =>
+            PrepareAuthority() ? OperationExecution<SleepState>.Success(Reply(request.StationTotals)) : OperationExecution<SleepState>.Rejected("SleepOff");
 
-        static SleepState Reply() => Current.WithBoostTotal(StationTimers.AddBoost(boostTotal, 0.0));
+        static SleepState Reply(bool stations) => stations ? Current.WithStationTotals(boostTotal, stationTotals) : Current.WithBoostTotal(boostTotal);
 
         // Boost total (station timers).
 
@@ -327,6 +336,17 @@ namespace ExtraPotions.Ember.Runtime
             return 0.0;
         }
 
+        static StationBoostTotals LoadStationTotals(long world, double total)
+        {
+            var path = BoostFile(world) + ".stations";
+            try
+            {
+                if (File.Exists(path) && StationBoostTotals.TryLoad(File.ReadAllText(path), total, out var saved)) return saved;
+            }
+            catch (Exception error) { log?.Warning("Could not read station sleep totals: " + error.GetType().Name); }
+            return default;
+        }
+
         /// <summary>Writes the authority's boost total when it changed; also the postfix of ZNet.SaveWorld.</summary>
         internal static void SaveBoostTotal()
         {
@@ -338,6 +358,7 @@ namespace ExtraPotions.Ember.Runtime
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                 File.WriteAllText(path, StationTimers.FormatTotal(boostTotal));
+                File.WriteAllText(path + ".stations", stationTotals.Save(boostTotal));
             }
             catch (Exception error) { log?.Warning("Could not save the sleep boost total: " + error.GetType().Name + ": " + error.Message); }
         }
@@ -372,11 +393,22 @@ namespace ExtraPotions.Ember.Runtime
             return false;
         }
 
+        internal static bool TryStationBoostTotal(EmberSetting<bool> setting, out double total)
+        {
+            if (!Plugin.Ready || Plugin.Settings == null || !Active) { total = 0; return false; }
+            StationBoostTotals? totals = AuthorityHere ? stationTotals : clientOwner != null ? Received?.StationTotals : null;
+            if (!totals.HasValue) { total = 0; return false; }
+            total = setting == EmberSettings.Stations.ProtectMeadTimers ? totals.Value.Mead :
+                setting == EmberSettings.Stations.ProtectCropTimers ? totals.Value.Crops : totals.Value.Pickables;
+            return true;
+        }
+
         /// <summary>S6 cap: the start of the next morning (BetterSleepBruh's day lookup with a 0.15 day back-off).</summary>
         static double MorningCap()
         {
             var env = EnvMan.instance;
             if (!IsServer || env == null) return double.PositiveInfinity;
+            if (EmberSeasons.NightActive) return EmberSeasons.NextMorning(env);
             var time = ZNet.instance.GetTimeSeconds();
             var day = env.GetDay(time - env.m_dayLengthSec * 0.150000005960464);
             return env.GetMorningStartSec(day + 1);
@@ -386,6 +418,12 @@ namespace ExtraPotions.Ember.Runtime
         internal static void AfterNetTime(ZNet znet, float dt)
         {
             if (!ReferenceEquals(znet, ZNet.instance) || !PrepareAuthority() || znet.GetNrOfPlayers() <= 0) return;
+            // The recount can lag dawn by one heartbeat; do not reuse last night's boost for tomorrow's cap.
+            if (EmberSeasons.NightActive && !WindowOpen(EnvMan.instance))
+            {
+                timeSync.Reset();
+                return;
+            }
             var rate = Current.ExtraRate;
             if (rate <= 0.0)
             {
@@ -400,6 +438,9 @@ namespace ExtraPotions.Ember.Runtime
             }
             znet.SetNetTime(step.NewTime);
             boostTotal = StationTimers.AddBoost(boostTotal, step.Applied);
+            stationTotals = stationTotals.Add(step.Applied,
+                StationsOn(EmberSettings.Stations.ProtectMeadTimers), StationsOn(EmberSettings.Stations.ProtectCropTimers),
+                StationsOn(EmberSettings.Stations.ProtectPickableTimers));
             boostDirty = true;
             if (znet.m_peers == null || znet.m_peers.Count == 0 || !timeSync.Tick(dt)) return;
             var netTime = znet.GetTimeSeconds();
@@ -480,7 +521,7 @@ namespace ExtraPotions.Ember.Runtime
             }
             if (!hintWanted) return;
             hintWanted = false;
-            hint = CruciblePlugin.RequestClient.InvokeAsync<SleepPing, SleepState>(SleepCommands.BedChangedId, SleepPing.Instance, clientOwner!.Cancellation.Token);
+            hint = CruciblePlugin.RequestClient.InvokeAsync<SleepPing, SleepState>(SleepCommands.BedChangedId, legacyAuthority ? SleepPing.Legacy : SleepPing.Instance, clientOwner!.Cancellation.Token);
         }
 
         static void Poll(double dt)
@@ -499,11 +540,17 @@ namespace ExtraPotions.Ember.Runtime
             if (!joined && (pollTimer < 1.0 || !windowLikely)) return;
             pollTimer = 0.0;
             polledSession = session;
-            poll = CruciblePlugin.RequestClient.InvokeAsync<SleepPing, SleepState>(SleepCommands.StateId, SleepPing.Instance, clientOwner!.Cancellation.Token);
+            poll = CruciblePlugin.RequestClient.InvokeAsync<SleepPing, SleepState>(SleepCommands.StateId, legacyAuthority ? SleepPing.Legacy : SleepPing.Instance, clientOwner!.Cancellation.Token);
         }
 
         static void Accept(OperationResult<SleepState> result)
         {
+            if (result.State == OperationState.Rejected && result.Code == "HandlerFailed" && !legacyAuthority)
+            {
+                // Older authorities reject the optional request byte; retain their sleep HUD and bed protocol.
+                legacyAuthority = true;
+                polledSession = -1;
+            }
             if (result.State != OperationState.Succeeded || clientOwner == null || !clientOwner.IsCurrent() ||
                 !Active || Plugin.Settings == null) return;
             var previous = Received;

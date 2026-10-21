@@ -42,9 +42,11 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
         /// <summary>Pace and growth speed (Husbandry perks) apply.</summary>
         public static bool PaceActive => Active && NativeHusbandry.Active;
 
-        public static InheritanceSettings Inheritance() => new InheritanceSettings(ShepherdSettings.Inheritance.Value,
+        /// <summary><paramref name="stars"/> is Wildblood's answer. False keeps the mother's level and adds no bonus star.</summary>
+        public static InheritanceSettings Inheritance(bool stars) => new InheritanceSettings(ShepherdSettings.Inheritance.Value,
             ShepherdSettings.MaxAboveBestParent.Value, HusbandryBreedingSettings.MaxOffspringLevel.Value,
-            NativeHusbandry.Active ? HusbandryBreedingSettings.BetterOffspring.Value : 0, ShepherdSettings.BirthStarChance.Value);
+            NativeHusbandry.Active ? HusbandryBreedingSettings.BetterOffspring.Value : 0, ShepherdSettings.BirthStarChance.Value,
+            stars);
 
         public static void Initialize(MeadworksLog logger)
         {

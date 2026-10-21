@@ -48,7 +48,7 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
         private static void BindOffspring(NativeConfiguration config)
         {
             BetterOffspring = config.Bind(Section, "Better Offspring At 100", 25f,
-                "Percent chance, with a level 100 keeper, that a newborn or a laid egg is one star above its parent (the game passes the parent's own level on).",
+                "Percent chance, with a level 100 keeper, that a newborn or a laid egg is one star above its parent (the game passes the parent's own level on). It adds nothing without Wildblood, or when Wildblood's Tamed Stars is off.",
                 acceptableValues: Settings.UpTo(100f));
             MaxOffspringLevel = config.Bind(Section, "Max Offspring Level", 3,
                 "The highest game level Better Offspring reaches: 1 is no star, 2 one star, 3 two stars (the most the game spawns). Drops double with each level. With Elite Creatures Reborn installed its own breeding decides stars, and Better Offspring gives one star more, up to one above the stronger parent.",

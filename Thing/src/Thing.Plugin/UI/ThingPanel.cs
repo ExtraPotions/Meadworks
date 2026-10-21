@@ -6,7 +6,9 @@ using System.Globalization;
 using System.Linq;
 using ExtraPotions.Meadworks.Crucible;
 using ExtraPotions.Meadworks.Crucible.UI;
+using ExtraPotions.Thing.Admin;
 using ExtraPotions.Thing.Config;
+using ExtraPotions.Thing.Moderation;
 using ExtraPotions.Thing.UI;
 using TMPro;
 using UnityEngine;
@@ -50,6 +52,17 @@ namespace ExtraPotions.Thing.Runtime
             }
         }
         internal static bool CanOpen => CanAdmin || CanConfigure;
+        internal static bool KeepsJob => CanOpen || CanPeople || AskingSelf;
+        internal static bool AskingSelf { get; private set; }
+        static bool SelfKnown => ThingSelf.Known && CruciblePlugin.IsReady && ThingSelf.Generation == CruciblePlugin.Session.Generation;
+        internal static bool CanEditGrants => CanAdmin || SelfKnown && ThingSelf.FullAdmin;
+        internal static bool CanPeople => CanAdmin || SelfKnown && (ThingSelf.FullAdmin || ThingSelf.Held != AdminRight.None);
+        static bool Holds(AdminRight bit) => CanAdmin || SelfKnown && (ThingSelf.FullAdmin || (ThingSelf.Held & bit) == bit);
+        static string shownFor = "";
+        static AdminRight shown;
+        static bool shownReady;
+        static string grantAsk = "";
+        static float nextSelf;
         static string RowKey(ThingUiRow row, int at) => row.Kind + ":" + row.Id + ":" + (offset + at).ToString(CultureInfo.InvariantCulture);
         static ThingUiRow? Selected => page?.Rows.Where((row, at) => RowKey(row, at) == selected).FirstOrDefault();
 
@@ -60,9 +73,21 @@ namespace ExtraPotions.Thing.Runtime
             var context = window?.IsOpen == true ? InputContext.Window : InputContext.Gameplay;
             if (MeadworksInput.Pressed(Plugin.Settings.ShortcutValue(ThingSettings.General.AdminWindowKey), context))
             { if (window?.IsOpen == true) ResetWindow(); else Open(); }
+            ThingPanelJobs.Tick();
             if (window == null) return;
-            if (!CanOpen || generation != CruciblePlugin.Session.Generation) { ResetWindow(); return; }
-            ThingPanelJobs.Tick(); list?.Tick();
+            if ((!CanOpen && !CanPeople) || generation != CruciblePlugin.Session.Generation) { ResetWindow(); return; }
+            list?.Tick();
+            if (tab == 0 && (query == "players" || query == "grants") && CanEditGrants && Selected != null)
+                EnsureGrant(Selected.Id);
+            if (!CanAdmin && !ThingPanelJobs.Busy && Time.unscaledTime >= nextSelf)
+            {
+                nextSelf = Time.unscaledTime + 10f;
+                ThingPanelJobs.Start(new[] { "grant", "self" }, lines =>
+                {
+                    if (lines.Count > 0) ThingSelf.Apply(CruciblePlugin.Session.Generation, lines[0]);
+                    if (window != null && !CanPeople && !CanOpen) ResetWindow();
+                });
+            }
             foreach (var action in actions) if (action != null) action.interactable = !ThingPanelJobs.Busy;
             if (language != MeadworksBlockedOptions.Language && KitAlmanacDialog.Active == null && !ThingPanelJobs.Busy) { language = MeadworksBlockedOptions.Language; Draw(); }
             if (!CanAdmin || MeadworksInput.Typing || KitAlmanacDialog.Active != null) return;
@@ -71,8 +96,27 @@ namespace ExtraPotions.Thing.Runtime
         }
         public static void Open()
         {
-            if (!CanOpen) { if (Plugin.AllowsUi && Player.m_localPlayer != null) MessageHud.instance?.ShowMessage(MessageHud.MessageType.Center, ThingText.Text("hint_not_admin")); return; }
-            if (!CrucibleUiPlugin.Active) return;
+            if (CanAdmin) { Show(); return; }
+            if (!Plugin.AllowsUi || Player.m_localPlayer == null) return;
+            if (CruciblePlugin.IsReady && CruciblePlugin.Session.AuthorityReady && !CruciblePlugin.Session.IsAuthority && !CanPeople)
+            {
+                AskingSelf = true;
+                if (!ThingPanelJobs.Start(new[] { "grant", "self" }, lines =>
+                {
+                    AskingSelf = false;
+                    if (lines.Count > 0) ThingSelf.Apply(CruciblePlugin.Session.Generation, lines[0]);
+                    if (CanPeople || CanOpen) Show();
+                    else if (Player.m_localPlayer != null) MessageHud.instance?.ShowMessage(MessageHud.MessageType.Center, ThingText.Text("hint_not_admin"));
+                }, failure: () => { AskingSelf = false; if (Player.m_localPlayer != null) MessageHud.instance?.ShowMessage(MessageHud.MessageType.Center, ThingText.Text("hint_not_admin")); }))
+                { AskingSelf = false; if (CanOpen) Show(); else if (Player.m_localPlayer != null) MessageHud.instance?.ShowMessage(MessageHud.MessageType.Center, ThingText.Text("hint_not_admin")); }
+                return;
+            }
+            if (CanPeople || CanOpen) { Show(); return; }
+            MessageHud.instance?.ShowMessage(MessageHud.MessageType.Center, ThingText.Text("hint_not_admin"));
+        }
+        static void Show()
+        {
+            if (!CrucibleUiPlugin.Active || (!CanOpen && !CanPeople)) return;
             ResetWindow(); generation = CruciblePlugin.Session.Generation; language = MeadworksBlockedOptions.Language;
             window = KitWindow.Create("Thing_Admin", new Vector2(1000, 700)); if (window == null) return;
             title = KitAlmanacDialog.Label(window.Panel, "Title", "Thing", new Vector2(20, -14), new Vector2(960, 32), 22);
@@ -85,7 +129,7 @@ namespace ExtraPotions.Thing.Runtime
             tab = at; offset = 0; selected = ""; page = null;
             query = tab == 0 ? "players" : tab == 4 ? "delve" : "audit"; Draw();
         }
-        static void Draw()
+        static void Draw(bool refreshRows = true)
         {
             if (window == null) return;
             ClearContent();
@@ -93,14 +137,21 @@ namespace ExtraPotions.Thing.Runtime
             KitAlmanacDialog.Place(content, Vector2.zero, new Vector2(1000, 700));
             status = KitAlmanacDialog.Label(content, "Status", "", new Vector2(220, -620), new Vector2(760, 60), 14);
             status.richText = false; status.raycastTarget = false;
+            if (!CanAdmin && CanPeople)
+            {
+                Add("close", ResetWindow, 20, 620, 180, 0, 20, false);
+                if (CanConfigure) Add("tab_server_config", ThingPanelConfig.Open, 20, 80, 180, 0, 1);
+                tab = 0; if (query != "players" && !(query == "grants" && CanEditGrants)) query = "players";
+                DrawRows(refreshRows); return;
+            }
             if (!CanAdmin) { Add("close", ResetWindow, 20, 620, 180, 0, 20, false); DrawServerConfig(); return; }
             var buttons = KitTabs.Place(content, tabs.Select((name, at) => new KitTab { Id = name, Caption = Ui("tab_" + name), Click = () => SelectTab(at) }).ToList(), tabs[tab], 20, 65, 960);
             for (var i = 0; i < buttons.Count; i++) { KitAlmanacDialog.Place((RectTransform)buttons[i].transform, new Vector2(20, -65 - 52 * i), new Vector2(180, 42)); Register(buttons[i], 0, i + 1); Tip(buttons[i].gameObject, "tab_" + tabs[i]); }
             Add("close", ResetWindow, 20, 620, 180, 0, 20, false);
-            if (tab < 2) DrawRows();
+            if (tab < 2) DrawRows(refreshRows);
             else if (tab == 2) DrawMessages();
             else if (tab == 3) DrawWorld();
-            else if (tab == 4) DrawRows();
+            else if (tab == 4) DrawRows(refreshRows);
             else DrawServerConfig();
         }
         static void DrawServerConfig()
@@ -120,35 +171,22 @@ namespace ExtraPotions.Thing.Runtime
             Add("tab_server_config", ThingPanelConfig.Open, 220, configY, 350, 1, 2);
             KitAlmanacDialog.Label(content!, "ConfigHint", Ui("config_hint"), new Vector2(220, -configY-65), new Vector2(740, 80), 14);
         }
-        static void DrawRows()
+        static void DrawRows(bool refreshRows = true)
         {
             Add("refresh", Refresh, 220, 65, 180, 1, 1);
             Add("previous", () => { offset = Math.Max(0, offset - ThingUiPage.PageSize); Refresh(); }, 420, 65, 180, 2, 1);
             Add("next", () => { if (page != null && offset + ThingUiPage.PageSize < page.Total) { offset += ThingUiPage.PageSize; Refresh(); } }, 620, 65, 180, 3, 1);
-            if (tab == 0) Add(query, () => { query = query == "players" ? "permitted" : query == "permitted" ? "admins" : "players"; offset = 0; selected = ""; page = null; Draw(); }, 820, 65, 160, 4, 1);
+            if (tab == 0 && CanEditGrants) Add(query, () => { query = query == "players" ? "permitted" : query == "permitted" ? "admins" : query == "admins" ? "grants" : "players"; offset = 0; selected = ""; shownFor = ""; shownReady = false; page = null; Draw(); }, 820, 65, 160, 4, 1);
             if (tab == 4) Add(query == "delve" ? "delve_actions" : query == "delve_actions" ? "delve_due" : query == "delve_due" ? "delve_nearest" : query == "delve_nearest" ? "delve_nature" : "delve_kinds", () => { query = query == "delve" ? "delve_actions" : query == "delve_actions" ? "delve_due" : query == "delve_due" ? "delve_nearest" : query == "delve_nearest" ? "delve_nature" : "delve"; offset = 0; selected = ""; page = null; Draw(); }, 820, 65, 160, 4, 1);
             if (tab == 1) Add(query == "audit" ? "ledger" : "audit", () => { query = query == "audit" ? "moderation" : "audit"; offset = 0; selected = ""; Refresh(); }, 820, 65, 160, 4, 1);
-            list = KitVirtualList.Create(content!, "Rows", new Vector2(760, 350), parent =>
+            var people = tab == 0 && query == "players" && CruciblePlugin.Session.Role != SessionRole.SinglePlayer;
+            var grantPage = tab == 0 && query == "grants";
+            var listHeight = people && CanEditGrants ? 200f : people || grantPage ? 250f : 350f;
+            list = KitVirtualList.Create(content!, "Rows", new Vector2(760, listHeight), parent =>
             { var row = new GameObject("Row", typeof(RectTransform)); row.transform.SetParent(parent, false); return (RectTransform)row.transform; });
-            if (list != null) KitAlmanacDialog.Place(list.Root, new Vector2(220, -120), new Vector2(760, 350));
-            if (tab == 0 && query == "players" && CruciblePlugin.Session.Role != SessionRole.SinglePlayer)
-            {
-                Add("kick", () => Moderate("kick"), 220, 490, 170, 1, 20);
-                Add("ban", () => Moderate("ban"), 410, 490, 170, 2, 20);
-                Add("tempban", () => Moderate("tempban"), 600, 490, 170, 3, 20);
-                Add("warn", () => Moderate("warn"), 790, 490, 190, 4, 20);
-                Add("mute", () => Moderate("mute"), 220, 540, 170, 1, 21);
-                Add("unmute", () =>
-                {
-                    var target = Selected; if (target == null || target.Kind != "player") { Message(Ui("select_player")); return; }
-                    Send(new[] { "unmute", target.Id });
-                }, 410, 540, 170, 2, 21);
-                if (ExtraPotions.Thing.Admin.ActionCatalog.Visible(ExtraPotions.Thing.Admin.ThingAction.TeleportTo, ThingModules.StepAside.AdminToolLoaded))
-                {
-                    Add("goto", () => Teleport("goto"), 600, 540, 170, 3, 21);
-                    Add("bring", () => Teleport("bring"), 790, 540, 190, 4, 21);
-                }
-            }
+            if (list != null) KitAlmanacDialog.Place(list.Root, new Vector2(220, -120), new Vector2(760, listHeight));
+            if (people) DrawPlayerActions();
+            else if (grantPage) DrawGrantPage();
             else if (tab == 0 && query != "players") DrawNativeListActions();
             else if (tab == 4) DrawDelveActions();
             else if (tab == 1 && CruciblePlugin.Session.Role != SessionRole.SinglePlayer) Add("unban", () =>
@@ -157,7 +195,8 @@ namespace ExtraPotions.Thing.Runtime
                 ThingPanelForms.Confirm(window!, Ui("unban") + "\n" + target.Caption, () => Send(new[] { "unban", target.Id }));
             }, 220, 490, 230, 1, 20);
             if (query == "audit") Message(Ui("audit_bounded"));
-            Refresh();
+            if (refreshRows) Refresh();
+            else RenderRows();
         }
         static void Refresh()
         {
@@ -184,7 +223,16 @@ namespace ExtraPotions.Thing.Runtime
                 if (row.Kind == "player" && Plugin.Settings?.Get(ThingSettings.General.ShowPlatformIds) != true) detail = "";
                 var name = query == "delve" ? ThingText.Text("delve_kind_" + row.Id.ToLowerInvariant()) : row.Caption;
                 var caption = (selected == RowKey(row, at) ? "> " : "") + name + "\n" + (row.Kind == "player" || tab == 4 ? "" : row.Kind + " | ") + detail;
-                var button = KitButton.Create(rect, "Select", caption, () => { selected = RowKey(row, at); RenderRows(); }, new Vector2(0, -2), new Vector2(740, 68));
+                var button = KitButton.Create(rect, "Select", caption, () =>
+                {
+                    selected = RowKey(row, at);
+                    if (shownFor != row.Id) { shownFor = ""; shownReady = false; }
+                    if ((query == "players" || query == "grants") && CanEditGrants)
+                    {
+                        Draw(false);
+                    }
+                    else RenderRows();
+                }, new Vector2(0, -2), new Vector2(740, 68));
                 KitTooltip.Set(button.gameObject, name, Ui("help_select"));
                 var words = button.GetComponentInChildren<TMP_Text>(true); if (words != null) { words.richText = false; words.textWrappingMode = TextWrappingModes.Normal; }
                 window.Focusable(button, 1, at + 2);
@@ -289,13 +337,19 @@ namespace ExtraPotions.Thing.Runtime
         }
         internal static void Send(string[] args)
         {
-            if (!CanAdmin) return;
-            ThingPanelJobs.Start(args, lines => { Message(string.Join("\n", lines)); },
+            if (!CanAdmin && !CanPeople) return;
+            ThingPanelJobs.Start(args, lines =>
+            {
+                Message(string.Join("\n", lines));
+                if (args.Length > 1 && args[0] == "grant") RememberGrant(args[1], lines);
+                if (args.Length > 2 && args[0] == "grant" && (args[2] == "add" || args[2] == "remove"))
+                { offset = 0; selected = ""; shownFor = ""; shownReady = false; page = null; Refresh(); }
+            },
                 args.Length > 0 && (args[0] == "goto" || args[0] == "bring") ? ThingTeleportCommands.OperationId : ExtraPotions.Thing.Commands.RemoteAdmin.OperationId);
         }
         static void Add(string key, Action click, float x, float y, float width, int gridX, int gridY, bool mutation = true)
         {
-            var button = KitButton.Create(content!, key, Ui(key), () => { if ((CanAdmin || CanConfigure && (key == "tab_server_config" || key == "close")) && (!mutation || !ThingPanelJobs.Busy)) click(); }, new Vector2(x, -y), new Vector2(width, 40));
+            var button = KitButton.Create(content!, key, Ui(key), () => { if ((CanAdmin || CanConfigure && (key == "tab_server_config" || key == "close") || CanPeople && (key == "close" || tab == 0)) && (!mutation || !ThingPanelJobs.Busy)) click(); }, new Vector2(x, -y), new Vector2(width, 40));
             Tip(button.gameObject, key);
             Register(button, gridX, gridY); if (mutation) actions.Add(button);
         }
@@ -304,7 +358,7 @@ namespace ExtraPotions.Thing.Runtime
             string hint;
             switch(key)
             {
-                case "players": case "permitted": case "admins": hint="help_identity_lists";break;
+                case "players": case "permitted": case "admins": case "grants": hint="help_identity_lists";break;
                 case "ledger": case "audit": hint="help_moderation_views";break;
                 case "delve_actions": case "delve_due": case "delve_nearest": case "delve_nature": case "delve_kinds": hint="help_delve_views";break;
                 case "delve_request": hint="delve_request_warning";break;
@@ -332,10 +386,144 @@ namespace ExtraPotions.Thing.Runtime
         {
             var active = KitAlmanacDialog.Active;
             if (active != null && window != null && active.Panel != null && active.Panel.IsChildOf(window.Panel)) active.Dispose();
+            AskingSelf = false;
+            shownFor = ""; shownReady = false; grantAsk = "";
+            ThingInventoryWindow.Close();
             ThingPanelJobs.Reset(); ThingPanelWorld.Reset(); ThingPanelMessages.Reset(); ThingPanelConfig.Reset();
             ClearContent(); var old = window; window = null; title = null; page = null; selected = "";
             if (old != null) { old.Closed -= ResetWindow; old.Close(); old.Destroy(); }
         }
-        public static void Shutdown() { ResetWindow(); ThingPanelMenu.Reset(); }
+        public static void Shutdown() { AskingSelf = false; ThingSelf.Clear(); ResetWindow(); ThingPanelMenu.Reset(); }
+
+        static void DrawPlayerActions()
+        {
+            var y = CanEditGrants ? 330f : 390f;
+            if (CanEditGrants)
+            {
+                Add("kick", () => Moderate("kick"), 220, y, 170, 1, 20);
+                Add("ban", () => Moderate("ban"), 410, y, 170, 2, 20);
+                Add("tempban", () => Moderate("tempban"), 600, y, 170, 3, 20);
+                Add("warn", () => Moderate("warn"), 790, y, 190, 4, 20);
+                Add("mute", () => Moderate("mute"), 220, y + 46, 170, 1, 21);
+                Add("unmute", () => { var target = SelectedPlayer(); if (target == null) return; Send(new[] { "unmute", target }); }, 410, y + 46, 170, 2, 21);
+            }
+            if (Holds(AdminRight.Teleport) && ActionCatalog.Visible(ThingAction.TeleportTo, ThingModules.StepAside.AdminToolLoaded))
+            {
+                Add("goto", () => Teleport("goto"), 600, y + 46, 170, 3, 21);
+                Add("bring", () => Teleport("bring"), 790, y + 46, 190, 4, 21);
+            }
+            if (Holds(AdminRight.Freeze))
+            {
+                Add("freeze_player", () => { var target = SelectedPlayer(); if (target == null) return; Send(new[] { "freeze", target }); }, 220, y + 92, 170, 1, 22);
+                Add("unfreeze_player", () => { var target = SelectedPlayer(); if (target == null) return; Send(new[] { "unfreeze", target }); }, 410, y + 92, 170, 2, 22);
+            }
+            if (Holds(AdminRight.Inventory))
+                Add("inventory", () => { var target = Selected; if (target == null || target.Kind != "player") { Message(Ui("select_player")); return; } ThingInventoryWindow.Open(target.Id, target.Caption); }, 600, y + 92, 360, 3, 22);
+            if (CanEditGrants) DrawGrantToggles(y + 146);
+        }
+
+        static void DrawGrantPage()
+        {
+            var field = KitTextField.Create(content!, "GrantId", KitFieldMode.Text, new Vector2(220, -390), new Vector2(360, 40), keyboardTitle: Ui("platform_id"));
+            if (field != null)
+            {
+                window!.Focusable(field.Input, 1, 20);
+                controls.Add(field.Input);
+                KitTooltip.Set(field.Input.gameObject, Ui("grant_add"), Ui("help_grant_add"));
+            }
+            Add("grant_add", () =>
+            {
+                var id = field == null ? "" : field.Text.Trim();
+                if (!GameListIdentity.Valid(id)) { Message(Ui("help_grant_add")); return; }
+                Send(new[] { "grant", id, "add" });
+            }, 600, 390, 170, 2, 20);
+            Add("grant_remove", () =>
+            {
+                var target = Selected; if (target == null || target.Kind != "grant") { Message(Ui("permissions_empty")); return; }
+                ThingPanelForms.Confirm(window!, Ui("help_grant_remove") + "\n" + target.Id, () => Send(new[] { "grant", target.Id, "remove" }));
+            }, 790, 390, 170, 3, 20);
+            DrawGrantToggles(450);
+        }
+
+        static void DrawGrantToggles(float y)
+        {
+            var target = Selected;
+            if (!CanEditGrants) return;
+            if (target == null || target.Kind != "player" && target.Kind != "grant")
+            { KitAlmanacDialog.Label(content!, "GrantEmpty", Ui("permissions_empty"), new Vector2(220, -y), new Vector2(740, 30), 14); return; }
+            if (!shownReady || shownFor != target.Id)
+            {
+                KitAlmanacDialog.Label(content!, "GrantWait", Ui(shownFor == target.Id && !shownReady && grantAsk.Length == 0 ? "permissions_failed" : "permissions_loading"), new Vector2(220, -y), new Vector2(740, 30), 14);
+                EnsureGrant(target.Id);
+                return;
+            }
+            var bits = new[] { AdminRight.World, AdminRight.Spawn, AdminRight.Teleport, AdminRight.Freeze, AdminRight.Inventory, AdminRight.Ward };
+            var names = new[] { "world", "spawn", "teleport", "freeze", "inventory", "ward" };
+            for (var i = 0; i < bits.Length; i++)
+            {
+                var bit = bits[i]; var name = names[i]; var id = target.Id;
+                var toggle = KitToggle.Create(content!, "Grant_" + name, (shown & bit) == bit, value =>
+                {
+                    if (!CanEditGrants || ThingPanelJobs.Busy || !shownReady || shownFor != id || !GrantReply.IsCurrent(id, Selected?.Id ?? "")) return;
+                    ThingPanelJobs.Start(new[] { "grant", id, name, value ? "on" : "off" }, lines =>
+                    {
+                        if (RememberGrant(id, lines)) Draw(false);
+                        else if (GrantReply.IsCurrent(id, Selected?.Id ?? "")) GrantFailed(id);
+                    }, failure: () => { if (GrantReply.IsCurrent(id, Selected?.Id ?? "")) GrantFailed(id); });
+                }, new Vector2(220 + (i % 3) * 250, -(y + (i / 3) * 46)), new Vector2(230, 36), Ui("grant_" + name), Ui("grant_" + name));
+                if (toggle == null) continue;
+                toggle.Tooltip(Ui("grant_" + name), Ui("help_grant_" + name));
+                Register(toggle.Button, 1 + (i % 3), 30 + i / 3);
+                actions.Add(toggle.Button);
+            }
+        }
+
+        static void EnsureGrant(string id)
+        {
+            if (!CanEditGrants || id.Length == 0 || shownFor == id || grantAsk == id || ThingPanelJobs.Busy) return;
+            grantAsk = id;
+            ThingPanelJobs.Start(new[] { "grant", "get", id }, lines =>
+            {
+                grantAsk = "";
+                if (!GrantReply.IsCurrent(id, Selected?.Id ?? "")) return;
+                if (!RememberGrant(id, lines)) GrantFailed(id);
+                else if (window != null && KitAlmanacDialog.Active == null) Draw(false);
+            }, failure: () => { grantAsk = ""; if (GrantReply.IsCurrent(id, Selected?.Id ?? "")) GrantFailed(id); });
+        }
+
+        static void GrantFailed(string id)
+        {
+            shownFor = id; shownReady = false;
+            if (window != null && KitAlmanacDialog.Active == null) Draw(false);
+            Message(Ui("permissions_failed"));
+        }
+
+        static bool RememberGrant(string id, IReadOnlyList<string> lines)
+        {
+            if (!GrantReply.TryRead(id, Selected?.Id ?? "", lines, out var set)) return false;
+            shownFor = id; shown = set; shownReady = true;
+            return true;
+        }
+
+        static string SelectedPlayer()
+        {
+            var target = Selected;
+            if (target == null || target.Kind != "player") { Message(Ui("select_player")); return null; }
+            return target.Id;
+        }
+    }
+
+    internal static class ThingSelf
+    {
+        internal static long Generation = -1;
+        internal static bool Known, FullAdmin;
+        internal static AdminRight Held;
+        internal static void Apply(long generation, string line)
+        {
+            if (Generation != generation) { Generation = generation; Known = false; FullAdmin = false; Held = AdminRight.None; }
+            if (!AdminPermissions.TryWire(line ?? "", out var full, out var set)) return;
+            Known = true; FullAdmin = full; Held = full ? AdminRight.All : set;
+        }
+        internal static void Clear() { Generation = -1; Known = false; FullAdmin = false; Held = AdminRight.None; }
     }
 }

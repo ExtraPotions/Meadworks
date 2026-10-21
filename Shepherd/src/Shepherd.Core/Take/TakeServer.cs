@@ -7,8 +7,7 @@ namespace ExtraPotions.Shepherd.Take
 {
     /// <summary>
     /// Request ids seen recently: at most <see cref="TakeProtocol.DedupeCapacity"/>, each for
-    /// <see cref="TakeProtocol.DedupeWindowSeconds"/>; the oldest is evicted when full. Requesters never resend an id,
-    /// so the ring only guards against a repeated delivery.
+    /// <see cref="TakeProtocol.DedupeWindowSeconds"/>; the oldest is evicted when full.
     /// </summary>
     public sealed class DedupeRing
     {
@@ -38,6 +37,18 @@ namespace ExtraPotions.Shepherd.Take
             return true;
         }
 
+        /// <summary>Drops the id so a later request can be granted. Removes it from the queue as well as the map.</summary>
+        public void Forget(TakeRequestId id)
+        {
+            if (!seen.Remove(id)) return;
+            int count = order.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var item = order.Dequeue();
+                if (!item.Id.Equals(id)) order.Enqueue(item);
+            }
+        }
+
         private void Prune(double now)
         {
             while (order.Count > 0 && now - order.Peek().At >= window)
@@ -50,7 +61,9 @@ namespace ExtraPotions.Shepherd.Take
     {
         /// <summary>Remove one item through the container's normal save path, then send <c>shepherd.meal</c>.</summary>
         Granted,
-        /// <summary>The id was seen within the dedupe window: nothing changes.</summary>
+        /// <summary>This id already removed one item. Send the meal again and do not remove another.</summary>
+        Resend,
+        /// <summary>The id was seen within the dedupe window and no item was removed for it: nothing changes.</summary>
         Duplicate,
         /// <summary>This machine does not own the trough (ownership moved in flight): nothing changes, nothing remembered.</summary>
         NotOwner,
@@ -62,8 +75,11 @@ namespace ExtraPotions.Shepherd.Take
 
     public static class TakeVerdicts
     {
-        /// <summary>Only a grant removes an item; every refusal changes nothing.</summary>
+        /// <summary>Only a grant removes an item. A resend and every refusal leave the stack as it is.</summary>
         public static bool RemovesItem(TakeVerdict verdict) => verdict == TakeVerdict.Granted;
+
+        /// <summary>A grant and a resend both send the meal.</summary>
+        public static bool SendsMeal(TakeVerdict verdict) => verdict == TakeVerdict.Granted || verdict == TakeVerdict.Resend;
     }
 
     /// <summary>What the trough owner knows at the moment a request arrives.</summary>
@@ -82,14 +98,14 @@ namespace ExtraPotions.Shepherd.Take
     }
 
     /// <summary>
-    /// The trough-owner side (design 3.3 step 3). Checks, in order: the trough exists, this machine owns it (a request
-    /// that reached a non-owner is not remembered, so the real owner can still serve it), the id is new, the trough is
-    /// enabled, the item is allowed and present. Every id that passes the owner check is remembered, refused or not,
-    /// because a requester never resends one.
+    /// The trough-owner side (design 3.3 step 3). A trough that is gone, or that this machine does not own, is not
+    /// remembered. A refusal (disabled, disallowed, missing) is not remembered, so a later try can still grant.
+    /// An id that already removed an item is a resend. Any other id already in the ring is a duplicate.
     /// </summary>
     public sealed class TakeServer
     {
         private readonly DedupeRing ring;
+        private readonly HashSet<TakeRequestId> granted = new HashSet<TakeRequestId>();
 
         public TakeServer(DedupeRing? ring = null) { this.ring = ring ?? new DedupeRing(); }
 
@@ -98,11 +114,22 @@ namespace ExtraPotions.Shepherd.Take
             if (request == null) throw new ArgumentNullException(nameof(request));
             if (!facts.Exists) return TakeVerdict.TroughGone;
             if (!facts.IsOwner) return TakeVerdict.NotOwner;
-            if (!ring.CheckAndRemember(request.Id, now)) return TakeVerdict.Duplicate;
+            if (granted.Contains(request.Id)) return TakeVerdict.Resend;
             if (!facts.Enabled) return TakeVerdict.TroughDisabled;
             if (facts.Disallowed) return TakeVerdict.ItemDisallowed;
             if (!facts.HasItem) return TakeVerdict.ItemMissing;
+            if (!ring.CheckAndRemember(request.Id, now)) return TakeVerdict.Duplicate;
             return TakeVerdict.Granted;
+        }
+
+        /// <summary>Call after the item has left the trough. A later request with this id resends and does not remove again.</summary>
+        public void Commit(TakeRequestId id) => granted.Add(id);
+
+        /// <summary>Call when a grant cannot be delivered and the item is still in the trough. The same id may grant later.</summary>
+        public void Release(TakeRequestId id)
+        {
+            granted.Remove(id);
+            ring.Forget(id);
         }
     }
 }

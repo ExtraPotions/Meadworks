@@ -55,17 +55,24 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
             ApplySettings();
         }
 
+        /// <summary>Run speed from the current setting. Walk is half of that, as it is when the prefab is built.</summary>
+        public static void ApplyPace(Humanoid? humanoid)
+        {
+            if (humanoid == null)
+            {
+                return;
+            }
+            humanoid.m_runSpeed = MimicSettings.RunSpeed;
+            humanoid.m_walkSpeed = MimicSettings.RunSpeed * 0.5f;
+        }
+
         /// <summary>
         /// The live mimic settings (the server's, when locked), before Elite Creatures Reborn, when installed, captures
         /// its speeds in Start.
         /// </summary>
         private void ApplySettings()
         {
-            if (_character is Humanoid humanoid)
-            {
-                humanoid.m_runSpeed = MimicSettings.RunSpeed;
-                humanoid.m_walkSpeed = MimicSettings.RunSpeed * 0.5f;
-            }
+            ApplyPace(_character as Humanoid);
             MimicBite.ApplySettings();
         }
 

@@ -19,6 +19,11 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         public static string Unknown => KindleText.Text("salvage_unknown");
         public static string NoStation => KindleText.Text("salvage_nostation");
         public static string Done => KindleText.Text("salvage_done");
+        public static string FromChest => KindleText.Text("salvage_from_chest");
+        public static string ChestWait => KindleText.Text("salvage_chest_wait");
+        public static string ChestChanged => KindleText.Text("salvage_chest_changed");
+        public static string ChestBusy => KindleText.Text("salvage_chest_busy");
+        public static string Dropped => KindleText.Text("salvage_dropped");
     }
     internal static class Messages
     {

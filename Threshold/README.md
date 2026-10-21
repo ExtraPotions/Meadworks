@@ -1,6 +1,6 @@
 # Threshold
 
-Version 0.3.9. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.10. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Choose destinations from the integrated map/list, use a named-portal selector with an explicit Teleport action, or keep native tag pairing.
 
@@ -8,7 +8,7 @@ Choose destinations from the integrated map/list, use a named-portal selector wi
 
 - Teleport Mode (server-authoritative): Map keeps the integrated map/list by default. TargetTeleport offers named destinations in a dropdown with an explicit Teleport button. Default keeps native tag pairing with portal access modes and custom map icons off. Quick jumps and sea gates remain available in all modes.
 
-- Portal travel: walking into a portal opens the game's large map with a searchable, categorized destination list on the left. Click a list entry or portal pin to travel. Closing the map or stepping out of the trigger cancels; when the map cannot open, the game's tag-paired jump remains the fallback.
+- Portal travel: walking into a portal opens the game's large map with a searchable, categorized destination list on the left. Click a list entry to travel at once. A single click on a portal pin travels after the game's 0.3 second double-click window. Double-click the map, or a portal pin, to place one of the game's own map pins. Right-click a pin to remove it. Those pins are saved with your character for that world. While you are choosing a destination, "You are here" marks the portal you walked into. With Show Portal Pins on, the ordinary large map uses the same words above your player arrow. Closing the map or stepping out of the trigger cancels; when the map cannot open, the game's tag-paired jump remains the fallback.
 - Hubs: name portals as hubs and pick one as your home hub per world. The map's Return To Hub button leads back to it (the button appears once you pick a usable hub).
 - Access modes: make your portals Public, Private or Admin. Alt + E on your own portal cycles its mode; Shift + E on a hub opens the game's tag input.
 - Personal favorites: right-click a destination in the list to add or remove it. The list also retains the home-hub and source-hub actions.
@@ -23,7 +23,7 @@ Choose destinations from the integrated map/list, use a named-portal selector wi
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.24 or a later 0.3.x, which includes Crucible.UI 0.3.17 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 

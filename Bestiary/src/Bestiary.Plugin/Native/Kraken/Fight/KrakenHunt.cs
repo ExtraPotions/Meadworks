@@ -85,9 +85,8 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Kraken
         public void Leave(float age, float dt)
         {
             _brain.Place(Position + Vector3.down * 10f, _brain.transform.forward, SinkSpeed, dt);
-            if (age > Gone)
+            if (age > Gone && KrakenBoss.Released(_brain.Character))
             {
-                KrakenBoss.Forget(_brain.Character);
                 ZNetScene.instance.Destroy(_brain.gameObject);
             }
         }

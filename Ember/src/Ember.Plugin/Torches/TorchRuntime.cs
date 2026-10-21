@@ -79,11 +79,11 @@ namespace ExtraPotions.Ember.Runtime
             {
                 var isListed = listed.Contains(Utils.GetPrefabName(fire.gameObject));
                 SetArea(fire.gameObject, TorchFire.PieceIsFire(active && warmthReady,
-                    isListed && Utils.GetPrefabName(fire.gameObject) != "fire_pit", fire.IsBurning()));
+                    EmberSeasons.Heat(isListed) && Utils.GetPrefabName(fire.gameObject) != "fire_pit", fire.IsBurning()));
                 RefreshFire(fire);
                 TorchScheduleRuntime.Apply(fire);
             }
-            var warms = Plugin.Settings.Get(EmberSettings.Torches.HeldTorchWarms);
+            var warms = EmberSeasons.Heat(Plugin.Settings.Get(EmberSettings.Torches.HeldTorchWarms));
             foreach (var player in Player.GetAllPlayers())
             {
                 if (player == null) continue;
@@ -227,7 +227,7 @@ namespace ExtraPotions.Ember.Runtime
                 s.Get(EmberSettings.Torches.BurnRate));
             var environment = EnvMan.instance != null ? EnvMan.instance.GetCurrentEnvironment()?.m_name : null;
             var biome = humanoid is Player player ? player.GetCurrentBiome().ToString() : null;
-            var drain = TorchBurn.Drain(vanilla, settings, environment, biome, s.EndlessTorches);
+            var drain = EmberSeasons.Drain(TorchBurn.Drain(vanilla, settings, environment, biome, s.EndlessTorches), s.EndlessTorches);
             if (drain <= 0f) dt = 0f;
             else if (vanilla > 0f) dt *= drain / vanilla;
         }

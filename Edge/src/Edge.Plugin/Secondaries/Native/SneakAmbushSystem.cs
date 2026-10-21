@@ -9,6 +9,7 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace ExtraPotions.Edge.Runtime.Secondaries.Native;
+using ExtraPotions.Edge.Secondaries;
 using ExtraPotions.Edge.Secondaries.Adopted;
 using ExtraPotions.Edge.Runtime.Quickstep;
 
@@ -316,6 +317,10 @@ internal static class SneakAmbushSystem
 
     private static void ClearMonsterAwareness(Character character, MonsterAI monsterAI, float backstabResetSeconds)
     {
+        ZNetView? nview = character != null ? character.m_nview : null;
+        if (character == null || nview == null || !OwnedCharacterWrite.Allowed(nview.IsValid(), nview.IsOwner()))
+            return;
+
         monsterAI.SetTarget(null);
         monsterAI.SetTargetInfo(ZDOID.None);
         monsterAI.SetAlerted(false);
@@ -328,17 +333,11 @@ internal static class SneakAmbushSystem
         monsterAI.m_updateTargetTimer = 0f;
         monsterAI.m_unableToAttackTargetTimer = 0f;
 
-        ZNetView? nview = character.m_nview;
-        if (nview != null && nview.IsValid())
-        {
-            ZDO zdo = nview.GetZDO();
+        ZDO? zdo = nview.GetZDO();
+        if (zdo != null)
             zdo.Set("target", ZDOID.None);
-            if (nview.IsOwner())
-            {
-                monsterAI.SetTargetInfo(ZDOID.None);
-                monsterAI.SetAlerted(false);
-            }
-        }
+        monsterAI.SetTargetInfo(ZDOID.None);
+        monsterAI.SetAlerted(false);
 
         BackstabSkillGainSystem.TryReduceBackstabTime(character, backstabResetSeconds);
     }
@@ -383,6 +382,9 @@ internal static class SneakAmbushSystem
                     continue;
                 }
 
+                ZNetView? nview = character.m_nview;
+                if (nview == null || !OwnedCharacterWrite.Allowed(nview.IsValid(), nview.IsOwner()))
+                    continue;
                 if (character.GetBaseAI() is MonsterAI monsterAI)
                 {
                     ClearMonsterAwareness(character, monsterAI, 0f);

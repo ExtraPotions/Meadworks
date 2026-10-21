@@ -28,7 +28,9 @@ namespace ExtraPotions.Wildblood.Adopted.Breeding
             {
                 return child;
             }
-            int cap = RuleState.Active.CreatureStars ? Mathf.Max(mother.Stars, sire?.Stars ?? 0) + 1 : 0; // off: declined
+            bool starsKept = ExtraPotions.Wildblood.Runtime.Plugin.Settings == null
+                || ExtraPotions.Wildblood.Runtime.Plugin.Settings.Get(ExtraPotions.Wildblood.Config.WildbloodSettings.Traits.TamedStars);
+            int cap = RuleState.Active.CreatureStars && starsKept ? Mathf.Max(mother.Stars, sire?.Stars ?? 0) + 1 : 0; // off: declined
             int stars = Mathf.Min(child.Stars + bonus, cap);
             if (stars <= child.Stars)
             {

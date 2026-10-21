@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ExtraPotions.Meadworks.Crucible;
+using ExtraPotions.Thing.Admin;
 using ExtraPotions.Thing.Commands;
 using ExtraPotions.Thing.Localization;
 using ExtraPotions.Thing.Moderation;
@@ -91,7 +92,15 @@ namespace ExtraPotions.Thing.Runtime
             var caller = Caller(context, out var hostName);
             // C02 context decides admin from the connection; re-checked against the live adminlist by platform ID.
             var isAdmin = context.IsLocal || (context.IsAdmin && hostName.Length > 0 && net != null && net.IsAdmin(hostName));
-            var refusal = RemoteAdmin.Refusal(active, isAdmin);
+            var parsed = CommandParser.Parse(args);
+            var held = isAdmin ? AdminRight.None : ThingAccess.Of(hostName);
+            var self = parsed.Kind == CommandKind.Action && parsed.Action == ThingAction.GrantEdit && parsed.Text == "self";
+            var covered = parsed.Kind == CommandKind.Action && AdminPermissions.Covers(held, parsed.Action);
+            var playerRead = parsed.Kind == CommandKind.Status && args.Count >= 2
+                && string.Equals(args[0], "ui-read", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(args[1], "players", StringComparison.OrdinalIgnoreCase)
+                && (held & AdminRight.Inventory) == AdminRight.Inventory;
+            var refusal = RemoteAdmin.Refusal(active, isAdmin || self || covered || playerRead);
             if (refusal != null)
             {
                 log?.Info("Thing remote command from " + caller.Id + " refused: " + refusal + ".");

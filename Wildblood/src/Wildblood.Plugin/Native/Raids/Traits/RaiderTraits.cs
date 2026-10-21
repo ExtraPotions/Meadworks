@@ -40,7 +40,7 @@ namespace ExtraPotions.Wildblood.Adopted.Raids
             }
             CreatureTraits traits = BaseRoll(creature, biome);
             traits.Mask &= ~barredMask;
-            AddStars(creature, traits, extraStars);
+            AddStars(creature, traits, extraStars, biome);
             if (traits.Mask == 0 && mutatedPercent > 0f && Util.Dice.Percent(mutatedPercent))
             {
                 traits.Mask = RaiderMutation.Pick(creature, biome, traits.Stars);
@@ -55,7 +55,7 @@ namespace ExtraPotions.Wildblood.Adopted.Raids
             TraitRoller.Roll(RuleState.Active.For(biome, Utils.GetPrefabName(creature.gameObject)), RuleState.Active, WorldTier.Current(), biome, MutationBars.Of(creature));
 
         // The mod's stars when they are on; otherwise the game's level, which a creature with no stars of the mod keeps.
-        private static void AddStars(Character creature, CreatureTraits traits, int extra)
+        private static void AddStars(Character creature, CreatureTraits traits, int extra, Heightmap.Biome biome)
         {
             if (extra <= 0)
             {
@@ -63,7 +63,13 @@ namespace ExtraPotions.Wildblood.Adopted.Raids
             }
             if (RuleState.Active.CreatureStars)
             {
-                traits.Stars = Mathf.Min(traits.Stars + extra, RaidTable.MaxRaiderStars);
+                // Extra stars stop at the difficulty cap for this biome (ECR 3.28.1), not the fixed 8.
+                RuleSet set = RuleState.Active;
+                BiomeRules rules = set.For(biome, Utils.GetPrefabName(creature.gameObject));
+                int cap = set.Difficulty == Difficulty.Custom
+                    ? rules.StarCeiling
+                    : PresetCell.For(set.Difficulty, traits.Tier, PresetTables.Rank(biome)).Cap;
+                traits.Stars = ExtraPotions.Wildblood.Stars.TamedStars.ClampRaiderStars(traits.Stars, extra, cap);
                 return;
             }
             creature.SetLevel(Mathf.Min(Mathf.Max(1, creature.GetLevel()) + extra, RaidTable.MaxRaiderStars + 1));

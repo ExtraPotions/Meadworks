@@ -4,6 +4,7 @@
 // Changed by expDARE, 2026: the decision is a pure function over facts the plugin reads from the chest's ZDO; the stamp is
 // a Delve two-clock Stamp instead of an integer day + 1, so a chest can wait in in-game days or real hours (design B1);
 // the Notifier's in-memory clock start arrives as the Seen fact; writes, dry-run memory and the loot roll stay in the plugin.
+// A loaded chest never returns Restock: Restock Loaded only keeps its clock running until the chest unloads.
 using System;
 using ExtraPotions.Delve.Engine;
 
@@ -12,7 +13,7 @@ namespace ExtraPotions.Delve.Chests
     /// <summary>What the sweep knows about one loot chest (a prefab with a loot table, not excluded).</summary>
     public sealed class ChestFacts
     {
-        public ChestFacts(int? itemCount, Stamp? stamp, Stamp? seen, bool playerBuilt, bool heldByPlayer, bool inUse)
+        public ChestFacts(int? itemCount, Stamp? stamp, Stamp? seen, bool playerBuilt, bool heldByPlayer, bool inUse, bool liveInventory = false)
         {
             ItemCount = itemCount;
             Stamp = stamp;
@@ -20,6 +21,7 @@ namespace ExtraPotions.Delve.Chests
             PlayerBuilt = playerBuilt;
             HeldByPlayer = heldByPlayer;
             InUse = inUse;
+            LiveInventory = liveInventory;
         }
 
         /// <summary>Items in the chest; null when it was never loaded (the game rolls its loot on first load).</summary>
@@ -39,6 +41,11 @@ namespace ExtraPotions.Delve.Chests
 
         /// <summary>Someone has it open now.</summary>
         public bool InUse { get; }
+
+        /// <summary>
+        /// A live container may still show the previous items: a player is in its active area, or this machine has the container loaded.
+        /// </summary>
+        public bool LiveInventory { get; }
     }
 
     public sealed class ChestOptions
@@ -63,7 +70,7 @@ namespace ExtraPotions.Delve.Chests
         None,
         SkipPlayerBuilt,
         SkipNeverLoaded,
-        /// <summary>A player has it loaded and it is open, or Restock Loaded is off: it keeps its turn.</summary>
+        /// <summary>A live inventory still has the old items, or Restock Loaded is off: the item blob stays.</summary>
         SkipLoaded,
         /// <summary>Leftovers without Reset Opened: the running clock stops.</summary>
         ClearStamp,
@@ -77,11 +84,12 @@ namespace ExtraPotions.Delve.Chests
 
     public sealed class ChestDecision
     {
-        internal ChestDecision(ChestAction action, Stamp? newStamp = null, bool forced = false)
+        internal ChestDecision(ChestAction action, Stamp? newStamp = null, bool forced = false, bool keepOpening = false)
         {
             Action = action;
             NewStamp = newStamp;
             Forced = forced;
+            KeepOpening = keepOpening;
         }
 
         public ChestAction Action { get; }
@@ -89,8 +97,11 @@ namespace ExtraPotions.Delve.Chests
         /// <summary>The clock this sweep started, when it started one.</summary>
         public Stamp? NewStamp { get; }
 
-        /// <summary>Processed although a player has it loaded (Restock Loaded, closed).</summary>
+        /// <summary>The clock was considered while a live inventory still held the old items. Those items were not replaced.</summary>
         public bool Forced { get; }
+
+        /// <summary>Clear the stored clock and still remember that a player opened this chest.</summary>
+        public bool KeepOpening { get; }
 
         /// <summary>A refill stops the clock until the chest is next opened or emptied.</summary>
         public bool ClearsStamp => Action == ChestAction.Restock || Action == ChestAction.ClearStamp;
@@ -100,21 +111,30 @@ namespace ExtraPotions.Delve.Chests
     /// The daily sweep's decision for one loot chest. No clock yet and empty or opened by a player: start its clock, from
     /// when the opening was seen if it was, otherwise now. Clock started the delay or more ago: replace whatever is inside
     /// with a fresh roll and stop the clock. With Reset Opened a chest with leftovers keeps its clock; without it only
-    /// empty chests are on a clock and anything put back stops it. A chest a player has loaded is still processed with
-    /// Restock Loaded unless someone has it open: the owner only writes its items while the chest is open.
+    /// empty chests are on a clock and anything put back stops it. Restock Loaded lets that clock run while a container
+    /// is still loaded, and the new roll is written on the first check after that copy is gone. Off leaves a loaded chest
+    /// alone: a clock it already has is cleared, and the delay starts at the first check after it unloads.
     /// </summary>
     public static class ChestRefill
     {
+        /// <summary>The item blob may be replaced only when no live container can still show the previous items.</summary>
+        public static bool MayReplaceItems(bool heldByPlayer, bool liveInventory) => !heldByPlayer && !liveInventory;
+
         public static ChestDecision Decide(ChestFacts chest, Stamp now, ChestOptions options, bool regenerateNow = false)
         {
             if (chest == null) throw new ArgumentNullException(nameof(chest));
             if (options == null) throw new ArgumentNullException(nameof(options));
             if (chest.PlayerBuilt) return new ChestDecision(ChestAction.SkipPlayerBuilt);
             if (chest.ItemCount == null) return new ChestDecision(ChestAction.SkipNeverLoaded);
+            bool live = !MayReplaceItems(chest.HeldByPlayer, chest.LiveInventory);
             bool forced = false;
-            if (chest.HeldByPlayer)
+            if (live && !options.RestockLoaded)
+                return chest.Stamp.HasValue
+                    ? new ChestDecision(ChestAction.ClearStamp, keepOpening: true)
+                    : new ChestDecision(ChestAction.SkipLoaded);
+            if (live)
             {
-                if (!options.RestockLoaded || chest.InUse) return new ChestDecision(ChestAction.SkipLoaded);
+                if (chest.InUse) return new ChestDecision(ChestAction.SkipLoaded);
                 forced = true;
             }
             int count = chest.ItemCount.Value;
@@ -125,12 +145,15 @@ namespace ExtraPotions.Delve.Chests
             if (!stamp.HasValue)
             {
                 if (count > 0 && !chest.Seen.HasValue) return new ChestDecision(ChestAction.None, null, forced);
-                var start = chest.Seen.HasValue && !After(chest.Seen.Value, now) ? chest.Seen.Value.CompletedWith(now) : now;
+                var start = !options.RestockLoaded
+                    ? now
+                    : chest.Seen.HasValue && !After(chest.Seen.Value, now) ? chest.Seen.Value.CompletedWith(now) : now;
                 started = start;
                 stamp = start;
             }
             if (!regenerateNow && !ClockRules.Due(options.Clock, options.Delay, stamp.Value.CompletedWith(now), now))
                 return new ChestDecision(started.HasValue ? ChestAction.Stamp : ChestAction.Waiting, started, forced);
+            if (live) return new ChestDecision(started.HasValue ? ChestAction.Stamp : ChestAction.SkipLoaded, started, true);
             return new ChestDecision(ChestAction.Restock, started, forced);
         }
 

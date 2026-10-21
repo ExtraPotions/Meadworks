@@ -9,7 +9,8 @@ namespace ExtraPotions.Wildroot.Runtime {
   static int collisionMask=-1;
   internal static int CollisionMask=>collisionMask!=-1?collisionMask:(collisionMask=LayerMask.GetMask("Default","static_solid","Default_small","piece","piece_nonsolid","item"));
   static readonly int floorMask=LayerMask.GetMask("terrain","static_solid","piece","Default");
-  static readonly int SpaceMask=LayerMask.GetMask("Default","static_solid","Default_small","piece","piece_nonsolid");
+  // Prepared layers. Plant.m_spaceMask is 0 until the game's own check runs, and then misses every collider.
+  static readonly int SpaceMask=LayerMask.GetMask(GrowSpaceCheck.Layers);
   internal static Vec3 V(Vector3 v)=>new Vec3(v.x,v.y,v.z);
   internal static Vector3 U(Vec3 v)=>new Vector3((float)v.X,(float)v.Y,(float)v.Z);
   internal static bool IsPlantOrPickable(GameObject obj)=>obj&&(obj.GetComponent<Plant>()||obj.GetComponent<Pickable>());
@@ -54,7 +55,7 @@ namespace ExtraPotions.Wildroot.Runtime {
    var temperature=biome==Heightmap.Biome.AshLands?TemperatureRisk.Hot:biome==Heightmap.Biome.DeepNorth||biome==Heightmap.Biome.Mountain?TemperatureRisk.Cold:TemperatureRisk.None;
    bool tolerates=plant&&(temperature==TemperatureRisk.Hot?traits.heat:traits.cold);
    return new GhostFacts(heightmap!=null,Permitted(position),plant?plant.m_needCultivatedGround:piece.m_cultivatedGroundOnly,heightmap&&heightmap.IsCultivated(position),mask==Heightmap.Biome.None||(biome&mask)!=0,
-    plant,!plant||Physics.OverlapSphere(position,traits.radius,SpaceMask).Length==0,roof,plant&&plant.m_attachDistance>0,attached,temperature,tolerates,temperature!=TemperatureRisk.None&&ShieldGenerator.IsInsideShield(position),!plant&&Collides(position));
+    plant,!plant||GrowSpaceCheck.Clear(Physics.OverlapSphere(position,traits.radius,SpaceMask).Length),roof,plant&&plant.m_attachDistance>0,attached,temperature,tolerates,temperature!=TemperatureRisk.None&&ShieldGenerator.IsInsideShield(position),!plant&&Collides(position));
   }
   /// <summary>Snapping world backed by Unity physics; ghosts live on the ghost layer and are never targets.</summary>
   internal sealed class SnapWorld:ISnapWorld {
@@ -70,7 +71,7 @@ namespace ExtraPotions.Wildroot.Runtime {
     return result;
    }
    public bool Collides(Vec3 position)=>NativePlanting.Collides(U(position));
-   public bool HasGrowSpace(Vec3 position)=>!ghostPlant||Physics.OverlapSphere(U(position),FarmingTraits.Placement(ghostPlant!).radius,SpaceMask).Length==0;
+   public bool HasGrowSpace(Vec3 position)=>!ghostPlant||GrowSpaceCheck.Clear(Physics.OverlapSphere(U(position),FarmingTraits.Placement(ghostPlant!).radius,SpaceMask).Length);
   }
  }
 }

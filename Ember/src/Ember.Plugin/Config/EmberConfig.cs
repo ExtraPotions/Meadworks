@@ -49,6 +49,7 @@ namespace ExtraPotions.Ember.Runtime
         private readonly Dictionary<ConfigEntryBase, EmberSetting> settingsByEntry = new Dictionary<ConfigEntryBase, EmberSetting>();
         private readonly HashSet<EmberSetting> trackedLocks = new HashSet<EmberSetting>();
         private readonly ConfigEntry<string> lockedValues;
+        private readonly EmberPresetRuntime presets;
 
         private string? lockListText;
         private LockList lockList = LockList.Empty;
@@ -74,6 +75,7 @@ namespace ExtraPotions.Ember.Runtime
                 lockedValues = MeadworksConfig.BindHidden(file, EmberSettings.Server.Section, LockedValuesKey, "",
                     "Managed by Ember: the server's values for Locked Player Settings. Do not edit.", ConfigScope.ServerAuthoritative);
                 MoveDoorDistanceDefaults();
+                presets = new EmberPresetRuntime(file, this, log);
             }
             finally
             {
@@ -196,6 +198,7 @@ namespace ExtraPotions.Ember.Runtime
         /// <summary>Called from the plugin's Update: keeps the lock state, read-only tags and the server's locked values current.</summary>
         public void Tick(float now)
         {
+            presets.Tick();
             if (now < nextRefresh) return;
             nextRefresh = now + RefreshSeconds;
             Refresh(force: false);
@@ -203,6 +206,7 @@ namespace ExtraPotions.Ember.Runtime
 
         public void Shutdown()
         {
+            presets.Dispose();
             file.SettingChanged -= OnSettingChanged;
             Changed = null;
             SynchronizationManager.OnConfigurationSynchronized -= OnSynchronized;
@@ -304,6 +308,7 @@ namespace ExtraPotions.Ember.Runtime
                     case EmberSetting<float> f: entry = Bind(f, new AcceptableValueRange<float>((float)f.Minimum!, (float)f.Maximum!)); break;
                     case EmberSetting<string> s: entry = Bind(s, null); break;
                     case EmberSetting<ExtraPotions.Ember.Doors.AutomationMechanic> m: entry = Bind(m, null); break;
+                    case EmberSetting<SettingsPreset> p: entry = Bind(p, null); break;
                     default: throw new NotSupportedException(setting.Id + ": unsupported value type " + setting.ValueType.Name + ".");
                 }
             }
@@ -335,6 +340,9 @@ namespace ExtraPotions.Ember.Runtime
         private ConfigDescription Describe(EmberSetting setting, AcceptableValueBase? acceptable, string? text = null)
         {
             ConfigDependency? dependency = null;
+            if (ReferenceEquals(setting, EmberSettings.Doors.Preset))
+                dependency = new ConfigDependency(() => !IsLocked(EmberSettings.Doors.Preset) && !EmberPresets.All.Single(g => g.Selector == EmberSettings.Doors.Preset).Members.Any(IsLocked),
+                    () => EmberText.Text("preset_locked"));
             if (ReferenceEquals(setting, EmberSettings.Sleep.NearestOwnedBedRespawn) ||
                 ReferenceEquals(setting, EmberSettings.Sleep.QuickRespawn))
                 dependency = new ConfigDependency(() => Get(EmberSettings.Sleep.Enabled), () => "Requires " + EmberSettings.Sleep.Enabled.Section + ": " + EmberSettings.Sleep.Enabled.Key + ".");

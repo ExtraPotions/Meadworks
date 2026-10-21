@@ -46,6 +46,9 @@ namespace ExtraPotions.Ember.Config
                 var name = setting?.Id ?? id;
                 if (!target.Contains(name, StringComparer.OrdinalIgnoreCase)) target.Add(name);
             }
+            foreach (var group in EmberPresets.All.Where(g => lockedIds.Contains(g.Selector.Id, StringComparer.OrdinalIgnoreCase)))
+                foreach (var member in group.Members)
+                    if (member.Lockable && !lockedIds.Contains(member.Id, StringComparer.OrdinalIgnoreCase)) lockedIds.Add(member.Id);
             return lockedIds.Count + unknown.Count + notLockable.Count == 0 ? Empty : new LockList(lockedIds, unknown, notLockable);
         }
 

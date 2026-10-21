@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.14 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Hold a key or a gamepad button to choose one attuned power. The choice calls the game's SetGuardianPower and keeps the recharge timer. Host setting Activate All Attuned Powers stays on by default, so one activation still runs every attuned power and the wheel stays hidden. Turn it off to choose a single power. The key and the gamepad button are unbound by default. Almanac warns when the key is already used by the game or another MeadWorks mod.
+- Grouped number presets in the MeadWorks menu: Experience, Perk Thresholds, Perk Strength, Death, Finds, Fishing Fight and Power Strength. Each is Vanilla, MeadWorks default, Relaxed or Custom. Choosing one writes that group's values immediately. Editing a member selects Custom. Loading never replaces saved values; a group that does not match its label becomes Custom. Host or server owns every group. Joining clients keep their own saved preferences and do not expand a server preset locally. Planted Pickable Foraging XP, Activate All Attuned Powers and the power wheel keys are unchanged. The overlapping callout, sneak, weapon and power settings still work; none of those keys were removed.
+- Boss kill credit is granted when the boss dies, by the server, to players inside Kill Credit Range. A living boss and a packet from another player do not grant a kill. The count is still one per boss, saved on the character as before.
+- Woodcutting fell and split experience is granted by the server, once per tree or log, and only up to the configured fell or split amount for the hardest wood. Another player cannot raise your Woodcutting skill.
+- A clean-strike mark counts only when the player who sent it owns that character, so a mark cannot force an extra ore roll.
+- While the power wheel is open, the gamepad buttons it uses do not also use, build, dodge, or start the guardian power. Escape closes the wheel without opening the pause menu.
+- The open wheel updates its labels when the text or the highlight changes.
+
+## 0.1.13 (2026-10-21)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- New host setting 19 - Foraging / Planted Pickable Foraging XP (0–100%, default 10%): picking a pickable a player planted, such as cultivator stones, berries or mushrooms, earns that share of the normal Foraging experience, so a planted patch is no longer a fast way to level. Wild plants give full experience as before. Yields, Extra Yield Chance and sweep picking are unchanged, and crops still train Farming. A pickable counts as planted when it carries the shared `meadworks.pickable.planted` marker (written by Wildroot 0.1.17 and later) or the game's own builder record, which pickables planted with Wildroot before this change already have; pickables with neither count as wild. The setting is server-owned and applies on the next pick.
+
 ## 0.1.12 (2026-10-19)
 
 - Requires Crucible 0.3.22 / Crucible.UI 0.3.15.

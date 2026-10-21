@@ -30,6 +30,7 @@ namespace ExtraPotions.Ember.Localization
         public const string DoorsOn = "doors_on";
         public const string DoorsOff = "doors_off";
         public const string DoorsNotAllowed = "doors_not_allowed";
+        public const string PresetLocked = "preset_locked";
         public const string HudSleeping = "hud_sleeping";
         public const string HudBoost = "hud_boost";
         public const string ImportDone = "import_done";
@@ -57,6 +58,7 @@ namespace ExtraPotions.Ember.Localization
             new TextKey(DoorsOn, 0),
             new TextKey(DoorsOff, 0),
             new TextKey(DoorsNotAllowed, 0),
+            new TextKey(PresetLocked, 0),
             new TextKey(HudSleeping, 2),
             new TextKey(HudBoost, 1),
             new TextKey(ImportDone, 2),

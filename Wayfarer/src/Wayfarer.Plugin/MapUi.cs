@@ -15,8 +15,11 @@ namespace Wayfarer {
  /// </summary>
  internal sealed class MapUi {
   static readonly Color Ink=new Color(.92f,.88f,.76f);
+  static readonly Category[] EveryCategory=(Category[])Enum.GetValues(typeof(Category));
   readonly Plugin p;RectTransform? root;
   string signature="";string screen="main";Category category=Category.Boat;int page;long lastWorld;
+  bool inputsReady;string heldScreen="";Category heldCategory;int heldPage;string heldLanguage="";
+  bool heldEnabled,heldArmed,heldTeleport;int heldMask;
   readonly Dictionary<GridCell,Selectable> focusables=new Dictionary<GridCell,Selectable>();
   GridNavigator? navigator;GridCell? focus;
   internal MapUi(Plugin plugin){p=plugin;}
@@ -30,8 +33,18 @@ namespace Wayfarer {
    if(!map||!map.m_largeRoot||!map.m_largeRoot.activeSelf||p.World==0){p.State.Close();if(root)root!.gameObject.SetActive(false);screen="main";signature="";focus=null;return;}
    if(PortalPickerOpen(map)){p.State.Close();if(root)root!.gameObject.SetActive(false);return;}
    if(screen=="picker"&&!p.State.PickerOpen)screen="main";
-   var next=$"{screen}|{category}|{page}|{p.Language}|{p.Options.Enabled.Value}|{p.State.Armed}|{p.CanTeleport}|{string.Join(",",Enum.GetValues(typeof(Category)).Cast<Category>().Where(p.CanUse))}";
-   if(!root||signature!=next){Build(map);signature=next;}else root!.gameObject.SetActive(true);
+   var language=p.Language;var enabled=p.Options.Enabled.Value;var armed=p.State.Armed;var teleport=p.CanTeleport;
+   var mask=0;for(var i=0;i<EveryCategory.Length;i++)if(p.CanUse(EveryCategory[i]))mask|=1<<i;
+   var screenNow=screen;var categoryNow=category;var pageNow=page;
+   var same=inputsReady&&screenNow==heldScreen&&categoryNow==heldCategory&&pageNow==heldPage&&language==heldLanguage
+    &&enabled==heldEnabled&&armed==heldArmed&&teleport==heldTeleport&&mask==heldMask;
+   if(root&&signature.Length>0&&same)root!.gameObject.SetActive(true);
+   else {
+    var next=$"{screenNow}|{categoryNow}|{pageNow}|{language}|{enabled}|{armed}|{teleport}|{string.Join(",",EveryCategory.Where(p.CanUse))}";
+    if(!root||signature!=next){Build(map);signature=next;}else root!.gameObject.SetActive(true);
+    inputsReady=true;heldScreen=screenNow;heldCategory=categoryNow;heldPage=pageNow;heldLanguage=language;
+    heldEnabled=enabled;heldArmed=armed;heldTeleport=teleport;heldMask=mask;
+   }
    Pad();
   }
   internal static bool PortalPickerOpen(Minimap map) {

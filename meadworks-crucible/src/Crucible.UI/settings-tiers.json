@@ -12,6 +12,10 @@
     "Look/Night Shade": "Advanced",
     "Look/Timber Border Width": "Advanced",
     "Look/Timber Border Jaggedness": "Advanced",
-    "HUD Layout/*": "FileOnly"
+    "HUD Layout/*": "FileOnly",
+    "Notices/Stacked Notices": "Essential",
+    "Notices/Position": "Essential",
+    "Notices/Duration": "Essential",
+    "Notices/Maximum Visible": "Essential"
   }
 }

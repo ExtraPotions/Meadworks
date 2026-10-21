@@ -1,6 +1,6 @@
 # Tempest
 
-Version 0.1.10. Requires Crucible 0.3.22 / Crucible.UI 0.3.15. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.12. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Rare dangerous weather: blizzards in the lowlands and the Deep North and severe thunderstorms, announced five minutes ahead and the same for every player.
 
@@ -18,7 +18,7 @@ Rare dangerous weather: blizzards in the lowlands and the Deep North and severe 
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.22 or a later 0.3.x, which includes Crucible.UI 0.3.15 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 
@@ -44,6 +44,7 @@ Rare dangerous weather: blizzards in the lowlands and the Deep North and severe 
 - Steps aside, module by module, and notes it in the log: WildWeather turns off Tempest's weather events; NoFogBruh turns off the weather filter; Valheim_Admin_Tool turns off the personal weather override.
 - Converter imports: NoFogBruh's weather switches.
 - Optional Meadworks integration: Cairn shows Tempest warnings on its HUD.
+- Solstice is optional: seasonal weather names use their base filter rules, and host-owned seasonal weights can adjust ordinary weather. Empty defaults keep existing weights. Tempest owns weather selection and events; Solstice owns season facts. See [the season contract](docs/SEASONS.md), including Cairn forecast limits.
 
 ## Notes
 

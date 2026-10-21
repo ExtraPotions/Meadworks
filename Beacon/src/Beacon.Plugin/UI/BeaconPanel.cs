@@ -20,7 +20,12 @@ namespace ExtraPotions.Beacon.Runtime
         static KitVirtualList? list;
         static TMP_Text? status, storage;
         static string? selected;
-        static string fingerprint = "";
+        static bool refreshNow = true;
+        static ServerList? seenList;
+        static int seenRevision = -1;
+        static SecretBackend seenBackend;
+        static string seenLanguage = "";
+        static int seenSecrets = int.MinValue;
         static long revision;
         static IDisposable? refresh;
         static float nextRefresh;
@@ -51,9 +56,23 @@ namespace ExtraPotions.Beacon.Runtime
             }
             if (Time.unscaledTime < nextRefresh) return;
             nextRefresh = Time.unscaledTime + .25f;
-            var current = ServerListCodec.Write(BeaconServers.List) + "|" + BeaconSecrets.Store.Backend + "|" + BeaconText.Text("ui_servers")
-                + string.Join("", BeaconServers.List.Entries.Select(e => BeaconSecrets.Store.Contains(e.SecretRef) ? "1" : "0"));
-            if (fingerprint != current) { fingerprint = current; Refresh(); }
+            var saved = BeaconServers.List;
+            var backend = BeaconSecrets.Store.Backend;
+            var language = BeaconText.Text("ui_servers");
+            var secrets = SecretBits(saved);
+            if (!refreshNow && seenList == saved && seenRevision == saved.Revision && seenBackend == backend && seenLanguage == language && seenSecrets == secrets)
+            {
+                RefreshControls();
+                if (BeaconImportSecrets.Busy) Message(BeaconText.Text("import_password_pending"));
+                return;
+            }
+            refreshNow = false;
+            seenList = saved;
+            seenRevision = saved.Revision;
+            seenBackend = backend;
+            seenLanguage = language;
+            seenSecrets = secrets;
+            Refresh();
             RefreshControls();
             if (BeaconImportSecrets.Busy) Message(BeaconText.Text("import_password_pending"));
         }
@@ -91,9 +110,9 @@ namespace ExtraPotions.Beacon.Runtime
             Add("forget_all", () => Forget(true), 1, 2);
             status = KitAlmanacDialog.Label(window.Panel, "Status", "", new Vector2(470, -546), new Vector2(290, 48), 14);
             window.Closed += Reset;
-            window.Open(); fingerprint = ""; Refresh();
+            window.Open(); refreshNow = true; Refresh();
             HideMenu();
-            refresh = BeaconSecretActions.Run(BeaconSecretActions.Refresh, _ => fingerprint = "", () => Message(BeaconText.Text("secret_store_failed")));
+            refresh = BeaconSecretActions.Run(BeaconSecretActions.Refresh, _ => refreshNow = true, () => Message(BeaconText.Text("secret_store_failed")));
         }
 
         static void Add(string key, Action action, int x, int y, bool needsSelection = false)
@@ -118,7 +137,7 @@ namespace ExtraPotions.Beacon.Runtime
                 {
                     foreach (Transform child in rect) KitUnity.Retire(child.gameObject);
                     var caption = (selected == entry.SecretRef ? "> " : "") + entry.Name + "\n" + entry.Address + "  " + BeaconText.Format("ui_alias_count", entry.Aliases.Count);
-                    var button = KitButton.Create(rect, "Select", caption, () => { selected = entry.SecretRef; fingerprint = ""; Refresh(); }, new Vector2(0, -2), new Vector2(600, 60));
+                    var button = KitButton.Create(rect, "Select", caption, () => { selected = entry.SecretRef; refreshNow = true; Refresh(); }, new Vector2(0, -2), new Vector2(600, 60));
                     Tip(button.gameObject,"select",BeaconText.Text("ui_help_select")+"\n"+entry.Name+"\n"+entry.Address);
                     var words = button.GetComponentInChildren<TMP_Text>(true);
                     if (words != null) { words.richText = false; words.textWrappingMode = TextWrappingModes.Normal; }
@@ -144,6 +163,16 @@ namespace ExtraPotions.Beacon.Runtime
             if (BeaconServers.List.Count == 0) Message(Ui("empty"));
             else if (!BeaconServers.Writable) Message(Ui("read_only"));
             else if (!BeaconJoin.Active) Message(Ui("step_aside"));
+        }
+
+        static int SecretBits(ServerList list)
+        {
+            var entries = list.Entries;
+            var store = BeaconSecrets.Store;
+            var hash = entries.Count;
+            for (var i = 0; i < entries.Count; i++)
+                hash = unchecked(hash * 31 + (store.Contains(entries[i].SecretRef) ? 1 : 0));
+            return hash;
         }
 
         static void RefreshControls()
@@ -195,8 +224,8 @@ namespace ExtraPotions.Beacon.Runtime
             Confirm(all ? Ui("forget_all_confirm") : BeaconText.Format("ui_forget_confirm", entry!.Name), () =>
             {
                 if (BeaconImportSecrets.Busy) { Message(BeaconText.Text("import_password_pending")); return; }
-                if (all) BeaconSecretActions.Run(BeaconSecretActions.ForgetAll, count => { Message(BeaconText.Format("passwords_forgotten_all", count)); fingerprint = ""; }, () => Message(BeaconText.Text("secret_store_failed")));
-                else BeaconSecretActions.Run(cancel => BeaconSecretActions.Forget(entry!.SecretRef, cancel), forgotten => { Message(forgotten ? BeaconText.Format("password_forgotten", entry!.Name) : BeaconText.Text("secret_store_failed")); fingerprint = ""; }, () => Message(BeaconText.Text("secret_store_failed")));
+                if (all) BeaconSecretActions.Run(BeaconSecretActions.ForgetAll, count => { Message(BeaconText.Format("passwords_forgotten_all", count)); refreshNow = true; }, () => Message(BeaconText.Text("secret_store_failed")));
+                else BeaconSecretActions.Run(cancel => BeaconSecretActions.Forget(entry!.SecretRef, cancel), forgotten => { Message(forgotten ? BeaconText.Format("password_forgotten", entry!.Name) : BeaconText.Text("secret_store_failed")); refreshNow = true; }, () => Message(BeaconText.Text("secret_store_failed")));
             });
         }
         internal static bool Amend(Action<ServerList> change)
@@ -205,7 +234,7 @@ namespace ExtraPotions.Beacon.Runtime
             if (Plugin.Log == null) return false;
             try { if (!BeaconServers.Amend(change, Plugin.Log)) { Message(Ui("write_failed")); return false; } }
             catch (Exception error) { Plugin.Log.Warning("Beacon server edit rejected: " + error.GetType().Name); Message(Ui("invalid")); return false; }
-            fingerprint = ""; Refresh(); return true;
+            refreshNow = true; Refresh(); return true;
         }
         internal static void Message(string words) { if (status != null) status.text = words; }
         internal static void Confirm(string prompt, Action commit, KitWindow? parent = null)
@@ -243,6 +272,6 @@ namespace ExtraPotions.Beacon.Runtime
             var old = window; window = null; status = storage = null;
             if (old != null) { old.Closed -= Reset; old.Close(); old.Destroy(); }
         }
-        public static void Reset() { ResetWindow(); BeaconPanelMenu.Reset(); fingerprint = ""; }
+        public static void Reset() { ResetWindow(); BeaconPanelMenu.Reset(); refreshNow = true; }
     }
 }

@@ -209,6 +209,15 @@
     "cfg_weather_filter_raid__enable_the_hollow_raid_weather_help": "Enables The Hollow event weather. Off: the game never chooses this weather.",
     "cfg_weather_filter_other_heading": "Weather Filter - Other",
     "cfg_weather_filter_other__disabled_environments_name": "Disabled Environments",
-    "cfg_weather_filter_other__disabled_environments_help": "Other environment names (for example from other mods) the game should never choose, separated by commas. Names containing 'clear' are ignored."
+    "cfg_weather_filter_other__disabled_environments_help": "Other environment names (for example from other mods) the game should never choose, separated by commas. Names containing 'clear' are ignored.",
+    "cfg_seasonal_weather_heading": "Seasonal Weather",
+    "cfg_seasonal_weather__spring_weights_name": "Spring Weights",
+    "cfg_seasonal_weather__spring_weights_help": "Tempest host setting: weather weights for this Solstice season. Comma-separated environment names and weights from 0 to 4, for example Rain=0.5,ThunderStorm=0. Empty: unchanged. A base name also covers its seasonal variants; an exact variant overrides it. Zero removes ordinary weather; clear skies and Tempest events are always kept. Applies live to all players while Solstice effects are active. Solstice owns the season; Tempest owns weather selection.",
+    "cfg_seasonal_weather__summer_weights_name": "Summer Weights",
+    "cfg_seasonal_weather__summer_weights_help": "Tempest host setting: weather weights for this Solstice season. Comma-separated environment names and weights from 0 to 4, for example Rain=0.5,ThunderStorm=0. Empty: unchanged. A base name also covers its seasonal variants; an exact variant overrides it. Zero removes ordinary weather; clear skies and Tempest events are always kept. Applies live to all players while Solstice effects are active. Solstice owns the season; Tempest owns weather selection.",
+    "cfg_seasonal_weather__fall_weights_name": "Fall Weights",
+    "cfg_seasonal_weather__fall_weights_help": "Tempest host setting: weather weights for this Solstice season. Comma-separated environment names and weights from 0 to 4, for example Rain=0.5,ThunderStorm=0. Empty: unchanged. A base name also covers its seasonal variants; an exact variant overrides it. Zero removes ordinary weather; clear skies and Tempest events are always kept. Applies live to all players while Solstice effects are active. Solstice owns the season; Tempest owns weather selection.",
+    "cfg_seasonal_weather__winter_weights_name": "Winter Weights",
+    "cfg_seasonal_weather__winter_weights_help": "Tempest host setting: weather weights for this Solstice season. Comma-separated environment names and weights from 0 to 4, for example Rain=0.5,ThunderStorm=0. Empty: unchanged. A base name also covers its seasonal variants; an exact variant overrides it. Zero removes ordinary weather; clear skies and Tempest events are always kept. Applies live to all players while Solstice effects are active. Solstice owns the season; Tempest owns weather selection."
   }
 }

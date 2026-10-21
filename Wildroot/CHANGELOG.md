@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.1.18 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Shared-chest grids wait for temporarily unloaded cells before requesting payment, and retry confirmed unpaid cells after short resource or ownership delays. Waits scale with server latency and run in the background without holding the cultivator. Uncertain payments keep their original request until they settle, so late replies cannot charge a cell twice.
+
+- Ordinary crop picks grant seed returns and automatic replants only after the crop owner confirms the harvest. Shared planting counts outstanding jobs toward its admission limit while keeping completed payment and removal evidence. Catalog growth, yield and respawn edits refresh loaded plants without resetting their ages. Gardening HUD text and layout refresh when their inputs change.
+
+- Essential presets group grid size, extra spacing, cultivator effort, Farming progression and crop growth overrides. Member edits select Custom; loading preserves saved values. Host presets apply live without replacing clients' personal preferences. Legacy logging/localization keys and the removed farming-mode key stay in the file, are ignored and are identified once at startup.
+
+- Grid grow-space checks use a prepared collision mask (Default, static_solid, Default_small, piece, piece_nonsolid), the PlantEasily 2.3.0 fix. The game's plant space mask stays empty until its own grow-space method runs, and an empty mask misses nearby plants. Ashlands crops, planting the rest of a grid, and shared-chest planting are unchanged.
+
+## 0.1.17 (2026-10-21)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- A pickable you plant (stones, berries, mushrooms and the like) is marked with the shared world value `meadworks.pickable.planted`. It stays through picks, respawns and saves. Saga uses it to give planted pickables reduced Foraging experience; Wildroot's own behavior is unchanged.
+
+## 0.1.16 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- A shared-material cell that was skipped for a moment is planted after all. Picking up a stone mid-grid makes the game report the area as not ready for a few frames, and the cells being planted right then were canceled. Now a canceled cell is tried once more while you are still planting and its spot is permitted, after waiting up to 5 seconds for the area to be ready; it was never charged. Escape, the pause menu, unequipping and a spot that stays unplaceable still skip it.
+
+## 0.1.15 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- A grid keeps planting when something nearby changes mid-planting, such as picking a stone you just planted. Only the cells that can no longer be placed are skipped, and skipped cells are never charged. Before, the grid could stop as a whole. Your cultivator now counts as long as it is in your right hand, even if another mod rebuilds the item, and wear goes on the cultivator you are holding.
+- With Prevent Partial Planting, a whole-grid payment whose cell can no longer be created is returned in full, then the remaining cells are planted one by one. A spot that changed before the grid started is skipped the same way. Escape, the pause menu, unequipping and changing worlds still stop the grid.
+
 ## 0.1.14 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.6 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Optional Solstice integration uses the host's seasonal facts for bounded night length, held-torch durability drain and torch warmth. Sleep skips, partial-sleep caps and night-only torches follow the seasonal dawn; world day length and day counting stay unchanged. Missing or disabled seasons preserves Ember's existing behavior. Placed-fire seasonal fuel remains Solstice's rule and is not applied twice.
+- Added three live, server-owned Seasons switches with metadata in all seven languages. Host facts are synchronized for the current world and connection; client preferences stay saved locally. Existing sleep and door presets keep seasonal choices unchanged, and fuel-free/endless behavior keeps priority.
+
+- Sleep timer protection applies only to boost accrued while each timer setting is enabled, including unloaded crops, regrowing pickables and ongoing mead batches. Starting a new mead batch discards compensation accumulated while its fermenter was empty.
+- The sleep HUD reuses unchanged captions and reads chevron states without creating arrays; its appearance and animation are preserved.
+
+- Sleep and automatic doors each have an Essential preset selector: MeadWorksDefault, Vanilla, Relaxed and Custom. Selecting a preset applies its values live; changing a member selects Custom. Existing customized values and the one-time untouched door-distance migration are preserved.
+- Presets respect host authority and locked door settings. Local preset saves preserve server overlays and unrelated saved preferences. Added preset descriptions in all seven supported languages.
+
 ## 0.5.5 (2026-10-20)
 
 - Requires Crucible 0.3.23 / Crucible.UI 0.3.16.

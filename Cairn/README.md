@@ -2,7 +2,7 @@
 
 See more of the world: an exploration radius that grows on high ground and at sea and shrinks in forest, at night and in fog; an Exploration skill; per-effect fog controls; a time, weather and compass HUD; and tidy map pins.
 
-Version 0.1.14. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -11,6 +11,7 @@ Version 0.1.14. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [C
 - Vantage: from Exploration level 50, Vantage uncovers twice the radius after you stand still on high ground (off while Pathfinder runs the radius).
 - Fog, mist and smoke removal: one toggle per effect (distance fog, ground mist, fog clouds, Mistlands mist, cave mist, smoke and more). All effects stay on by default, so installing Cairn changes nothing until you switch one off.
 - Time, weather and compass HUD with the map markers you choose, live radius rows and Tempest warnings. It uses a fixed default position; show or hide it from the Meadworks menu (F8 or Esc > Meadworks), with a gamepad chord, or with a key you bind. Marker choices are saved per character and world. `4 - HUD / Compass Strip Width` widens the compass (240 to 640).
+- Weather forecast on the clock line: the next weather in your biome, its name, the minutes until the shared world clock changes it, and the wind direction and strength at that change. `4 - HUD / Show Forecast` is your own setting and is on by default. The line stays hidden during a raid, a forced environment or a Tempest event, and it leaves out environments Tempest has switched off. A seasonal name such as Clear Winter uses the name and icon of the weather it copies. The forecast uses the current season's list, so a change after the season turns can differ. The current weather stays beside the forecast when both fit.
 - Sleep row under the minimap, shown while Ember reports sleep and no window or the large map is open.
 - Sleep row icons: the moon means it is night and beds can be used; the bed and count (for example 1/3) are players in bed out of players online; +N% is how much faster the night passes while some players sleep; N% without a plus is the skip to morning once enough players sleep.
 - A Comfort square in the column right of the minimap (with Mantle): your comfort level over the Rested icon, with the Rested time left while you are rested.
@@ -21,7 +22,7 @@ Version 0.1.14. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [C
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.24 or a later 0.3.x, which includes Crucible.UI 0.3.17 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 

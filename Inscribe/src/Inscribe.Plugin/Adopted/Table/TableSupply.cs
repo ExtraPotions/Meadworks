@@ -19,6 +19,9 @@ namespace ExtraPotions.Inscribe.Adopted.Tables
     {
         private readonly TableStore _store;
         private readonly Essence? _essence;
+        private string? _paidId;
+        private int _paidRunes;
+        private int _paidEssence;
 
         public TableSupply(TableStore store, Essence? essence)
         {
@@ -48,20 +51,55 @@ namespace ExtraPotions.Inscribe.Adopted.Tables
             return EssenceHeld() >= cost ? null : new StoneMessage("not_enough_essence", new[] { cost.ToString() });
         }
 
-        public void Pay(StoneJob job)
+        public bool Pay(StoneJob job)
         {
+            _paidId = null;
+            _paidRunes = 0;
+            _paidEssence = 0;
             string? runeId = job.Def?.Id;
             if (runeId != null && job.Cost > 0)
             {
-                _store.TakeRunes(runeId, job.Cost);
-            }
-            if (runeId != null)
-            {
-                _store.MarkCast(runeId);
+                if (!_store.TakeRunes(runeId, job.Cost))
+                {
+                    return false;
+                }
+                _paidId = runeId;
+                _paidRunes = job.Cost;
             }
             if (_essence != null)
             {
-                _store.TakeEssence(Essences.CostFor(ItemTier.Of(job.Target)));
+                int cost = Essences.CostFor(ItemTier.Of(job.Target));
+                if (!_store.TakeEssence(cost))
+                {
+                    Refund(job);
+                    return false;
+                }
+                _paidEssence = cost;
+            }
+            return true;
+        }
+
+        public void Refund(StoneJob job)
+        {
+            if (_paidId != null && _paidRunes > 0)
+            {
+                _store.AddRunes(_paidId, _paidRunes);
+            }
+            if (_paidEssence > 0)
+            {
+                _store.AddEssence(_paidEssence);
+            }
+            _paidId = null;
+            _paidRunes = 0;
+            _paidEssence = 0;
+        }
+
+        public void NoteUsed(StoneJob job)
+        {
+            string? runeId = job.Def?.Id;
+            if (runeId != null)
+            {
+                _store.MarkCast(runeId);
             }
         }
     }

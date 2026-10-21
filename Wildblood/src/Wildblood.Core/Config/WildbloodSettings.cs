@@ -69,7 +69,8 @@ namespace ExtraPotions.Wildblood.Config
             public static readonly WildbloodSetting<float> LargeStarPower = WildbloodSetting.Number(Section, "Large Star Power", 1f, 0f, 5f, ServerAuthoritative, "Multiplier of E-marked mutation numbers on creatures with five or more stars.");
             public static readonly WildbloodSetting<float> BlinkAlertGrace = WildbloodSetting.Number(Section, "Blink Alert Grace", 3f, 0f, 10f, ServerAuthoritative, "Seconds after a Blinking creature is alerted before it may blink.");
             public static readonly WildbloodSetting<int> ReflectionDamageCap = WildbloodSetting.Integer(Section, "Reflection Damage Cap", 25, 0, 100000, ServerAuthoritative, "Most health an attacker loses per reflection; 0 means no cap.");
-            public static readonly WildbloodSetting<bool> TamedKeepTraits = WildbloodSetting.Toggle(Section, "Tamed Keep Traits", true, ServerAuthoritative, "Taming keeps a creature's traits (tamed variants apply). Off: while a creature is tamed its mutations and modifiers do not act; they stay stored, and its stars stay.");
+            public static readonly WildbloodSetting<bool> TamedKeepTraits = WildbloodSetting.Toggle(Section, "Tamed Keep Traits", true, ServerAuthoritative, "Taming keeps a creature's traits (tamed variants apply). Off: while a creature is tamed its mutations and modifiers do not act; they stay stored, and its stars stay. Young born while this is off inherit no mutation.");
+            public static readonly WildbloodSetting<bool> TamedStars = WildbloodSetting.Toggle(Section, "Tamed Stars", true, ServerAuthoritative, "On: a new birth may inherit stars, and Shepherd follows this when it is installed. Off: a newborn keeps its parent's level, as the game does, and no bonus star is added. Taming never removes stars, health, or mutations. A creature an older build left at the game's level gets its stored stars back the next time it loads. The server sets this.");
             public static readonly WildbloodSetting<bool> PlayersMayInspect = WildbloodSetting.Toggle(Section, "Players May Inspect", true, ServerAuthoritative, "Host rule: every player may run wildblood inspect, which lists the stars, traits and resulting values of the creature under the crosshair. It only reads, so it is not a cheat. Off: admins only.");
         }
 
@@ -99,6 +100,8 @@ namespace ExtraPotions.Wildblood.Config
             public static readonly WildbloodSetting<int> AmountPerStarBosses = WildbloodSetting.Integer(Section, "Amount Per Star Bosses", 50, 0, 100, ServerAuthoritative, "Amount mode: percent more of each successful boss drop per star.");
             public static readonly WildbloodSetting<bool> MultiplyTrophies = WildbloodSetting.Toggle(Section, "Multiply Trophies", false, ServerAuthoritative, "Star rules also multiply trophies.");
             public static readonly WildbloodSetting<bool> DeferToDropNSpawn = WildbloodSetting.Toggle(Section, "Defer To DropNSpawn", true, ServerAuthoritative, "Loot steps aside while DropNSpawn is installed.");
+            public static readonly WildbloodSetting<bool> SeasonalMeat = WildbloodSetting.Toggle(Section, "Seasonal Meat", true, ServerAuthoritative, "Host or server: while Solstice seasons are on, meat and hide from creatures use that season's published rate. Spring and summer drop less, fall and winter drop more, between one quarter and three times the usual amount. One item stays one item. Trophies, feathers, fangs, scales and coins stay as they are. Off, missing Solstice, or seasons turned off keeps today's drops. The next kill uses the current rate.");
+            public static readonly WildbloodSetting<bool> SeasonalWood = WildbloodSetting.Toggle(Section, "Seasonal Wood", true, ServerAuthoritative, "Host or server: while Solstice seasons are on, wood from felled trees uses that season's published rate. Spring and summer drop less, fall and winter drop more, between one quarter and three times the usual amount. One piece stays one piece. Off, missing Solstice, or seasons turned off keeps today's wood. The next tree uses the current rate.");
         }
 
         public static class Luck
@@ -211,9 +214,9 @@ namespace ExtraPotions.Wildblood.Config
             General.PressureEnabled, General.ProtectedPrefabs,
             Stars.Difficulty, Stars.StarMode, Stars.MaxStars, Stars.DistanceScaling, Stars.ScaleSaddleable, Stars.RespectEnemyLevelUpRate,
             WorldTier.Enabled, WorldTier.BossKeys, WorldTier.Override, WorldTier.Announce,
-            Traits.MaxMutations, Traits.CreatureModifiers, Traits.LargeStarPower, Traits.BlinkAlertGrace, Traits.ReflectionDamageCap, Traits.TamedKeepTraits, Traits.PlayersMayInspect,
+            Traits.MaxMutations, Traits.CreatureModifiers, Traits.LargeStarPower, Traits.BlinkAlertGrace, Traits.ReflectionDamageCap, Traits.TamedKeepTraits, Traits.TamedStars, Traits.PlayersMayInspect,
             Bosses.BossStars, Bosses.Aspects, Bosses.AltarShiftSeconds, Bosses.BossModifiers, Bosses.DamageBoard, Bosses.BossHints, Bosses.BlockSpawnsNearBoss,
-            Loot.Mode, Loot.ExtraRollChance, Loot.MaxExtraRolls, Loot.AmountPerStar, Loot.AmountPerStarBosses, Loot.MultiplyTrophies, Loot.DeferToDropNSpawn,
+            Loot.Mode, Loot.ExtraRollChance, Loot.MaxExtraRolls, Loot.AmountPerStar, Loot.AmountPerStarBosses, Loot.MultiplyTrophies, Loot.DeferToDropNSpawn, Loot.SeasonalMeat, Loot.SeasonalWood,
             Luck.PersistCounters, Luck.AttributeToKiller, Luck.TameCreditRange,
             Pressure.KarmaMode, Pressure.MaxEnforcersPerSector, Pressure.DungeonEnforcerDelay, Pressure.EnforcerAbandonDespawn,
             Pressure.BlockEnforcerWhileBossActive, Pressure.BlockKarmaWhileBossActive, Pressure.BlockKarmaWhileEnforcerActive,

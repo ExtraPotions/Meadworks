@@ -121,6 +121,8 @@ namespace ExtraPotions.Kindle.Config
                 "Salvages the item under the pointer on the Salvage tab. Unbound by default; the Salvage button does the same.", Shortcut);
             public static readonly KindleSetting<bool> ShowRarityBackgrounds = KindleSetting.Toggle(Section, "Show Rarity Backgrounds", true, Local,
                 "Show rarity backgrounds on the Salvage tab (also obeys Epic Loot's own setting).");
+            public static readonly KindleSetting<bool> NearbyChests = KindleSetting.Toggle(Section, "Nearby Chests", true, ServerAuthoritative,
+                "The Salvage tab also lists gear in the nearby chests Burrow lets you craft from (needs Burrow: its range, wards and chest rules apply, and chests other players have open are skipped). Salvaged materials go to your inventory; what does not fit drops at your feet. Your own value applies in single player; on a server the host's value applies.");
         }
 
         public static class Cart
@@ -176,7 +178,7 @@ namespace ExtraPotions.Kindle.Config
             Tracker.ReadyColour, Tracker.BackgroundOpacity,
             Salvage.Enabled, Salvage.ReturnFraction, Salvage.Rounding, Salvage.AtLeastOne, Salvage.UpgradeMaterials,
             Salvage.RequireKnownRecipe, Salvage.RequireStation, Salvage.SkipItemsWithModData, Salvage.ModDataPrefixes,
-            Salvage.SalvageKey, Salvage.ShowRarityBackgrounds,
+            Salvage.SalvageKey, Salvage.ShowRarityBackgrounds, Salvage.NearbyChests,
             Cart.CartWorkbench, Cart.CartStationLevel, Cart.CartStationRange,
             VirtualWorkbench.Enabled, VirtualWorkbench.Key,
             Stations.UseDistance,

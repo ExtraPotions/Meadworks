@@ -7,7 +7,7 @@ namespace ExtraPotions.Hex;
 
 // Remote debug kill and drops. A dedicated server holds the world as ZDOs and instantiates almost none of it, so the server
 // authorizes the request, lists the targets by ZDO, and hands each owner its own targets; the owner acts on the live instance.
-public enum HexOwnerAction : byte { Kill = 1, Drops = 2 }
+public enum HexOwnerAction : byte { Kill = 1, Drops = 2, Tame = 3 }
 
 public readonly struct HexTargetId : IEquatable<HexTargetId>
 {
@@ -26,9 +26,10 @@ public sealed class HexOwnerCommand
     public float X { get; }
     public float Y { get; }
     public float Z { get; }
+    public float Radius { get; }
     public IReadOnlyList<HexTargetId> Targets { get; }
-    public HexOwnerCommand(HexOwnerAction action, float x, float y, float z, IReadOnlyList<HexTargetId> targets)
-    { Action = action; X = x; Y = y; Z = z; Targets = targets; }
+    public HexOwnerCommand(HexOwnerAction action, float x, float y, float z, float radius, IReadOnlyList<HexTargetId> targets)
+    { Action = action; X = x; Y = y; Z = z; Radius = radius; Targets = targets; }
 }
 
 public readonly struct HexOwnerReply
@@ -42,13 +43,14 @@ public static class HexOwnerData
 {
     public const string CommandId = "meadworks.hex.debug_owner";
     public const int MaxBatch = 64;
-    public const float KillRadius = 1000f;
-    // About the area a client keeps loaded around itself; the native removedrops command only reaches loaded drops.
-    public const float DropsRadius = 128f;
-    public static readonly Version Version = new(1, 0);
+    public const float MinRadius = 5f;
+    public const float MaxRadius = 1000f;
+    public static readonly Version Version = new(2, 0);
     static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
-    static bool Defined(HexOwnerAction action) => action == HexOwnerAction.Kill || action == HexOwnerAction.Drops;
-    public static float Radius(HexOwnerAction action) => action == HexOwnerAction.Drops ? DropsRadius : KillRadius;
+    static bool Defined(HexOwnerAction action) => action == HexOwnerAction.Kill || action == HexOwnerAction.Drops || action == HexOwnerAction.Tame;
+    public static bool ValidRadius(float radius) => Finite(radius) && radius >= MinRadius && radius <= MaxRadius;
+    /// <summary>Kill and tame leave players and already tamed creatures alone. Drops are not creatures.</summary>
+    public static bool SkipCreature(HexOwnerAction action, bool player, bool tamed) => action != HexOwnerAction.Drops && (player || tamed);
     /// <summary>Distance check that refuses non-finite positions instead of letting NaN compare as in range.</summary>
     public static bool Within(float cx, float cy, float cz, float x, float y, float z, float radius)
     {
@@ -58,26 +60,26 @@ public static class HexOwnerData
     }
     public static byte[] Encode(HexOwnerCommand command)
     {
-        if (command == null || !Defined(command.Action) || !Finite(command.X) || !Finite(command.Y) || !Finite(command.Z) || command.Targets == null
+        if (command == null || !Defined(command.Action) || !Finite(command.X) || !Finite(command.Y) || !Finite(command.Z) || !ValidRadius(command.Radius) || command.Targets == null
             || command.Targets.Count < 1 || command.Targets.Count > MaxBatch || command.Targets.Distinct().Count() != command.Targets.Count)
             throw new ArgumentException("Invalid owner command.");
         using var stream = new MemoryStream(); using var writer = new BinaryWriter(stream);
-        writer.Write((byte)1); writer.Write((byte)command.Action); writer.Write(command.X); writer.Write(command.Y); writer.Write(command.Z);
+        writer.Write((byte)2); writer.Write((byte)command.Action); writer.Write(command.X); writer.Write(command.Y); writer.Write(command.Z); writer.Write(command.Radius);
         writer.Write((ushort)command.Targets.Count);
         foreach (var target in command.Targets) { writer.Write(target.User); writer.Write(target.Id); }
         return stream.ToArray();
     }
     public static HexOwnerCommand Decode(byte[] bytes)
     {
-        if (bytes == null || bytes.Length < 16 || bytes[0] != 1 || !Defined((HexOwnerAction)bytes[1])) throw new FormatException("Invalid owner command.");
+        if (bytes == null || bytes.Length < 20 || bytes[0] != 2 || !Defined((HexOwnerAction)bytes[1])) throw new FormatException("Invalid owner command.");
         using var reader = new BinaryReader(new MemoryStream(bytes, false)); reader.ReadByte();
-        var action = (HexOwnerAction)reader.ReadByte(); var x = reader.ReadSingle(); var y = reader.ReadSingle(); var z = reader.ReadSingle();
+        var action = (HexOwnerAction)reader.ReadByte(); var x = reader.ReadSingle(); var y = reader.ReadSingle(); var z = reader.ReadSingle(); var radius = reader.ReadSingle();
         int count = reader.ReadUInt16();
-        if (!Finite(x) || !Finite(y) || !Finite(z) || count < 1 || count > MaxBatch || bytes.Length != 16 + count * 12) throw new FormatException("Invalid owner command.");
+        if (!Finite(x) || !Finite(y) || !Finite(z) || !ValidRadius(radius) || count < 1 || count > MaxBatch || bytes.Length != 20 + count * 12) throw new FormatException("Invalid owner command.");
         var targets = new List<HexTargetId>(count);
         for (var i = 0; i < count; i++) targets.Add(new HexTargetId(reader.ReadInt64(), reader.ReadUInt32()));
         if (targets.Distinct().Count() != count) throw new FormatException("Repeated owner target.");
-        return new HexOwnerCommand(action, x, y, z, targets);
+        return new HexOwnerCommand(action, x, y, z, radius, targets);
     }
     static bool Valid(int applied, int skipped) => applied >= 0 && skipped >= 0 && applied <= MaxBatch && skipped <= MaxBatch && applied + skipped >= 1 && applied + skipped <= MaxBatch;
     public static byte[] EncodeReply(HexOwnerReply reply)

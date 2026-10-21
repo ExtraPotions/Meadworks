@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
+using ExtraPotions.Larder.Eating;
 using ExtraPotions.Meadworks.Crucible;
 using HarmonyLib;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace ExtraPotions.Larder.Runtime
         static long world, playerId;
         static float deadline, nextCheck;
         static bool pending, eating;
+        static FoodTopUpReason requestReason;
         static readonly HashSet<string> graves = new HashSet<string>(StringComparer.Ordinal);
         static string lastResult = "idle";
         static int attempts, consumed;
@@ -54,7 +56,7 @@ namespace ExtraPotions.Larder.Runtime
         internal static void Spawned(Player player)
         {
             if (enabled?.Value!=true || !Scope(player) || ReferenceEquals(lastSpawn,player)) return;
-            lastSpawn=player;Queue(player,"spawn");
+            lastSpawn=player;Queue(player,FoodTopUpReason.Spawn);
         }
 
         internal static void Retrieved(long sourceWorld,long sourcePlayer,string tombId)
@@ -65,13 +67,13 @@ namespace ExtraPotions.Larder.Runtime
             if (graves.Contains(tombId)) return;
             // Fail closed at capacity; a world/player change clears the session's bounded duplicate history.
             if (graves.Count>=256) { lastResult="retrieval-history-full";return; }
-            graves.Add(tombId);Queue(player,"retrieval");
+            graves.Add(tombId);Queue(player,FoodTopUpReason.Retrieval);
         }
 
-        static void Queue(Player player,string reason)
+        static void Queue(Player player,FoodTopUpReason reason)
         {
             if (eating) return;
-            actor=player;pending=true;deadline=Time.realtimeSinceStartup+180f;nextCheck=0f;lastResult="waiting-"+reason;
+            actor=player;requestReason=reason;pending=true;deadline=Time.realtimeSinceStartup+180f;nextCheck=0f;lastResult="waiting-"+reason;
         }
 
         // Every two seconds, queue a normal eating pass when a Food-slot item could be eaten now.
@@ -90,7 +92,7 @@ namespace ExtraPotions.Larder.Runtime
                 var item=inventory.GetItemAt(cell.Item1,cell.Item2);
                 if(item?.m_shared!=null && item.m_stack>0 && item.m_shared.m_itemType==ItemDrop.ItemData.ItemType.Consumable
                     && (item.m_shared.m_food>0f || item.m_shared.m_foodStamina>0f || item.m_shared.m_foodEitr>0f) && player.CanEat(item,false))
-                { Queue(player,"auto");return; }
+                { Queue(player,FoodTopUpReason.Automatic);return; }
             }
         }
 
@@ -98,7 +100,8 @@ namespace ExtraPotions.Larder.Runtime
         {
             if (!pending) AutoCheck();
             if (!pending) return;
-            if (enabled?.Value!=true || !Plugin.Ready || !Plugin.AllowsUi || !actor || actor!=Player.m_localPlayer
+            if (!FoodTopUpRules.Allowed(requestReason,enabled?.Value==true,AutoFromSlots?.Value==true)
+                || !Plugin.Ready || !Plugin.AllowsUi || !actor || actor!=Player.m_localPlayer
                 || !ZNet.instance || ZNet.instance.GetWorld()==null || ZNet.instance.GetWorldUID()!=world
                 || actor.GetPlayerID()!=playerId || actor.IsDead()) { pending=false;lastResult="cancelled";return; }
             float now=Time.realtimeSinceStartup;

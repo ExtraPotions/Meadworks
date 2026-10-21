@@ -53,6 +53,11 @@ namespace ExtraPotions.Threshold.Runtime.Map
         static TMP_Text? emptyText;
         static Button? closeButton, favourite, home, sourceHub, returnHub;
         static readonly List<Button> rows = new List<Button>();
+        static readonly List<Button> padControls = new List<Button>();
+        static readonly List<int> padStamp = new List<int>();
+        static readonly List<int> padSeen = new List<int>();
+        static int padGeneration;
+        static bool padReady;
         static PickerView? view;
         static int selected = -1;
         static long builtRevision = long.MinValue;
@@ -136,8 +141,7 @@ namespace ExtraPotions.Threshold.Runtime.Map
             if (Pressed(PadButton.Y) && search != null) { search.Focus(); return; }
             if (view == null) return;
             int direction = Pressed(PadButton.DPadDown) ? 1 : Pressed(PadButton.DPadUp) ? -1 : 0;
-            var controls = rows.Where(r => r != null && r.interactable)
-                .Concat(new[] { favourite, home, sourceHub, returnHub, closeButton }.Where(r => r != null && r.interactable && r.gameObject.activeSelf).Select(r => r!)).ToList();
+            var controls = PadControls();
             var focused = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
             int at = controls.FindIndex(r => r.gameObject == focused);
             if (direction != 0 && controls.Count > 0)
@@ -151,6 +155,57 @@ namespace ExtraPotions.Threshold.Runtime.Map
             if (Pressed(PadButton.A) && at >= 0) controls[at].onClick.Invoke();
             if (Pressed(PadButton.X)) TravelSelected();
         }
+
+        /// <summary>The gamepad's button list. Refilled when the rows are rebuilt or a row's interactable flag changes.</summary>
+        static List<Button> PadControls()
+        {
+            CollectPadStamp(padSeen);
+            if (padReady && PickerPadList.Unchanged(padStamp, padSeen)) return padControls;
+            padStamp.Clear();
+            for (int i = 0; i < padSeen.Count; i++) padStamp.Add(padSeen[i]);
+            padControls.Clear();
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var row = rows[i];
+                if (row != null && row.interactable) padControls.Add(row);
+            }
+            AddPad(favourite);
+            AddPad(home);
+            AddPad(sourceHub);
+            AddPad(returnHub);
+            AddPad(closeButton);
+            padReady = true;
+            return padControls;
+        }
+
+        static void AddPad(Button? button)
+        {
+            if (button != null && button.interactable && button.gameObject.activeSelf) padControls.Add(button);
+        }
+
+        static void CollectPadStamp(List<int> into)
+        {
+            into.Clear();
+            into.Add(padGeneration);
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var row = rows[i];
+                into.Add(row == null ? PickerPadList.Missing : row.interactable ? PickerPadList.Ready : PickerPadList.Blocked);
+            }
+            into.Add(ActionStamp(favourite));
+            into.Add(ActionStamp(home));
+            into.Add(ActionStamp(sourceHub));
+            into.Add(ActionStamp(returnHub));
+            into.Add(ActionStamp(closeButton));
+        }
+
+        static int ActionStamp(Button? button)
+        {
+            if (button == null || !button.gameObject.activeSelf) return PickerPadList.Missing;
+            return button.interactable ? PickerPadList.Ready : PickerPadList.Blocked;
+        }
+
+        static void InvalidatePadList() => padGeneration++;
 
         static bool Pressed(PadButton button)
         {
@@ -332,6 +387,7 @@ namespace ExtraPotions.Threshold.Runtime.Map
                 UnityEngine.Object.Destroy(dying);
             }
             rows.Clear();
+            InvalidatePadList();
             if (view == null || content == null) return;
             if (emptyText != null) emptyText.gameObject.SetActive(view.IsEmpty);
             var untagged = ThresholdText.Text(ThresholdTextKeys.PickerUntagged);
@@ -471,6 +527,9 @@ namespace ExtraPotions.Threshold.Runtime.Map
             search?.Destroy();
             search = null;
             rows.Clear();
+            padControls.Clear();
+            padReady = false;
+            InvalidatePadList();
             window?.Destroy();
             window = null;
             content = null;

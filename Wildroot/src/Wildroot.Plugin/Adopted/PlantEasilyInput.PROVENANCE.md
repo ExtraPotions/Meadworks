@@ -1,10 +1,10 @@
 # PlantEasily native input adoption
 
-Source: [PlantEasily 2.2.2, Patches/InputPatches.cs](https://github.com/AdvizeGH/Advize_ValheimMods/blob/1deeb3962eb8681394961b0f35a4dfbc315c6f99/Advize_PlantEasily/Patches/InputPatches.cs).
+Source: [PlantEasily 2.3.0, Patches/InputPatches.cs](https://github.com/AdvizeGH/Advize_ValheimMods/blob/864defe2f471f3c10e0ddd8237fc8fee74190433/Advize_PlantEasily/Patches/InputPatches.cs).
 
-Pinned commit: `1deeb3962eb8681394961b0f35a4dfbc315c6f99`.
+Pinned commit: `864defe2f471f3c10e0ddd8237fc8fee74190433`.
 
-Source file SHA256: `283A17F90916D3617DE29211FD3DB9868B2747A633BEE95D769F3840A9D22F26`.
+Source file SHA256: `283A17F90916D3617DE29211FD3DB9868B2747A633BEE95D769F3840A9D22F26`. The file is byte-identical at PlantEasily 2.2.2 commit `1deeb3962eb8681394961b0f35a4dfbc315c6f99`. The 2.3.0 grow-space fix is the prepared collision mask in `GrowSpaceCheck`, not this file. ConditionalConfigSync from 2.3.0 is not adopted.
 
 The source repository's unmodified `LICENSE` declares GNU GPL version 3. Its SHA256 is `589ED823E9A84C56FEB95AC58E7CF384626B9CBF4FDA2A907BC36E103DE1BAD2`. The adopted file preserves that grant as `GPL-3.0-only`; no permission for a later GPL version is inferred. Wildroot's existing code license is GPL-3.0-or-later, and the full GPL version 3 text is already included at `licenses/GPL-3.0.txt`. Third-party source provenance and licensing remain separate from Wildroot product identity.
 

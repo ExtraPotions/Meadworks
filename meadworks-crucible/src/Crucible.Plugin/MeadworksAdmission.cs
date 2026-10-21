@@ -14,8 +14,10 @@ namespace ExtraPotions.Meadworks.Crucible {
     /// vanilla clients and this decision stays Strict. Main thread only.
     /// </summary>
     internal static class MeadworksAdmission {
-        /// <summary>Seconds a greeted peer has to answer or send any Crucible frame before it counts as vanilla.</summary>
-        internal const double AnswerTimeoutSeconds=30;
+        /// <summary>Seconds a greeted peer has to answer once its send queue has drained. A busy queue restarts this, up to <see cref="PeerPresenceTracker.DefaultCeilingSeconds"/>.</summary>
+        internal const double AnswerTimeoutSeconds=60;
+        /// <summary>The fixed timeout this replaced. One warning is written when a busy queue keeps a peer waiting longer than this.</summary>
+        internal const double FormerAnswerTimeoutSeconds=30;
         internal static PeerPresenceTracker Peers { get; }=new PeerPresenceTracker(AnswerTimeoutSeconds);
         static ConfigEntry<AdmissionMode>? mode;static string? lastSummary;
 

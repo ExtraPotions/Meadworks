@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using ExtraPotions.Inscribe.Adopted.Bundles;
+using ExtraPotions.Inscribe.Adopted.Core;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using ExtraPotions.Meadworks.OriginalArt;
@@ -26,36 +27,57 @@ namespace ExtraPotions.Inscribe.Adopted.Items
 
         internal static bool WearOriginal(StoneEntry entry, GameObject? materialItem)
         {
+            if (StoneVisuals.Headless) return false;
+            try
+            {
+                return Dress(entry, materialItem);
+            }
+            catch (Exception error)
+            {
+                Log.Warn($"Original item art unavailable for {entry.PrefabName}; keeping the registered item: {error.Message}");
+                return false;
+            }
+        }
+
+        private static bool Dress(StoneEntry entry, GameObject? materialItem)
+        {
             // The Honing and Tempering Runes wear a tinted copy of an existing rune's art (user decision 2026-10-19: no new art).
             string art = Runtime.TintedRuneArt.ArtPrefab(entry.PrefabName);
             GameObject model = OriginalItemArt.Model(materialItem, art);
-            Strip(entry.Prefab);
-            GameObject placed = Place(entry.Prefab, model);
+            Sprite icon = OriginalItemArt.Icon(art);
             Color tint = Color.white;
-            bool tinted = art != entry.PrefabName && !StoneVisuals.Headless && StoneTints.TryById(entry.BuiltInId, out tint);
-            if (tinted)
+            bool tinted = art != entry.PrefabName && StoneTints.TryById(entry.BuiltInId, out tint);
+            Sprite shownIcon = tinted ? StoneIcons.Tinted(icon, tint, entry.PrefabName) ?? icon : icon;
+            GameObject placed = Place(entry.Prefab, model);
+            try
             {
-                Runtime.TintedRuneArt.TintModel(placed, tint);
+                if (tinted)
+                {
+                    Runtime.TintedRuneArt.TintModel(placed, tint);
+                }
             }
-            if (!StoneVisuals.Headless)
+            catch
             {
-                Sprite icon = OriginalItemArt.Icon(art);
-                entry.Shared.m_icons = new[] { tinted ? StoneIcons.Tinted(icon, tint, entry.PrefabName) ?? icon : icon };
+                Object.DestroyImmediate(placed);
+                throw;
             }
+            Strip(entry.Prefab, placed);
+            entry.Shared.m_icons = new[] { shownIcon };
             return true;
         }
 
         /// <summary>Removes the base's colliders and every part that draws or lights it (models, glows, sparkles).</summary>
-        private static void Strip(GameObject item)
+        private static void Strip(GameObject item, GameObject replacement)
         {
             foreach (Collider collider in item.GetComponentsInChildren<Collider>(true))
             {
+                if (collider.transform.IsChildOf(replacement.transform)) continue;
                 Object.DestroyImmediate(collider);
             }
             Transform holder = HolderOf(item);
             foreach (GameObject part in LookParts(item))
             {
-                if (part == null)
+                if (part == null || part.transform.IsChildOf(replacement.transform))
                 {
                     continue;
                 }
@@ -102,14 +124,22 @@ namespace ExtraPotions.Inscribe.Adopted.Items
         {
             Transform holder = HolderOf(item);
             GameObject copy = Object.Instantiate(model, holder, false);
-            copy.name = ModelName;
-            copy.SetActive(true);
-            foreach (Transform part in copy.GetComponentsInChildren<Transform>(true))
+            try
             {
-                part.gameObject.layer = item.layer;
+                copy.name = ModelName;
+                copy.SetActive(true);
+                foreach (Transform part in copy.GetComponentsInChildren<Transform>(true))
+                {
+                    part.gameObject.layer = item.layer;
+                }
+                copy.transform.localPosition = -ModelBounds.In(copy, holder).center;
+                return copy;
             }
-            copy.transform.localPosition = -ModelBounds.In(copy, holder).center;
-            return copy;
+            catch
+            {
+                Object.DestroyImmediate(copy);
+                throw;
+            }
         }
 
         private static Transform HolderOf(GameObject item) => item.transform.Find(Holder) ?? item.transform;

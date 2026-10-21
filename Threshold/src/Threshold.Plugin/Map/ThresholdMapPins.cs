@@ -51,6 +51,9 @@ namespace ExtraPotions.Threshold.Runtime.Map
         static float listedAt = float.NegativeInfinity;
         static bool listedForTravel;
         static readonly List<PinPoint> points = new List<PinPoint>();
+        static readonly List<PinPoint> spread = new List<PinPoint>();
+        static readonly List<LabelSide> sides = new List<LabelSide>();
+        static readonly PinLayoutCache layoutCache = new PinLayoutCache();
         static readonly List<int> placed = new List<int>();
         static Sprite? glyph;
         static RectTransform? here;
@@ -141,8 +144,11 @@ namespace ExtraPotions.Threshold.Runtime.Map
                 placed.Add(i);
             }
             bool spreadOn = settings.Get(ThresholdSettings.Map.SpreadClusteredPins);
-            var spread = PinSpread.Spread(points, OrdinaryMapPins.IconSize, spreadOn);
-            var sides = PinSpread.LabelSides(points, OrdinaryMapPins.IconSize, spreadOn);
+            if (!layoutCache.Matches(view, spreadOn, points))
+            {
+                PinSpread.LayoutInto(points, OrdinaryMapPins.IconSize, spreadOn, spread, sides);
+                layoutCache.Remember(view, spreadOn, points);
+            }
             var sprite = PortalIcon(minimap);
             for (int k = 0; k < placed.Count; k++)
             {

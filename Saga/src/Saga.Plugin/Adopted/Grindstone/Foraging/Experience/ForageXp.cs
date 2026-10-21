@@ -11,7 +11,8 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
     /// 1, on the picker's client, not again while the pick is in flight); while <see cref="ForagePick"/> has a pick's
     /// scope open, the Foraging raise is scaled to Experience Per Pick × the item's factor × 1 + Experience Per Biome
     /// Step per step of the plant's biome (<see cref="MineXp.BiomeStep"/>, the Pickaxes steps), and the first pick of
-    /// each kind of forage × Discovery Multiplier (<see cref="ForageDiscovery"/>), with a callout.
+    /// each kind of forage × Discovery Multiplier (<see cref="ForageDiscovery"/>), with a callout. A pickable a player
+    /// planted (<see cref="Forage.IsPlanted"/>) earns Planted Pickable Foraging XP percent of that.
     /// </summary>
     public static class ForageXp
     {
@@ -55,7 +56,8 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
             ForageEntry forage = entry;
             entry = null;
             Vector3 spot = pickable != null ? pickable.transform.position : player.transform.position;
-            float scale = Mathf.Max(0f, ForagingSettings.ExperiencePerPick.Value) * forage.Experience * BiomeScale(spot);
+            float scale = Mathf.Max(0f, ForagingSettings.ExperiencePerPick.Value) * forage.Experience * BiomeScale(spot)
+                * ExtraPotions.Saga.Skills.ForageExperience.PlantedShare(ForagingSettings.PlantedExperience.Value, Forage.IsPlanted(pickable));
             if (scale <= 0f || !ForageDiscovery.TryRecord(player, forage.Item))
                 return scale;
             ForageCallout.Show(spot, $"Discovered {Forage.ItemName(pickable)}!");

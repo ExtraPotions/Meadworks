@@ -48,7 +48,8 @@ namespace ExtraPotions.Ember.Runtime
             var skipping = server && env.IsTimeSkipping();
             var now = znet.GetTimeSeconds();
             // The game skips to the next morning start; read the target the same way the game computes it.
-            var target = skipping ? env.m_skipToTime : env.GetMorningStartSec(env.GetDay(now - env.m_dayLengthSec * 0.15) + 1);
+            var target = skipping ? env.m_skipToTime : EmberSeasons.NightActive ? EmberSeasons.NextMorning(env)
+                : env.GetMorningStartSec(env.GetDay(now - env.m_dayLengthSec * 0.15) + 1);
             var running = state.FullSkip || skipping;
             Reading = SleepReading.From(state, skipping, skip.Update(running, now, target));
         }

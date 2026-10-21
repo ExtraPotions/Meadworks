@@ -4,6 +4,7 @@
 // Changed by expDARE, 2026: Threshold namespace; Threshold's settings, log, catalog words, access rules and portal keys (SeaGateBridge); Threshold ZDO keys, RPC names and pillar prefab name; patches installed by Threshold's own Harmony instance; the Kit picker instead of the large map; no crew pointers, map icons, placement preview or copied portal swirl.
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes. SPDX-License-Identifier: GPL-3.0-or-later
 using System;
+using ExtraPotions.Threshold.SeaGates;
 using UnityEngine;
 
 namespace ExtraPotions.Threshold.Runtime.SeaGates
@@ -79,7 +80,7 @@ namespace ExtraPotions.Threshold.Runtime.SeaGates
                 CrewReport.Decline(sender, order, player);
                 return;
             }
-            Begin(player, ship, order);
+            Begin(player, ship, order, sender);
         }
 
         private static bool CanJump(Player player)
@@ -113,19 +114,27 @@ namespace ExtraPotions.Threshold.Runtime.SeaGates
             return false;
         }
 
-        private static void Begin(Player player, Ship ship, JumpOrder order)
+        private static void Begin(Player player, Ship ship, JumpOrder order, long captain)
         {
-            bool hadHelm = CrewHelm.Release(player, ship);
             Transform frame = ship.transform;
             Transform self = player.transform;
-            CrewSpot spot = CrewSpot.Measure(frame.position, frame.rotation, self.position, self.rotation);
-            Vector3 estimate = spot.PositionOn(order.DestPos, order.DestRot);
+            CrewSpot stood = CrewSpot.Measure(frame.position, frame.rotation, self.position, self.rotation);
             player.m_teleportCooldown = Mathf.Max(player.m_teleportCooldown, 2f);
-            if (!player.TeleportTo(estimate, spot.FacingOn(order.DestRot), distantTeleport: true))
+            bool teleported = player.TeleportTo(stood.PositionOn(order.DestPos, order.DestRot), stood.FacingOn(order.DestRot), distantTeleport: true);
+            CrewTeleportDecision decision = CrewTeleportDecision.AfterAttempt(order.JumpId, teleported);
+            if (!decision.ReleaseHelm)
             {
+                lastJump = decision.LastJump;
+                if (decision.Decline)
+                    CrewReport.Decline(captain, order, player);
                 SeaGateLog.LogWarning("Sea gate: the game refused the crew teleport; this player stays where they are.");
                 return;
             }
+            bool hadHelm = CrewHelm.Release(player, ship);
+            self = player.transform;
+            CrewSpot spot = CrewSpot.Measure(frame.position, frame.rotation, self.position, self.rotation);
+            player.m_teleportTargetPos = spot.PositionOn(order.DestPos, order.DestRot);
+            player.m_teleportTargetRot = spot.FacingOn(order.DestRot);
             CrewHold.Begin(player, order, spot, hadHelm);
         }
     }

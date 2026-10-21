@@ -54,7 +54,7 @@ namespace ExtraPotions.Cairn.Runtime
         static HudSize drawnSize;
         static int drawnCompassWidth;
         static readonly List<HudRow> extraRows = new List<HudRow>();
-        static (IReadOnlyList<HudRow>? Rows, int Width, int Day, int Hour, int Minute, bool Use24, bool Night, WeatherCategory Category, string? Language, long Revision, string? Event) statusDrawn;
+        static (IReadOnlyList<HudRow>? Rows, int Width, int Day, int Hour, int Minute, bool Use24, bool Night, WeatherCategory Category, string? Language, long Revision, string? Event, bool Forecast, string? ForecastName, int ForecastMinutes, string? ForecastWind, int ForecastPercent, WeatherCategory ForecastCategory) statusDrawn;
         static (IReadOnlyList<HudRow>? Rows, int Width, bool Plate) stripDrawn;
         static (IReadOnlyList<HudRow>? Rows, int Width, int Degrees, string? Point, string? Language, long Revision, bool Plate) headingDrawn;
         static (IReadOnlyList<HudRow>? Rows, int Width, int Plates) extrasDrawn;
@@ -124,10 +124,12 @@ namespace ExtraPotions.Cairn.Runtime
             if (panel == null) Build(root);
             if (panel == null) return;
 
+            var envMan = EnvMan.instance;
+            var forecast = CairnForecast.Read(envMan, settings.Get(CairnSettings.Hud.ShowForecast), CairnTempest.Line.Kind == TempestLineKind.None);
             var options = new HudOptions(settings.Get(CairnSettings.Hud.ShowDay), settings.Get(CairnSettings.Hud.ShowTime),
                 settings.Get(CairnSettings.Hud.ShowWeather), settings.Get(CairnSettings.Hud.ShowCompass), settings.Get(CairnSettings.Hud.ShowHeading),
                 // Show Radius Inputs stays a file-only diagnostic setting and is no longer drawn in game.
-                settings.Get(CairnSettings.Radius.ShowRadius), false, CairnTempest.Line.Kind);
+                settings.Get(CairnSettings.Radius.ShowRadius), false, CairnTempest.Line.Kind, forecast: forecast.Visible);
             var compassWidth = settings.Get(CairnSettings.Hud.CompassWidth);
             if (drawnRows == null || !SameOptions(options, drawnOptions) || compassWidth != drawnCompassWidth)
             {
@@ -154,7 +156,7 @@ namespace ExtraPotions.Cairn.Runtime
                 placement = requested;
             }
 
-            var env = EnvMan.instance;
+            var env = envMan;
             var player3 = player.transform;
             var forward = GameCamera.instance != null ? GameCamera.instance.transform.forward : player3.forward;
             var heading = Compass.Heading(forward.x, forward.z);
@@ -173,7 +175,7 @@ namespace ExtraPotions.Cairn.Runtime
 
         static bool SameOptions(HudOptions a, HudOptions b) => a.ShowDay == b.ShowDay && a.ShowTime == b.ShowTime && a.ShowWeather == b.ShowWeather
             && a.ShowCompass == b.ShowCompass && a.ShowHeading == b.ShowHeading && a.ShowRadius == b.ShowRadius && a.ShowRadiusInputs == b.ShowRadiusInputs
-            && a.Tempest == b.Tempest && a.Sleep == b.Sleep;
+            && a.Tempest == b.Tempest && a.Sleep == b.Sleep && a.Forecast == b.Forecast;
 
         /// <summary>The row's plate exists: until it does, the part is drawn every frame, as before, so the plate appears once its art reads.</summary>
         static bool PlateReady(HudRow row) => plates.TryGetValue(row, out var image) && image != null;
@@ -198,7 +200,9 @@ namespace ExtraPotions.Cairn.Runtime
             // During a Tempest event here, the weather name and mark are the event's (as on the Tempest row and badge).
             var tempestEvent = TempestWarning.StatusEvent(category, environment?.m_name, CairnTempest.Line);
             var activeEvent = tempestEvent?.Key;
-            var key = (rows, panelWidth, day, hour, minute, use24, night, category, language, revision, activeEvent);
+            var forecast = CairnForecast.Current;
+            var key = (rows, panelWidth, day, hour, minute, use24, night, category, language, revision, activeEvent,
+                forecast.Visible, forecast.NameKey, forecast.Minutes, forecast.WindPoint, forecast.WindPercent, forecast.Category);
             if (key == statusDrawn) return;
             statusDrawn = key;
             var on = rows.Contains(HudRow.Status);
@@ -207,23 +211,27 @@ namespace ExtraPotions.Cairn.Runtime
             if (!on) return;
             var clock = HudText.Clock(options.ShowDay, options.ShowTime, day, fraction, use24);
             var clockString = HudText.Dot(clock.Day.Length == 0 ? "" : CairnText.Format(CairnTextKeys.HudDay, clock.Day), clock.Time);
-            var weatherString = options.ShowWeather ? CairnText.Text(activeEvent ?? CairnTextKeys.Weather(category)) : "";
+            var currentWeather = options.ShowWeather ? CairnText.Text(activeEvent ?? CairnTextKeys.Weather(category)) : "";
+            var nextWeather = forecast.Visible ? CairnForecast.Text(forecast) : "";
             var hasClock = clockString.Length > 0;
-            var hasWeather = weatherString.Length > 0;
             var gap = HudLayout.StatusGap;
             var top = HudLayout.Top(rows, HudRow.Status);
             var iconY = top + (HudLayout.StatusHeight - IconSize) * .5f;
             clockText.text = clockString;
-            weatherText.text = weatherString;
             var showClockIcon = hasClock && options.ShowTime;
             // The clock keeps its full text; the weather name takes what is left and best-fits into it (a smaller font, then an ellipsis).
             var clockWidth = hasClock ? Mathf.Min(clockText.GetPreferredValues(clockString).x, HudLayout.StatusRoom(panelWidth) - (showClockIcon ? IconSize + 3f : 0f)) : 0f;
             var clockGroup = (showClockIcon ? IconSize + 3f : 0f) + clockWidth;
+            weatherText.fontSize = HudLayout.StatusFontSize;
+            var weatherRoom = HudLayout.WeatherTextRoom(panelWidth, hasClock ? clockGroup : 0f);
+            var both = nextWeather.Length > 0 && currentWeather.Length > 0 ? HudText.Dot(currentWeather, nextWeather) : "";
+            var combinedFits = both.Length > 0 && !HudLayout.FitText(weatherText.GetPreferredValues(both).x, weatherRoom).Ellipsis;
+            var weatherString = HudText.WithForecast(currentWeather, nextWeather, combinedFits);
+            weatherText.text = weatherString;
+            var hasWeather = weatherString.Length > 0;
             var weatherWidth = 0f;
             if (hasWeather)
             {
-                var weatherRoom = HudLayout.WeatherTextRoom(panelWidth, hasClock ? clockGroup : 0f);
-                weatherText.fontSize = HudLayout.StatusFontSize;
                 var (size, ellipsis) = HudLayout.FitText(weatherText.GetPreferredValues(weatherString).x, weatherRoom);
                 weatherText.fontSize = size;
                 weatherText.overflowMode = ellipsis ? TextOverflowModes.Ellipsis : TextOverflowModes.Truncate;
@@ -251,12 +259,16 @@ namespace ExtraPotions.Cairn.Runtime
             else clockText.gameObject.SetActive(false);
             if (hasWeather)
             {
-                var eventGlyph = tempestEvent != null ? EventGlyph(tempestEvent.Value.Glyph) : null;
+                // The mark matches the words: the coming weather when that is all the line could fit, otherwise the current weather.
+                var showingForecastOnly = nextWeather.Length > 0 && weatherString == nextWeather;
+                var markEvent = showingForecastOnly ? null : tempestEvent;
+                var markCategory = showingForecastOnly ? forecast.Category : category;
+                var eventGlyph = markEvent != null ? EventGlyph(markEvent.Value.Glyph) : null;
                 if (eventGlyph != null) SetGlyph(weatherIcon!, eventGlyph);
                 else
                 {
-                    var weatherMark = HudIcons.For(category, night);
-                    SetIcon(weatherIcon!, weatherMark, weatherMark == HudIcon.Moon ? MoonTint : WeatherTint(category));
+                    var weatherMark = HudIcons.For(markCategory, night);
+                    SetIcon(weatherIcon!, weatherMark, weatherMark == HudIcon.Moon ? MoonTint : WeatherTint(markCategory));
                 }
                 Place(weatherIcon!.rectTransform, weatherLeft, iconY, IconSize, IconSize);
                 weatherText.alignment = TextAlignmentOptions.Left;

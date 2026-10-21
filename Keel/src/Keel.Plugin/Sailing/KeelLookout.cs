@@ -10,7 +10,7 @@
 // by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See
 // THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt and licenses/GPL-3.0.txt.
 //
-// Changed by expDARE, 2026: one Keel class; the key through Crucible C07 plus Keel's gamepad chord; settings, levels
+// Changed by expDARE, 2026: the pulse is accepted only from a peer who is aboard that ship. One Keel class; the key through Crucible C07 plus Keel's gamepad chord; settings, levels
 // (CS1), unlock, refusal, cooldown, target test and ring radius from Keel.Core (AbilityRules, AbilityCooldown,
 // LookoutRules); Keel's RPC (keel_Lookout); the report is Keel's C05 text; pressed away from a ship the key does nothing
 // (no message); PatchGuard replaced by try/catch; acts only while Keel's Sailing module is active and draws nothing on
@@ -65,10 +65,12 @@ namespace ExtraPotions.Keel.Runtime
             ship.m_nview.InvokeRPC(ZNetView.Everybody, SailingKeys.RpcLookout);
         }
 
-        internal static void Receive(Ship ship)
+        internal static void Receive(Ship ship, long sender)
         {
             var player = Player.m_localPlayer;
             if (ship == null || player == null || !SailingPerks.Active || !Plugin.AllowsUi) return;
+            var caller = ShipCallGate.PlayerId(sender);
+            if (!ShipCall.MayPulseLookout(caller, ShipCallGate.Aboard(ship, caller))) return;
             var settings = Plugin.Settings!;
             var center = ship.transform.position;
             var radius = settings.Get(KeelSettings.Lookout.Radius);
@@ -148,7 +150,7 @@ namespace ExtraPotions.Keel.Runtime
                 if (nview == null || nview.GetZDO() == null) return;
                 nview.Register(SailingKeys.RpcLookout, sender =>
                 {
-                    try { Receive(__instance); }
+                    try { Receive(__instance, sender); }
                     catch (Exception error) { KeelShips.Warn("lookout pulse", error); }
                 });
             }

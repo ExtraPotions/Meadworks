@@ -81,7 +81,7 @@ namespace ExtraPotions.Thing.Runtime
 
         internal static void Confirm(KitWindow parent, string words, Action apply, Action? cancelled = null, bool settingsOnly = false)
         {
-            bool Allowed() => settingsOnly ? ThingPanel.CanConfigure : ThingPanel.CanAdmin;
+            bool Allowed() => settingsOnly ? ThingPanel.CanConfigure : ThingPanel.CanOpen || ThingPanel.CanPeople;
             if (!Allowed()) return;
             var dialog = KitAlmanacDialog.Create(parent, ThingPanel.Ui("confirm"), new Vector2(620, 300)); if (dialog == null) return;
             KitAlmanacDialog.Label(dialog.Panel, "Detail", words, new Vector2(20, -54), new Vector2(580, 110)).richText = false;

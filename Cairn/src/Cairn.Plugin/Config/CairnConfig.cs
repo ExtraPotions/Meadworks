@@ -145,6 +145,7 @@ namespace ExtraPotions.Cairn.Runtime
             if (ReferenceEquals(setting, CairnSettings.Hud.ShowDay) ||
                 ReferenceEquals(setting, CairnSettings.Hud.ShowTime) ||
                 ReferenceEquals(setting, CairnSettings.Hud.ShowWeather) ||
+                ReferenceEquals(setting, CairnSettings.Hud.ShowForecast) ||
                 ReferenceEquals(setting, CairnSettings.Hud.ShowCompass) ||
                 ReferenceEquals(setting, CairnSettings.Hud.ShowHeading) ||
                 ReferenceEquals(setting, CairnSettings.Hud.ShowMarkers) ||

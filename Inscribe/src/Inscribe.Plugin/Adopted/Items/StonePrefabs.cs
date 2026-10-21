@@ -115,10 +115,10 @@ namespace ExtraPotions.Inscribe.Adopted.Items
                 return;
             }
             StoneCloner.Build(entry, basePrefab, _holder!.transform);
-            entry.WearsTablet = StoneTablets.WearOriginal(entry, material);
             Entries.Add(entry);
             ByName[entry.PrefabName] = entry;
             ByObject[entry.Prefab] = entry;
+            entry.WearsTablet = StoneTablets.WearOriginal(entry, material);
         }
 
         /// <summary>Appends every stone prefab whose name the list does not hold yet. True when anything was added.</summary>

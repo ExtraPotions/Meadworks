@@ -10,7 +10,7 @@ namespace ExtraPotions.Shepherd
     {
         public const string ProductId = "com.meadworks.shepherd";
         public const string Name = "Shepherd";
-        public const string Version = "0.1.14";
+        public const string Version = "0.1.15";
         public const string Family = "Hearth";
 
         /// <summary>The game build the design and research were read from (design header).</summary>

@@ -12,7 +12,7 @@ namespace Mantle.Tackle
     /// ZNetScene and ObjectDB (the BundlePrefabs library), so a dropped box and one in a chest mean the same prefab
     /// everywhere. Original geometry and its model-rendered icon retain native item lifecycle and material shaders.
     /// A box is never worn on the body, so the item is all there is. Built once per process;
-    /// a box that fails is logged and left out, the others still come. A box listed in <see cref="TackleboxCatalog.Tinted"/>
+    /// art failures leave the native item registered. A box listed in <see cref="TackleboxCatalog.Tinted"/>
     /// wears another box's model and icon with its own frost tint on copied materials and a copied icon (no new art).
     /// </summary>
     public static class TackleboxPrefab
@@ -25,10 +25,12 @@ namespace Mantle.Tackle
             {
                 try
                 {
-                    if (kind.Item == null)
+                    bool built = kind.Item == null;
+                    if (built)
                         Build(scene, kind);
                     NetPrefabs.Register(scene, kind.Item);
                     ItemPrefabs.Register(harmony, kind.Item);
+                    if (built) Dress(scene, kind);
                 }
                 catch (Exception e)
                 {
@@ -41,22 +43,35 @@ namespace Mantle.Tackle
         private static void Build(ZNetScene scene, TackleboxKind kind)
         {
             var template = scene.GetPrefab(CraftedItem.BaseItem);
-            if (!template || template.GetComponent<ItemDrop>() == null || template.transform.Find("model") == null)
-                throw new InvalidOperationException("Tacklebox item template requires item and model.");
-            bool tinted = TackleboxCatalog.Tinted.TryGetValue(kind.Id, out var tint);
-            string art = tinted ? tint.Art : kind.Id;
-            Sprite icon = OriginalItemArt.Icon(art);
-            GameObject model = PrefabBench.Copy(OriginalItemArt.Model(scene, art), "model");
-            if (tinted)
-            {
-                var frost = new Color(tint.R, tint.G, tint.B, 1f);
-                TackleboxTint.Model(model, frost);
-                icon = TackleboxTint.Icon(icon, frost);
-            }
-            model.SetActive(true);
-            kind.Item = CraftedItem.Build(template, model, kind);
-            kind.Item.GetComponent<ItemDrop>().m_itemData.m_shared.m_icons = new[] { icon };
+            if (!template || template.GetComponent<ItemDrop>() == null)
+                throw new InvalidOperationException("Tacklebox item template requires an item.");
+            kind.Item = CraftedItem.Build(template, kind);
             Plugin.Log.LogInfo($"{kind.Name} ready: {kind.Id}");
+        }
+
+        private static void Dress(ZNetScene scene, TackleboxKind kind)
+        {
+            if (ExtraPotions.Meadworks.Crucible.MeadworksHeadless.IsHeadless) return;
+            try
+            {
+                bool tinted = TackleboxCatalog.Tinted.TryGetValue(kind.Id, out var tint);
+                string art = tinted ? tint.Art : kind.Id;
+                Sprite icon = OriginalItemArt.Icon(art);
+                GameObject model = PrefabBench.Copy(OriginalItemArt.Model(scene, art), "model");
+                if (tinted)
+                {
+                    var frost = new Color(tint.R, tint.G, tint.B, 1f);
+                    TackleboxTint.Model(model, frost);
+                    icon = TackleboxTint.Icon(icon, frost);
+                }
+                model.SetActive(true);
+                CraftedItem.Dress(kind.Item, model);
+                kind.Item.GetComponent<ItemDrop>().m_itemData.m_shared.m_icons = new[] { icon };
+            }
+            catch (Exception error)
+            {
+                Plugin.Log.LogWarning($"The {kind.Name} art did not load ({error.Message}); its item remains registered.");
+            }
         }
     }
 }

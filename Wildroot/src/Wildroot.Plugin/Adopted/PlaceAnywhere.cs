@@ -1,5 +1,5 @@
-// PlaceAnywhere lifecycle adapted from PlantEverything 1.21.3, Advize_ValheimMods commit
-// 1deeb3962eb8681394961b0f35a4dfbc315c6f99. See THIRD_PARTY_NOTICES/PlantEverything.txt.
+// PlaceAnywhere lifecycle adapted from PlantEverything 1.21.4, commit 864defe2f471f3c10e0ddd8237fc8fee74190433.
+// The adapted patch files are unchanged from 1.21.3 (1deeb396). See THIRD_PARTY_NOTICES/PlantEverything.txt.
 using System;
 using System.Collections.Generic;
 using System.Reflection;

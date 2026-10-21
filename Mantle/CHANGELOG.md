@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.23 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Dedicated servers register backpacks, tackleboxes, rings and belts without loading item art or reading materials. If art fails on a client, the item remains registered with a warning.
+- A slow join is no longer refused at 20 seconds while the server's send queue is still full. Charter waits until that queue drops to 64 KB, then allows 60 seconds for the mod list, and never waits longer than 5 minutes from the greeting. A player who never answers is still refused, with the reason in English, Spanish, French, German, Russian, Chinese and Korean. One warning is written when the wait passes 20 seconds.
+
 ## 0.1.22 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

@@ -103,11 +103,17 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         }
 
         /// <summary>Null when the item can be salvaged by this player, else the "$ok_..." word that says why not.</summary>
-        public static string Blocker(Player player, ItemDrop.ItemData item)
+        public static string Blocker(Player player, ItemDrop.ItemData item) => Blocker(player, item, null);
+
+        /// <summary>
+        /// As <see cref="Blocker(Player, ItemDrop.ItemData)"/>; with <paramref name="chest"/> the item must be in that chest's
+        /// inventory (salvage from nearby chests) instead of the player's. Every other rule is the same.
+        /// </summary>
+        public static string Blocker(Player player, ItemDrop.ItemData item, Inventory chest)
         {
             if (!KindleSalvage.Ready || !SalvageSettings.Enabled.Value)
                 return SalvageWords.Off;
-            if (player == null || player != Player.m_localPlayer || item == null || !player.GetInventory().ContainsItem(item))
+            if (player == null || player != Player.m_localPlayer || item == null || !(chest ?? player.GetInventory()).ContainsItem(item))
                 return SalvageWords.Cannot;
             if (item == null || item.m_shared == null)
                 return SalvageWords.Cannot;

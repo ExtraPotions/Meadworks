@@ -142,11 +142,17 @@ namespace ExtraPotions.Tempest.Localization
             new TextKey("override_cleared", 0),
         });
 
+        /// <summary>The whole second <see cref="Countdown"/> displays. It changes when that text changes.</summary>
+        public static long WholeSeconds(double seconds)
+        {
+            if (double.IsNaN(seconds) || double.IsInfinity(seconds) || seconds < 0) seconds = 0;
+            return (long)Math.Ceiling(seconds - 1e-9);
+        }
+
         /// <summary>Formats seconds as <c>m:ss</c> (or <c>h:mm:ss</c>) for countdowns; negative and non-finite values give <c>0:00</c>.</summary>
         public static string Countdown(double seconds)
         {
-            if (double.IsNaN(seconds) || double.IsInfinity(seconds) || seconds < 0) seconds = 0;
-            var total = (long)Math.Ceiling(seconds - 1e-9);
+            var total = WholeSeconds(seconds);
             var h = total / 3600;
             var m = total / 60 % 60;
             var s = total % 60;

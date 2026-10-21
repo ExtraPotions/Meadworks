@@ -34,6 +34,8 @@ namespace ExtraPotions.Wildroot.Runtime {
   readonly Dictionary<string,GrowthOverride> moddedOriginals=new Dictionary<string,GrowthOverride>(StringComparer.Ordinal);
   IReadOnlyList<ExtraResourceDefinition> extras=Array.Empty<ExtraResourceDefinition>();FileSystemWatcher? watcher;
   readonly MutationLedger ledger=new MutationLedger();
+  readonly LiveCatalogValues liveValues=new LiveCatalogValues();
+  readonly Dictionary<Component,HashSet<string>> liveFields=new Dictionary<Component,HashSet<string>>();
   /// <summary>The cultivator's own pieces before Wildroot registered anything; restored when Wildroot turns off.</summary>
   readonly HashSet<string> nativeCultivator=new HashSet<string>(StringComparer.Ordinal);
   bool lastActive;ExtraResourceOrigin lastOrigin;bool compareNeeded;readonly CatalogMismatchGate mismatch=new CatalogMismatchGate();
@@ -101,7 +103,7 @@ namespace ExtraPotions.Wildroot.Runtime {
     foreach(var d in next.Values)Configure(d,nextPolicies[d.Prefab],true,added.TryGetValue(d.Prefab,out var own)?own:null);
     var removedExtras=definitions.Keys.Where(k=>!next.ContainsKey(k)).ToArray();
     definitions.Clear();foreach(var pair in next)definitions[pair.Key]=pair.Value;policies.Clear();foreach(var pair in nextPolicies)policies[pair.Key]=pair.Value;extras=extra;
-    ApplyTrees();SyncCultivator(removedExtras);PickedSpawners.SyncAll();Restored=false;Revision++;LastWarnings=warnings;foreach(var warning in warnings)log.LogWarning("Wildroot catalog: "+warning);
+    ApplyTrees();SyncCultivator(removedExtras);Restored=false;RefreshLoadedInstances();PickedSpawners.SyncAll();Revision++;LastWarnings=warnings;foreach(var warning in warnings)log.LogWarning("Wildroot catalog: "+warning);
     Fingerprint=CatalogDistribution.Fingerprint(definitions.Values);PublishFingerprint();CompareWithServer();
    }catch(Exception error){log.LogError("Wildroot catalog apply rejected; previous catalog kept: "+error.Message);}
   }
@@ -268,13 +270,55 @@ namespace ExtraPotions.Wildroot.Runtime {
    if(target==null||target is UnityEngine.Object unity&&!unity)throw new InvalidOperationException("Missing prefab component");
    var info=AccessTools.Field(target.GetType(),field)??throw new MissingFieldException(field);
    ledger.Capture(target,field,info.GetValue(target));info.SetValue(target,value);
+   if(IsLiveField(target,field)){
+    var component=(Component)target;if(!liveFields.TryGetValue(component,out var fields))liveFields[component]=fields=new HashSet<string>(StringComparer.Ordinal);fields.Add(field);
+   }
   }
+  static bool IsLiveField(object target,string field)=>target is Plant&&(field=="m_growTime"||field=="m_growTimeMax"||field=="m_minScale"||field=="m_maxScale"||field=="m_growRadius"||field=="m_tolerateHeat"||field=="m_tolerateCold"||field=="m_needCultivatedGround"||field=="m_attachDistance"||field=="m_biome"||field=="m_destroyIfCantGrow")||target is Pickable&&(field=="m_amount"||field=="m_respawnTimeMinutes"||field=="m_extraDrops");
+  void RefreshLoadedInstances(){
+   foreach(var plant in UnityEngine.Object.FindObjectsByType<Plant>(FindObjectsInactive.Include,FindObjectsSortMode.None))RefreshInstance(plant);
+   foreach(var pickable in UnityEngine.Object.FindObjectsByType<Pickable>(FindObjectsInactive.Include,FindObjectsSortMode.None))RefreshInstance(pickable);
+  }
+  internal void RefreshInstance(Component instance){
+   if(Restored||!settings.Active||!instance)return;
+   var network=instance.GetComponentInParent<ZNetView>();var root=network?network.transform:instance.transform;
+   var prefab=PrefabManager.Instance.GetPrefab(PlacementBackend.PrefabName(root.gameObject));if(!prefab)return;
+   string path="";for(var child=instance.transform;child!=root&&child;child=child.parent)path=path.Length==0?child.name:child.name+"/"+path;
+   var sourceTransform=path.Length==0?prefab.transform:prefab.transform.Find(path);if(!sourceTransform)return;
+   var source=sourceTransform.GetComponent(instance.GetType());
+   if(!source||source==instance||!liveFields.TryGetValue(source,out var fields))return;
+   foreach(var field in fields){
+    var info=AccessTools.Field(instance.GetType(),field);var original=ledger.Original(source,field);if(original==null)continue;
+    object? current=info.GetValue(instance),effective=info.GetValue(source);
+    if(liveValues.Apply(instance,field,current,original.Original,effective,SnapshotLiveValue))info.SetValue(instance,effective);
+   }
+  }
+  static object? SnapshotLiveValue(object? value){
+   if(!(value is DropTable table))return value;
+   // Unity copies serializable drop tables. Compare their contents, including future native public fields,
+   // and capture an immutable signature so another mod's in-place edits are observed before restoration.
+   var signature=new System.Text.StringBuilder();
+   void Fields(object item,string excluded){foreach(var field in item.GetType().GetFields(System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public).OrderBy(f=>f.Name,StringComparer.Ordinal)){
+    if(field.Name==excluded)continue;var part=field.GetValue(item);
+    signature.Append(field.Name).Append(':').Append(part is UnityEngine.Object unity?unity?unity.GetInstanceID().ToString(System.Globalization.CultureInfo.InvariantCulture):"null":Convert.ToString(part,System.Globalization.CultureInfo.InvariantCulture)).Append(';');
+   }}
+   Fields(table,"m_drops");if(table.m_drops==null)signature.Append("null");else foreach(var drop in table.m_drops){signature.Append('{');Fields(drop,"");signature.Append('}');}
+   return signature.ToString();
+  }
+  [HarmonyPatch(typeof(Plant),"Awake")]
+  static class LivePlant {static void Postfix(Plant __instance)=>Plugin.Instance?.Catalog?.RefreshInstance(__instance);}
+  [HarmonyPatch(typeof(Pickable),"Awake")]
+  static class LivePickable {static void Postfix(Pickable __instance)=>Plugin.Instance?.Catalog?.RefreshInstance(__instance);}
   /// <summary>
   /// Puts the game's own values back (newest change first), removes Wildroot's snap points and leaves only the
   /// cultivator's native pieces. Objects already planted stay in the world; they simply follow the game's rules again.
   /// </summary>
   internal void RestoreNative(){
    var table=CultivatorTable();if(table)RestoreCultivator(table!);
+   // Only local component fields change. Plant/pick timestamps and all other ZDO data stay untouched.
+   liveValues.Restore(target=>target is Component component&&component,
+    (target,field)=>AccessTools.Field(target.GetType(),field).GetValue(target),
+    (target,field,value)=>AccessTools.Field(target.GetType(),field).SetValue(target,value));
    if(Restored&&ledger.Count==0)return;
    int restored=0;
    foreach(var record in ledger.Restore()){

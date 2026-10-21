@@ -27,6 +27,8 @@ internal static partial class HexWindow
         "reveal" => "help_reveal", "reset" => "map_confirm_reset", "seed" => "help_seed",
         "debug_kill" => ZNet.instance != null && ZNet.instance.IsServer() ? "debug_confirm_kill_body" : "debug_confirm_remote_kill_body",
         "debug_drops" => ZNet.instance != null && ZNet.instance.IsServer() ? "debug_confirm_drops_body" : "debug_confirm_remote_drops_body",
+        "debug_tame" => ZNet.instance != null && ZNet.instance.IsServer() ? "debug_confirm_tame_body" : "debug_confirm_remote_tame_body",
+        "debug_event" => "debug_confirm_event_body",
         "debug_fly" => "fly", "debug_build" => "debug_mode",
         "savepreset" => "help_savepreset", "reloadpresets" => "help_reloadpreset",
         _ => "quick_actions"

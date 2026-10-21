@@ -44,7 +44,7 @@ namespace ExtraPotions.Wildroot {
   /// <summary>Personal switches inside a server-owned section.</summary>
   static readonly HashSet<string> LocalKeys=new HashSet<string>(StringComparer.Ordinal){FarmingRules.RowPlantingId,FarmingRules.AutoReplantId};
   static readonly HashSet<string> ServerKeys=new HashSet<string>(StringComparer.Ordinal){
-   Enabled,"Planting.PreventPartialPlanting","Planting.PreventInvalidPlanting","Planting.UseStamina","Planting.UseDurability",
+   Enabled,"Planting.PreventPartialPlanting","Planting.PreventInvalidPlanting","Planting.UseStamina","Planting.UseDurability","Planting.EffortPreset",
    "Catalog.ShowPickableSpawners","Catalog.EnableMiscFlora","Catalog.EnableDebris","Catalog.EnableExtraResources","Catalog.SnappableVines","Catalog.DisabledResourceNames",
    ExtraResourcesShared,ServerFingerprint,
   };

@@ -37,6 +37,25 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
         public static bool CanPick(Pickable pickable) =>
             pickable != null && pickable.m_nview != null && pickable.m_nview.IsValid() && pickable.m_enabled != 0 && !pickable.m_picked;
 
+        /// <summary>
+        /// The shared ZDO bool a planting mod (Wildroot) writes on a pickable a player places. Saga reads it without
+        /// depending on that mod.
+        /// </summary>
+        public const string PlantedKey = "meadworks.pickable.planted";
+
+        private static readonly int plantedHash = PlantedKey.GetStableHashCode();
+
+        /// <summary>
+        /// Whether a player planted this pickable: it carries <see cref="PlantedKey"/>, or the game's piece creator (set by
+        /// Player.PlacePiece, also on pickables planted before the key existed). Wild pickables have neither. Both live on
+        /// the pickable's own ZDO, so they survive picks, respawns and world saves.
+        /// </summary>
+        public static bool IsPlanted(Pickable pickable)
+        {
+            ZDO zdo = pickable != null && pickable.m_nview != null && pickable.m_nview.IsValid() ? pickable.m_nview.GetZDO() : null;
+            return zdo != null && (zdo.GetBool(plantedHash) || zdo.GetLong(ZDOVars.s_creator, 0L) != 0L);
+        }
+
         /// <summary>The item's display name, localized ("Raspberries"); the prefab name when it has none.</summary>
         public static string ItemName(Pickable pickable)
         {

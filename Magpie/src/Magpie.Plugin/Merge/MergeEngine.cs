@@ -127,18 +127,27 @@ namespace ExtraPotions.Magpie.Runtime.Merge
 
             // Step 4: barrier. Only roles where it passes at once reach this point (MergeBarrier).
             // Step 5, phase 2: the source shrinks or goes, after phase 1 in the same ordered stream.
-            if (!StillOwned(source))
+            if (!StillOwned(source) || !StillOwned(target))
             {
-                MagpieRuntime.Log?.Verbose("Merge phase 2 deferred: source ownership changed; reconcile decides.");
+                MagpieRuntime.Log?.Verbose("Merge phase 2 deferred: ownership changed; reconcile decides.");
                 return;
             }
+            var completed = intent.WithPhase2Saved().Format();
             if (plan.DestroysSource)
+            {
+                // The removal is on the target before Destroy. A save that keeps the removal cannot roll those items back.
+                targetZdo.Set(MagpieCore.MergeInKey, completed);
+                target.Save();
                 ZNetScene.instance.Destroy(source.gameObject);
+            }
             else
             {
+                // Flag, reduced stack, and nonce are one step. The flag is not a later write that a save can skip.
                 source.m_itemData.m_stack = plan.SourceStackAfter;
                 sourceZdo.Set(MagpieCore.MergeOutKey, MergeIntent.AppendNonce(sourceZdo.GetString(MagpieCore.MergeOutKey, ""), plan.Nonce));
+                targetZdo.Set(MagpieCore.MergeInKey, completed);
                 source.Save();
+                target.Save();
             }
             Merged++;
             MagpieRuntime.Log?.Debug($"Merged {plan.Moved} {plan.Target.Identity.Prefab} into one stack ({plan.TargetStackAfter}).");
@@ -165,11 +174,20 @@ namespace ExtraPotions.Magpie.Runtime.Merge
                 switch (MergeReconcile.Decide(intent, world, ready, Observe(intent, position, searchRadius)))
                 {
                     case ReconcileAction.RollBackTarget:
-                        target.m_itemData.m_stack = Math.Max(1, target.m_itemData.m_stack - intent.Moved);
+                        target.m_itemData.m_stack = MergeReconcile.StackAfterRollback(target.m_itemData.m_stack, intent.Moved, intent.PreMergeStack);
                         zdo.Set(MagpieCore.MergeInKey, "");
                         target.Save();
                         RolledBack++;
-                        MagpieRuntime.Log?.Verbose($"Merge rolled back: {intent.Moved} returned to the source (nonce {intent.Nonce}).");
+                        MagpieRuntime.Log?.Verbose($"Merge rolled back: {intent.Moved} removed from the target (nonce {intent.Nonce}).");
+                        break;
+                    case ReconcileAction.FinishDestroy:
+                        var sourceDrop = FindSource(intent, position, searchRadius);
+                        if (sourceDrop != null && StillOwned(sourceDrop))
+                        {
+                            // Leave the flag. The next pass clears it once this source is gone, so the removal is not also a rollback.
+                            ZNetScene.instance.Destroy(sourceDrop.gameObject);
+                            MagpieRuntime.Log?.Verbose($"Merge removal finished for nonce {intent.Nonce}.");
+                        }
                         break;
                     case ReconcileAction.Clear:
                         zdo.Set(MagpieCore.MergeInKey, "");
@@ -180,16 +198,25 @@ namespace ExtraPotions.Magpie.Runtime.Merge
 
         private static SourceObservation Observe(MergeIntent intent, Vector3 near, float radius)
         {
+            var item = FindSource(intent, near, radius);
+            if (item == null)
+                return SourceObservation.NotFound;
+            return MergeIntent.HasNonce(item.m_nview.GetZDO().GetString(MagpieCore.MergeOutKey, ""), intent.Nonce)
+                ? SourceObservation.FoundWithNonce
+                : SourceObservation.FoundWithoutNonce;
+        }
+
+        private static ItemDrop FindSource(MergeIntent intent, Vector3 near, float radius)
+        {
             var limit = radius * radius;
             foreach (var item in ItemDrop.s_instances)
             {
                 var view = item != null ? item.m_nview : null;
                 if (view == null || !view.IsValid() || (item.transform.position - near).sqrMagnitude > limit) continue;
-                var zdo = view.GetZDO();
-                if (zdo.GetString(MagpieCore.InstanceTokenKey, "") != intent.SourceToken) continue;
-                return MergeIntent.HasNonce(zdo.GetString(MagpieCore.MergeOutKey, ""), intent.Nonce) ? SourceObservation.FoundWithNonce : SourceObservation.FoundWithoutNonce;
+                if (view.GetZDO().GetString(MagpieCore.InstanceTokenKey, "") != intent.SourceToken) continue;
+                return item;
             }
-            return SourceObservation.NotFound;
+            return null;
         }
 
         private static bool StillOwned(ItemDrop item) =>

@@ -2,7 +2,7 @@
 
 Faster nights when some players sleep, torches that warm you like a campfire, and doors that open as you walk up.
 
-Version 0.5.5. Requires Crucible 0.3.23 / Crucible.UI 0.3.16. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.6. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -15,13 +15,17 @@ Version 0.5.5. Requires Crucible 0.3.23 / Crucible.UI 0.3.16. Changes are in [CH
 - Station timers: while the night is sped up, cooking stations, smelters, crops, fermenters and pickables keep working at normal speed (each can be turned off).
 - Torches: lit torches and other listed fire pieces act like a campfire (warmth, resting and the bed's fire check), and a torch in your hand warms you too. Rain, storms and cold biomes can make a held torch burn down faster.
 - Doors: nearby doors open as you walk up and close behind you, and stay open while other players are near. Optional toggle key. The server can turn automatic doors off for everyone.
+- Sleep / Sleep In Any Bed (the host decides, on by default): sleep in a bed another player has claimed. The hover shows the sleep prompt, and the game's time, enemy, roof, fire and wet checks apply. The bed keeps its owner and your spawn point does not change.
+- Each door kind has its own Open Distance and Close Distance. Defaults are 1.5 m and 2.25 m for doors, and 3 m and 4 m for drawbridges. A saved distance that still equals the older default moves to the new default once. A distance you set is kept.
+- Sleep / Preset and Doors / Preset are Vanilla, MeadWorksDefault, Relaxed or Custom. Choosing one applies that group's values immediately. Editing a member selects Custom. Loading does not replace saved values. The host or server owns the sleep preset. Each player owns the door preset, subject to server locks. [Preset values](docs/settings-presets.md).
+- Seasons, when Solstice is installed and its seasons are on: Night Length, Fuel Burn and Torch Heat (host or server, on by default). They use Solstice's night length, held-torch fuel drain and torch warmth. Missing or disabled seasons leave Ember's usual sleep and torch behavior. Placed-fire fuel stays Solstice's own rule.
 - Sleep, Torches and Doors each have their own on/off switch.
 
 ## Requirements
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.23 or a later 0.3.x, which includes Crucible.UI 0.3.16 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 
@@ -56,6 +60,8 @@ Version 0.5.5. Requires Crucible 0.3.23 / Crucible.UI 0.3.16. Changes are in [CH
 - Source: Corresponding Source for this exact version, free of charge: https://github.com/ExtraPotions/Meadworks/tree/main/Ember
 
 ## Changelog
+
+Sleep and automatic-door presets are documented in [Settings presets](docs/settings-presets.md).
 
 See the Changelog tab (CHANGELOG.md).
 

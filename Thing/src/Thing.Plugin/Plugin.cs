@@ -3,6 +3,7 @@
 using System;
 using BepInEx;
 using ExtraPotions.Meadworks.Crucible;
+using ExtraPotions.Thing.Admin;
 using ExtraPotions.Thing.Config;
 using ExtraPotions.Thing.Integration;
 using Jotunn.Managers;
@@ -58,6 +59,7 @@ namespace ExtraPotions.Thing.Runtime
                 Settings = ThingConfig.Bind(Config, log);
                 ThingText.Initialize(Info.Metadata, Logger);
                 ThingNotices.Initialize(log);
+                ThingPlayerFreeze.Initialize(log);
                 ThingServer.Initialize(log);
                 ThingPickup.Initialize(log);
                 Ready = true;
@@ -87,6 +89,9 @@ namespace ExtraPotions.Thing.Runtime
                 ThingTime.Initialize();
                 ThingChatMute.Initialize();
                 ThingHexAudit.Initialize(registration!);
+                ThingAccess.Initialize(log);
+                ThingInventory.Initialize(registration!, log);
+                registration!.AddCapability<Func<string, string, bool>>(AdminPermissions.CapabilityId, AdminPermissions.CapabilityVersion, ThingAccess.Allows);
                 // meadworks.admin.command: another product (Hex) runs a thing command through Thing's own admin, module and audit checks.
                 registration!.AddCapability<Func<string[], bool>>(ExtraPotions.Meadworks.Contracts.AdminCommandContract.Id,
                     ExtraPotions.Meadworks.Contracts.AdminCommandContract.ContractVersion, args => { new ThingCommand().Run(args); return true; });
@@ -108,6 +113,7 @@ namespace ExtraPotions.Thing.Runtime
             Settings?.Tick(UnityEngine.Time.unscaledTime);
             ThingModules.Tick(log);
             ThingNotices.Tick();
+            ThingPlayerFreeze.Tick();
             ThingServer.Tick();
             ThingTime.Tick();
             ThingRemoteCommands.Tick();
@@ -118,6 +124,7 @@ namespace ExtraPotions.Thing.Runtime
             ThingWard.Tick();
             ThingPickup.Tick();
             ThingPanel.Tick();
+            ThingInventory.Tick();
             if (Settings != null && Player.m_localPlayer != null && ThingModules.Active(ThingModule.WorldTools))
             {
                 if (MeadworksInput.Pressed(Settings.ShortcutValue(ThingSettings.Hotkeys.WardOverride))) ThingWard.Run(new[] { "ward" });
@@ -131,7 +138,7 @@ namespace ExtraPotions.Thing.Runtime
         {
             Ready = false;
             started = false;
-            foreach (Action stop in new Action[] { ThingPanel.Shutdown, ThingConfigFiles.Reset, ThingYamlFiles.Reset, ThingTeleportCommands.Shutdown, ThingChatMute.Shutdown, ThingTime.Shutdown, ThingPoi.Shutdown, ThingWard.Shutdown, ThingPickup.Shutdown, ThingDropCommands.Shutdown, ThingTerrainCommands.Shutdown, ThingRemoteCommands.Shutdown, ThingServer.Unload, ThingNotices.Shutdown, () => import?.Dispose(), ThingModules.Reset, ThingText.Shutdown })
+            foreach (Action stop in new Action[] { ThingPanel.Shutdown, ThingConfigFiles.Reset, ThingYamlFiles.Reset, ThingTeleportCommands.Shutdown, ThingChatMute.Shutdown, ThingTime.Shutdown, ThingPoi.Shutdown, ThingWard.Shutdown, ThingPickup.Shutdown, ThingDropCommands.Shutdown, ThingTerrainCommands.Shutdown, ThingInventory.Shutdown, ThingRemoteCommands.Shutdown, ThingServer.Unload, ThingNotices.Shutdown, ThingPlayerFreeze.Shutdown, () => import?.Dispose(), ThingModules.Reset, ThingText.Shutdown })
                 try { stop(); } catch (Exception error) { log?.Warning("Thing teardown: " + error.GetType().Name); }
             import = null;
             Settings?.Shutdown();

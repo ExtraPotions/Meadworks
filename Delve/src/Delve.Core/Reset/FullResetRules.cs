@@ -4,6 +4,8 @@
 // are Delve's own: never with a player inside, a tombstone inside postpones it (user decision Q2 a), a player piece
 // inside blocks it while Full Reset Build Clearance is on, never inside a player base.
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using ExtraPotions.Delve.Engine;
 
 namespace ExtraPotions.Delve.Reset
@@ -55,6 +57,33 @@ namespace ExtraPotions.Delve.Reset
         /// <summary>The generator stays (it is generated again in place), players and tombstones are never removed; everything else inside goes.</summary>
         public static WipeAction Wipe(bool isGenerator, bool isPlayer, bool isTombstone) =>
             isGenerator || isPlayer || isTombstone ? WipeAction.Keep : WipeAction.Remove;
+
+        /// <summary>
+        /// Generation either returns a replacement, or it does not. The old interior is removed only when the replacement
+        /// exists. A failed attempt removes whatever that attempt created and leaves the old ids.
+        /// </summary>
+        public readonly struct ResetCommit
+        {
+            private ResetCommit(bool removeOld, bool removeCreated)
+            {
+                RemoveOld = removeOld;
+                RemoveCreated = removeCreated;
+            }
+
+            public bool RemoveOld { get; }
+            public bool RemoveCreated { get; }
+
+            public static ResetCommit For(bool replacementReady) =>
+                replacementReady ? new ResetCommit(true, false) : new ResetCommit(false, true);
+
+            public static long[] Surviving(IReadOnlyList<long> oldIds, IReadOnlyList<long> createdIds, bool replacementReady)
+            {
+                if (oldIds == null) throw new ArgumentNullException(nameof(oldIds));
+                if (createdIds == null) throw new ArgumentNullException(nameof(createdIds));
+                var commit = For(replacementReady);
+                return (commit.RemoveCreated ? oldIds : createdIds).ToArray();
+            }
+        }
 
         /// <summary>
         /// The interior volume: centered on the generator's zone on the ground plane (as DungeonGenerator.Generate centers its

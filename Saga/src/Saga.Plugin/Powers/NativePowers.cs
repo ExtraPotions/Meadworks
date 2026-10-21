@@ -77,7 +77,7 @@ namespace ExtraPotions.Saga.Runtime {
             SaveKills(player,counts);if(all&&Read(player,Attunement.AttunedKey).Length==0&&Power(player.m_guardianPower,out var selected))Save(player,Attunement.Empty.Use(selected,Plugin.Settings!.Get(SagaSettings.Powers.MaxAttunedPowers)));
             player.m_customData[KillCounts.SeededKey]="1";player.m_customData[KillCounts.SeededKallKey]="1";
         }
-        public static void Tick(){if(Time.unscaledTime<next)return;next=Time.unscaledTime+.5f;var player=Player.m_localPlayer;
+        public static void Tick(){BossKillCredit.Poll();PowerWheelRuntime.Poll();if(Time.unscaledTime<next)return;next=Time.unscaledTime+.5f;var player=Player.m_localPlayer;
             if(current!=player){Remove(current);current=player;credited.Clear();DestroyHud();}
             if(player==null||!NativeSaga.Active("powers")||player.IsDead()){Remove(player);hud?.Update(false,false,1,1);RestoreNativeTooltip();return;}
             Seed(player);var state=Attuned(player);Save(player,state);
@@ -114,12 +114,12 @@ namespace ExtraPotions.Saga.Runtime {
             if(hud.Root.parent is RectTransform parent&&Hud.instance.m_gpRoot?.transform is RectTransform nativeRoot){var corners=new Vector3[4];nativeRoot.GetWorldCorners(corners);var at=parent.InverseTransformPoint(corners[1]);hud.SetPosition(new Vector2(at.x-parent.rect.xMin,parent.rect.yMax-at.y-hud.Root.rect.height-spacing));}
             hud.Update(shown.Length>0,Cursor.visible,1,.85f);foreach(var row in hudRows){bool recharging=player.m_guardianPowerCooldown>0;var mastery=MasteryText(player,row.Boss);var shownValue=recharging?PowerRecharge.TimeLeft(player.m_guardianPowerCooldown):mastery;row.Title.text=row.IconOnly?shownValue:BossLabel(row.Boss)+"  "+shownValue;row.Icon.color=recharging?new Color(.45f,.45f,.45f,1):Color.white;row.Icon.sprite=templates.TryGetValue(row.Boss,out var template)?template.m_icon:null;if(row.Details!=null)row.Details.text=string.Join(", ",Effects(player,row.Boss).Select(EffectText));KitTooltip.Set(row.Root,BossLabel(row.Boss),Tooltip(player,row.Boss)+(recharging?"\n"+RechargeText(player):""));}
         }
-        static void Credit(Character character){if(!NativeSaga.Active("powers")||character.m_nview==null||!character.m_nview.IsValid()||!character.m_nview.IsOwner())return;var name=Utils.GetPrefabName(character.gameObject);var boss=bosses.FirstOrDefault(p=>p.Value==name).Key;if(boss==null)return;
-            var id=character.m_nview.GetZDO().m_uid;var range=Plugin.Settings!.Get(SagaSettings.Powers.KillCreditRange);foreach(var player in Player.GetAllPlayers()){if(player==null||player.IsDead()||range>0&&Vector3.Distance(character.transform.position,player.transform.position)>range)continue;var view=player.m_nview;if(view==null||!view.IsValid())continue;if(player==Player.m_localPlayer)Receive(player,boss,id);else {var packet=new ZPackage();packet.Write(boss);packet.Write(id);view.InvokeRPC(view.GetZDO().GetOwner(),"saga.BossKill",packet);}}
-        }
-        static void Receive(Player player,string boss,ZDOID id){if(!NativeSaga.Active("powers")||player!=Player.m_localPlayer||!bosses.ContainsKey(boss)||!credited.Add(id))return;var counts=Kills(player);counts[boss]=(int)Math.Min(int.MaxValue,(long)(counts.TryGetValue(boss,out var old)?old:0)+1);SaveKills(player,counts);next=0;}
-        [HarmonyPatch(typeof(Character),nameof(Character.OnDeath))]static class Died {static void Prefix(Character __instance)=>Credit(__instance);}
-        [HarmonyPatch(typeof(Player),nameof(Player.Awake))]static class Rpc {static void Postfix(Player __instance){var view=__instance.m_nview;if(view==null||!view.IsValid())return;view.Register<ZPackage>("saga.BossKill",(sender,packet)=>{if(__instance!=Player.m_localPlayer||!view.IsOwner())return;try{var boss=packet.ReadString();var id=packet.ReadZDOID();var zdo=ZDOMan.instance?.GetZDO(id);if(zdo==null||zdo.GetOwner()!=sender||!bosses.TryGetValue(boss,out var prefab)||zdo.GetPrefab()!=prefab.GetStableHashCode())return;Receive(__instance,boss,id);}catch(Exception e){NativeSaga.Report(e,"boss credit");}});NativeRpcCleanup.Track(view,"saga.BossKill");}}
+        internal static bool KnownBossPrefab(string prefab,out string boss){boss="";if(string.IsNullOrEmpty(prefab))return false;foreach(var pair in bosses)if(pair.Value==prefab){boss=pair.Key;return true;}return false;}
+        internal static bool KnownBossHash(int hash,out string boss){boss="";foreach(var pair in bosses)if(pair.Value.GetStableHashCode()==hash){boss=pair.Key;return true;}return false;}
+        internal static bool IsKnownBoss(string boss)=>!string.IsNullOrEmpty(boss)&&bosses.ContainsKey(boss);
+        internal static bool AlreadyCredited(ZDOID id)=>credited.Contains(id);
+        internal static void ApplyKill(string boss,ZDOID id){var player=Player.m_localPlayer;if(!NativeSaga.Active("powers")||player==null||!bosses.ContainsKey(boss)||!credited.Add(id))return;var counts=Kills(player);counts[boss]=(int)Math.Min(int.MaxValue,(long)(counts.TryGetValue(boss,out var old)?old:0)+1);SaveKills(player,counts);next=0;}
+        [HarmonyPatch(typeof(Character),nameof(Character.OnDeath))]static class Died {static void Prefix(Character __instance)=>BossKillCredit.Report(__instance);}
         [HarmonyPatch(typeof(ItemStand),nameof(ItemStand.Interact))]static class Stone {
             static bool Prefix(ItemStand __instance,Humanoid user,bool hold,ref bool __result){if(!NativeSaga.Active("powers")||hold||!(user is Player player)||player!=Player.m_localPlayer||!__instance.HaveAttachment()||!Power(__instance.m_guardianPower?.name??"",out var boss))return true;var preview=Attuned(player).Preview(boss,Plugin.Settings!.Get(SagaSettings.Powers.MaxAttunedPowers));Save(player,Attuned(player).Use(boss,Plugin.Settings.Get(SagaSettings.Powers.MaxAttunedPowers)));player.SetGuardianPower(__instance.m_guardianPower.name);player.Message(MessageHud.MessageType.Center,preview.Kind==AttuneKind.Release?SagaText.Format("power_release",BossLabel(boss)):preview.Kind==AttuneKind.Replace?SagaText.Format("power_replace",BossLabel(preview.Replaced!.Value),BossLabel(boss)):SagaText.Format("power_attune",BossLabel(boss)));next=0;__result=true;return false;}
         }
@@ -144,7 +144,24 @@ namespace ExtraPotions.Saga.Runtime {
                 __result+="\n"+GameLocalization.instance.Localize(AltUse)+(preview.Kind==AttuneKind.Release?SagaText.Format("power_release",BossLabel(Boss.Kall)):preview.Kind==AttuneKind.Replace?SagaText.Format("power_replace",BossLabel(preview.Replaced!.Value),BossLabel(Boss.Kall)):SagaText.Format("power_attune",BossLabel(Boss.Kall)))+"\n"+Tooltip(player,Boss.Kall);}
         }
         static bool OwnPowers(Player player)=>player==Player.m_localPlayer&&player.m_nview!=null&&player.m_nview.IsValid()&&player.m_nview.IsOwner()&&NativeSaga.Active("powers");
-        static StatusEffect[] ActivationSources(Player player)=>Attuned(player).Attuned.Reverse().Select(PowerSource).Where(source=>source!=null).Cast<StatusEffect>().ToArray();
+        static StatusEffect[] ActivationSources(Player player){
+            var sources=Attuned(player).Attuned.Reverse().Select(PowerSource).Where(source=>source!=null).Cast<StatusEffect>().ToArray();
+            var names=PowerWheelRules.ActivationOrder(Plugin.Settings!.Get(SagaSettings.Powers.ActivateAllAttuned),player.m_guardianPower,sources.Select(source=>source.name).ToArray());
+            if(names.Count==sources.Length)return sources;
+            return names.Select(name=>sources.First(source=>string.Equals(source.name,name,StringComparison.OrdinalIgnoreCase))).ToArray();
+        }
+        internal static Boss[] WheelBosses(Player player)=>Attuned(player).Attuned.ToArray();
+        internal static string WheelLabel(Boss boss)=>BossLabel(boss);
+        internal static Sprite WheelIcon(Boss boss)=>PowerIcon(boss)!;
+        internal static bool WheelCanActivate(Boss boss)=>PowerSource(boss)!=null;
+        internal static bool TrySelectWheel(Player player,Boss boss){
+            if(player!=Player.m_localPlayer||!NativeSaga.Active("powers")||Plugin.Settings!.Get(SagaSettings.Powers.ActivateAllAttuned)||!Attuned(player).Attuned.Contains(boss))return false;
+            var source=PowerSource(boss);
+            if(source==null){player.Message(MessageHud.MessageType.Center,SagaText.Format("power_wheel_unavailable",BossLabel(boss)));return false;}
+            player.SetGuardianPower(source.name);
+            player.Message(MessageHud.MessageType.Center,SagaText.Format("power_wheel_selected",BossLabel(boss)));
+            return true;
+        }
         [HarmonyPatch(typeof(Player),nameof(Player.StartGuardianPower))]static class BlockStart {
             static bool Prefix(Player __instance,ref bool __result){if(!OwnPowers(__instance))return true;if(__instance.IsDead()||Plugin.Settings!.Get(SagaSettings.Powers.BlockPowerActivation)){__result=false;return false;}var sources=ActivationSources(__instance);if(sources.Length==0){__result=false;return false;}__instance.SetGuardianPower(sources[0].name);return true;}
         }
@@ -158,7 +175,7 @@ namespace ExtraPotions.Saga.Runtime {
                 finally{cooldown=PowerRecharge.Shared(cooldown,__instance.m_guardianPowerCooldown);activatingExtras=false;__instance.m_adrenalineGuardianPower=adrenaline;try{__instance.SetGuardianPower(selected);}finally{__instance.m_guardianPowerCooldown=cooldown;}}
             }
         }
-        public static void Shutdown(){Remove(current);current=null;foreach(var template in templates.Values)UnityEngine.Object.Destroy(template);templates.Clear();credited.Clear();DestroyHud();RestoreNativeTooltip();if(Hud.instance!=null&&Player.m_localPlayer!=null)Hud.instance.UpdateGuardianPower(Player.m_localPlayer);next=0;}
+        public static void Shutdown(){BossKillCredit.Clear();PowerWheelRuntime.Shutdown();Remove(current);current=null;foreach(var template in templates.Values)UnityEngine.Object.Destroy(template);templates.Clear();credited.Clear();DestroyHud();RestoreNativeTooltip();if(Hud.instance!=null&&Player.m_localPlayer!=null)Hud.instance.UpdateGuardianPower(Player.m_localPlayer);next=0;}
     }
     public sealed class SagaPowerEffect:SE_Stats {
         public Boss Boss;

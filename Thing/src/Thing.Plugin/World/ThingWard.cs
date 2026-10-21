@@ -96,7 +96,7 @@ namespace ExtraPotions.Thing.Runtime
             var id = context.IsLocal ? "host" : peer?.m_socket?.GetHostName() ?? "";
             var admin = context.IsLocal || (context.IsAdmin && id.Length > 0 && net.IsAdmin(id));
             var role = net.IsDedicated() ? ThingRole.DedicatedServer : net.GetPeers().Count > 0 ? ThingRole.Host : ThingRole.SinglePlayer;
-            var verdict = AdminCheck.Decide(ThingAction.WardOverride, new RequestFacts(role, context.IsLocal, admin, false), Plugin.Settings.Rules());
+            var verdict = AdminCheck.Decide(ThingAction.WardOverride, new RequestFacts(role, context.IsLocal, admin, false, granted: admin ? AdminRight.None : ThingAccess.Of(id)), Plugin.Settings.Rules());
             if (!AdminCheck.Permits(verdict)) { context.MarkDecisionMade(); Revoke(id); return OperationExecution<IReadOnlyList<string>>.Success(new[] { "off", request[1], AdminCheck.TextKey(verdict) }); }
             if (!Resolve(id, peer, out var player) || CharacterId(player!) != request[1])
             { context.MarkDecisionMade(); Revoke(id); return OperationExecution<IReadOnlyList<string>>.Success(new[] { "off", request[1], "ward_unavailable" }); }
@@ -146,7 +146,7 @@ namespace ExtraPotions.Thing.Runtime
                 foreach (var id in grants.Prune(id => Plugin.Settings != null && Plugin.Settings.Get(ThingSettings.World.WardOverrideAllowed)
                     && ThingServer.Active && ThingModules.ProductActive(out _) && bindings.TryGetValue(id, out var binding)
                     && binding.Generation == currentGeneration
-                    && (binding.Peer == null || ZNet.instance.IsAdmin(id)) && Resolve(id, binding.Peer, out var player)
+                    && (binding.Peer == null || ZNet.instance.IsAdmin(id) || ThingAccess.Has(id, AdminRight.Ward)) && Resolve(id, binding.Peer, out var player)
                     && CharacterId(player!) == binding.Character && player!.GetPlayerID() == binding.PlayerId))
                 {
                     bindings.Remove(id);

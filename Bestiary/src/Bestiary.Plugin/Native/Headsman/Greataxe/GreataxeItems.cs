@@ -90,7 +90,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Headsman
             shared.m_damagesPerLevel = new HitData.DamageTypes();
         }
 
-        /// <summary>After a settings change: the damage on the prefab (every greataxe shares its data) and the recipe.</summary>
+        /// <summary>After a settings change: the damage on the prefab. Existing greataxes copy it from there. The recipe follows.</summary>
         public static void Reapply()
         {
             if (Axe != null)

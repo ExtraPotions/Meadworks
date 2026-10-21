@@ -30,6 +30,7 @@ namespace ExtraPotions.Saga.Runtime
 
         private ProductRegistration? registration;
         private MeadworksLog? log;
+        private SagaPresetRuntime? presets;
 
         /// <summary>Registered with Crucible and running.</summary>
         public static bool Ready { get; private set; }
@@ -51,6 +52,7 @@ namespace ExtraPotions.Saga.Runtime
                     new System.Version(0, 1), new System.Version(0, 1), MultiplayerPolicy.RequiredOnAllPeers, Family));
                 AllowsUi = MeadworksHeadless.AllowsUi;
                 Settings = SagaConfig.Bind(Config, log);
+                presets = new SagaPresetRuntime(Config, Settings, log);
                 Adopted.Grindstone.NativeSaga.Initialize(Logger);
                 SagaConverter.Initialize(Config);
                 PowerCommands.Initialize(registration);
@@ -71,11 +73,18 @@ namespace ExtraPotions.Saga.Runtime
 
         private void OnDestroy() => Shutdown();
         private void Start(){if(Ready)try{Adopted.Grindstone.NativeSaga.Start();}catch(Exception error){log?.Error("Saga modules rejected: "+error);Shutdown();}}
-        private void Update(){if(Ready)Adopted.Grindstone.NativeSaga.Tick();}
+        private void Update()
+        {
+            if (!Ready) return;
+            presets?.Tick();
+            Adopted.Grindstone.NativeSaga.Tick();
+        }
 
         private void Shutdown()
         {
             Ready = false;
+            presets?.Dispose();
+            presets = null;
             Adopted.Grindstone.NativeSaga.Shutdown();
             SagaConverter.Shutdown();
             PowerCommands.Shutdown();

@@ -1,5 +1,7 @@
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks). SPDX-License-Identifier: GPL-3.0-or-later
 // Meadworks-original: the Join Game attachment follows Cairn's owned native-navigation baseline.
+using System.Collections.Generic;
+using ExtraPotions.Beacon.Servers;
 using ExtraPotions.Meadworks.Crucible.UI;
 using HarmonyLib;
 using UnityEngine;
@@ -104,23 +106,36 @@ namespace ExtraPotions.Beacon.Runtime
         static bool Input() => BeaconPanel.Window?.IsOpen != true;
 
         /// <summary>
-        /// The game's own keyboard path calls the move with no selected favorite (index -1) whenever S is pressed on the Favorites
-        /// tab; the swap would throw. A move whose rows are not both in the list is skipped; every valid move runs unchanged.
+        /// The game moves a favorite by its row in the filtered list but swaps by that number in the full favorites list:
+        /// with nothing selected (its S key passes -1) the swap throws, and with a filter typed it swaps the wrong pair.
+        /// The selected row and its visible neighbor are found in the full list by join data and swapped there; entries the
+        /// filter hides keep their places. A move without a valid pair is skipped. Unfiltered moves run the game's own code.
         /// </summary>
         [HarmonyPatch(nameof(ServerListGui.OnMoveServerUpButton)), HarmonyPrefix]
-        static bool Up(ServerListGui __instance) => Movable(__instance, -1);
+        static bool Up(ServerListGui __instance) => Move(__instance, -1);
 
         [HarmonyPatch(nameof(ServerListGui.OnMoveServerDownButton)), HarmonyPrefix]
-        static bool Down(ServerListGui __instance) => Movable(__instance, 1);
+        static bool Down(ServerListGui __instance) => Move(__instance, 1);
 
-        static bool Movable(ServerListGui gui, int offset)
+        static readonly List<int> VisibleToFull = new List<int>();
+
+        static bool Move(ServerListGui gui, int offset)
         {
             try
             {
-                var index = gui.GetSelectedServer(); var count = gui.m_favoriteServersList.Count;
-                return index >= 0 && index < count && index + offset >= 0 && index + offset < count;
+                var favorites = gui.m_favoriteServersList; var visible = gui.CurrentServerListFiltered;
+                VisibleToFull.Clear();
+                foreach (var row in visible) VisibleToFull.Add(favorites.TryGetIndexOf(row.m_joinData, out var index) ? index : -1);
+                var selected = gui.GetSelectedServer();
+                if (!FavoriteMove.Resolve(VisibleToFull, favorites.Count, selected, offset, out var from, out var to)) return false;
+                if (from == selected && to == selected + offset) return true;
+                favorites.Swap(from, to);
+                gui.m_filteredListOutdated = true;
+                gui.UpdateServerListGui(centerSelection: true);
+                return false;
             }
-            catch { return true; }
+            catch { return false; }
+            finally { VisibleToFull.Clear(); }
         }
     }
 }

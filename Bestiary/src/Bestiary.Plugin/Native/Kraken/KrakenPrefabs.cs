@@ -29,7 +29,11 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Kraken
 
         public static void Install(Harmony harmony)
         {
-            NetPrefabs.OnSceneAwake(harmony, scene => Guard.Run("KrakenPrefabs.Build", () => Build(scene, harmony)));
+            NetPrefabs.OnSceneAwake(harmony, scene =>
+            {
+                Guard.Run("KrakenPrefabs.Build", () => Build(scene, harmony));
+                Guard.Run("KrakenBoss.Bind", KrakenBoss.Bind);
+            });
             Settings.Changed += () => SafeCall.Run("kraken settings", Reapply);
         }
 

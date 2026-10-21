@@ -10,10 +10,11 @@ namespace ExtraPotions.Thing.Admin
     /// <summary>Every Thing admin action (design 1.1 rows A, B, C and D). The order is the catalog order.</summary>
     public enum ThingAction
     {
-        ListPlayers, Kick, Ban, TempBan, Unban, PermitAdd, PermitRemove, TeleportTo, Bring, Mute, Unmute, Warn, AuditView,
+        ListPlayers, Kick, Ban, TempBan, Unban, PermitAdd, PermitRemove, TeleportTo, Bring, Mute, Unmute, FreezePlayer, UnfreezePlayer, Warn, AuditView,
         AdminListView, AdminListEdit, Broadcast, MessageOfTheDay, Announcements, Shutdown, CancelShutdown, SaveWorld,
         GlobalTime, ReleaseTime, ResetDungeons, ResetResources, RegenerateNature, RegenerationPage, TerrainReset, RemoveDrops,
         WardOverride, ShowSeed, PoiService, RemoteConfigRead, RemoteConfigWrite, HexSpawn, PermitListView,
+        GrantEdit, InventoryView, InventoryTake, InventoryDelete,
     }
 
     /// <summary>The admin window's pages (design 9).</summary>
@@ -76,6 +77,8 @@ namespace ExtraPotions.Thing.Admin
             I(ThingAction.Bring, "bring", AdminPage.People, others: true, vat: true),
             I(ThingAction.Mute, "mute", AdminPage.People, others: true),
             I(ThingAction.Unmute, "unmute", AdminPage.People, others: true),
+            I(ThingAction.FreezePlayer, "freeze", AdminPage.People, others: true),
+            I(ThingAction.UnfreezePlayer, "unfreeze", AdminPage.People, others: true),
             I(ThingAction.Warn, "warn", AdminPage.People, others: true),
             I(ThingAction.AuditView, "audit", AdminPage.ModerationLog),
             I(ThingAction.AdminListView, "admins", AdminPage.People),
@@ -101,6 +104,10 @@ namespace ExtraPotions.Thing.Admin
             I(ThingAction.RemoteConfigWrite, "set", AdminPage.ServerConfig, destructive: true, gate: ActionGate.RemoteConfigEditing),
             I(ThingAction.HexSpawn, "hex-spawn", AdminPage.ModerationLog),
             I(ThingAction.PermitListView, "permitted", AdminPage.People),
+            I(ThingAction.GrantEdit, "grant", AdminPage.People),
+            I(ThingAction.InventoryView, "inv-view", AdminPage.People, others: true),
+            I(ThingAction.InventoryTake, "inv-take", AdminPage.People, others: true),
+            I(ThingAction.InventoryDelete, "inv-delete", AdminPage.People, others: true),
         });
 
         static readonly Dictionary<ThingAction, ActionInfo> byAction = All.ToDictionary(i => i.Action);

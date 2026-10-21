@@ -4,7 +4,8 @@
 // Changed by expDARE, 2026: Inscribe namespace; Crucible configuration, session and lifecycle boundaries.
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
+using ExtraPotions.Meadworks.Crucible;
+using ExtraPotions.Inscribe.Adopted.Core;
 
 namespace ExtraPotions.Inscribe.Adopted.Items
 {
@@ -17,8 +18,8 @@ namespace ExtraPotions.Inscribe.Adopted.Items
     {
         private static readonly Dictionary<string, AppliedLook> Applied = new Dictionary<string, AppliedLook>();
 
-        /// <summary>No graphics device: a dedicated server. The game's own check (ZNet.IsDedicated is always false in this build).</summary>
-        public static bool Headless { get; } = SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null;
+        /// <summary>Crucible's null-graphics or batch-mode server check.</summary>
+        public static bool Headless => MeadworksHeadless.IsHeadless;
 
         /// <summary>The tint of a rune id; white when the id is unknown.</summary>
         public static Color Tint(string? stoneId) => StoneTints.TryById(stoneId, out Color tint) ? tint : Color.white;
@@ -40,6 +41,18 @@ namespace ExtraPotions.Inscribe.Adopted.Items
             {
                 return;
             }
+            try
+            {
+                ApplyLook(entry);
+            }
+            catch (System.Exception error)
+            {
+                Log.Warn($"Rune visual unavailable for {entry.PrefabName}; keeping the registered item: {error.Message}");
+            }
+        }
+
+        private static void ApplyLook(StoneEntry entry)
+        {
             entry.Look ??= new StoneLook(entry.Prefab);
             Color? tint = StoneTints.TryByPrefab(entry.PrefabName, out Color t) ? t : (Color?)null;
             AppliedLook? last = Applied.TryGetValue(entry.PrefabName, out AppliedLook found) ? found : null;

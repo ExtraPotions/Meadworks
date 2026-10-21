@@ -34,6 +34,21 @@ namespace ExtraPotions.Wildroot.Runtime {
   internal static void Write(ZDO zdo,long planter,float level){zdo.Set(PlanterHash,planter);zdo.Set(LevelHash,level);}
  }
 
+ /// <summary>
+ /// Marks a pickable a player places (stones, berries, mushrooms from the cultivator) with the shared ZDO bool
+ /// <c>meadworks.pickable.planted</c>, so skill mods can tell it from a wild one without depending on Wildroot (Saga
+ /// gives it reduced Foraging experience). The key lives on the pickable's own ZDO, which keeps it through picks,
+ /// respawns and world saves. Pickables placed before this key existed carry only the game's piece creator.
+ /// </summary>
+ internal static class PlantedPickable {
+  internal const string Key="meadworks.pickable.planted";
+  internal static void Mark(Piece piece){
+   if(!piece||!piece.GetComponent<Pickable>())return;
+   var view=piece.GetComponent<ZNetView>();if(!view||!view.IsValid()||!view.IsOwner())return;
+   view.GetZDO().Set(Key,true);
+  }
+ }
+
  /// <summary>A plant that grows into a pickable crop, with the items that set its experience tier.</summary>
  internal sealed class CropInfo {
   internal string Plant="";internal Plant Prefab=null!;internal Piece? Piece;internal string Pickable="";

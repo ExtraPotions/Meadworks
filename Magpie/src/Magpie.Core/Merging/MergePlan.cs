@@ -72,7 +72,8 @@ namespace ExtraPotions.Magpie.Merging
 
         public IReadOnlyList<MergeStep> Steps => steps;
 
-        /// <summary>The phase 1 intent record, once the source carries its token.</summary>
-        public MergeIntent Intent(string sourceToken) => new MergeIntent(Nonce, sourceToken, Moved, WorldTime);
+        /// <summary>The phase 1 intent, including the pre-merge count and whether the source is removed.</summary>
+        public MergeIntent Intent(string sourceToken) =>
+            new MergeIntent(Nonce, sourceToken, Moved, WorldTime).WithBaseline(Target.Stack, DestroysSource);
     }
 }

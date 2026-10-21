@@ -14,7 +14,7 @@ namespace ExtraPotions.Wildroot.Runtime {
  /// <see cref="WildrootSettings.ScopeOf"/>, server-owned settings are read-only for non-administrators in configuration
  /// managers (C03), and the one cheat is bound through <c>BindCheat</c> with its safe value and Mischief category.
  /// </summary>
- public sealed class WildrootConfig {
+ public sealed partial class WildrootConfig:IDisposable {
   readonly Dictionary<string,ConfigEntryBase> entries=new Dictionary<string,ConfigEntryBase>(StringComparer.Ordinal);
   readonly Dictionary<string,ConfigScope> scopes=new Dictionary<string,ConfigScope>(StringComparer.Ordinal);
   readonly Dictionary<string,string> aliases=new Dictionary<string,string>(StringComparer.Ordinal);
@@ -38,11 +38,7 @@ namespace ExtraPotions.Wildroot.Runtime {
   public WildrootConfig(ConfigFile file,string assetDirectory){
    this.file=file;bool upgradeShortcuts=false;
    MeadworksConfig.EnsureSchema(file,WildrootSettings.SchemaVersion,new[]{new MigrationStep(0,1,()=>{}),new MigrationStep(1,2,()=>upgradeShortcuts=true)});
-   file.SettingChanged+=(_,e)=>{
-    // A same-frame master-switch or cheat amendment must invalidate the cached authority decision immediately.
-    decidedFrame=-1;placementFrame=-2;Revision++;
-    Changed?.Invoke(e.ChangedSetting.Definition.Section+"."+e.ChangedSetting.Definition.Key);
-   };
+   file.SettingChanged+=OnFileSettingChanged;
    var mapping=JObject.Parse(System.IO.File.ReadAllText(Path.Combine(assetDirectory,"config","import-mapping.json")));
    if(mapping.Value<int>("schema")!=1)throw new NotSupportedException("Unsupported import mapping schema");
    foreach(var token in (JArray)mapping["rules"]!){var obj=(JObject)token;if(obj.Value<bool>("metadataOnly"))continue;string id=obj.Value<string>("target")!;if(WildrootSettings.Superseded.ContainsKey(id))continue;aliases.Add(obj.Value<string>("source")!,id);if(entries.ContainsKey(id))continue;
@@ -74,9 +70,17 @@ namespace ExtraPotions.Wildroot.Runtime {
    ImportConflictChoices=Bind("Import","ConflictChoices","",null,"Conflict choices for the import, as Target=SourceSetting pairs separated by semicolons.");Add("Import.ConflictChoices",ImportConflictChoices);
    ImportBindingOverrides=Bind("Import","BindingOverrides","",null,"Replacement shortcuts for import collisions, as Target=Key pairs separated by semicolons.");Add("Import.BindingOverrides",ImportBindingOverrides);
    BindFarming();
+   BindPresets();
    if(upgradeShortcuts)UpgradeShortcuts();
    foreach(var pair in entries)if(scopes[pair.Key]!=ConfigScope.Local)MeadworksBlockedOptions.Track(WildrootSettings.ProductId,pair.Value,scopes[pair.Key]);
   }
+  void OnFileSettingChanged(object sender,SettingChangedEventArgs e){
+   // A same-frame master-switch or cheat amendment must invalidate the cached authority decision immediately.
+   decidedFrame=-1;placementFrame=-2;Revision++;
+   string changed=e.ChangedSetting.Definition.Section+"."+e.ChangedSetting.Definition.Key;
+   ObservePreset(changed);Changed?.Invoke(changed);
+  }
+  public void Dispose(){file.SettingChanged-=OnFileSettingChanged;file.ConfigReloaded-=OnPresetReloaded;presetChanges.Clear();presetsReady=false;}
   /// <summary>Farming skill settings (#12, #64, #65, #108) and seed recipes (#31). Server-owned except the two personal switches.</summary>
   void BindFarming(){
    var percent=new AcceptableValueRange<float>(0f,100f);var levels=new AcceptableValueRange<int>(0,101);

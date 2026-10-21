@@ -12,7 +12,8 @@
 // by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See
 // THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt and licenses/GPL-3.0.txt.
 //
-// Changed by expDARE, 2026: namespace Keel.Sailing; Unity-free; the
+// Changed by expDARE, 2026: ShipCall accepts a networked Wind Call only from the player steering that ship, and a Lookout
+// pulse only from a player aboard it. Namespace Keel.Sailing; Unity-free; the
 // cooldown is an object per ability and player instead of a static field; refusals are reasons for Keel's C05 texts
 // instead of English strings; the ZDO reads and writes stay in the plugin; the announcement choice, the lookout target
 // test and the ring radius are pure functions of their inputs so they are testable.
@@ -116,6 +117,16 @@ namespace ExtraPotions.Keel.Sailing
     }
 
     public enum WindAnnouncement { Self, ByName, Everyone }
+
+    /// <summary>Who may apply a ship RPC. The caller id is the resolved peer, not the number in the packet.</summary>
+    public static class ShipCall
+    {
+        public static bool MayCallWind(long senderPlayerId, bool aboard, bool controlling) =>
+            senderPlayerId != 0L && aboard && controlling;
+
+        public static bool MayPulseLookout(long senderPlayerId, bool aboard) =>
+            senderPlayerId != 0L && aboard;
+    }
 
     /// <summary>The lookout pulse: which creatures it reveals and how its ring spreads.</summary>
     public static class LookoutRules

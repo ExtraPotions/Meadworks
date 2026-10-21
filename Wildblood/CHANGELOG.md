@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.4 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Seasonal Meat and Seasonal Wood (on by default, set by the host or server): while Solstice seasons are on, meat and hide from creatures, and wood from trees, follow that season's published rate. Spring and summer drop less, fall and winter drop more, between one quarter and three times the usual amount. One item stays one item. Trophies and other drops stay as they are. Off, or without Solstice, drops stay as they are. Creature stars are unchanged.
+- Raids: extra stars stop at that biome's difficulty cap. They no longer stop at a fixed 8.
+- A player who just joined no longer rolls nearby creatures, or applies their stats, from that player's own rules before the server's rules arrive. The creatures stay as the game spawned them until that package is in, then use the server's rules.
+- Flamebound burning ground burns through armor. Fire resistance and being wet still reduce it.
+- Tamed Stars (on by default, set by the server) changes new births only. On: a newborn may inherit stars, and Shepherd follows this. Off: a newborn keeps its parent's level, as the game does, and no bonus star is added. Taming never removes stars, health, or mutations. A creature an older build left at the game's level gets its stored stars back the next time it loads.
+- Tamed Keep Traits off: young born while it is off inherit no mutation. Traits already stored on a tame stay stored.
+
+## 0.5.3 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- Theft history no longer grows forever. When a character loads into a world with more than 64 settled thefts, Wildblood keeps the newest 32 and removes the older ones from its theft journal, their two saved receipts from the character, and any leftover world row. It removes nothing while any theft is still waiting for an answer, a refund or a confirmed character save. Journal records go first and receipts after, through a verified copy, so a pass interrupted by a crash or power loss is finished safely on the next load. One log line reports the counts. Before, each character could record about 4,096 thefts per world; after that, thieves could no longer steal from that character.
+
 ## 0.5.2 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

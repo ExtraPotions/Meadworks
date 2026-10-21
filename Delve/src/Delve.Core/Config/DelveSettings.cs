@@ -127,7 +127,7 @@ namespace ExtraPotions.Delve.Config
             public static readonly DelveSetting<bool> ResetOpened = DelveSetting.Toggle(Section, "Reset Opened", true, ServerAuthoritative,
                 "On: an opened chest refills after the delay even with leftovers inside, which are replaced. Off: only empty chests are on a clock.");
             public static readonly DelveSetting<bool> RestockLoaded = DelveSetting.Toggle(Section, "Restock Loaded", true, ServerAuthoritative,
-                "Refill chests a player has loaded too, unless someone has the chest open. Chests near a base are loaded most of the time.");
+                "On: the delay keeps running while a player has the chest loaded, and the new contents are written on the first check after the chest unloads. Off: a loaded chest is left alone until it unloads, and the delay starts then. Contents are never replaced while a loaded copy is still in memory.");
             public static readonly DelveSetting<bool> DryRun = DryRunOf(Section, "Chest Dry Run");
             public static readonly DelveSetting<string> Exclude = DelveSetting.Text(Section, "Exclude", DefaultExclude, ServerAuthoritative,
                 "Chest prefabs never refilled, separated by commas (Hildir's quest chests by default). Changes apply at the next chest check or observation without restarting.", NormalizeList);

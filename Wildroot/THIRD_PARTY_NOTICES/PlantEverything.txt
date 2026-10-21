@@ -1,9 +1,9 @@
 PlantEverything PlaceAnywhere lifecycle source
 
-Upstream project: AdvizeGH/Advize_ValheimMods, PlantEverything 1.21.3
+Upstream project: AdvizeGH/Advize_ValheimMods, PlantEverything 1.21.4
 Official source: https://github.com/AdvizeGH/Advize_ValheimMods
-Frozen commit: 1deeb3962eb8681394961b0f35a4dfbc315c6f99
-Frozen archive: https://github.com/AdvizeGH/Advize_ValheimMods/archive/1deeb3962eb8681394961b0f35a4dfbc315c6f99.zip
+Frozen commit: 864defe2f471f3c10e0ddd8237fc8fee74190433
+Frozen archive: https://github.com/AdvizeGH/Advize_ValheimMods/archive/864defe2f471f3c10e0ddd8237fc8fee74190433.zip
 Upstream license: GNU General Public License, version 3. The exact upstream
 LICENSE is preserved alongside this notice as PlantEverything-GPL-3.0.txt.
 Upstream assembly notice: Copyright © 2021
@@ -17,6 +17,12 @@ Source files used:
   Advize_PlantEverything/Framework/PluginInitUtils.cs (InitSaplings and InitModdedSaplings)
   Advize_PlantEverything/Patches/ModInitPatches.cs (TreeBase sapling classification)
   Advize_PlantEverything/Framework/StaticContent.cs (explicit fixed-ground entries)
+
+The patch files above, and the fixed-ground entries in StaticContent.cs, are
+byte-identical at the previous pin 1deeb3962eb8681394961b0f35a4dfbc315c6f99
+(PlantEverything 1.21.3). StaticContent.cs crop and Timberwood biome
+assignments changed in 1.21.4 and are not copied. Those mask values live in
+src/Wildroot.Core/Catalog/ReferenceTraits.cs.
 
 Wildroot adaptation:
   src/Wildroot.Plugin/Adopted/PlaceAnywhere.cs

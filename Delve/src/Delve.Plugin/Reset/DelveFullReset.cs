@@ -2,8 +2,9 @@
 // Meadworks-original: the full dungeon reset runtime (design C1, D4, DV09). Behavior from MoreDungeonResets' README and
 // config only (behavior reference; nothing of it is read or copied). Dungeons whose type is Full in Delve.Dungeons.yml
 // are tracked: a player inside restarts the clock, players at the entrance and inside are warned, and once due with every
-// guard clear the interior is wiped and the dungeon generated again on the authority the way the game generates a zone
-// it has not loaded (ghost spawning), so the new rooms use the current room counts. The DV01b probe is accepted (user
+// guard clear a replacement is generated first. The old interior is removed only after that generation returns a ZDO.
+// If it does not, the pieces created by that attempt are removed and the old dungeon stays. Generation uses ghost spawning,
+// the way the game generates a zone it has not loaded, so the new rooms use the current room counts. The DV01b probe is accepted (user
 // decision 2026-10-10), so resets run live unless Full Reset Dry Run or Dry Run All is on.
 // A citadel's reset also places the Queen in her room when the new rooms did not bring her, and locks its sealed door
 // again (Close Sealed Door), as the Queen's return does.
@@ -262,12 +263,29 @@ namespace ExtraPotions.Delve.Runtime
                         + (now ? " (regenerate now)" : ""), true);
                     continue;
                 }
-                foreach (var z in wipe) DelveWorld.Remove(z);
-                var fresh = Regenerate(generator);
-                if (fresh != null) pendingVisits[fresh.m_uid] = e.Now;
-                string citadel = fresh != null ? Citadel(e, site.Name, fresh, box, new HashSet<ZDOID>(wipe.Select(z => z.m_uid))) : "";
+                var fresh = Regenerate(generator, out var created);
+                var commit = FullResetRules.ResetCommit.For(fresh != null);
+                if (commit.RemoveCreated)
+                {
+                    RemoveIds(created);
+                    e.Record(DelveKind.FullReset, "left " + site.Name + " at (" + at.x.ToString("0") + ", " + at.z.ToString("0")
+                        + ") in place; generation failed (see the log)" + (now ? " (regenerate now)" : ""), false);
+                    continue;
+                }
+                if (commit.RemoveOld)
+                {
+                    foreach (var z in wipe)
+                    {
+                        if (z == null || created.Contains(z.m_uid) || z.m_uid == fresh!.m_uid) continue;
+                        RemoveOne(z);
+                    }
+                    var previous = ZDOMan.instance.GetZDO(generator.m_uid);
+                    if (previous != null && previous.m_uid != fresh!.m_uid) RemoveOne(previous);
+                }
+                pendingVisits[fresh!.m_uid] = e.Now;
+                string citadel = Citadel(e, site.Name, fresh, box, new HashSet<ZDOID>(wipe.Select(z => z.m_uid)));
                 e.Record(DelveKind.FullReset, "wiped " + wipe.Count + " objects in " + site.Name + " at (" + at.x.ToString("0") + ", " + at.z.ToString("0") + ") and "
-                    + (fresh != null ? "generated it again" : "could not generate it again (see the log)") + citadel + (now ? " (regenerate now)" : ""), false);
+                    + "generated it again" + citadel + (now ? " (regenerate now)" : ""), false);
             }
             if (scheduled) e.Swept(DelveKind.FullReset, deferred);
             e.Report(DelveKind.FullReset, new KindReport(tracked, waiting, deferred, acted, blocked, true, dryRun,
@@ -308,35 +326,54 @@ namespace ExtraPotions.Delve.Runtime
         private static void Count(Dictionary<GuardResult, int> map, GuardResult g) => map[g] = map.TryGetValue(g, out var n) ? n + 1 : 1;
 
         /// <summary>
-        /// The generator is replaced by a fresh one generated in ghost mode, as ZoneSystem does for a zone the authority has
-        /// not loaded: the new rooms and their networked objects become objects of the world, the room list is saved on the
-        /// new generator, and the game objects are dropped again. Room counts apply through the GenerateRooms hook.
+        /// Builds a fresh generator in ghost mode, as ZoneSystem does for a zone the authority has not loaded. The old
+        /// generator and interior are not removed here. <paramref name="created"/> is every ZDO this attempt added.
+        /// The result is null unless that new generator ZDO is one of them. Room counts apply through the GenerateRooms hook.
         /// </summary>
-        private ZDO? Regenerate(ZDO generator)
+        private ZDO? Regenerate(ZDO generator, out HashSet<ZDOID> created)
         {
+            created = new HashSet<ZDOID>();
             GameObject prefab = ZNetScene.instance.GetPrefab(generator.GetPrefab());
-            if (prefab == null || prefab.GetComponent<DungeonGenerator>() == null) return null;
+            if (prefab == null || prefab.GetComponent<DungeonGenerator>() == null || ZDOMan.instance == null) return null;
             Vector3 position = generator.GetPosition();
             Quaternion rotation = generator.GetRotation();
-            DelveWorld.Remove(generator);
+            var before = new HashSet<ZDOID>(ZDOMan.instance.m_objectsByID.Keys);
             GameObject? instance = null;
+            ZDO? fresh = null;
             ZNetView.StartGhostInit();
             try
             {
                 instance = UnityEngine.Object.Instantiate(prefab, position, rotation);
                 instance.GetComponent<DungeonGenerator>().Generate(ZoneSystem.SpawnMode.Ghost);
-                return instance.GetComponent<ZNetView>()?.GetZDO();
+                fresh = instance.GetComponent<ZNetView>()?.GetZDO();
             }
             catch (Exception error)
             {
                 engine?.Log.Error("Delve full reset generation failed: " + error.GetType().Name + ": " + error.Message);
-                return null;
+                fresh = null;
             }
             finally
             {
                 ZNetView.FinishGhostInit();
                 if (instance != null) UnityEngine.Object.Destroy(instance);
             }
+            if (ZDOMan.instance == null) return null;
+            foreach (var id in ZDOMan.instance.m_objectsByID.Keys)
+                if (!before.Contains(id)) created.Add(id);
+            if (fresh == null || !created.Contains(fresh.m_uid) || ZDOMan.instance.GetZDO(fresh.m_uid) == null) return null;
+            return fresh;
+        }
+
+        private void RemoveIds(IEnumerable<ZDOID> ids)
+        {
+            foreach (var id in ids) RemoveOne(ZDOMan.instance?.GetZDO(id));
+        }
+
+        private void RemoveOne(ZDO? zdo)
+        {
+            if (zdo == null) return;
+            try { DelveWorld.Remove(zdo); }
+            catch (Exception error) { engine?.Log.Error("Delve full reset remove failed: " + error.GetType().Name + ": " + error.Message); }
         }
 
         private void Flush()

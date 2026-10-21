@@ -15,8 +15,8 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
     /// ZDO, spawns the drop table's items (a half) and the sub-logs (a whole log). A prefix reads everything into a
     /// <see cref="BreakContext"/> first, asks <see cref="OldGrowth"/> and <see cref="CleanSplits"/> for their yield
     /// bonus (added together) and scales the drop count for this call; <see cref="LogSpawns"/> passes the feller and
-    /// the clean mark to the halves. A postfix hands the context to experience and clean splits; a finalizer puts the
-    /// drop table back.</item>
+    /// the clean mark to the halves. Split experience is reported from that prefix, while the log ZDO still exists.
+    /// A postfix hands the context to clean splits; a finalizer puts the drop table back.</item>
     /// </list>
     /// The yield bonus scales the number of drop rolls: the game rolls m_dropMin..m_dropMax, the prefix rolls that same
     /// count itself, multiplies it by 1 + bonus, rounds up or down at random by the remainder and fixes the table to it.
@@ -71,6 +71,7 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
                 return null;
             Open = Read(log, hit);
             Open.YieldBonus = Bonus(Open);
+            HookGuard.Run("split experience", () => WoodXp.OnLogBroken(Open));
             return Open.DropsWood && Open.YieldBonus > 0f ? DropCount.Scale(log.m_dropWhenDestroyed, 1f + Open.YieldBonus) : null;
         }
 
@@ -102,7 +103,6 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
         private static void Dispatch(BreakContext broken)
         {
             HookGuard.Run("clean splits", () => CleanSplits.OnLogBroken(broken));
-            HookGuard.Run("split experience", () => WoodXp.OnLogBroken(broken));
         }
 
         private static bool IsOwned(TreeLog log) =>

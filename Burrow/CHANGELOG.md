@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.3.24 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Shared Materials waits up to ten seconds for permitted chests that are held, still loading or handing over ownership, retaining that wait if a source briefly disappears. Availability counts also wait for ownership and fresh data. A ready shortage still refuses with nothing held, and replaying a cancelled request preserves any existing payment decision.
+
+- Chest salvage pays its materials only after the gear has left the chest. A take whose removal is still in recovery, with the gear still in the chest, waits instead of paying. An unfinished salvage from an earlier session leaves the gear in the chest.
+- A reach pull whose stack fits in neither inventory nor the chest drops that leftover at your feet, and the chest keeps the removal.
+
+- Reach counts materials only when their chest can be claimed now and requests a handover for remote stock. Crafting, upgrades and placement first pull missing materials through the owner-checked transfer path; a short transfer or lack of inventory room refuses the action before output is created. Any materials already pulled remain in the player's inventory.
+- A borrowed station unit returns to the player if its chest rejects it, without removing another unit from a later chest.
+- Trash reports success only after the inventory accepts the removal; a held stack stays without a false confirmation.
+
+- A slow join is no longer refused at 20 seconds while the server's send queue is still full. Charter waits until that queue drops to 64 KB, then allows 60 seconds for the mod list, and never waits longer than 5 minutes from the greeting. A player who never answers is still refused, with the reason in English, Spanish, French, German, Russian, Chinese and Korean. One warning is written when the wait passes 20 seconds.
+
+## 0.3.23 (2026-10-21)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- New optional capabilities for Kindle's salvage from nearby chests: `meadworks.storage.chest_items` 1.0 lists the items in the chests Reach crafting may use now (same range, wards, privacy, in-use and allow/deny rules; held chests left out), and `meadworks.storage.chest_take` 1.0 takes one listed item through the Shared Materials ledger: the chest is claimed the game's way, the slot must still hold the listed item, the removal is held, decided, applied and saved with a receipt, and only then are the materials delivered, once. A refused or aborted take changes nothing. Trash Uses Salvage and Shared Materials payments are unchanged.
+
+## 0.3.22 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- Shared Materials: a held payment still goes through when its inventory or chest changed only outside the stacks it pays from, for example when Wildroot wears the equipped cultivator for the previous cell or an item lands in another slot. Before, any change refused the payment, so a stone grid paid partly from your inventory skipped about one cell in ten. The stacks it pays from must still hold exactly the reserved item and count; otherwise nothing is charged, as before. The payment is checked against the live inventory and recorded before anything changes, so it is still all or nothing and never charged twice.
+- Shared Materials: a large payment is held longer before it must be committed: 10 seconds plus a quarter second per unit, at most 60 seconds (a 90-stone grid gets 32.5 seconds). Before, every hold ended after 10 seconds, so a slow Prevent Partial Planting grid could be returned whole. A hold that runs out still returns everything and charges nothing.
+- Shared chest transfers are unchanged: they still require the exact inventory they reserved.
+
+## 0.3.21 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- Item safety (Shared Materials and shared transfers): a payment now changes only the stacks it pays from. It lowers or removes exactly those stacks, and every other item keeps its instance, slot, durability, custom data and equipped state. Before, the payment rebuilt the whole item list from its saved image and put a fresh copy in place of any item that did not match (reported by Wildroot for an equipped cultivator). Burrow applies a payment only to an inventory that is unchanged since the reservation, and changes nothing otherwise.
+- Item safety: an inventory or chest the game cannot load back unchanged (for example a stack above the current stack size after lowering a stack setting) is no longer paid from, escrowed or changed by a shared chest request. The request is refused with nothing held. Before, the payment cut or dropped that item.
+
 ## 0.3.20 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

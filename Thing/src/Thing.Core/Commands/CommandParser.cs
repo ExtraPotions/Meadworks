@@ -67,6 +67,8 @@ namespace ExtraPotions.Thing.Commands
             { "warn", "thing warn <player> <reason>" },
             { "mute", "thing mute <player> [duration: 30m, 24h, 7d | forever] [reason]" },
             { "unmute", "thing unmute <player|platform id>" },
+            { "freeze", "thing freeze <player>" },
+            { "unfreeze", "thing unfreeze <player>" },
             { "goto", "thing goto <player|platform id>" },
             { "bring", "thing bring <player|platform id>" },
             { "say", "thing say <text>" },
@@ -87,6 +89,7 @@ namespace ExtraPotions.Thing.Commands
             { "unpermit", "thing unpermit <platform id>" },
             { "admins", "thing admins [offset 0 to 9999]" },
             { "admin", "thing admin <add|remove> <platform id>" },
+            { "grant", "thing grant self | get <platform id> | <platform id> add|remove | <platform id> <world|spawn|teleport|freeze|inventory|ward> <on|off>" },
             { "config", "thing config list [offset] | entries <file id> [offset] | get <file id> <entry id>" },
             { "set", "thing set <file id> <entry id> <version> <encoded value chunks>" },
         };
@@ -106,7 +109,7 @@ namespace ExtraPotions.Thing.Commands
             if (verb == "ui-read")
                 return a.Count == 3 && UI.ThingUiPage.AdminReadPage(a[1]) && int.TryParse(a[2], NumberStyles.None, CultureInfo.InvariantCulture, out var offset)
                     && offset >= 0 && offset < UI.ThingUiPage.MaxTotal ? new ParsedCommand(CommandKind.Status)
-                    : new ParsedCommand(CommandKind.Usage, text: "thing ui-read <players|permitted|admins|moderation|audit> <offset>");
+                    : new ParsedCommand(CommandKind.Usage, text: "thing ui-read <players|permitted|admins|grants|moderation|audit> <offset>");
             if (!Usage.ContainsKey(verb)) return new ParsedCommand(CommandKind.Unknown, text: a[0]);
             var action = ActionCatalog.FromVerb(verb)!.Action;
             var rest = a.Skip(1).ToList();
@@ -139,6 +142,17 @@ namespace ExtraPotions.Thing.Commands
                 case "admin":
                     return rest.Count == 2 && (rest[0].Equals("add", StringComparison.OrdinalIgnoreCase) || rest[0].Equals("remove", StringComparison.OrdinalIgnoreCase))
                         && GameListIdentity.Valid(rest[1]) ? new ParsedCommand(CommandKind.Action, action, rest[1], rest[0].ToLowerInvariant()) : Bad();
+                case "grant":
+                    if (rest.Count == 1 && rest[0].Equals("self", StringComparison.OrdinalIgnoreCase))
+                        return new ParsedCommand(CommandKind.Action, action, text: "self");
+                    if (rest.Count == 2 && rest[0].Equals("get", StringComparison.OrdinalIgnoreCase) && GameListIdentity.Valid(rest[1]))
+                        return new ParsedCommand(CommandKind.Action, action, rest[1], "get");
+                    if (rest.Count == 2 && GameListIdentity.Valid(rest[0]) && (rest[1].Equals("add", StringComparison.OrdinalIgnoreCase) || rest[1].Equals("remove", StringComparison.OrdinalIgnoreCase)))
+                        return new ParsedCommand(CommandKind.Action, action, rest[0], rest[1].ToLowerInvariant());
+                    if (rest.Count == 3 && GameListIdentity.Valid(rest[0]) && AdminPermissions.TryBit(rest[1], out _)
+                        && (rest[2].Equals("on", StringComparison.OrdinalIgnoreCase) || rest[2].Equals("off", StringComparison.OrdinalIgnoreCase)))
+                        return new ParsedCommand(CommandKind.Action, action, rest[0], rest[1].ToLowerInvariant() + " " + rest[2].ToLowerInvariant());
+                    return Bad();
                 case "time":
                     return rest.Count >= 1 && rest.Count <= 2 && TimeOfDay.Parse(rest[0]).HasValue
                         && (rest.Count == 1 || rest[1].Equals("freeze", StringComparison.OrdinalIgnoreCase))
@@ -148,6 +162,8 @@ namespace ExtraPotions.Thing.Commands
                     return rest.Count < 1 ? Bad() : new ParsedCommand(CommandKind.Action, action, rest[0], Join(1));
                 case "goto":
                 case "bring":
+                case "freeze":
+                case "unfreeze":
                     return rest.Count == 1 && rest[0].Length <= 160 && rest[0].IndexOfAny(new[] { '\0', '\r', '\n' }) < 0 ? new ParsedCommand(CommandKind.Action, action, rest[0]) : Bad();
                 case "warn":
                     return rest.Count < 2 ? Bad() : new ParsedCommand(CommandKind.Action, action, rest[0], Join(1));

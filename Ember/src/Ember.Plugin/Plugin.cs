@@ -58,6 +58,7 @@ namespace ExtraPotions.Ember.Runtime
                     new System.Version(0, 1), new System.Version(0, 1), MultiplayerPolicy.RequiredOnAllPeers, Family));
                 AllowsUi = MeadworksHeadless.AllowsUi;
                 Settings = EmberConfig.Bind(Config, log);
+                EmberSeasons.Initialize(Config);
                 EmberText.Initialize(Info.Metadata, Logger);
                 Ready = true;
                 log.Info(AllowsUi ? "Ember registered; modules start after plugin discovery."
@@ -101,6 +102,7 @@ namespace ExtraPotions.Ember.Runtime
             EmberText.Tick();
             if (!started) return;
             EmberModules.Tick(log!);
+            EmberSeasons.Tick();
             OwnedBedRespawn.Tick();
             OwnedBedChoice.Tick();
             OwnedBedPins.Tick();
@@ -120,7 +122,7 @@ namespace ExtraPotions.Ember.Runtime
             started = false;
             try { harmony?.UnpatchSelf(); } catch (Exception error) { log?.Warning("Ember unpatch: " + error.GetType().Name); }
             harmony = null;
-            foreach (Action stop in new Action[] { OwnedBedChoice.Close, OwnedBedPins.Clear, QuickRespawn.Reset, OwnedBedRespawn.Reset, EmberSleepHud.Shutdown, SleepRuntime.Shutdown, SleepCapability.Reset, TorchRuntime.Shutdown, DoorManager.Shutdown, EmberModules.Reset, EmberText.Shutdown })
+            foreach (Action stop in new Action[] { OwnedBedChoice.Close, OwnedBedPins.Clear, QuickRespawn.Reset, OwnedBedRespawn.Reset, EmberSleepHud.Shutdown, SleepRuntime.Shutdown, SleepCapability.Reset, EmberSeasons.Shutdown, TorchRuntime.Shutdown, DoorManager.Shutdown, EmberModules.Reset, EmberText.Shutdown })
                 try { stop(); } catch (Exception error) { log?.Warning("Ember teardown: " + error.GetType().Name); }
             import?.Dispose();
             import = null;

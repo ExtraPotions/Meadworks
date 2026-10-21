@@ -2,7 +2,7 @@
 
 One in-game settings book for every installed mod's configuration, aware of server locks.
 
-Version 0.1.15. Requires Crucible 0.3.22 / Crucible.UI 0.3.15. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -24,7 +24,7 @@ The Advanced switch in the header controls specialist settings. Pin/Unpin manage
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2 (installed with Crucible)
-- Crucible 0.3.22 or a later 0.3.x, which includes Crucible.UI 0.3.15 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 

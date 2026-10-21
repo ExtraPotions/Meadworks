@@ -1,5 +1,5 @@
 // Copyright (C) 2026 expDARE. SPDX-License-Identifier: GPL-3.0-or-later
-// Lifecycle/authority adapter for pinned GrindstoneSkills Cooking; no replacement transport or payment path.
+// Lifecycle/authority adapter for pinned GrindstoneSkills Cooking and owned add-transaction recovery.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +27,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             active = isActive ?? throw new ArgumentNullException(nameof(isActive));
             CookingSettings.Initialize(config);
             harmony = new Harmony(HarmonyId);
+            StationAddTransactions.Initialize();
             NativeCookingFeatures.Initialize(log);
             Tick();
         }
@@ -34,6 +35,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         public static void Tick()
         {
             if (harmony == null) return;
+            StationAddTransactions.Tick();
             bool wanted = Active;
             if (wanted != installed)
             {
@@ -42,7 +44,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                     try
                     {
                         foreach (Type type in PatchRoots.Where(root => MeadworksHeadless.AllowsUi ||
-                            (root != typeof(KitchenHover) && root != typeof(FermenterHover))).SelectMany(PatchTypes))
+                            root != typeof(KitchenHover)).SelectMany(PatchTypes))
                             harmony.CreateClassProcessor(type).Patch();
                         installed = true;
                         KitchenDiscovery.Discover();
@@ -72,7 +74,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             typeof(KitchenDiscovery), typeof(StationRpc), typeof(StationSlots), typeof(StationPlacement),
             typeof(StationPerks), typeof(StationTakeOff), typeof(KitchenCraft), typeof(CraftRecord),
             typeof(FermenterAddSend), typeof(FermenterAddReceive), typeof(FermenterSpeed), typeof(FermenterTap),
-            typeof(FermenterDrop), typeof(FermenterHover), typeof(RpcSendSwap), typeof(KitchenHover)
+            typeof(FermenterDrop), typeof(RpcSendSwap), typeof(KitchenHover)
         };
         static IEnumerable<Type> PatchTypes(Type type)
         {
@@ -101,6 +103,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         public static void Shutdown()
         {
             active = null;
+            StationAddTransactions.Shutdown();
             NativeCookingFeatures.Shutdown();
             harmony?.UnpatchSelf();
             harmony = null;

@@ -8,6 +8,7 @@
 // action budget and the rest wait for the next check; chests inside a dungeon set to Full are left to the full reset;
 // messages are Delve catalog texts in the server language through Crucible's server notices; the authority's own
 // player's openings are seen through Container.SetInUse and Container.Save postfixes (user decision R-Q4).
+// The item blob is written only when no live container remains, including a host standing at the chest.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -127,7 +128,7 @@ namespace ExtraPotions.Delve.Runtime
                         loaded++;
                         break;
                     case ChestAction.ClearStamp:
-                        seen.Remove(zdo.m_uid);
+                        if (!decision.KeepOpening) seen.Remove(zdo.m_uid);
                         SetStamp(zdo, null, dryRun);
                         break;
                     case ChestAction.Stamp:
@@ -171,17 +172,37 @@ namespace ExtraPotions.Delve.Runtime
         {
             Stamp? s = seen.TryGetValue(zdo.m_uid, out var at) ? at : (Stamp?)null;
             return new ChestFacts(ChestInventory.ItemCount(zdo.GetByteArray(ZDOVars.s_items)), GetStamp(zdo, dryRun), s,
-                zdo.GetLong(ZDOVars.s_creator) != 0L, DelveWorld.HeldByPlayer(zdo), zdo.GetInt(ZDOVars.s_inUse) == 1);
+                zdo.GetLong(ZDOVars.s_creator) != 0L, DelveWorld.HeldByPlayer(zdo), zdo.GetInt(ZDOVars.s_inUse) == 1, LiveInventory(zdo));
+        }
+
+        /// <summary>
+        /// True when a container can still be showing the items it loaded: this machine has the view, or any current player is in its active area.
+        /// </summary>
+        private bool LiveInventory(ZDO zdo)
+        {
+            if (zdo == null) return false;
+            if (DelveWorld.HeldByPlayer(zdo)) return true;
+            var scene = ZNetScene.instance;
+            if (scene == null) return false;
+            var view = scene.FindInstance(zdo);
+            if (view != null && view.GetComponent<Container>() != null) return true;
+            Vector3 pos = zdo.GetPosition();
+            IReadOnlyList<DelvePlayer> players = engine != null ? engine.Players : DelveWorld.Players();
+            foreach (var player in players)
+                if (ZNetScene.InActiveArea(pos, player.Position)) return true;
+            return false;
         }
 
         /// <summary>
         /// Rolls the prefab's loot table into a fresh inventory of the prefab's size and writes it to the chest, as
         /// Container.AddDefaultItems and Container.Save do on a client. Whatever was inside is replaced. A table can roll
         /// nothing (drop chance below 1): then nothing is written and the chest tries again at the next sweep.
+        /// A live container is left unchanged: its next save would put the old items back, or a second player could take the new roll.
         /// </summary>
-        private static bool Restock(ZDO zdo, Container prefab, out string rolled)
+        private bool Restock(ZDO zdo, Container prefab, out string rolled)
         {
             rolled = "";
+            if (!ChestRefill.MayReplaceItems(DelveWorld.HeldByPlayer(zdo), LiveInventory(zdo))) return false;
             var inventory = new Inventory(prefab.m_name, null, prefab.m_width, prefab.m_height);
             var names = new List<string>();
             foreach (ItemDrop.ItemData item in prefab.m_defaultItems.GetDropListItems())
@@ -190,6 +211,7 @@ namespace ExtraPotions.Delve.Runtime
                 inventory.AddItem(item);
             }
             if (inventory.NrOfItems() == 0) return false;
+            if (!ChestRefill.MayReplaceItems(DelveWorld.HeldByPlayer(zdo), LiveInventory(zdo))) return false;
             var pkg = new ZPackage();
             inventory.Save(pkg);
             zdo.Set(ZDOVars.s_items, pkg.GetArray());

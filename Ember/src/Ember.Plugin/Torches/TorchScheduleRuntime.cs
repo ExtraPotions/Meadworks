@@ -62,7 +62,7 @@ namespace ExtraPotions.Ember.Runtime
                 if (!TorchSchedule.Settled(fraction, env.RescaleDayFraction(clock))) return null;
             }
             float margin = Plugin.Settings!.Get(EmberSettings.Torches.TorchMargin) / 24f;
-            return TorchSchedule.IsNight(fraction, env.RescaleDayFraction(.15f + margin), env.RescaleDayFraction(.85f - margin));
+            return TorchSchedule.IsNight(fraction, env.RescaleDayFraction(EmberSeasons.Dawn + margin), env.RescaleDayFraction(1f - EmberSeasons.Dawn - margin));
         }
 
         public static void Apply(Fireplace fire)

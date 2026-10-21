@@ -119,8 +119,16 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
                 if (wear != null) wear.m_materialType = WearNTear.MaterialType.Stone;
             }
             // Registration must not depend on the art: without it the trough keeps its source look.
-            try { Reskin(copy, scene, definition.Prefab); piece.m_icon = OriginalItemArt.Icon(definition.Prefab); }
-            catch (System.Exception error) { NativeFeeding.Warn("The " + definition.DisplayName + " art did not load (" + error.Message + "); it keeps a plain look."); }
+            if (!ExtraPotions.Meadworks.Crucible.MeadworksHeadless.IsHeadless)
+            {
+                try
+                {
+                    Sprite icon = OriginalItemArt.Icon(definition.Prefab);
+                    Reskin(copy, scene, definition.Prefab);
+                    piece.m_icon = icon;
+                }
+                catch (System.Exception error) { NativeFeeding.Warn("The " + definition.DisplayName + " art did not load (" + error.Message + "); it keeps a plain look."); }
+            }
             Prefabs[definition.Prefab] = copy;
         }
 

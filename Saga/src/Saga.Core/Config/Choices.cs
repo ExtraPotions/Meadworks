@@ -12,6 +12,12 @@ namespace ExtraPotions.Saga.Config
     /// <summary>Design 4.2 Power Display Mode: how several attunements share the power HUD.</summary>
     public enum PowerDisplayMode { Stacked, Mixed, Compact, Icons, NewestOnly }
 
+    /// <summary>Gamepad button that holds the power wheel open. Names match Crucible <c>PadButton</c>, plus Unbound.</summary>
+    public enum PowerWheelPad { Unbound, A, B, X, Y, LeftBumper, RightBumper, LeftTrigger, RightTrigger, Back, Start, LeftStick, RightStick }
+
+    /// <summary>Named bundle for one group of related numbers. Custom writes nothing.</summary>
+    public enum SagaPreset { Vanilla, MeadWorksDefault, Relaxed, Custom }
+
     /// <summary>A comma list of names (item prefabs): trimmed, empty entries and repeats dropped, order kept.</summary>
     public static class NameList
     {

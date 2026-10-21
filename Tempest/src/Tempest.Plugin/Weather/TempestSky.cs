@@ -249,6 +249,7 @@ namespace ExtraPotions.Tempest.Runtime
                 if (!string.IsNullOrEmpty(__result) || !string.IsNullOrEmpty(__instance.m_forceEnv)) return;
                 if (!TempestModules.Active(TempestModule.Events) || Player.m_localPlayer == null) return;
                 var wanted = EnvironmentPlan.For(TempestWorld.Current, TempestWorld.Now, TempestWorld.LocalBiome, false);
+                wanted = TempestSeasons.EventEnvironment(wanted, name => EnvMan.instance != null && Find(EnvMan.instance, name) != null);
                 var env = Find(__instance, wanted);
                 // A newly wanted environment (event start or phase change) is looked up at once, then every 10 s.
                 if (env == null && EnvironmentPlan.IsEventEnvironment(wanted) && (wanted != lastWanted || UnityEngine.Time.unscaledTime >= nextRetry))

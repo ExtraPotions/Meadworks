@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.16 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- The clock line shows the next weather for the biome you are in: its name, the minutes until the shared world clock changes it, and the wind direction and strength at that change. The roll is the game's environment schedule, so a client matches the host. When Tempest is installed, environments it has switched off are left out. `4 - HUD / Show Forecast` (your own setting, default on) hides it. The line stays hidden while a raid, a forced environment or a Tempest event is controlling the weather. The current weather stays beside the forecast when both fit, and the clock is never cut.
+- Seasonal weather from Solstice, such as Clear Winter, shows the same name and icon as the weather it copies. The forecast still uses the current season's weather list, so a change after the season turns can differ.
+- New texts in English, Spanish, French, German, Russian, Chinese and Korean.
+- The weather forecast looks up Tempest once per session. With Tempest not installed, the HUD no longer scans loaded assemblies every frame.
+- Spanish and French marker-map help, and the other compass-window help lines that were still in English, are translated.
+
+## 0.1.15 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- License text: LICENSE-CODE.md now lists all four adapted sources, adding BetterSleepBruh 2.1.0 (MIT) as LICENSE_SCOPE.md and SOURCE_NOTICE.md already did.
+
 ## 0.1.14 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

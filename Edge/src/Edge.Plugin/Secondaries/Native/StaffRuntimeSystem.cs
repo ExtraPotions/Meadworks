@@ -4,6 +4,7 @@
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes.
 using ExtraPotions.Edge.Config;
 using ExtraPotions.Edge.Integration;
+using ExtraPotions.Edge.Secondaries;
 using ExtraPotions.Edge.Secondaries.Adopted;
 using System;
 using System.Collections.Generic;
@@ -322,7 +323,8 @@ internal static class StaffRuntimeSystem
     internal static void SyncShieldDisplayState(Character character)
     {
         if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
-        if (!SecondaryAttackManager.TryGetCharacterZdo(character, out _, out ZDO? zdo))
+        if (!SecondaryAttackManager.TryGetCharacterZdo(character, out ZNetView? nview, out ZDO? zdo)
+            || !OwnedCharacterWrite.Allowed(true, nview!.IsOwner()))
         {
             return;
         }

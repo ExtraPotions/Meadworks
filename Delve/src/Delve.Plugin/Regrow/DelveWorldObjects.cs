@@ -6,7 +6,8 @@
 // live in Delve's JSON sidecar (RestockRegen's record file is carried over once, copy only when absent); visits are
 // two-clock stamps, so a kind can wait in in-game days or real hours; the per-spot decision is Delve.Core's
 // RegrowRules.DecideAt with the shared guards plus the player base guard; restorations count against the engine's action
-// budget; biome notices use Delve's cooldown and catalog texts in the server language.
+// budget; biome notices use Delve's cooldown and catalog texts in the server language. A drifting flametal spire keeps
+// one spot, and a missing spot is not restored while any whole spire of that prefab remains.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,6 +33,7 @@ namespace ExtraPotions.Delve.Runtime
         private readonly Dictionary<(int, int, int), RecordSpot> spots = new Dictionary<(int, int, int), RecordSpot>();
         private readonly NoticeCooldown cooldown = new NoticeCooldown();
         private readonly HashSet<long> told = new HashSet<long>();
+        private readonly HashSet<int> blockedDrift = new HashSet<int>();
         private DelveEngine? engine;
         private bool ready;
 
@@ -72,6 +74,7 @@ namespace ExtraPotions.Delve.Runtime
             intactOf.Clear();
             kindOf.Clear();
             spots.Clear();
+            blockedDrift.Clear();
             foreach (var kind in Kinds)
             {
                 var info = KindCatalog.Of(kind);
@@ -144,6 +147,7 @@ namespace ExtraPotions.Delve.Runtime
             engine = null;
             spots.Clear();
             told.Clear();
+            blockedDrift.Clear();
         }
 
         /// <summary>The key of the remembered spot at this position, allowing for rounding, and for drift on a floating kind.</summary>
@@ -178,6 +182,12 @@ namespace ExtraPotions.Delve.Runtime
         {
             int whole = intactOf[zdo.GetPrefab()];
             Vector3 p = zdo.GetPosition();
+            if (kindOf.TryGetValue(whole, out var info) && info.Drifts)
+            {
+                if (KeyAt(p, whole) != null) return;
+                ApplyDrift(whole);
+                return;
+            }
             if (KeyAt(p, whole) != null) return;
             var spot = new RecordSpot(whole, V(p), V(zdo.GetRotation().eulerAngles));
             spots[SpotIndex.Key(spot.Position)] = spot;
@@ -185,6 +195,68 @@ namespace ExtraPotions.Delve.Runtime
             var zone = Zone(p);
             if (!E.Sidecar.Visits.ContainsKey(zone)) E.Sidecar.Visits[zone] = E.Now;
             E.MarkSidecarDirty();
+        }
+
+        /// <summary>
+        /// One uncovered spot and one spire past the drift radius is that spire: the spot moves. A missing spot stays
+        /// missing while any whole spire of this prefab still exists.
+        /// </summary>
+        private void ReconcileDrifting()
+        {
+            blockedDrift.Clear();
+            var seen = new HashSet<int>();
+            foreach (var kv in kindOf)
+            {
+                if (!kv.Value.Drifts || !intactOf.TryGetValue(kv.Key, out var whole) || whole != kv.Key || !seen.Add(kv.Key)) continue;
+                ApplyDrift(kv.Key);
+            }
+        }
+
+        private void ApplyDrift(int prefab)
+        {
+            if (ZDOMan.instance == null) return;
+            var spotList = new List<((int, int, int) Key, RecordSpot Spot)>();
+            foreach (var kv in spots)
+                if (kv.Value.Prefab == prefab) spotList.Add((kv.Key, kv.Value));
+            var objects = new List<(ZDO Zdo, bool Whole)>();
+            foreach (ZDO zdo in ZDOMan.instance.m_objectsByID.Values)
+            {
+                if (!intactOf.TryGetValue(zdo.GetPrefab(), out var whole) || whole != prefab) continue;
+                objects.Add((zdo, IsWhole(zdo)));
+            }
+            var settlement = DriftRules.Settle(
+                spotList.Select((s, i) => new DriftSpot(i, s.Spot.Position)).ToList(),
+                objects.Select((o, i) => new DriftObject(i, V(o.Zdo.GetPosition()), o.Whole)).ToList());
+            if (settlement.BlockMissingRestore) blockedDrift.Add(prefab);
+            else blockedDrift.Remove(prefab);
+            bool changed = false;
+            foreach (var move in settlement.Moves)
+            {
+                var spot = spotList[move.SpotId];
+                var zdo = objects[move.ObjectId].Zdo;
+                var updated = new RecordSpot(prefab, V(zdo.GetPosition()), V(zdo.GetRotation().eulerAngles));
+                var key = SpotIndex.Key(updated.Position);
+                if (!key.Equals(spot.Key) && spots.ContainsKey(key))
+                {
+                    blockedDrift.Add(prefab);
+                    continue;
+                }
+                spots.Remove(spot.Key);
+                spots[key] = updated;
+                changed = true;
+            }
+            foreach (int id in settlement.NewObjects)
+            {
+                var zdo = objects[id].Zdo;
+                var created = new RecordSpot(prefab, V(zdo.GetPosition()), V(zdo.GetRotation().eulerAngles));
+                var key = SpotIndex.Key(created.Position);
+                if (KeyAt(zdo.GetPosition(), prefab) != null || spots.ContainsKey(key)) continue;
+                spots[key] = created;
+                var zone = Zone(zdo.GetPosition());
+                if (!E.Sidecar.Visits.ContainsKey(zone)) E.Sidecar.Visits[zone] = E.Now;
+                changed = true;
+            }
+            if (changed) SyncSidecar();
         }
 
         public void Check(DelveEngine e, ISet<DelveKind> sweeping)
@@ -247,6 +319,7 @@ namespace ExtraPotions.Delve.Runtime
 
         private void Sweep(DelveEngine e, List<DelveKind> due)
         {
+            ReconcileDrifting();
             var standing = new Dictionary<(int, int, int), ZDO>();
             foreach (ZDO zdo in ZDOMan.instance.m_objectsByID.Values.ToList())
             {
@@ -290,6 +363,12 @@ namespace ExtraPotions.Delve.Runtime
                 if (blocked.HasValue)
                 {
                     c.Blocked[blocked.Value] = c.Blocked.TryGetValue(blocked.Value, out var n) ? n + 1 : 1;
+                    counts[kind] = c;
+                    continue;
+                }
+                if (info.Drifts && state == SpotState.Missing && blockedDrift.Contains(kv.Value.Prefab))
+                {
+                    c.Waiting++;
                     counts[kind] = c;
                     continue;
                 }

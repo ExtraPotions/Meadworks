@@ -6,7 +6,7 @@ namespace Burrow.Reach
     /// Single ingredient recipes (<c>m_requireOnlyOneIngredient</c>) pick their material through
     /// <c>Player.GetFirstRequiredItem</c>. When the inventory alone has none but inventory plus storage covers
     /// a requirement, the postfix returns the inventory's stack of it or, failing that, the container's stack;
-    /// the game only reads its name and quality, and the payment hook pays the shortfall from storage.
+    /// the game only reads its name and quality. Action admission pulls that quality before crafting starts.
     /// </summary>
     [HarmonyPatch(typeof(Player), nameof(Player.GetFirstRequiredItem))]
     public static class FirstRequiredItemPatch

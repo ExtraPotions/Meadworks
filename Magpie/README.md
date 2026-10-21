@@ -1,6 +1,6 @@
 # Magpie
 
-Version 0.1.11. Requires Crucible 0.3.22 / Crucible.UI 0.3.15. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.12. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Items within range glide to you and are picked up, nearby ground stacks merge, and drops float; an optional loot multiplier is a server-controlled cheat.
 
@@ -18,7 +18,7 @@ Items within range glide to you and are picked up, nearby ground stacks merge, a
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.22 or a later 0.3.x, which includes Crucible.UI 0.3.15 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 

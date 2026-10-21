@@ -57,7 +57,9 @@ namespace ExtraPotions.Wildroot.Runtime {
   [HarmonyPatch(typeof(Piece),nameof(Piece.SetCreator))]
   static class Creator {
    static void Postfix(Piece __instance,long uid){
-    if(!placing||uid==0L||!FarmingState.Active)return;
+    if(!placing||uid==0L)return;
+    PlantedPickable.Mark(__instance);
+    if(!FarmingState.Active)return;
     var plant=__instance.GetComponent<Plant>();var zdo=plant?PlantKeys.Of(plant!):null;if(zdo==null||GrowsVine(plant!))return;
     PlantKeys.Write(zdo,uid,FarmingState.Level(Player.m_localPlayer));
    }
@@ -120,45 +122,6 @@ namespace ExtraPotions.Wildroot.Runtime {
    float level=FarmingState.Level(Player.m_localPlayer);
    return (FarmingPerks.GrowRadius(rules,plant.m_growRadius,true,level),(Heightmap.Biome)FarmingPerks.Biomes(rules,(int)plant.m_biome,true,level),
     FarmingPerks.HeatTolerant(rules,plant.m_tolerateHeat,true,level),FarmingPerks.ColdTolerant(rules,plant.m_tolerateCold,(int)plant.m_biome,true,level));
-  }
- }
-
- /// <summary>
- /// Picking a crop (#12, #21): the bonus crop rolls with Bonus Yield Chance in place of the game's 25%, the raise is
- /// scaled (tier, discovery), and afterwards seed return and auto replant (#108) roll at the picker's level. Bulk
- /// harvest calls the same Interact inside its dispatch scope; its seed return and replant run when the owner's receipt
- /// confirms the harvest, so nothing is given for a pick that did not happen.
- /// </summary>
- [HarmonyPatch(typeof(Pickable),nameof(Pickable.Interact))]
- static class FarmingPick {
-  // Id is read before the pick: the owner's pick destroys a non-respawning crop's network view inside Interact.
-  internal sealed class State {internal Pickable Pickable=null!;internal CropInfo Crop=null!;internal ZDOID Id;internal float Chance;internal bool Opened,Finished;}
-  static void Prefix(Pickable __instance,Humanoid character,out State? __state){
-   __state=null;
-   if(!(character is Player player)||player!=Player.m_localPlayer||!FarmingState.Active||!CanPick(__instance))return;
-   var crop=CropIndex.OfPickable(PlacementBackend.PrefabName(__instance.gameObject));if(crop==null)return;
-   __state=new State{Pickable=__instance,Crop=crop,Id=FarmingState.PickableView(__instance).GetZDO().m_uid,Chance=__instance.m_maxLevelBonusChance};
-   __instance.m_maxLevelBonusChance=FarmingPerks.BonusChance(FarmingState.Rules,__state.Chance);
-   __state.Opened=FarmingExperience.Begin(crop,crop.Pickable);
-  }
-  static void Postfix(Pickable __instance,Humanoid character,State? __state){
-   if(__state==null)return;Finish(__state);
-   // A pick happened only if the game marked this client's pick; a bulk-harvest prefix may have skipped Interact.
-   if(!FarmingState.PickablePickedLocal(__instance)||NativeHarvestService.Dispatching)return;
-   try{AfterPick((Player)character,__instance,__state);}
-   catch(Exception error){Debug.LogError("Wildroot farming pick failed: "+error.GetType().Name+": "+error.Message);}
-  }
-  static Exception? Finalizer(Exception? __exception,State? __state){if(__state!=null)Finish(__state);return __exception;}
-  static void Finish(State state){if(state.Finished)return;state.Finished=true;if(state.Pickable)state.Pickable.m_maxLevelBonusChance=state.Chance;FarmingExperience.End(state.Opened);}
-  static bool CanPick(Pickable pickable){
-   var view=FarmingState.PickableView(pickable);
-   if(!view||!view.IsValid()||FarmingState.PickableEnabled(pickable)==0||FarmingState.PickablePicked(pickable)||FarmingState.PickablePickedLocal(pickable)||!pickable.CanBePicked())return false;
-   var floating=pickable.m_tarPreventsPicking?pickable.GetComponent<Floating>():null;return !floating||!floating!.IsInTar();
-  }
-  static void AfterPick(Player player,Pickable pickable,State state){
-   var rules=FarmingState.Rules;float level=FarmingState.Level(player);
-   FarmingSeeds.Roll(rules,level,state.Crop,pickable.transform.position);
-   if(FarmingPerks.AutoReplants(rules,level))Plugin.Instance?.Harvesting?.SubmitAutoReplant(pickable,state.Id);
   }
  }
 

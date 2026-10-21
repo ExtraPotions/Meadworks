@@ -240,6 +240,7 @@ namespace Burrow.SharedTransfers {
         internal static NativeImage Escrow(TransferRequest request,NativeImage before,Player player){
             TransferWire.Decode(TransferWire.Encode(request));
             var result=before.Copy();var shadow=result.Load();var used=new HashSet<Vector2i>();
+            if(!NativeBundleStore.Bytes(shadow).SequenceEqual(before.Data))throw new InvalidDataException("Inventory does not load back exactly; nothing escrowed.");
             foreach(var offered in Offers(request)){
                 if(!used.Add(offered.m_gridPos))throw new InvalidDataException("Aliased escrow slot.");
                 var actual=player.GetInventory().GetItemAt(offered.m_gridPos.x,offered.m_gridPos.y);

@@ -202,6 +202,14 @@ namespace ExtraPotions.Tempest.Config
         public IEnumerable<TempestSetting> Entries() => WeatherSwitches.All.Select(s => (TempestSetting)Switches[s]).Append(OtherDisabled);
     }
 
+    public sealed class SeasonalWeatherSettings
+    {
+        const string Help = "Tempest host setting: weather weights for this Solstice season. Comma-separated environment names and weights from 0 to 4, for example Rain=0.5,ThunderStorm=0. Empty: unchanged. A base name also covers its seasonal variants; an exact variant overrides it. Zero removes ordinary weather; clear skies and Tempest events are always kept. Applies live to all players while Solstice effects are active. Solstice owns the season; Tempest owns weather selection.";
+
+        public IReadOnlyList<TempestSetting<string>> Weights { get; } = Array.AsReadOnly(new[] { "Spring", "Summer", "Fall", "Winter" }
+            .Select(season => TempestSetting.Text("Seasonal Weather", season + " Weights", "", ServerAuthoritative, Help, SeasonalWeights.Normalize)).ToArray());
+    }
+
     /// <summary>Every Tempest setting, in config file order.</summary>
     public static class TempestSettings
     {
@@ -213,9 +221,10 @@ namespace ExtraPotions.Tempest.Config
         public static NoticeSettings Notices { get; } = new NoticeSettings();
         public static CheatSettings Cheats { get; } = new CheatSettings();
         public static FilterSettings Filter { get; } = new FilterSettings();
+        public static SeasonalWeatherSettings SeasonalWeather { get; } = new SeasonalWeatherSettings();
 
         public static IReadOnlyList<TempestSetting> All { get; } = Schedule.Entries().Concat(Effects.Entries()).Concat(Notices.Entries())
-            .Concat(Cheats.Entries()).Concat(Filter.Entries()).ToList().AsReadOnly();
+            .Concat(Cheats.Entries()).Concat(Filter.Entries()).Concat(SeasonalWeather.Weights).ToList().AsReadOnly();
 
         static readonly Dictionary<string, TempestSetting> ById = All.ToDictionary(s => s.Id, StringComparer.Ordinal);
 

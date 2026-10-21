@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.10 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- German, Russian, Chinese and Korean portal text uses the game's stone-portal and cart names.
+- A sea-gate teleport the game refuses no longer drops that crew member off the helm or uses up the jump. The ship is told they are not coming.
+- Only the player who is landing, or the server, can mark sea-gate crew as landed. Only the owner of the other pillar, or the server, can clear a saved sea-gate link.
+- Portal pins on the large map lay out once, and skip that work while the pins, the map view and spread are unchanged. The destination picker reuses its gamepad button list until the rows change.
+
 ## 0.3.9 (2026-10-20)
 
 - Requires Crucible 0.3.24 / Crucible.UI 0.3.17.

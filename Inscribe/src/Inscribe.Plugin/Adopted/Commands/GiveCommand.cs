@@ -1,10 +1,11 @@
 // Portions Copyright (C) 2026 Gerald Glasgow. EliteCrafting 0.7.0 at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1.
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Changed by expDARE, 2026: Inscribe command identity and live permission gates.
+// Changed by expDARE, 2026: Inscribe command identity and live permission gates; give reports the measured counts.
 using System.Collections.Generic;
 using ExtraPotions.Inscribe.Adopted.Core;
 using ExtraPotions.Inscribe.Adopted.Items;
 using ExtraPotions.Inscribe.Adopted.Rules;
+using ExtraPotions.Inscribe.Runtime;
 using UnityEngine;
 
 namespace ExtraPotions.Inscribe.Adopted.Commands
@@ -51,7 +52,7 @@ namespace ExtraPotions.Inscribe.Adopted.Commands
                 return;
             }
             StoneDef? def = ActiveRules.Current.Stone(id);
-            call.Reply(Placed(prefab, count, InventorySpawn.GiveStack(player, prefab, count)));
+            call.Reply(Placed(prefab, InventorySpawn.GiveStack(player, prefab, count)));
             if (def == null || !def.Enabled)
             {
                 call.Detail($"{id} is {(def == null ? "not in the configuration" : "disabled")}: applying it refuses with stone_disabled.");
@@ -69,18 +70,19 @@ namespace ExtraPotions.Inscribe.Adopted.Commands
                     continue;
                 }
                 GameObject? prefab = StonePrefab(stone.Id, out string? problem);
-                lines.Add(prefab == null ? problem! : Placed(prefab, count, InventorySpawn.GiveStack(player, prefab, count)));
+                lines.Add(prefab == null ? problem! : Placed(prefab, InventorySpawn.GiveStack(player, prefab, count)));
                 given += prefab == null ? 0 : 1;
             }
             call.Reply($"{count} of each of {given} enabled runes");
             lines.ForEach(call.Detail);
         }
 
-        private static string Placed(GameObject prefab, int count, int added)
+        private static string Placed(GameObject prefab, SafeInventory.Delivery delivery)
         {
             string name = ItemText.Name(prefab.GetComponent<ItemDrop>().m_itemData);
-            string dropped = added < count ? $", {count - added} dropped at your feet (inventory full)" : "";
-            return $"{added} {name} ({prefab.name}) into the inventory{dropped}";
+            string dropped = delivery.Dropped > 0 ? $", {delivery.Dropped} dropped at your feet (inventory full or refused the add)" : "";
+            string missing = delivery.Missing > 0 ? $", {delivery.Missing} not created" : "";
+            return $"{delivery.Arrived} {name} ({prefab.name}) into the inventory{dropped}{missing}";
         }
 
         /// <summary>

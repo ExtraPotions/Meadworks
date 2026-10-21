@@ -11,6 +11,7 @@
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
     <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
     <Reference Include="assembly_utils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_utils.dll" Private="false"/>
+    <Reference Include="assembly_guiutils" HintPath="$(ValheimManagedDir)/assembly_guiutils.dll" Private="false"/>
     <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
     <Reference Include="gui_framework" HintPath="$(ValheimManagedDir)/gui_framework.dll" Private="false"/>
     <ProjectReference Include="../Thing.Core/Thing.Core.csproj"/>

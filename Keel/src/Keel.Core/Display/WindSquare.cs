@@ -25,12 +25,14 @@ namespace ExtraPotions.Keel.Display
             return (float)(angle == -180.0 ? 180.0 : angle);
         }
 
-        /// <summary>The wind's strength (the game's intensity, 0 to 1) as a whole percentage.</summary>
-        public static string Strength(float intensity)
+        /// <summary>The wind's strength (the game's intensity, 0 to 1) as a whole percent, 0 to 100.</summary>
+        public static int Percent(float intensity)
         {
             if (float.IsNaN(intensity) || float.IsInfinity(intensity)) intensity = 0f;
-            var percent = (int)Math.Round(Math.Max(0f, Math.Min(1f, intensity)) * 100f, MidpointRounding.AwayFromZero);
-            return percent.ToString(CultureInfo.InvariantCulture) + "%";
+            return (int)Math.Round(Math.Max(0f, Math.Min(1f, intensity)) * 100f, MidpointRounding.AwayFromZero);
         }
+
+        /// <summary>The wind's strength as a whole percentage.</summary>
+        public static string Strength(float intensity) => Percent(intensity).ToString(CultureInfo.InvariantCulture) + "%";
     }
 }

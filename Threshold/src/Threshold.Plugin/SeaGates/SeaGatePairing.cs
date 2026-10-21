@@ -5,6 +5,7 @@
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes. SPDX-License-Identifier: GPL-3.0-or-later
 using System.Collections;
 using System.Collections.Generic;
+using ExtraPotions.Threshold.SeaGates;
 using HarmonyLib;
 using UnityEngine;
 
@@ -125,14 +126,26 @@ namespace ExtraPotions.Threshold.Runtime.SeaGates
             SeaGateRegistry.Invalidate();
         }
 
-        /// <summary>Owner side of <see cref="SeaGateFields.UnpairRpc"/>: the partner is going away.</summary>
+        /// <summary>Owner side of <see cref="SeaGateFields.UnpairRpc"/>: the partner is going away. The sender must own
+        /// that partner, or be the server. A partner this machine cannot see is left linked; a one-sided link already
+        /// reads as unpaired.</summary>
         public static void OnUnpair(SeaGatePillar pillar, long sender, long partnerId)
         {
             if (!IsOwned(pillar) || partnerId == 0L || SeaGateFields.GetPartner(pillar.Zdo) != partnerId)
                 return;
+            if (!SeaGateAuthority.AcceptsUnpair(SenderIdentity.IsFromServer(sender), sender, OwnerOf(partnerId)))
+                return;
             ZDO zdo = pillar.Zdo;
             zdo.Set(SeaGateFields.PartnerKey, 0L);
             SeaGateRegistry.Invalidate();
+        }
+
+        /// <summary>The loaded partner pillar's owner, or 0 when it is not loaded here.</summary>
+        private static long OwnerOf(long pillarId)
+        {
+            SeaGatePillar partner = SeaGateRegistry.FindLoaded(pillarId);
+            ZDO zdo = partner != null ? partner.Zdo : null;
+            return zdo != null ? zdo.GetOwner() : 0L;
         }
 
         /// <summary>The verdict for a pillar at <paramref name="position"/> (the placement preview uses this too).</summary>

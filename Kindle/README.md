@@ -2,14 +2,14 @@
 
 Recipe search and sorting, favorites, batch crafting, a recipe tracker, salvage and an optional Cart Workbench.
 
-Version 0.1.20. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.22. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
 - Recipe search (accent-insensitive), category buttons (Ammo, Weapons, Bows, Armor, Shields, Tools, Food, Materials), sorting, per-character favorite recipes and a list or grid view, with keyboard and gamepad actions.
 - Batch crafting: pick an amount; Kindle checks materials and inventory space, and keeps the amount while it crafts.
 - Recipe tracker: track recipes per character and see material and station readiness and a craft countdown in a fixed HUD.
-- Salvage tab: break items back into materials by the salvage rules (a share of the recipe), with inventory checks. With Inscribe installed, salvage shows Inscribe names, inscription details and rarity backgrounds, inscribed Magic and Rare items can be salvaged and may give a rune back (chance shown); Epic Loot rarity colors are shown when Epic Loot is installed.
+- Salvage tab: break items back into materials by the salvage rules (a share of the recipe), with inventory checks. With Inscribe installed, salvage shows Inscribe names, inscription details and rarity backgrounds, inscribed Magic and Rare items can be salvaged and may give a rune back (chance shown); Epic Loot rarity colors are shown when Epic Loot is installed. With Burrow installed, the tab also lists gear in nearby chests and marks each row "From a chest". It uses the chests Reach crafting may use: the same range, wards, privacy, allow and deny lists, and the per-player Reach toggle. Chests another player has open, and chests held by another transfer, are skipped. Favorites, equipped items and the other salvage rules still refuse a chest item. The hotbar rule applies only to your own inventory. Materials go into your inventory, and what does not fit drops at your feet. A chest item that moved is not salvaged. Without Burrow, the tab lists only your inventory.
 - Repair On Station Open (off by default): opening a usable station runs the existing free repair-all action for its eligible carried gear.
 - Cart Workbench (cheat, off by default): use a cart as a crafting station.
 - Salvage rules are in `Kindle.Salvage*.yml` files that you can edit, or edit in Almanac's data pages.
@@ -18,7 +18,7 @@ Version 0.1.20. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [C
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.24 or a later 0.3.x, which includes Crucible.UI 0.3.17 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 
@@ -29,6 +29,7 @@ Version 0.1.20. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [C
 ## Configuration
 
 - Settings file: `BepInEx/config/com.meadworks.kindle.cfg`, under Recipe List, Batch Crafting, Repair, Recipe Tracker, Salvage, Cart Workbench and Server. Edit it in game with Almanac (the Meadworks settings book) or any ConfigurationManager.
+- `Salvage / Nearby Chests` is on by default. On a server the host's value applies. In single player your own value applies. Turning it off lists only your inventory.
 - Personal settings are your own. When the server runs Kindle, its values win for server-synced settings, and it can lock personal settings with `Server / Locked Player Settings`; locked settings show as read-only.
 - Cheats: Craft Speed (1, normal speed, by default), Instant Crafting (off by default; every craft and batch finishes at once) and Cart Workbench (off by default). In multiplayer they stay locked unless the server allows them; on a server without Kindle they read 1 and off.
 - Converter: imports your OpenKeep crafting settings after a preview, with a backup first.
@@ -42,7 +43,7 @@ Version 0.1.20. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [C
 
 - Steps aside: when OpenKeep (2.0 or newer) or Crafting Search is installed, Kindle turns itself off and says so.
 - Converter imports: OpenKeep settings (see Configuration).
-- Optional Meadworks integrations: Burrow supplies nearby chest counts and favorite protection (without it Kindle counts your own inventory); Mantle's inventory layout is respected; Inscribe decorates salvage entries.
+- Optional Meadworks integrations: Burrow supplies nearby chest counts, favorite protection and salvage from those chests (without it Kindle counts and salvages only your own inventory); Mantle's inventory layout is respected; Inscribe decorates salvage entries.
 
 ## Notes
 

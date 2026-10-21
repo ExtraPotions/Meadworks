@@ -22,6 +22,12 @@ namespace ExtraPotions.Wildroot {
     /// Cancellation cannot reverse a commit decision. Absence is never removal proof.</summary>
     public sealed class AsyncPlacementTransaction {
         readonly Dictionary<string,AsyncPlacementJob> jobs=new Dictionary<string,AsyncPlacementJob>(StringComparer.Ordinal);
+        // Keep replay/removal evidence without retaining completed native backends, actor closures or providers.
+        readonly Dictionary<string,SettledReceipt> settled=new Dictionary<string,SettledReceipt>(StringComparer.Ordinal);
+        sealed class SettledReceipt {
+            internal readonly PlacementJournalRecord Record;internal readonly PlacementResult Result;
+            internal SettledReceipt(AsyncPlacementJob job){Record=job.Record;Result=job.Result!;}
+        }
         readonly IPlacementJournal? journal;
         bool retiring;Task? retirement;
         public AsyncPlacementTransaction(IPlacementJournal? journal=null){this.journal=journal;}
@@ -35,9 +41,10 @@ namespace ExtraPotions.Wildroot {
             var record=new PlacementJournalRecord{ProviderId=providerId??ProviderIdentity(provider),ActorId=context.ActorId,WorldId=context.WorldId,SessionId=context.SessionId,RequestId=context.RequestId,Costs=costs,Cells=operations.Select((o,i)=>new PlacementCellRecord{RequestId=o.Context.RequestId,RecoveryData=(backends[i] as IDurablePlacementBackend)?.RecoveryData??"",Costs=o.Costs.ToList()}).ToList()};record.Validate();
             if(retiring)return Rejected(record,operations,backends,provider);
             if(jobs.TryGetValue(record.Key,out var old)){if(SamePlan(old.Record,record))return old;return Rejected(record,operations,backends,provider);}
+            if(settled.TryGetValue(record.Key,out var receipt)){if(SamePlan(receipt.Record,record))return new AsyncPlacementJob(receipt.Record,operations.ToArray(),backends.ToArray(),null){Result=receipt.Result};return Rejected(record,operations,backends,provider);}
             if(jobs.Count>=4096)return Rejected(record,operations,backends,provider);
             var job=new AsyncPlacementJob(record,operations.ToArray(),backends.ToArray(),provider);jobs.Add(record.Key,job);
-            if(!job.Active){job.Result=new PlacementResult(PlacementResultKind.Cancelled,context.RequestId);return job;}
+            if(!job.Active){job.Record.Completed=true;job.Result=new PlacementResult(PlacementResultKind.Cancelled,context.RequestId);Archive(job);return job;}
             StartReserve(job);return job;
         }
         static bool SamePlan(PlacementJournalRecord a,PlacementJournalRecord b)=>Fingerprint(a.Costs)==Fingerprint(b.Costs)&&a.Cells.Count==b.Cells.Count&&a.Cells.Zip(b.Cells,(x,y)=>x.RequestId==y.RequestId&&x.RecoveryData==y.RecoveryData&&Fingerprint(x.Costs)==Fingerprint(y.Costs)).All(v=>v);
@@ -52,6 +59,10 @@ namespace ExtraPotions.Wildroot {
                 old.Restored=true;old.Result=null;old.NeedsRecovery=true;old.Action=null;old.Reservation=null;old.Provider=provider;
                 if(old.Record.Decision==PlacementDecisionState.None){old.Record.Cancelled=true;old.Record.Decision=PlacementDecisionState.Abort;old.Record.AbortKind=PlacementResultKind.Cancelled;}
                 StartReserve(old);return old;
+            }
+            if(settled.TryGetValue(record.Key,out var receipt)){
+                if(!SamePlan(receipt.Record,record))throw new ArgumentException("Recovery identity collision.");
+                record=receipt.Record;settled.Remove(record.Key);
             }
             foreach(var cell in record.Cells)cell.Settled=false;
             var job=new AsyncPlacementJob(record,operations.ToArray(),backends.ToArray(),provider){Restored=true,IntentSaved=true,NeedsRecovery=true};jobs.Add(record.Key,job);
@@ -80,13 +91,14 @@ namespace ExtraPotions.Wildroot {
                         if(job.Restored||job.Record.Cells.Any(c=>c.Created)){AbandonUnpaid(job);return;}
                         Finish(job,job.Cancelled?PlacementResultKind.Cancelled:PlacementResultKind.InsufficientResources);return;
                     }
-                    if(result.State==AsyncReservationState.RolledBack){job.Record.Payment=result.State;Save(job);job.Phase=4;return;}
-                    if(result.State==AsyncReservationState.Committed){job.Record.Payment=result.State;job.Record.Decision=PlacementDecisionState.Commit;Save(job);job.Phase=7;return;}
+                    if(result.State==AsyncReservationState.RolledBack){job.NeedsRecovery=false;job.Record.Payment=result.State;Save(job);job.Phase=4;return;}
+                    if(result.State==AsyncReservationState.Committed){job.NeedsRecovery=false;job.Record.Payment=result.State;job.Record.Decision=PlacementDecisionState.Commit;Save(job);job.Phase=7;return;}
                     if(result.State!=AsyncReservationState.Reserved||job.Reservation==null){job.NeedsRecovery=true;job.Phase=job.Reservation==null?6:5;return;}
-                    job.Record.Payment=result.State;Save(job);job.Phase=job.Record.Decision==PlacementDecisionState.Abort?8:job.Record.Decision==PlacementDecisionState.Commit?2:1;
+                    job.NeedsRecovery=false;job.Record.Payment=result.State;Save(job);job.Phase=job.Record.Decision==PlacementDecisionState.Abort?8:job.Record.Decision==PlacementDecisionState.Commit?2:1;
                     if(job.Phase==8)Rollback(job,job.Record.AbortKind);return;
                 }
                 if(job.Phase==1){
+                    job.NeedsRecovery=false;
                     if(terminal||!job.Active){Rollback(job,PlacementResultKind.Cancelled);return;}
                     for(int i=0;i<job.Operations.Length&&budget>0;i++){
                         if(job.Record.Cells[i].Created)continue;
@@ -115,13 +127,13 @@ namespace ExtraPotions.Wildroot {
                     if(job.Action==null){job.Action=job.Reservation.GetStatusAsync(CancellationToken.None);return;}
                     if(!job.Action.IsCompleted)return;
                     var state=job.Action.GetAwaiter().GetResult();job.Action=null;
-                    if(state==AsyncReservationState.Reserved){job.Phase=job.Record.Decision==PlacementDecisionState.Commit?2:job.Record.Decision==PlacementDecisionState.Abort?8:job.Active?1:8;if(job.Phase==8)Rollback(job,job.Record.AbortKind);return;}
+                    if(state==AsyncReservationState.Reserved){job.NeedsRecovery=false;job.Phase=job.Record.Decision==PlacementDecisionState.Commit?2:job.Record.Decision==PlacementDecisionState.Abort?8:job.Active?1:8;if(job.Phase==8)Rollback(job,job.Record.AbortKind);return;}
                     AcceptStatus(job,state);
                 }
             }catch{job.NeedsRecovery=true;job.Action=null;job.Phase=job.Reservation==null?6:5;}
         }
         void AcceptStatus(AsyncPlacementJob job,AsyncReservationState state){
-            if(state==AsyncReservationState.Committed||state==AsyncReservationState.RolledBack){job.Record.Payment=state;if(state==AsyncReservationState.Committed)job.Record.Decision=PlacementDecisionState.Commit;Save(job);job.Phase=state==AsyncReservationState.Committed?7:4;}
+            if(state==AsyncReservationState.Committed||state==AsyncReservationState.RolledBack){job.NeedsRecovery=false;job.Record.Payment=state;if(state==AsyncReservationState.Committed)job.Record.Decision=PlacementDecisionState.Commit;Save(job);job.Phase=state==AsyncReservationState.Committed?7:4;}
             // The provider holds no reservation under this identity (an admission overflow reports RecoveryRequired, then Failed).
             else if(state==AsyncReservationState.Failed&&job.Record.Decision!=PlacementDecisionState.Commit)AbandonUnpaid(job);
             else{job.NeedsRecovery=true;job.Phase=5;}
@@ -139,6 +151,7 @@ namespace ExtraPotions.Wildroot {
         }
         PlacementProbe Probe(AsyncPlacementJob job,int index)=>job.Backends[index] is IDurablePlacementBackend durable?durable.Probe(job.Record.Cells[index]):new PlacementProbe(job.Placed[index]==null?PlacementPresence.Ambiguous:PlacementPresence.Present,job.Placed[index]);
         void Settle(AsyncPlacementJob job,bool paid,ref int budget,bool terminal){
+            job.NeedsRecovery=false;
             for(int i=0;i<job.Record.Cells.Count&&budget>0;i++){
                 var cell=job.Record.Cells[i];if(cell.Settled)continue;
                 if(cell.Retired){cell.Settled=true;Save(job);continue;}
@@ -153,7 +166,8 @@ namespace ExtraPotions.Wildroot {
             }
             if(job.Record.Cells.All(c=>c.Settled))Finish(job,paid?PlacementResultKind.Committed:job.Record.AbortKind==PlacementResultKind.Cancelled&&job.Record.Decision==PlacementDecisionState.Commit?PlacementResultKind.CommitFailed:job.Record.AbortKind);
         }
-        void Finish(AsyncPlacementJob job,PlacementResultKind kind){job.Record.Completed=true;Save(job);job.NeedsRecovery=false;job.Result=new PlacementResult(kind,job.Context.RequestId);try{job.Reservation?.Dispose();}catch{}job.Reservation=null;}
+        void Archive(AsyncPlacementJob job){settled[job.Record.Key]=new SettledReceipt(job);jobs.Remove(job.Record.Key);}
+        void Finish(AsyncPlacementJob job,PlacementResultKind kind){job.Record.Completed=true;Save(job);job.NeedsRecovery=false;job.Result=new PlacementResult(kind,job.Context.RequestId);try{job.Reservation?.Dispose();}catch{}job.Reservation=null;Archive(job);}
         public void CancelAll(){foreach(var job in jobs.Values.Where(j=>j.Result==null)){
             job.Cancel();job.CancellationSaved=false;
             if(job.Record.Decision==PlacementDecisionState.None){job.Record.Decision=PlacementDecisionState.Abort;job.Record.AbortKind=PlacementResultKind.Cancelled;}
@@ -184,6 +198,7 @@ namespace ExtraPotions.Wildroot {
         }
         public void RecordRemoval(string actorId,long worldId,string sessionId,string requestId,string nativeId){
             foreach(var job in jobs.Values.Where(j=>j.Context.ActorId==actorId&&j.Context.WorldId==worldId&&j.Context.SessionId==sessionId))foreach(var cell in job.Record.Cells.Where(c=>c.RequestId==requestId&&c.NativeId==nativeId)){cell.Retired=true;Save(job);}
+            foreach(var record in settled.Values.Select(receipt=>receipt.Record).Where(r=>r.ActorId==actorId&&r.WorldId==worldId&&r.SessionId==sessionId))foreach(var cell in record.Cells.Where(c=>c.RequestId==requestId&&c.NativeId==nativeId)){cell.Retired=true;journal?.Save(record);}
         }
     }
 }

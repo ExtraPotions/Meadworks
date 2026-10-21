@@ -7,7 +7,7 @@ namespace ExtraPotions.Beacon
     {
         public const string PluginGuid = "com.meadworks.beacon";
         public const string ProductName = "Beacon";
-        public const string ProductVersion = "0.1.11";
+        public const string ProductVersion = "0.1.13";
         public const string Family = "Runestone";
 
         /// <summary>Localization namespace (design section 11): tokens <c>$meadworks_beacon_&lt;key&gt;</c>.</summary>

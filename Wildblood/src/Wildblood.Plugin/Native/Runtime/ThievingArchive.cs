@@ -80,13 +80,14 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
             catch (Exception) { return TheftStatusAnswer.Unknown; } // unreadable evidence proves nothing
         }
 
-        /// <summary>Requester side, after its settlement is saved: removes its own world row.</summary>
-        internal static void Release(TheftRequest request)
+        /// <summary>Requester side, after its settlement is saved: removes its own world row. True when a row was removed.</summary>
+        internal static bool Release(TheftRequest request)
         {
             ZoneSystem zones = ZoneSystem.instance;
             string key = TheftWorldArchive.Key(request.Root);
-            if (zones == null || !zones.GetGlobalKey(key, out string value) || TheftWorldArchive.Read(value, request.Fingerprint) == TheftStatusAnswer.Unknown) return;
+            if (zones == null || !zones.GetGlobalKey(key, out string value) || TheftWorldArchive.Read(value, request.Fingerprint) == TheftStatusAnswer.Unknown) return false;
             zones.RemoveGlobalKey(key + " " + value);
+            return true;
         }
 
         private static void Warn(string message) => RootPlugin.NativeLogger?.LogWarning(message);

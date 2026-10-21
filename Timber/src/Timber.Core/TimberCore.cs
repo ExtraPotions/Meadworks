@@ -5,7 +5,7 @@ namespace ExtraPotions.Timber
     {
         public const string PluginGuid = "com.meadworks.timber";
         public const string ProductName = "Timber";
-        public const string ProductVersion = "0.2.0";
+        public const string ProductVersion = "0.2.1";
         public const string Family = "Forge";
         public const string ProtectedPieceKey = "timber.ignoreSupport";
     }

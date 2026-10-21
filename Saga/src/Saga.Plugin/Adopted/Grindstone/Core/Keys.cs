@@ -72,8 +72,10 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone
         public const string CleanSplit = "saga.clean_split";
         /// <summary>float 0..1 on a log's ZDO: how big its tree was within its kind's size range (old growth).</summary>
         public const string WoodSize = "saga.wood_size";
-        /// <summary>Routed RPC to everybody. ZPackage: long playerId, int kind, string species, float amount, int chain; only that player's client acts on it.</summary>
+        /// <summary>Routed RPC from the server. ZPackage: long playerId, int kind, string species, float amount, int chain. A client applies it only when the sender is the server.</summary>
         public const string RpcWoodCredit = "saga.WoodCredit";
+        /// <summary>Routed RPC to the server. The same fields as <see cref="RpcWoodCredit"/>, then the source ZDO id. The server checks ownership and the cap, then sends <see cref="RpcWoodCredit"/>.</summary>
+        public const string RpcWoodReport = "saga.WoodReport";
         /// <summary>Routed RPC to everybody: (Vector3 position, string text); each client near the spot shows the text there.</summary>
         public const string RpcWoodCallout = "saga.WoodCallout";
         /// <summary>Player custom data: comma-separated species (log prefab names) of every tree the character has felled.</summary>

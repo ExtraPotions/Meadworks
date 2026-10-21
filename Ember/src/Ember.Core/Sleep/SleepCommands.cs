@@ -25,19 +25,22 @@ namespace ExtraPotions.Ember.Sleep
 
         /// <summary>Version, flags, players (int32 LE), sleeping (int32 LE), extra rate and boost total (IEEE double LE).</summary>
         public const int StateLength = 1 + 1 + 4 + 4 + 8 + 8;
+        public const int StationStateLength = StateLength + 3 * 8;
 
         const byte FlagWindowOpen = 0x01;
         const byte FlagBoosting = 0x02;
         const byte FlagFullSkip = 0x04;
         const byte KnownFlags = FlagWindowOpen | FlagBoosting | FlagFullSkip;
 
-        /// <summary>Client to authority: "my player got into or out of bed; recount". No data beyond the version.</summary>
-        public static byte[] EncodeBedChanged() => new[] { Version };
+        /// <summary>Client to authority: "my player got into or out of bed; recount". The optional byte requests per-kind totals.</summary>
+        public static byte[] EncodeBedChanged() => EncodeBedChanged(false);
+        public static byte[] EncodeBedChanged(bool stationTotals) => stationTotals ? new[] { Version, (byte)1 } : new[] { Version };
 
         public static bool TryDecodeBedChanged(byte[]? payload, out string? error) => VersionOnly(payload, out error);
 
-        /// <summary>Client to authority: "send me the current sleep state". No data beyond the version.</summary>
-        public static byte[] EncodeStateRequest() => new[] { Version };
+        /// <summary>Client to authority: "send me the current sleep state". The optional byte requests per-kind totals.</summary>
+        public static byte[] EncodeStateRequest() => EncodeStateRequest(false);
+        public static byte[] EncodeStateRequest(bool stationTotals) => stationTotals ? new[] { Version, (byte)1 } : new[] { Version };
 
         public static bool TryDecodeStateRequest(byte[]? payload, out string? error) => VersionOnly(payload, out error);
 
@@ -47,13 +50,20 @@ namespace ExtraPotions.Ember.Sleep
             var problem = Validate(state);
             if (problem != null)
                 throw new ArgumentException("Invalid sleep state: " + problem, nameof(state));
-            var bytes = new byte[StateLength];
+            var bytes = new byte[state.StationTotals.HasValue ? StationStateLength : StateLength];
             bytes[0] = Version;
             bytes[1] = (byte)((state.WindowOpen ? FlagWindowOpen : 0) | (state.Boosting ? FlagBoosting : 0) | (state.FullSkip ? FlagFullSkip : 0));
             BinaryPrimitives.WriteInt32LittleEndian(bytes.AsSpan(2, 4), state.Players);
             BinaryPrimitives.WriteInt32LittleEndian(bytes.AsSpan(6, 4), state.Sleeping);
             BinaryPrimitives.WriteInt64LittleEndian(bytes.AsSpan(10, 8), BitConverter.DoubleToInt64Bits(state.ExtraRate));
             BinaryPrimitives.WriteInt64LittleEndian(bytes.AsSpan(18, 8), BitConverter.DoubleToInt64Bits(state.BoostTotal));
+            if (state.StationTotals.HasValue)
+            {
+                var totals = state.StationTotals.Value;
+                BinaryPrimitives.WriteInt64LittleEndian(bytes.AsSpan(26, 8), BitConverter.DoubleToInt64Bits(totals.Mead));
+                BinaryPrimitives.WriteInt64LittleEndian(bytes.AsSpan(34, 8), BitConverter.DoubleToInt64Bits(totals.Crops));
+                BinaryPrimitives.WriteInt64LittleEndian(bytes.AsSpan(42, 8), BitConverter.DoubleToInt64Bits(totals.Pickables));
+            }
             return bytes;
         }
 
@@ -70,7 +80,7 @@ namespace ExtraPotions.Ember.Sleep
                 error = "unknown version " + payload[0];
                 return false;
             }
-            if (payload.Length != StateLength)
+            if (payload.Length != StateLength && payload.Length != StationStateLength)
             {
                 error = "expected " + StateLength + " bytes, got " + payload.Length;
                 return false;
@@ -85,7 +95,11 @@ namespace ExtraPotions.Ember.Sleep
             int sleeping = BinaryPrimitives.ReadInt32LittleEndian(payload.AsSpan(6, 4));
             double rate = BitConverter.Int64BitsToDouble(BinaryPrimitives.ReadInt64LittleEndian(payload.AsSpan(10, 8)));
             double total = BitConverter.Int64BitsToDouble(BinaryPrimitives.ReadInt64LittleEndian(payload.AsSpan(18, 8)));
-            var decoded = new SleepState((flags & FlagWindowOpen) != 0, players, sleeping, rate, (flags & FlagBoosting) != 0, (flags & FlagFullSkip) != 0, total);
+            StationBoostTotals? stations = payload.Length == StationStateLength ? new StationBoostTotals(
+                BitConverter.Int64BitsToDouble(BinaryPrimitives.ReadInt64LittleEndian(payload.AsSpan(26, 8))),
+                BitConverter.Int64BitsToDouble(BinaryPrimitives.ReadInt64LittleEndian(payload.AsSpan(34, 8))),
+                BitConverter.Int64BitsToDouble(BinaryPrimitives.ReadInt64LittleEndian(payload.AsSpan(42, 8)))) : (StationBoostTotals?)null;
+            var decoded = new SleepState((flags & FlagWindowOpen) != 0, players, sleeping, rate, (flags & FlagBoosting) != 0, (flags & FlagFullSkip) != 0, total, stations);
             error = Validate(decoded);
             if (error != null)
                 return false;
@@ -105,8 +119,16 @@ namespace ExtraPotions.Ember.Sleep
                 return "boosting must match a positive extra rate";
             if (double.IsNaN(s.BoostTotal) || double.IsInfinity(s.BoostTotal) || s.BoostTotal < 0.0 || s.BoostTotal > StationTimers.MaxBoostTotal)
                 return "boost total out of range";
+            if (s.StationTotals.HasValue)
+            {
+                var totals = s.StationTotals.Value;
+                if (!ValidStation(totals.Mead, s.BoostTotal) || !ValidStation(totals.Crops, s.BoostTotal) || !ValidStation(totals.Pickables, s.BoostTotal))
+                    return "station boost total out of range";
+            }
             return null;
         }
+
+        static bool ValidStation(double value, double total) => !double.IsNaN(value) && value >= 0 && value <= total;
 
         static bool VersionOnly(byte[]? payload, out string? error)
         {
@@ -120,7 +142,7 @@ namespace ExtraPotions.Ember.Sleep
                 error = "unknown version " + payload[0];
                 return false;
             }
-            if (payload.Length != 1)
+            if (payload.Length != 1 && !(payload.Length == 2 && payload[1] == 1))
             {
                 error = "unexpected data after the version";
                 return false;

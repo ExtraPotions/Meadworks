@@ -5,20 +5,21 @@ using UnityEngine;
 namespace ExtraPotions.Wildblood.Adopted.Mutations
 {
     /// <summary>
-    /// Sets this machine's own player on fire from a patch of Flamebound ground: one hit of pure fire damage with no
-    /// attacker, which the game turns into its own Burning status (fire resistance and Fire Resistance Mead apply as to any
-    /// other fire). Called by the player's own machine, which owns the player, so the hit lands locally.
+    /// Sets this machine's own player on fire from a patch of Flamebound ground. Fire resistance and being wet still
+    /// apply, through the game's own Burning. Armor does not: a hit of this size was stopped by about 9 armor before it
+    /// could start Burning. No attacker, so it is not scaled again and does not feed Leeching. The player's own machine
+    /// decides it.
     /// </summary>
     internal static class FireGround
     {
         public static void Ignite(Player player, float fire)
         {
+            if (player == null || fire <= 0f) return;
             HitData hit = new HitData();
             hit.m_damage.m_fire = fire;
-            hit.m_point = player.transform.position;
-            hit.m_dir = Vector3.up;
-            hit.m_hitType = HitData.HitType.Burning;
-            player.Damage(hit);
+            hit.ApplyResistance(player.GetDamageModifiers(), out _);
+            if (hit.m_damage.m_fire <= 0f) return;
+            player.AddFireDamage(hit.m_damage.m_fire, hit.m_variant);
         }
     }
 }

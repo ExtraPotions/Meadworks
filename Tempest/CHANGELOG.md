@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.12 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Optional Solstice integration: seasonal environments follow base weather switches; four host-owned seasonal weight lists apply live with neutral defaults. Event warning and clearing weather can use existing seasonal variants while active Tempest event skies retain ownership. No Solstice dependency is required. See docs/SEASONS.md for the contract and Cairn forecast display limits.
+- German, Russian, Chinese and Korean weather text quotes setting names as names. The shield generator uses the game's piece name.
+- The weather badge updates its title and countdown when those lines change, including once a second while time is left. It no longer joins them into one string every frame. The meter still moves every frame.
+
+## 0.1.11 (2026-10-20)
+
+- Requires Crucible 0.3.25 / Crucible.UI 0.3.18.
+- License text: LICENSE_SCOPE.md now says Tempest ships its approved original icon.png (CC BY-NC-SA 4.0) instead of "no image".
+
 ## 0.1.10 (2026-10-19)
 
 - Requires Crucible 0.3.22 / Crucible.UI 0.3.15.

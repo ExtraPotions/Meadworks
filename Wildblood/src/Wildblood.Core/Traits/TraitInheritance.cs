@@ -18,7 +18,7 @@ namespace ExtraPotions.Wildblood.Traits
     public static class TraitInheritance
     {
         public static TraitSet Inherit(TraitSet mother, TraitSet? sire, float mutationChance, int enabled, int barred,
-            Func<Modifier, bool> modifierAllowed, IDice dice)
+            Func<Modifier, bool> modifierAllowed, IDice dice, bool mutationsKept = true)
         {
             if (mother == null) throw new ArgumentNullException(nameof(mother));
             if (modifierAllowed == null) throw new ArgumentNullException(nameof(modifierAllowed));
@@ -27,18 +27,18 @@ namespace ExtraPotions.Wildblood.Traits
             foreach (var mutation in Mutations.Of(pool))
                 if ((enabled & Mutations.Bit(mutation)) != 0) candidates.Add(mutation);
             var mask = 0;
-            if (candidates.Count > 0 && dice.Percent(mutationChance))
+            if (mutationsKept && candidates.Count > 0 && dice.Percent(mutationChance))
                 mask = Mutations.Bit(candidates[dice.Range(0, candidates.Count)]);
             return new TraitSet(mask, mother.Modifiers.Where(modifierAllowed), mother.Biome);
         }
 
         /// <summary>The capability's blob form; an unreadable parent counts as plain.</summary>
         public static string Inherit(string mother, string sire, float mutationChance, int enabled, int barred,
-            Func<Modifier, bool> modifierAllowed, IDice dice)
+            Func<Modifier, bool> modifierAllowed, IDice dice, bool mutationsKept = true)
         {
             TraitBlob.TryDecode(mother, out var m);
             TraitBlob.TryDecode(sire, out var s);
-            var young = Inherit(m, s, mutationChance, enabled, barred, modifierAllowed, dice);
+            var young = Inherit(m, s, mutationChance, enabled, barred, modifierAllowed, dice, mutationsKept);
             return young.Mutations == 0 && young.Modifiers.Count == 0 ? "" : TraitBlob.Encode(young);
         }
     }

@@ -116,6 +116,7 @@ namespace ExtraPotions.Larder.Runtime
                 restDelayAside=MeadworksStepAside.ShouldYield(RestDelaySourceId);
                 PatchSwitch.MarkDirty();
                 NativeCooking.Initialize(Config,log,()=>ModuleActive("Cooking"));
+                AnyQuality.Install(log);
                 referenceImport=new LarderReferenceImport(Config,log);
                 started=true;
             }catch(Exception error){log.Error("Larder modules rejected: "+error);Shutdown();}
@@ -139,7 +140,7 @@ namespace ExtraPotions.Larder.Runtime
             Ready = false;
             started=false;
             referenceImport?.Dispose();referenceImport=null;
-            foreach(Action stop in new Action[]{FoodTopUp.Shutdown,NativeCooking.Shutdown,SafeStamina.Shutdown,NativeFeastMaster.Shutdown,LarderText.Shutdown})
+            foreach(Action stop in new Action[]{AnyQuality.Shutdown,FoodTopUp.Shutdown,NativeCooking.Shutdown,SafeStamina.Shutdown,NativeFeastMaster.Shutdown,LarderText.Shutdown})
                 try{stop();}catch(Exception error){log?.Warning("Larder teardown "+stop.Method.DeclaringType?.FullName+"."+stop.Method.Name+": "+error);}
             registration?.Dispose();
             registration = null;

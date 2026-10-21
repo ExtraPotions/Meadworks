@@ -2,16 +2,18 @@
 
 Creature stars that grow with the world, mutations, boss aspects, loot rules and bad-luck protection.
 
-Version 0.5.2. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.4. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
-- Stars: creatures roll up to 8 stars from a difficulty you choose (per world), shown as small stars and large stars worth five. Health and damage can also rise with distance from the world center (off by default).
+- Stars: creatures roll up to 8 stars from a difficulty you choose (per world), shown as small stars and large stars worth five. Health and damage can also rise with distance from the world center (off by default). Raid extra stars stop at that biome's difficulty cap.
+- Tamed Stars (on by default, set by the server) changes new births only. On, a newborn may inherit stars, and Shepherd follows this. Off, a newborn keeps its parent's level, as the game does, and no bonus star is added. Taming never removes stars, health or mutations. A creature an older build left at the game's level gets its stored stars back the next time it loads.
 - World tier: the tier rises by one the first time anyone kills each listed boss, and each tier raises the odds of stars and mutations.
-- Traits: creatures can carry a signature mutation and up to two modifiers, with colored stars and the mutation word before their name. Tamed creatures keep their traits.
+- Traits: creatures can carry a signature mutation and up to two modifiers, with colored stars and the mutation word before their name. Tamed creatures keep their traits. Flamebound burning ground burns through armor. Fire resistance and being wet still reduce it.
 - Thieving and devouring creatures show an icon of what they hold.
 - Bosses: boss stars, an aspect taken at the altar, a damage board for each player when a boss dies, hints toward the next point of interest, and no natural spawns near an active boss.
 - Loot: server-tunable loot rules (extra rolls or more of each drop per star, optional trophy multiplying).
+- Seasonal Meat and Seasonal Wood (on by default, host or server): while Solstice seasons are on, meat and hide from creatures, and wood from trees, follow that season's rate. Spring and summer drop less. Fall and winter drop more, from one quarter to three times the usual amount. One item stays one item. Trophies and other drops stay as they are. Off, or without Solstice, drops stay as they are. Creature stars are unchanged.
 - Bad-luck protection for rare drops, saved with your character per world and credited to the player who made the kill. Safely identified rare single-item drops share star-tier progress, weighted 1/2/4 for zero/one/two stars. Ambiguous old counters retain their existing behavior. Attributed multiplayer decisions require matching Wildblood 0.4.x peers; older peers cannot write the new decision protocol. After a restart, an exact retained result can finish recipient recovery without repeating a death or recreating drops. A distinct durable recovery receipt releases the recipient for a different source; it does not fabricate producer acknowledgment or clear the original source fence. Bounded committed counter history can reconcile an exact older saved image with the durable head. Unresolved outcomes, conflicting images, and saves outside retained proof remain held.
 - Pressure: killing wild creatures raises Karma in the surrounding area, which adds stars to new spawns there and fades over time; a player dying there lowers it. High Karma can call an Enforcer, a strong creature with minions and extra loot. Creature health and damage also scale with nearby players.
 - Crouch and look at a creature to see its resistances and weaknesses.
@@ -23,7 +25,7 @@ Version 0.5.2. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CH
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.24 or a later 0.3.x, which includes Crucible.UI 0.3.17 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 
@@ -44,7 +46,8 @@ Version 0.5.2. Requires Crucible 0.3.24 / Crucible.UI 0.3.17. Changes are in [CH
 - Distance Scaling (off by default) makes creatures stronger the farther from the world center they are rolled.
 - It applies a `distanceScaling: [damageStep, healthStep, stepMeters, maxSteps]` band once, where each creature is rolled. The default rules ship the example band `[0.03, 0.08, 1000, 5]` (+3% damage and +8% health per 1000 m from the world center, up to 5 steps) on every creature but bosses; write your own on a `biomes:` or `creatures:` rule to change it. `modifierDistanceScaling` raises modifier chances the same way.
 - Respect Enemy Level Up Rate multiplies the odds of every star count by the world modifier's enemy level-up rate.
-- Tamed Keep Traits (on by default) lets tamed creatures keep their traits; off, a tamed creature's mutations and modifiers do not act while it is tamed (they stay stored and come back when the setting does; its stars stay).
+- Tamed Keep Traits (on by default) lets tamed creatures keep their traits; off, a tamed creature's mutations and modifiers do not act while it is tamed (they stay stored and come back when the setting does; its stars stay). Young born while it is off inherit no mutation. Traits already stored on a tame stay stored.
+- Tamed Stars (on by default) is set by the server. Shepherd reads that choice and does not use its own Tamed Stars value.
 - Scale Saddle-able Creatures off keeps creatures that take a saddle at their normal size at any star count.
 - Health Per Extra Player, Damage Per Extra Player and Max Players For Scaling set the game's own multiplayer difficulty while the Pressure module is on. Karma and Enforcers are not affected.
 - These three settings stand down, leaving the game's or the other mod's values alone, while CreatureManager (or a plugin GUID on the server's Yield Scaling To list) is installed, and for the rest of the session once another mod is seen changing those values; Wildblood says so once.
@@ -63,6 +66,7 @@ The original chest opens and closes automatically for the player using it and fo
 ## Multiplayer
 
 - Required on all peers: install it on the server and on every client, same major.minor version.
+- A player who just joined does not roll nearby creatures, or apply their stats, from that player's own rules before the server's rules arrive. Those creatures stay as the game spawned them until the server's rules are in.
 - Joining a server without Meadworks: Crucible waits for the server's reply (10 seconds by default), then treats it as a vanilla server; Wildblood turns off for that session and cheats stay locked.
 - Players without Meadworks (vanilla clients) cannot join a server running Wildblood. With only server-only or client-optional Meadworks products installed, an admin can let them join with Crucible's `Network.AdmissionMode` set to `AllowVanilla`.
 

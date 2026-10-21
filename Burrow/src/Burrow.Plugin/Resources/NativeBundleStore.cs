@@ -12,16 +12,17 @@ namespace Burrow.Resources {
         // The game's load leaves some durabilities a hundredth short of what they save as; keep every image byte-exact.
         internal Inventory Load(){var inventory=new Inventory("Burrow payment snapshot",null,Width,Height);inventory.Load(new ZPackage(Data));foreach(var item in inventory.GetAllItems())item.m_durability=SavedDurability.Exact(item.m_durability);return inventory;}
     }
-    internal sealed class NativeBundleStore:IInventoryImageStore,IInventoryCheckpointStore,IInventoryRecoveryDiagnostics {
+    internal sealed class NativeBundleStore:IInventoryImageStore,IInventoryCheckpointStore,IInventoryRecoveryDiagnostics,IInventoryImageRebase {
         internal const string HoldKey="burrow.resource-hold",HoldUntil="burrow.resource-hold-until";
         readonly Dictionary<string,(NativeImage[] Before,NativeImage[] After)> bindings=new Dictionary<string,(NativeImage[],NativeImage[])>();
         readonly HashSet<string> confirmed=new HashSet<string>(StringComparer.Ordinal);
         readonly HashSet<string> unsavedPlayerReceipts=new HashSet<string>(StringComparer.Ordinal);
-        readonly long world;readonly string actor;
+        readonly long world;readonly string actor;readonly bool rebaseUnpaid;
         internal Action<string,Inventory,IReadOnlyList<ItemDrop.ItemData>> BeforeChanged;
         double nextDiagnostic;
         public void RecoveryRequired(string code){if(UnityEngine.Time.realtimeSinceStartupAsDouble<nextDiagnostic)return;nextDiagnostic=UnityEngine.Time.realtimeSinceStartupAsDouble+10;Plugin.Log.LogWarning("Burrow native inventory recovery: "+code);}
-        internal NativeBundleStore(InventoryDecisionJournal journal,long world,string actor){this.world=world;this.actor=actor;foreach(var record in journal.Snapshot()){Bind(record.Source,record.Before,record.After);if(record.State==InventoryDecision.Decided)unsavedPlayerReceipts.Add(record.Source);}}
+        /// <param name="rebaseUnpaid">Shared Materials payments: a source that changed only outside the paid stacks still pays.</param>
+        internal NativeBundleStore(InventoryDecisionJournal journal,long world,string actor,bool rebaseUnpaid=false){this.world=world;this.actor=actor;this.rebaseUnpaid=rebaseUnpaid;foreach(var record in journal.Snapshot()){Bind(record.Source,record.Before,record.After);if(record.State==InventoryDecision.Decided)unsavedPlayerReceipts.Add(record.Source);}}
         internal static byte[] Bytes(Inventory inventory){var packet=new ZPackage();inventory.Save(packet);return packet.GetArray();}
         internal static byte[] Encode(NativeImage[] images){var packet=new ZPackage();packet.Write(1);packet.Write(images.Length);foreach(var image in images){packet.Write(image.Id);packet.Write(image.Width);packet.Write(image.Height);packet.Write(image.Data);}return packet.GetArray();}
         static NativeImage[] Decode(byte[] bytes){
@@ -58,22 +59,55 @@ namespace Burrow.Resources {
         public void Apply(string source,byte[] bytes){
             if(!IsBound(source)||!bytes.SequenceEqual(Encode(bindings[source].After)))throw new InvalidOperationException("Native payment image unavailable.");
             RequireForeignUnlocked(source);
+            var pair=bindings[source];
             NativeInventoryGuards.Applying=true;
-            try{foreach(var image in bindings[source].After){
+            try{for(int i=0;i<pair.After.Length;i++){
+                var image=pair.After[i];
                 if(EntryConfirmed(source,image))continue;
                 RequireForeignUnlocked(source);
-                var live=Inventory(image);if(Bytes(live).SequenceEqual(image.Data))continue;
-                var expected=image.Load();var original=live.GetAllItems().ToArray();var changed=new List<ItemDrop.ItemData>();
-                foreach(var item in expected.GetAllItems()){
-                    var same=original.FirstOrDefault(old=>old.m_gridPos==item.m_gridPos&&SameExceptCount(old,item));
-                    if(same!=null){same.m_stack=item.m_stack;changed.Add(same);}else changed.Add(item);
-                }
-                live.GetAllItems().Clear();live.GetAllItems().AddRange(changed);
+                var live=Inventory(image);var current=Bytes(live);if(current.SequenceEqual(image.Data))continue;
+                // Paid only from an inventory still exactly as reserved. Only the slots that differ between the two images
+                // change; every other item keeps its instance, so an equipped tool stays the item the player holds.
+                if(!current.SequenceEqual(pair.Before[i].Data))throw new InvalidOperationException("Native payment source changed before apply.");
+                var loaded=pair.Before[i].Load();if(!Bytes(loaded).SequenceEqual(pair.Before[i].Data))throw new InvalidOperationException("Native payment image does not load back exactly.");
+                var reserved=loaded.GetAllItems();var expected=image.Load().GetAllItems();var original=live.GetAllItems().ToArray();
+                ImagePayment.Apply(live.GetAllItems(),Items(reserved,image.Width),Items(expected,image.Width),expected,item=>Slot(item,image.Width),Identity,item=>item.m_stack,(item,count)=>item.m_stack=count);
                 BeforeChanged?.Invoke(source,live,original);
                 live.Changed();
             }}finally{NativeInventoryGuards.Applying=false;}
         }
-        static bool SameExceptCount(ItemDrop.ItemData a,ItemDrop.ItemData b){var first=a.Clone();var second=b.Clone();first.m_stack=1;second.m_stack=1;var p=new ZPackage();var q=new ZPackage();Burrow.Shared.ItemPacket.Write(p,first);Burrow.Shared.ItemPacket.Write(q,second);return p.GetArray().SequenceEqual(q.GetArray());}
+        /// <summary>
+        /// Moves a held payment onto its live sources when they changed only outside the paid stacks, for example the equipped
+        /// cultivator losing durability for the previous cell, or a picked-up item landing in another slot. Each source's paid
+        /// positions must still hold exactly the reserved item and count (<see cref="ImagePayment"/> checks this), and the live
+        /// source and its paid result must both load back byte for byte. Nothing live changes here.
+        /// </summary>
+        public bool TryRebase(string source,out byte[] before,out byte[] after){
+            before=after=null;
+            if(!rebaseUnpaid||!IsBound(source))return false;
+            var pair=bindings[source];var rebasedBefore=new NativeImage[pair.Before.Length];var rebasedAfter=new NativeImage[pair.After.Length];
+            try{
+                for(int i=0;i<pair.Before.Length;i++){
+                    var reservedImage=pair.Before[i];
+                    if(EntryConfirmed(source,reservedImage))return false;
+                    var current=Bytes(Inventory(reservedImage));
+                    if(current.SequenceEqual(reservedImage.Data)){rebasedBefore[i]=reservedImage.Copy();rebasedAfter[i]=pair.After[i].Copy();continue;}
+                    var live=new NativeImage{Id=reservedImage.Id,Width=reservedImage.Width,Height=reservedImage.Height,Data=current};
+                    var paid=live.Load();if(!Bytes(paid).SequenceEqual(current))return false;
+                    var reserved=reservedImage.Load();if(!Bytes(reserved).SequenceEqual(reservedImage.Data))return false;
+                    var expected=pair.After[i].Load().GetAllItems();
+                    ImagePayment.Apply(paid.GetAllItems(),Items(reserved.GetAllItems(),live.Width),Items(expected,live.Width),expected,item=>Slot(item,live.Width),Identity,item=>item.m_stack,(item,count)=>item.m_stack=count);
+                    var result=new NativeImage{Id=live.Id,Width=live.Width,Height=live.Height,Data=Bytes(paid)};
+                    if(!Bytes(result.Load()).SequenceEqual(result.Data))return false;
+                    rebasedBefore[i]=live;rebasedAfter[i]=result;
+                }
+            }catch(InvalidOperationException){return false;}
+            before=Encode(rebasedBefore);after=Encode(rebasedAfter);return true;
+        }
+        public void Rebind(string source,byte[] before,byte[] after){if(!rebaseUnpaid)throw new InvalidOperationException("Native payment cannot be rebased.");Bind(source,before,after);}
+        static int Slot(ItemDrop.ItemData item,int width)=>item.m_gridPos.y*width+item.m_gridPos.x;
+        static ImageItem[] Items(List<ItemDrop.ItemData> items,int width)=>items.Select(item=>new ImageItem(Slot(item,width),Identity(item),item.m_stack)).ToArray();
+        static byte[] Identity(ItemDrop.ItemData item){var copy=item.Clone();copy.m_stack=1;var packet=new ZPackage();Burrow.Shared.ItemPacket.Write(packet,copy);return packet.GetArray();}
         public bool ReceiptConfirmed(string source){
             if(confirmed.Contains(source))return true;
             if(!bindings.TryGetValue(source,out var pair)||NativeChestIdentity.World!=world||pair.Before.Any(e=>e.Id.StartsWith("player:",StringComparison.Ordinal))&&!Actor)return false;
@@ -106,9 +140,9 @@ namespace Burrow.Resources {
             write(zdo);
             if(chest.m_nview.IsOwner()&&chest.m_lastRevision==before)chest.m_lastRevision=zdo.DataRevision;
         }
-        internal void Hold(string source,bool decided){
+        internal void Hold(string source,bool decided,double seconds=DurableInventoryParticipant.HoldSeconds){
             if(!bindings.TryGetValue(source,out var pair))return;
-            foreach(var image in pair.Before.Where(e=>e.Id.StartsWith("chest:",StringComparison.Ordinal)&&!EntryConfirmed(source,e))){var chest=Chest(image.Id);if(!chest||!chest.m_nview.IsOwner())continue;WriteKeys(chest,zdo=>{zdo.Set(HoldKey,source);zdo.Set(HoldUntil,decided?0L:DateTime.UtcNow.AddSeconds(10).Ticks);});}
+            foreach(var image in pair.Before.Where(e=>e.Id.StartsWith("chest:",StringComparison.Ordinal)&&!EntryConfirmed(source,e))){var chest=Chest(image.Id);if(!chest||!chest.m_nview.IsOwner())continue;WriteKeys(chest,zdo=>{zdo.Set(HoldKey,source);zdo.Set(HoldUntil,decided?0L:DateTime.UtcNow.AddSeconds(seconds).Ticks);});}
         }
         internal void Release(string source){
             if(!bindings.TryGetValue(source,out var pair))return;

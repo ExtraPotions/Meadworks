@@ -9,18 +9,21 @@ namespace ExtraPotions.Wildroot.Runtime {
   readonly WildrootConfig settings;readonly PlacementController planting;readonly LocalizationLoader text;
   Hud? owner;RectTransform? panel,row;TMP_Text? title,body;TMP_Text[] keyText=Array.Empty<TMP_Text>();RectTransform[] keyBoxes=Array.Empty<RectTransform>();
   LayoutElement? reservation;Vector3 rowScale;Vector2 rowSize;string language="";bool gamepad;
+  int revision=-1,lastRows=-1,lastColumns=-1,screenWidth,screenHeight;float lastAvailable;bool shown;
   internal GridHud(WildrootConfig settings,PlacementController planting,LocalizationLoader text){this.settings=settings;this.planting=planting;this.text=text;}
   internal static string KeyLabel(object? value){var key=value?.ToString()??"None";return key.Replace("RightControl","Right Ctrl").Replace("LeftControl","Left Ctrl").Replace("RightArrow","→").Replace("LeftArrow","←").Replace("UpArrow","↑").Replace("DownArrow","↓").Replace("JoystickButton4","LB");}
   string Key(string id)=>KeyLabel(settings.Find(id)?.BoxedValue);
   internal void Update(){
    var hud=Hud.instance;var player=Player.m_localPlayer;var piece=player?player.GetSelectedPiece():null;
-   // The equipped-items scan allocates a list; it only matters when a piece is selected that planting does not handle.
-   bool Cultivator()=>player!.GetInventory().GetEquippedItems().Exists(item=>item.m_shared.m_name=="$item_cultivator");
+   bool Cultivator()=>PlacementController.RightItem(player!)?.m_shared?.m_name=="$item_cultivator";
    bool visible=CrucibleUiPlugin.Active&&settings.Active&&hud&&player&&!player.IsDead()&&!player.IsTeleporting()&&piece&&(planting.CanHandle(piece)||Cultivator())&&!Menu.IsVisible()&&!InventoryGui.IsVisible();
    if(!visible){Hide();return;}
    if(owner!=hud||language!=text.Language||gamepad!=ZInput.IsGamepadActive()||!panel){Dispose();owner=hud;Build();}
-   if(!panel||!title||!body||!row||!reservation)return;panel.gameObject.SetActive(true);
+   if(!panel||!title||!body||!row||!reservation)return;
    var preview=Plugin.Instance?.Preview;var (rows,columns)=preview!=null?Shape(preview.SizeFor(piece)):GridLayout.Size(settings.Get("Grid.Enabled",true),settings.Get("Grid.Rows",2),settings.Get("Grid.Columns",2));
+   float available=((RectTransform)row.parent).rect.width+rowSize.x;
+   if(shown&&revision==settings.Revision&&lastRows==rows&&lastColumns==columns&&lastAvailable.Equals(available)&&screenWidth==Screen.width&&screenHeight==Screen.height)return;
+   panel.gameObject.SetActive(true);shown=true;
    title.text=text.Text("grid_title");body.text=text.Format("grid_shape",columns,rows,(long)rows*columns);
    var keys=gamepad?new[]{Key("Input.GamepadModifierKey"),"←","↑","→","↓"}:new[]{Key("Input.KeyboardModifierKey"),Key("Input.DecreaseXKey"),Key("Input.IncreaseYKey"),Key("Input.IncreaseXKey"),Key("Input.DecreaseYKey")};
    bool showKeys=settings.Get("Preview.ShowHUDKeyHints",true);
@@ -32,8 +35,9 @@ namespace ExtraPotions.Wildroot.Runtime {
    reservation.minWidth=reservation.preferredWidth=(float)(positions[positions.Length-1]+widths[widths.Length-1]);reservation.minHeight=reservation.preferredHeight=height;
    LayoutRebuilder.ForceRebuildLayoutImmediate(panel);LayoutRebuilder.ForceRebuildLayoutImmediate(row);
    // Reserve the complete hint before Remove, and fit the native row when translations or bindings need more space.
-   var available=((RectTransform)row.parent).rect.width+rowSize.x;var required=LayoutUtility.GetPreferredWidth(row);
+   var required=LayoutUtility.GetPreferredWidth(row);
    float scale=(float)GridHintLayout.Scale(available,required);row.localScale=Vector3.Scale(rowScale,new Vector3(scale,scale,1));row.sizeDelta=new Vector2(rowSize.x+(scale>0?available/scale-available:0),rowSize.y);LayoutRebuilder.ForceRebuildLayoutImmediate(row);
+   revision=settings.Revision;lastRows=rows;lastColumns=columns;lastAvailable=available;screenWidth=Screen.width;screenHeight=Screen.height;
   }
   static (int rows,int columns) Shape((int rows,int columns,int max) size)=>(size.rows,size.columns);
   void Build(){
@@ -51,8 +55,8 @@ namespace ExtraPotions.Wildroot.Runtime {
   }
   TMP_Text CloneLabel(TMP_Text template,string name){var label=UnityEngine.Object.Instantiate(template,panel,false);label.name=name;label.text="";label.raycastTarget=false;return label;}
   static void Place(RectTransform rect,float x,float y,float width,float height){rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(x,-y);rect.sizeDelta=new Vector2(width,height);}
-  void Hide(){if(panel)panel.gameObject.SetActive(false);RestoreRow();}
+  void Hide(){if(!shown)return;shown=false;if(panel)panel.gameObject.SetActive(false);RestoreRow();}
   void RestoreRow(){if(row){row.localScale=rowScale;row.sizeDelta=rowSize;LayoutRebuilder.MarkLayoutForRebuild(row);}}
-  public void Dispose(){RestoreRow();if(panel){panel.gameObject.SetActive(false);UnityEngine.Object.Destroy(panel.gameObject);}panel=null;row=null;title=null;body=null;reservation=null;keyText=Array.Empty<TMP_Text>();keyBoxes=Array.Empty<RectTransform>();owner=null;language="";}
+  public void Dispose(){RestoreRow();if(panel){panel.gameObject.SetActive(false);UnityEngine.Object.Destroy(panel.gameObject);}panel=null;row=null;title=null;body=null;reservation=null;keyText=Array.Empty<TMP_Text>();keyBoxes=Array.Empty<RectTransform>();owner=null;language="";shown=false;revision=-1;}
  }
 }

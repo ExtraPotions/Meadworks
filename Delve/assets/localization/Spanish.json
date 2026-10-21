@@ -121,7 +121,7 @@
     "cfg_chests__reset_opened_name": "Reiniciar los abiertos",
     "cfg_chests__reset_opened_help": "Activado: un cofre abierto se rellena tras el retraso aunque queden restos dentro, que se reemplazan. Desactivado: solo los cofres vacíos siguen un reloj.",
     "cfg_chests__restock_loaded_name": "Rellenar los cargados",
-    "cfg_chests__restock_loaded_help": "Rellena también los cofres que un jugador tiene cargados, salvo que alguien tenga el cofre abierto. Los cofres cerca de una base están cargados casi siempre.",
+    "cfg_chests__restock_loaded_help": "Activado: el retraso sigue contando mientras un jugador tiene el cofre cargado, y el contenido nuevo se escribe en la primera revisión después de que el cofre se descarga. Desactivado: un cofre cargado se deja quieto hasta que se descarga, y el retraso empieza entonces. El contenido nunca se reemplaza mientras esa copia sigue en memoria.",
     "cfg_chests__chest_dry_run_name": "Cofres: simulación",
     "cfg_chests__chest_dry_run_help": "Activado: solo informa de lo que volvería; no cambia nada.",
     "cfg_chests__exclude_name": "Excluir",

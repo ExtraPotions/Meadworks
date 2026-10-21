@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using ExtraPotions.Inscribe.Adopted.Items;
 using ExtraPotions.Inscribe.Adopted.Text;
+using ExtraPotions.Inscribe.Runtime;
 using UnityEngine;
 
 namespace ExtraPotions.Inscribe.Adopted.Tables.Window
@@ -48,6 +49,10 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
                 return;
             }
             int given = Take(view.Inventory, prefab, all ? count : 1);
+            if (given <= 0)
+            {
+                return;
+            }
             view.Store.AddEssence(given * each);
             Report(view, given * each);
         }
@@ -67,6 +72,10 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
                 {
                     gained += Take(view.Inventory, prefab, count) * each;
                 }
+            }
+            if (gained <= 0)
+            {
+                return;
             }
             view.Store.AddEssence(gained);
             Report(view, gained);
@@ -162,8 +171,7 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
                     continue;
                 }
                 int take = Mathf.Min(item.m_stack, count - taken);
-                inventory.RemoveItem(item, take);
-                taken += take;
+                taken += SafeInventory.RemoveFrom(inventory, item, take);
             }
             return taken;
         }

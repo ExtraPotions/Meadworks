@@ -25,8 +25,12 @@ namespace ExtraPotions.Wildblood.Adopted.Breeding
         public static CreatureTraits Offspring(CreatureTraits mother, CreatureTraits? sire, RuleSet rules, int barred = 0)
         {
             int cap = Mathf.Max(mother.Stars, sire?.Stars ?? 0);
-            int stars = rules.CreatureStars ? Random.Range(0, cap + 1) : 0; // off: the game passes the parent's level on
-            int mask = PickMutation((mother.Mask | (sire?.Mask ?? 0)) & ~barred, rules);
+            bool starsKept = ExtraPotions.Wildblood.Runtime.Plugin.Settings == null
+                || ExtraPotions.Wildblood.Runtime.Plugin.Settings.Get(ExtraPotions.Wildblood.Config.WildbloodSettings.Traits.TamedStars);
+            bool mutationsKept = ExtraPotions.Wildblood.Runtime.Plugin.Settings == null
+                || ExtraPotions.Wildblood.Runtime.Plugin.Settings.Get(ExtraPotions.Wildblood.Config.WildbloodSettings.Traits.TamedKeepTraits);
+            int stars = rules.CreatureStars && starsKept ? Random.Range(0, cap + 1) : 0; // off: the game passes the parent's level on
+            int mask = mutationsKept ? PickMutation((mother.Mask | (sire?.Mask ?? 0)) & ~barred, rules) : 0;
             return new CreatureTraits(stars, mask);
         }
 

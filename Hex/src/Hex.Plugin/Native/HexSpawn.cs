@@ -23,7 +23,7 @@ internal static class HexSpawn
     static int scan, picked;
     static readonly HashSet<ZDOID> attempted = new();
     internal static bool Allowed => Plugin.Ready && Plugin.Active && Plugin.Settings?.Enabled.Value == true && Plugin.Settings.Spawning.Value
-        && HexMovement.Owned(Player.m_localPlayer) && MeadworksMischief.Decide(Plugin.Guid, MischiefCategory.Economy).Allowed;
+        && HexMovement.Owned(Player.m_localPlayer) && HexGrantHint.SpawnAllowed();
     internal static string Request(HexSpawnRequest value, bool confirmed = false)
     {
         if (pending != null || delivery != null) return HexText.Text("spawn_busy");
@@ -32,7 +32,8 @@ internal static class HexSpawn
         var entry = HexSpawnCatalog.Resolve(value);
         if (entry == null || !HexSpawnData.Supported(value, entry.MaxQuality, entry.Tameable)) return HexText.Text("spawn_unsupported");
         if (!confirmed && value.Amount > Plugin.Settings!.ConfirmSpawnAbove.Value) return HexText.Format("spawn_confirm", value.Amount);
-        if (!MeadworksMischief.TryUse(Plugin.Guid, "Spawn.Create", MischiefCategory.Economy, HexText.Text("label_spawning"))) return HexText.Text("spawn_denied");
+        if (MeadworksMischief.Decide(Plugin.Guid, MischiefCategory.Economy).Allowed
+            && !MeadworksMischief.TryUse(Plugin.Guid, "Spawn.Create", MischiefCategory.Economy, HexText.Text("label_spawning"))) return HexText.Text("spawn_denied");
         Reset(); request = value; actor = Player.m_localPlayer; net = ZNet.instance; generation = CruciblePlugin.Session.Generation; profile = actor.GetPlayerID();
         if (profile == 0 || net == null) { Reset(); return HexText.Text("spawn_denied"); }
         try

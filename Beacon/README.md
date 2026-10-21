@@ -1,6 +1,6 @@
 # Beacon
 
-Version 0.1.11. Requires Crucible 0.3.23 / Crucible.UI 0.3.16. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.13. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Saved servers that join without the password prompt, with passwords kept in your system's protected storage.
 
@@ -21,7 +21,7 @@ Saved servers that join without the password prompt, with passwords kept in your
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.23 or a later 0.3.x, which includes Crucible.UI 0.3.16 (the shared Meadworks interface kit)
+- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
 
 ## Installation
 

@@ -19,7 +19,7 @@ namespace ExtraPotions.Cairn.Hud
     /// <summary>The settings and state that decide which rows show.</summary>
     public readonly struct HudOptions
     {
-        public HudOptions(bool showDay, bool showTime, bool showWeather, bool showCompass, bool showHeading, bool showRadius, bool showRadiusInputs, TempestLineKind tempest, bool sleep = false)
+        public HudOptions(bool showDay, bool showTime, bool showWeather, bool showCompass, bool showHeading, bool showRadius, bool showRadiusInputs, TempestLineKind tempest, bool sleep = false, bool forecast = false)
         {
             ShowDay = showDay;
             ShowTime = showTime;
@@ -30,6 +30,7 @@ namespace ExtraPotions.Cairn.Hud
             ShowRadiusInputs = showRadiusInputs;
             Tempest = tempest;
             Sleep = sleep;
+            Forecast = forecast;
         }
 
         public bool ShowDay { get; }
@@ -40,6 +41,9 @@ namespace ExtraPotions.Cairn.Hud
         public bool ShowRadius { get; }
         public bool ShowRadiusInputs { get; }
         public bool Sleep { get; }
+
+        /// <summary>A forecast is ready for the clock line, so the status line stays even with the day, time and current weather hidden.</summary>
+        public bool Forecast { get; }
 
         /// <summary>The Tempest row this frame; <see cref="TempestLineKind.None"/> draws no row.</summary>
         public TempestLineKind Tempest { get; }
@@ -98,7 +102,7 @@ namespace ExtraPotions.Cairn.Hud
         public static IReadOnlyList<HudRow> Rows(HudOptions options)
         {
             var rows = new List<HudRow>();
-            if (options.ShowDay || options.ShowTime || options.ShowWeather) rows.Add(HudRow.Status);
+            if (options.ShowDay || options.ShowTime || options.ShowWeather || options.Forecast) rows.Add(HudRow.Status);
             if (options.ShowCompass) rows.Add(HudRow.Compass);
             if (options.ShowCompass && options.ShowHeading) rows.Add(HudRow.Heading);
             if (options.Sleep) rows.Add(HudRow.Sleep);
@@ -322,6 +326,19 @@ namespace ExtraPotions.Cairn.Hud
             if (string.IsNullOrEmpty(first)) return second ?? "";
             if (string.IsNullOrEmpty(second)) return first;
             return first + " \u00b7 " + second;
+        }
+
+        /// <summary>
+        /// The clock line's weather words. The forecast stands alone when there is no current name, or when the pair does not
+        /// fit the room the clock leaves. Otherwise the current name and the forecast share the line.
+        /// </summary>
+        public static string WithForecast(string? current, string? next, bool combinedFits)
+        {
+            current ??= "";
+            next ??= "";
+            if (next.Length == 0) return current;
+            if (current.Length == 0 || !combinedFits) return next;
+            return Dot(current, next);
         }
 
         public static HeadingParts Heading(float heading)

@@ -6,6 +6,7 @@
 // in Tempest's "Weather Filter" sections (Cairn Q2 moved them to Tempest); IsEnvironmentEnabled, the GetAvailableEnvironments
 // filter with its biome clear fallback, and the GetEnvironmentOverride rule became pure functions; dynamically created
 // switches were replaced by one list of other environment names; Tempest's own event environments are never filtered.
+// Known Solstice variants inherit base switches and disabled names; optional seasonal weights can remove ordinary weather.
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks). This file as a whole: SPDX-License-Identifier: GPL-3.0-or-later
 using System;
 using System.Collections.Generic;
@@ -110,20 +111,27 @@ namespace ExtraPotions.Tempest.Weather
     {
         readonly Func<WeatherSwitch, bool> isOn;
         readonly HashSet<string> others;
+        readonly SeasonalWeights? seasonal;
 
-        public WeatherFilter(Func<WeatherSwitch, bool> isOn, string? otherDisabled)
+        public WeatherFilter(Func<WeatherSwitch, bool> isOn, string? otherDisabled) : this(isOn, otherDisabled, null) { }
+
+        public WeatherFilter(Func<WeatherSwitch, bool> isOn, string? otherDisabled, SeasonalWeights? seasonal)
         {
             this.isOn = isOn ?? throw new ArgumentNullException(nameof(isOn));
             others = new HashSet<string>(SplitList(otherDisabled), StringComparer.OrdinalIgnoreCase);
+            this.seasonal = seasonal;
         }
 
         public bool Allows(string? environment)
         {
             if (string.IsNullOrEmpty(environment) || IsClear(environment!) || IsTempest(environment!)) return true;
-            if (others.Contains(environment!)) return false;
-            var s = WeatherSwitches.Find(environment);
-            return s == null || isOn(s);
+            var source = SeasonalEnvironments.BaseName(environment!);
+            if (others.Contains(environment!) || others.Contains(source)) return false;
+            var s = WeatherSwitches.Find(source);
+            return (s == null || isOn(s)) && Weight(environment) > 0;
         }
+
+        public float Weight(string? environment) => seasonal?.Multiplier(environment) ?? 1;
 
         /// <summary>
         /// NoFogBruh's GetAvailableEnvironments filter: drops switched-off entries; when nothing is left, the fallback

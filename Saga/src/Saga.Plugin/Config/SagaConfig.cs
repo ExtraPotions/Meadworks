@@ -8,6 +8,7 @@ using BepInEx.Configuration;
 using ExtraPotions.Saga.Config;
 using ExtraPotions.Saga.Powers;
 using ExtraPotions.Meadworks.Crucible;
+using UnityEngine;
 
 namespace ExtraPotions.Saga.Runtime
 {
@@ -33,6 +34,7 @@ namespace ExtraPotions.Saga.Runtime
             try
             {
                 foreach (var setting in SagaSettings.All) BindSetting(setting);
+                ReconcilePresetLabels();
             }
             finally
             {
@@ -68,6 +70,14 @@ namespace ExtraPotions.Saga.Runtime
         public ConfigEntryBase Entry(SagaSetting setting) =>
             entries.TryGetValue(setting ?? throw new ArgumentNullException(nameof(setting)), out var entry) ? entry : throw new ArgumentException("Not a Saga setting.", nameof(setting));
 
+        internal bool TryMatch(ConfigEntryBase entry, out SagaSetting setting)
+        {
+            foreach (var pair in entries)
+                if (ReferenceEquals(pair.Value, entry)) { setting = pair.Key; return true; }
+            setting = null!;
+            return false;
+        }
+
         public object GetBoxed(SagaSetting setting) {
             if(setting is SagaSetting<bool> b)return Get(b);
             if(setting is SagaSetting<float> f)return Get(f);
@@ -75,13 +85,19 @@ namespace ExtraPotions.Saga.Runtime
             if(setting is SagaSetting<string> s)return Get(s);
             if(setting is SagaSetting<SkillGainNotices> n)return Get(n);
             if(setting is SagaSetting<PowerDisplayMode> p)return Get(p);
+            if(setting is SagaSetting<PowerWheelPad> w)return Get(w);
+            if(setting is SagaSetting<SagaPreset> preset)return Get(preset);
             if(setting is SagaSetting<Resistance> r)return Get(r);
             throw new ArgumentException("Unsupported Saga setting "+setting.Id);
         }
 
         /// <summary>The value Saga acts on now.</summary>
+        public ConfigEntry<KeyboardShortcut> WheelKey => (ConfigEntry<KeyboardShortcut>)Entry(SagaSettings.Powers.PowerWheelKey);
+
         public T Get<T>(SagaSetting<T> setting)
         {
+            if (setting.IsShortcut)
+                return setting.Normalize((T)(object)ShortcutText(setting));
             var entry = (ConfigEntry<T>)Entry(setting);
             switch (setting.Scope)
             {
@@ -121,9 +137,14 @@ namespace ExtraPotions.Saga.Runtime
                 case SagaSetting<bool> b: entry = Bind(b, null); break;
                 case SagaSetting<int> i: entry = Bind(i, new AcceptableValueRange<int>((int)i.Minimum!, (int)i.Maximum!)); break;
                 case SagaSetting<float> f: entry = Bind(f, new AcceptableValueRange<float>((float)f.Minimum!, (float)f.Maximum!)); break;
+                case SagaSetting<string> s when s.IsShortcut:
+                    entry = MeadworksConfig.Bind(file, s.Section, s.Key, KeyboardShortcut.Empty, Describe(s, null), Map(s.Scope));
+                    break;
                 case SagaSetting<string> s: entry = Bind(s, null); break;
                 case SagaSetting<SkillGainNotices> notices: entry = Bind(notices, null); break;
                 case SagaSetting<PowerDisplayMode> display: entry = Bind(display, null); break;
+                case SagaSetting<PowerWheelPad> pad: entry = Bind(pad, null); break;
+                case SagaSetting<SagaPreset> preset: entry = Bind(preset, null); break;
                 case SagaSetting<Resistance> resistance: entry = Bind(resistance, null); break;
                 default: throw new NotSupportedException(setting.Id + ": unsupported value type " + setting.ValueType.Name + ".");
             }
@@ -136,7 +157,11 @@ namespace ExtraPotions.Saga.Runtime
             if (ReferenceEquals(setting, SagaSettings.Powers.MaxAttunedPowers) ||
                 ReferenceEquals(setting, SagaSettings.Powers.KillCreditRange) ||
                 ReferenceEquals(setting, SagaSettings.Powers.BlockPowerActivation) ||
-                ReferenceEquals(setting, SagaSettings.Powers.ShowLockedFeatures))
+                ReferenceEquals(setting, SagaSettings.Powers.ShowLockedFeatures) ||
+                ReferenceEquals(setting, SagaSettings.Powers.ActivateAllAttuned) ||
+                ReferenceEquals(setting, SagaSettings.Powers.PowerWheelKey) ||
+                ReferenceEquals(setting, SagaSettings.Powers.PowerWheelGamepad) ||
+                ReferenceEquals(setting, SagaSettings.Powers.PowerStrength))
                 dependency = new ConfigDependency(() => Get(SagaSettings.General.Enabled) && Get(SagaSettings.General.PowersEnabled),
                     () => "Requires General: Enabled and Powers Enabled.");
             if (ReferenceEquals(setting, SagaSettings.Sneak.SpeedAt100) || ReferenceEquals(setting, SagaSettings.Sneak.VisibilitySkillFactor))
@@ -154,6 +179,22 @@ namespace ExtraPotions.Saga.Runtime
             return MeadworksConfig.Bind(file, setting.Section, setting.Key, setting.Default, Describe(setting, acceptable), Map(setting.Scope));
         }
 
+        string ShortcutText(SagaSetting setting)
+        {
+            var shortcut = ((ConfigEntry<KeyboardShortcut>)Entry(setting)).Value;
+            return shortcut.MainKey == KeyCode.None ? "" : shortcut.Serialize();
+        }
+
         private static int Count(SettingScope scope) => SagaSettings.All.Count(s => s.Scope == scope && !s.Hidden);
+
+        private void ReconcilePresetLabels()
+        {
+            foreach (var group in SagaPresets.Groups)
+            {
+                var entry = (ConfigEntry<SagaPreset>)Entry(group.Selector);
+                var selected = group.OnLoad(entry.Value, setting => entries[setting].BoxedValue);
+                if (selected != entry.Value) entry.Value = selected;
+            }
+        }
     }
 }

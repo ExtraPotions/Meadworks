@@ -591,6 +591,16 @@
     "cfg_farming__autoreplant_help": "Your own switch for the auto-replant perk.",
     "cfg_seedcrafting_heading": "SeedCrafting",
     "cfg_seedcrafting__enabled_name": "Enabled",
-    "cfg_seedcrafting__enabled_help": "Workbench recipes that turn one carrot, turnip, onion, kale or poteitr into two of its seeds."
+    "cfg_seedcrafting__enabled_help": "Workbench recipes that turn one carrot, turnip, onion, kale or poteitr into two of its seeds.",
+    "cfg_grid__sizepreset_name": "SizePreset",
+    "cfg_grid__sizepreset_help": "Your grid size. Vanilla: 1 by 1; MeadWorksDefault: 2 by 2; Relaxed: 4 by 4. Custom keeps your numbers. Choosing a preset writes Rows and Columns immediately; editing either number selects Custom. Saved numbers are never replaced on load.",
+    "cfg_grid__spacingpreset_name": "SpacingPreset",
+    "cfg_grid__spacingpreset_help": "Your extra spacing between plants. Vanilla and MeadWorksDefault: no extra spacing; Relaxed: 0.5 meters for crops and 1 meter for saplings. Custom keeps your numbers. Choosing a preset applies immediately; editing either extra spacing selects Custom. Saved numbers are never replaced on load.",
+    "cfg_planting__effortpreset_name": "EffortPreset",
+    "cfg_planting__effortpreset_help": "Host-owned cultivator effort. Vanilla and MeadWorksDefault: native stamina and durability costs, partial planting allowed, invalid extra cells skipped. Relaxed: no stamina or durability cost, with the same placement checks. Custom keeps your choices. Changes apply immediately; editing a member selects Custom. Saved choices are never replaced on load.",
+    "cfg_farming__progressionpreset_name": "ProgressionPreset",
+    "cfg_farming__progressionpreset_help": "Host-owned Farming progression. Vanilla turns off Wildroot Farming perks and extra experience scaling. MeadWorksDefault restores Wildroot growth, yield, seed, rain, perk-level and experience defaults. Relaxed gives faster growth, more yields and seeds, earlier perks and 1.5 times experience. Custom keeps your values. Changes apply immediately; editing a member selects Custom. Saved values are never replaced on load. Your RowPlanting and AutoReplant switches are kept.",
+    "cfg_growth_crops__overridepreset_name": "OverridePreset",
+    "cfg_growth_crops__overridepreset_help": "Host-owned crop overrides. Vanilla and MeadWorksDefault disable overrides and set scale to 0.9-1.1, growth to 4000-5000 seconds and clearance to 0.5 meters. Relaxed enables overrides with 2000-2500 seconds, the same scale and clearance. Custom keeps your values. Changes apply immediately; editing a member selects Custom. Saved values are never replaced on load. Growing-condition switches are kept."
   }
 }

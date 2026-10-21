@@ -10,10 +10,11 @@ namespace ExtraPotions.Burrow {
     public sealed class InventoryDecisionRecord {
         public string Id{get;}public string Source{get;}public string Fingerprint{get;}public double Deadline{get;}
         public InventoryDecision State{get;internal set;}
-        readonly byte[] before,after,metadata;
+        byte[] before,after;readonly byte[] metadata;
         public byte[] Before=>(byte[])before.Clone();public byte[] After=>(byte[])after.Clone();
         public byte[] Metadata=>(byte[])metadata.Clone();
         internal InventoryDecisionRecord(string id,string source,string fingerprint,double deadline,byte[] before,byte[] after,InventoryDecision state,byte[]? metadata=null){Id=id;Source=source;Fingerprint=fingerprint;Deadline=deadline;this.before=(byte[])before.Clone();this.after=(byte[])after.Clone();this.metadata=metadata==null?Array.Empty<byte>():(byte[])metadata.Clone();State=state;}
+        internal void Rebase(byte[] before,byte[] after){this.before=(byte[])before.Clone();this.after=(byte[])after.Clone();}
     }
     /// <summary>Owned local write-ahead journal. A complete corrupt record fails closed;
     /// an incomplete final frame is cut back to the last flushed frame before admission.</summary>
@@ -42,7 +43,16 @@ namespace ExtraPotions.Burrow {
             var changed=new InventoryDecisionRecord(record.Id,record.Source,record.Fingerprint,record.Deadline,record.Before,record.After,next,record.Metadata);
             Append(changed);record.State=next;
         }
-        static bool Allowed(InventoryDecision old,InventoryDecision next)=>old==next||old==InventoryDecision.Prepared&&(next==InventoryDecision.Decided||next==InventoryDecision.Aborted)||old==InventoryDecision.Decided&&next==InventoryDecision.Committed;
+        /// <summary>The decision of a hold whose payment was moved onto the live source (<see cref="IInventoryImageRebase"/>):
+        /// the Decided frame carries the rebased images, which replace the reserved ones. Only a Prepared hold can be rebased.</summary>
+        public void Decide(InventoryDecisionRecord record,byte[] before,byte[] after){
+            if(disposed||faulted||!records.TryGetValue(record.Id,out var existing)||!ReferenceEquals(record,existing))throw new InvalidOperationException("Inactive journal record.");
+            if(record.State!=InventoryDecision.Prepared||before==null||after==null||before.Length>MaxFrame/2-16384||after.Length>MaxFrame/2-16384)throw new InvalidOperationException("Invalid durable inventory transition.");
+            var changed=new InventoryDecisionRecord(record.Id,record.Source,record.Fingerprint,record.Deadline,before,after,InventoryDecision.Decided,record.Metadata);
+            Append(changed);record.Rebase(before,after);record.State=InventoryDecision.Decided;
+        }
+        // Decided → Aborted is written only for a chest salvage whose removal never landed (DurableInventoryParticipant).
+        static bool Allowed(InventoryDecision old,InventoryDecision next)=>old==next||old==InventoryDecision.Prepared&&(next==InventoryDecision.Decided||next==InventoryDecision.Aborted)||old==InventoryDecision.Decided&&(next==InventoryDecision.Committed||next==InventoryDecision.Aborted);
         static void Text(string value){if(string.IsNullOrWhiteSpace(value)||value.Length>512||value.IndexOfAny(new[]{'\0','\r','\n'})>=0)throw new InvalidDataException("Invalid journal identity.");}
         void Append(InventoryDecisionRecord record){
             try{
@@ -75,7 +85,8 @@ namespace ExtraPotions.Burrow {
                         var before=ReadImage(entry);var after=ReadImage(entry);var metadata=version==2?ReadImage(entry):Array.Empty<byte>();if(metadata.Length>16384)throw new InvalidDataException("Journal metadata exceeds bounds.");record=new InventoryDecisionRecord(id,source,fingerprint,deadline,before,after,state,metadata);if(bytes.Position!=bytes.Length)throw new InvalidDataException("Journal record has trailing bytes.");
                     }}catch(EndOfStreamException error){throw new InvalidDataException("Invalid complete journal frame.",error);}
                     if(records.TryGetValue(record.Id,out var previous)){
-                        if(record.Source!=previous.Source||record.Fingerprint!=previous.Fingerprint||record.Deadline!=previous.Deadline||!record.Before.SequenceEqual(previous.Before)||!record.After.SequenceEqual(previous.After)||!record.Metadata.SequenceEqual(previous.Metadata)||!Allowed(previous.State,record.State))throw new InvalidDataException("Conflicting journal history.");
+                        bool rebased=previous.State==InventoryDecision.Prepared&&record.State==InventoryDecision.Decided;
+                        if(record.Source!=previous.Source||record.Fingerprint!=previous.Fingerprint||record.Deadline!=previous.Deadline||!rebased&&(!record.Before.SequenceEqual(previous.Before)||!record.After.SequenceEqual(previous.After))||!record.Metadata.SequenceEqual(previous.Metadata)||!Allowed(previous.State,record.State))throw new InvalidDataException("Conflicting journal history.");
                     }else if(records.Count>=capacity||record.State!=InventoryDecision.Prepared)throw new InvalidDataException("Invalid journal admission history.");
                     records[record.Id]=record;complete=stream.Position;
                 }

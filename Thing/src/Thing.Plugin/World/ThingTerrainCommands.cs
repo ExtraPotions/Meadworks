@@ -93,7 +93,7 @@ namespace ExtraPotions.Thing.Runtime
             if (platform.Length == 0 || !player || player.GetPlayerID() == 0) return Fail(ThingTerrain.Incomplete);
             var admin = context.IsLocal || (context.IsAdmin && net.IsAdmin(platform));
             var role = net.IsDedicated() ? ThingRole.DedicatedServer : net.GetPeers().Count > 0 ? ThingRole.Host : ThingRole.SinglePlayer;
-            var verdict = AdminCheck.Decide(ThingAction.TerrainReset, new RequestFacts(role, context.IsLocal, admin, false), Plugin.Settings.Rules());
+            var verdict = AdminCheck.Decide(ThingAction.TerrainReset, new RequestFacts(role, context.IsLocal, admin, false, granted: admin ? AdminRight.None : ThingAccess.Of(platform)), Plugin.Settings.Rules());
             if (!AdminCheck.Permits(verdict)) return Fail(AdminCheck.TextKey(verdict));
             if (request.Count == 1 && request[0] == "cancel") { previews.Remove(platform); context.MarkDecisionMade(); return Fail("terrain_canceled"); }
             if (request.Count != 2) return Fail("terrain_usage");

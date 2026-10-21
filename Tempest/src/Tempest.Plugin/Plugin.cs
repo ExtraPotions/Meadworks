@@ -105,6 +105,7 @@ namespace ExtraPotions.Tempest.Runtime
             TempestText.Tick();
             if (!started || log == null) return;
             TempestModules.Tick(log);
+            TempestSeasons.Tick();
             TempestWorld.Tick(UnityEngine.Time.deltaTime);
             TempestSky.Tick();
             TempestStrikes.Tick();
@@ -127,7 +128,7 @@ namespace ExtraPotions.Tempest.Runtime
             started = false;
             try { harmony?.UnpatchSelf(); } catch (Exception error) { log?.Warning("Tempest unpatch: " + error.GetType().Name); }
             harmony = null;
-            foreach (Action stop in new Action[] { TempestRemoteCommands.Shutdown, TempestStrikes.Shutdown, TempestBadge.Shutdown, TempestSky.Shutdown, TempestFilter.Shutdown, TempestWorld.Shutdown, () => import?.Dispose(), TempestModules.Reset, TempestText.Shutdown })
+            foreach (Action stop in new Action[] { TempestRemoteCommands.Shutdown, TempestStrikes.Shutdown, TempestBadge.Shutdown, TempestSky.Shutdown, TempestSeasons.Shutdown, TempestFilter.Shutdown, TempestWorld.Shutdown, () => import?.Dispose(), TempestModules.Reset, TempestText.Shutdown })
                 try { stop(); } catch (Exception error) { log?.Warning("Tempest teardown: " + error.GetType().Name); }
             import = null;
             Settings?.Shutdown();

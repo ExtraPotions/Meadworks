@@ -59,7 +59,8 @@ namespace ExtraPotions.Wildblood.Runtime {
             var first=a.Clone();var second=b.Clone();first.m_stack=second.m_stack=1;
             var p=new ZPackage();var q=new ZPackage();p.Write(first.m_dropPrefab?first.m_dropPrefab.name:"");q.Write(second.m_dropPrefab?second.m_dropPrefab.name:"");first.Save(p);second.Save(q);return p.GetArray().SequenceEqual(q.GetArray());
         }
-        string Key(string source)=>"wildblood.theft.receipt."+source;
+        internal static string ReceiptKey(string source)=>"wildblood.theft.receipt."+source;
+        string Key(string source)=>ReceiptKey(source);
         internal void InvalidateReceipts(){confirmed.Clear();}
         public bool ReceiptConfirmed(string source){
             if(!Current)return false;

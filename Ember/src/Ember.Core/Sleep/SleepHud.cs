@@ -55,6 +55,8 @@ namespace ExtraPotions.Ember.Sleep
         /// <summary>Which of the three chevrons are lit at a step: they fill in over steps 0 to 2 and all dim at step 3.</summary>
         public static bool[] ChevronLit(int step) => new[] { step >= 0 && step <= 2, step >= 1 && step <= 2, step == 2 };
 
+        public static bool ChevronLit(int step, int index) => index >= 0 && index < 3 && step >= index && step <= 2;
+
         /// <summary>Above Compact Above players the HUD shows one pillow and the ratio text instead of one pillow per player.</summary>
         public static bool Compact(int players, int compactAbove) => players > Math.Max(MinCompactAbove, Math.Min(MaxCompactAbove, compactAbove));
 
@@ -63,5 +65,20 @@ namespace ExtraPotions.Ember.Sleep
 
         /// <summary>Pillows lit (one per sleeper, at most the pillows shown).</summary>
         public static int LitPillows(int sleeping, int pillows) => Math.Max(0, Math.Min(pillows, sleeping));
+    }
+
+    public sealed class SleepHudCaption
+    {
+        string? template, text;
+        int sleeping, players;
+        double percent;
+
+        public string Text(string format, int sleeping, int players, double percent)
+        {
+            var rounded = !(percent > 0.0001) ? 0 : Math.Round(percent, MidpointRounding.ToEven);
+            if (text != null && template == format && this.sleeping == sleeping && this.players == players && this.percent == rounded) return text;
+            template = format; this.sleeping = sleeping; this.players = players; this.percent = rounded;
+            return text = string.Format(CultureInfo.InvariantCulture, format, sleeping, players) + "   " + SleepHud.Label(rounded);
+        }
     }
 }

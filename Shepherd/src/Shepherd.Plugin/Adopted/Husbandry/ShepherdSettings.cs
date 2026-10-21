@@ -1,5 +1,6 @@
 // Copyright (C) 2026 expDARE. SPDX-License-Identifier: GPL-3.0-or-later
 using BepInEx.Configuration;
+using ExtraPotions.Meadworks.Crucible;
 using ExtraPotions.Shepherd.Breeding;
 
 namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
@@ -17,10 +18,11 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
         public static HusbandrySetting<string> DisallowFeed = null!, DisallowAnimals = null!, PlankRecipe = null!, StoneRecipe = null!;
         public static HusbandrySetting<LoreDetail> Detail = null!;
         public static HusbandrySetting<InheritanceMode> Inheritance = null!;
+        public static HusbandrySetting<bool> TamedStars = null!;
         public static HusbandrySetting<int> MaxAboveBestParent = null!, LandPenCapacity = null!;
         public static HusbandrySetting<string> LandPenRecipe = null!;
         public static HusbandrySetting<float> BirthStarChance = null!, TwinDelay = null!, MutationChance = null!;
-        public static HusbandrySetting<bool> RecordLineage = null!, StrictHerd = null!, PenMode = null!, PauseMovingShips = null!;
+        public static HusbandrySetting<bool> RecordLineage = null!, SeasonalBreeding = null!, StrictHerd = null!, PenMode = null!, PauseMovingShips = null!;
         public static HusbandrySetting<KeyboardShortcut> BookKey = null!;
         public static HusbandrySetting<string> BookPadChord = null!;
         public static HusbandrySetting<float> BookRange = null!;
@@ -47,12 +49,14 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
             PlankRecipe = config.Bind("3 - Troughs", "Plank Trough Recipe", "Wood:6, Resin:2", "Comma-separated item:amount recipe. Unusable recipes fall back to Wood:10.");
             StoneRecipe = config.Bind("3 - Troughs", "Stone Trough Recipe", "Stone:12, Wood:2", "Comma-separated item:amount recipe. Unusable recipes fall back to Wood:10.");
             Detail = config.Bind("4 - Husbandry", "Lore Detail", LoreDetail.Full, "Compact gives one lore line; Full gives every available detail.", synced: false);
-            Inheritance = config.Bind("6 - Breeding", "Star Inheritance", InheritanceMode.ParentMean, "How a newborn's base stars are chosen. Vanilla: the mother's stars, as in the game. BestParentUniform: a random number from 0 to the stronger parent's stars. ParentMean: the parents' average, rounded up.");
+            Inheritance = config.Bind("6 - Breeding", "Star Inheritance", InheritanceMode.ParentMean, "How a newborn's base stars are chosen when Wildblood is installed and its Tamed Stars is on. Vanilla: the mother's stars, as in the game. BestParentUniform: a random number from 0 to the stronger parent's stars. ParentMean: the parents' average, rounded up. Without Wildblood, or when that setting is off, a newborn keeps its mother's level, as the game does.");
+            TamedStars = config.Bind("6 - Breeding", "Tamed Stars", true, "Ignored. Wildblood decides creature stars. Without Wildblood, a newborn keeps its mother's level, as the game does. Kept so an older config file still loads.", synced: false);
             MaxAboveBestParent = config.Bind("6 - Breeding", "Max Above Best Parent", 1, "Maximum bonus levels above the stronger parent.", acceptableValues: new AcceptableValueRange<int>(0, 2));
-            BirthStarChance = config.Bind("6 - Breeding", "Birth Star Chance", 0f, "Flat percent chance of an additional birth star, independent of Husbandry.", acceptableValues: Settings.UpTo(100f));
+            BirthStarChance = config.Bind("6 - Breeding", "Birth Star Chance", 0f, "Flat percent chance of an additional birth star, independent of Husbandry. It adds nothing without Wildblood, or when Wildblood's Tamed Stars is off.", acceptableValues: Settings.UpTo(100f));
             TwinDelay = config.Bind("6 - Breeding", "Twin Delay", 30f, "Seconds between the first birth and a twin.", acceptableValues: new AcceptableValueRange<float>(5f, 300f));
             MutationChance = config.Bind("6 - Breeding", "Mutation Chance", 100f, "Percent chance to carry a Wildblood mutation. Used only when Wildblood supplies traits.", acceptableValues: Settings.UpTo(100f));
             RecordLineage = config.Bind("6 - Breeding", "Record Lineage", true, "Record parent identities, generation, birth day and breeder.");
+            SeasonalBreeding = config.Bind("6 - Breeding", "Seasonal Breeding", true, "Host or server: while Solstice seasons are on, tame breeding uses that season's published rate. Spring is faster, winter is slower, and a rate of zero starts no new pregnancies. The pace stays between one quarter and three times the usual pace. A pregnancy already underway still finishes. Off, missing Solstice, or seasons turned off keeps today's breeding. Feeding and troughs stay as they are. The next breeding check uses the current rate.");
             StrictHerd = config.Bind("7 - Herd", "Strict Herd Limit", false, "Delay a due birth while the herd is over its current limit.");
             PenMode = config.Bind("7 - Herd", "Pen Mode", false, "Count crowding within an assigned livestock pen. A pen capacity of 0 keeps the game's own crowding limit.");
             PauseMovingShips = config.Bind("7 - Herd", "Pause Breeding On Moving Ships", true, "Pause breeding in a moving Keel ship pen.");
@@ -66,6 +70,16 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
             NoHunger = config.Cheat("No Hunger", "Tamed animals never become hungry.");
             UnlimitedHerd = config.Cheat("Unlimited Herd", "Crowding never stops breeding.");
             BreedingCommands = config.Cheat("Breeding Commands", "Enable shepherd breed and shepherd stars console commands.");
+        }
+
+        private static bool notedIgnoredStars;
+
+        /// <summary>Once per process. The config key is kept and is not read.</summary>
+        public static void NoteIgnoredStars(MeadworksLog log)
+        {
+            if (notedIgnoredStars || log == null) return;
+            notedIgnoredStars = true;
+            log.Info("Shepherd Tamed Stars is ignored. Wildblood decides creature stars. Without Wildblood, births keep the game's level.");
         }
     }
 }

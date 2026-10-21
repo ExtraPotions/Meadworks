@@ -126,24 +126,32 @@ namespace ExtraPotions.Saga.Skills
 
     public sealed class ForageValues
     {
-        public float PerPick, BiomeStep, Discovery;
+        public float PerPick, BiomeStep, Discovery, Planted;
 
         public static ForageValues Defaults() => new ForageValues
         {
             PerPick = SagaSettings.Foraging.ExperiencePerPick.Default,
             BiomeStep = SagaSettings.Foraging.BiomeStep.Default,
             Discovery = SagaSettings.Foraging.DiscoveryMultiplier.Default,
+            Planted = SagaSettings.Foraging.PlantedExperience.Default,
         };
     }
 
     /// <summary>Foraging experience (ForageXp): the factor of the game's pick raise, sent to Foraging instead of Farming.</summary>
     public static class ForageExperience
     {
-        public static float Scale(ForageValues v, float itemFactor, Biome biome, bool firstOfKind)
+        public static float Scale(ForageValues v, float itemFactor, Biome biome, bool firstOfKind, bool planted = false)
         {
-            var scale = Math.Max(0f, v.PerPick) * Math.Max(0f, itemFactor) * (1f + Pct.Of(v.BiomeStep) * MineExperience.BiomeStep(biome));
+            var scale = PlantedShare(v.Planted, planted) * Math.Max(0f, v.PerPick) * Math.Max(0f, itemFactor) * (1f + Pct.Of(v.BiomeStep) * MineExperience.BiomeStep(biome));
             return scale > 0f && firstOfKind ? scale * Math.Max(1f, v.Discovery) : scale;
         }
+
+        /// <summary>
+        /// The share of the experience a pick earns: 1 for a wild plant, Planted Pickable Foraging XP (0 to 100 percent)
+        /// for one a player planted, so planting pickables next to each other is not a fast way to level.
+        /// </summary>
+        public static float PlantedShare(float plantedPercent, bool planted) =>
+            planted ? Math.Min(1f, Math.Max(0f, Pct.Of(plantedPercent))) : 1f;
     }
 
     public sealed class FishValues
@@ -175,5 +183,47 @@ namespace ExtraPotions.Saga.Skills
         /// <summary>A new species (Discovery Experience) or a new size of a known one (New Size Experience), times the species scale.</summary>
         public static float Discovery(FishValues v, float speciesScale, bool newSpecies) =>
             Math.Max(0f, newSpecies ? v.Discovery : v.NewSize) * Math.Max(0f, speciesScale) * Math.Max(0f, v.Multiplier);
+    }
+
+    /// <summary>How much wood credit the server may forward. The cap is the current fell or split setting at the hardest vanilla tool tier.</summary>
+    public static class WoodCreditRules
+    {
+        public const int MaxToolTier = 4;
+
+        public static float Cap(WoodValues values, bool fell) =>
+            fell ? WoodExperience.FellAmount(values, MaxToolTier) : WoodExperience.SplitAmount(values, MaxToolTier, true);
+
+        public static float Clamp(float amount, float cap)
+        {
+            if (float.IsNaN(amount) || float.IsInfinity(amount) || amount <= 0f) return 0f;
+            if (float.IsNaN(cap) || float.IsInfinity(cap) || cap <= 0f) return 0f;
+            return amount < cap ? amount : cap;
+        }
+
+        public static int ClampChain(int chain, int maxChain)
+        {
+            if (maxChain < 0) maxChain = 0;
+            if (chain < 0) return 0;
+            return chain > maxChain ? maxChain : chain;
+        }
+
+        /// <summary>A fell has to be a tree, and a split a log. A prefab that is both, or neither, is not wood credit.</summary>
+        public static bool KindMatches(bool sourceIsTree, bool sourceIsLog, bool fell)
+        {
+            if (sourceIsTree == sourceIsLog) return false;
+            return fell ? sourceIsTree : sourceIsLog;
+        }
+
+        public static bool ServerAccepts(bool server, bool senderOwnsSource, bool kindMatchesSource, bool firstForSource) =>
+            server && senderOwnsSource && kindMatchesSource && firstForSource;
+
+        public static bool ClientAccepts(bool senderIsServer) => senderIsServer;
+    }
+
+    /// <summary>A clean-strike mark is kept only for a miner the sender actually owns.</summary>
+    public static class CleanStrikeRules
+    {
+        public static bool Keep(bool active, bool ownsRock, bool minerPresent, bool senderOwnsMiner, int area) =>
+            active && ownsRock && minerPresent && senderOwnsMiner && area >= 0;
     }
 }

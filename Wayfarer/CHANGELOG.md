@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.12 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- German, Russian, Chinese and Korean travel text uses the game's words for the grave and for ships. The cheat section title matches its heading.
+- The large-map panel rebuilds its contents when the screen, category, page, language, or which destinations are available changes. It no longer builds that comparison every frame while the map stays still.
+
 ## 0.5.11 (2026-10-19)
 
 - Requires Crucible 0.3.22 / Crucible.UI 0.3.15.

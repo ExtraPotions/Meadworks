@@ -12,6 +12,7 @@ internal static partial class TheftTransfers
         Proof ??= ThievingArchive.Proof;
         Probe ??= ThievingStatus.Ask;
         Settled ??= ThievingStatus.Acknowledge;
+        ReleaseRow ??= ThievingArchive.Release;
         Clock ??= () => ZNet.instance != null ? ZNet.instance.GetTimeSeconds() : double.NaN;
     }
 }

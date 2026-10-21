@@ -73,8 +73,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
             humanoid.m_randomShield = new GameObject[0];
             humanoid.m_randomSets = new Humanoid.ItemSet[0];
             humanoid.m_randomItems = new Humanoid.RandomItem[0];
-            humanoid.m_runSpeed = MimicSettings.RunSpeed;
-            humanoid.m_walkSpeed = MimicSettings.RunSpeed * 0.5f;
+            MimicDisguise.ApplyPace(humanoid);
             humanoid.m_deathEffects.m_effectPrefabs = DeathEffects(humanoid.m_deathEffects.m_effectPrefabs, corpse);
         }
 

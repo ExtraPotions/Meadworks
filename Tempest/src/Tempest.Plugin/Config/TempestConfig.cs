@@ -122,7 +122,7 @@ namespace ExtraPotions.Tempest.Runtime
         public WeatherFilter Filter()
         {
             var f = TempestSettings.Filter;
-            return new WeatherFilter(s => Get(f.Switches[s]), Get(f.OtherDisabled));
+            return new WeatherFilter(s => Get(f.Switches[s]), Get(f.OtherDisabled), TempestSeasons.Weights(this));
         }
 
         /// <summary>Whether Tempest may act on a cheat now; tells the player why not (once per option per session).</summary>

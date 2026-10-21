@@ -23,6 +23,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.FeastMaster
         static Func<string,bool> active;
         static readonly Dictionary<ConfigEntryBase,string> entries=new Dictionary<ConfigEntryBase,string>();
         static readonly Dictionary<string,bool> states=new Dictionary<string,bool>();
+        static readonly string[] modules={"Foods","Eating","Recovery","Exertion","Kitchen","Cooking","Cheats"};
         static readonly Dictionary<Type,string> groups=new Dictionary<Type,string>
         {
             [typeof(PlayerEatFoodPatch)]="Foods",
@@ -63,6 +64,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.FeastMaster
         };
         static readonly Skills.SkillType[] gainSkills={Skills.SkillType.Run,Skills.SkillType.Jump,Skills.SkillType.Sneak,Skills.SkillType.Swim,Skills.SkillType.Fishing};
         static readonly SkillModifier[] gains=new SkillModifier[5];
+        static ConfigEntry<float>[] gainSettings=Array.Empty<ConfigEntry<float>>();
         internal static void Note(ConfigEntryBase entry,string module)=>entries[entry]=module;
         public static bool Active(string module)=>running&&active!=null&&active(module);
         public static T Value<T>(ConfigEntry<T> entry)
@@ -98,6 +100,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.FeastMaster
             if(running)throw new InvalidOperationException("Larder native food lifecycle already initialized.");
             Log=log;active=moduleActive;Bindings=new NativeBindings(config);running=true;
             FeastMasterData.Initialize(Bindings);Settings.Initialize(Bindings);
+            gainSettings=new[]{Settings.RunSkillGain,Settings.JumpSkillGain,Settings.SneakSkillGain,Settings.SwimSkillGain,Settings.FishingSkillGain};
             InstantKitchenSetting=MeadworksConfig.BindCheat(config,"9 - Cheats","Instant Kitchen",false,"Stations finish at the next tick, fermenters are ready at once, and nothing burns.");
             EndlessFoodSetting=MeadworksConfig.BindCheat(config,"9 - Cheats","Endless Food",false,"Active food timers hold while enabled.");
             EatAnythingSetting=MeadworksConfig.BindCheat(config,"9 - Cheats","Eat Anything",false,"Food slots never report full and food can be eaten again below its complete duration.");
@@ -115,7 +118,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.FeastMaster
         {
             if(!running)return;
             bool changed=false;
-            foreach(string module in new[]{"Foods","Eating","Recovery","Exertion","Kitchen","Cooking","Cheats"})
+            foreach(string module in modules)
             {
                 bool now=Active(module);
                 if(!states.TryGetValue(module,out bool before)||before!=now){states[module]=now;changed=true;}
@@ -125,10 +128,9 @@ namespace ExtraPotions.Larder.Runtime.Adopted.FeastMaster
         }
         static void RefreshGains()
         {
-            var settings=new[]{Settings.RunSkillGain,Settings.JumpSkillGain,Settings.SneakSkillGain,Settings.SwimSkillGain,Settings.FishingSkillGain};
             for(int i=0;i<gains.Length;i++)
             {
-                float value=Value(settings[i]);
+                float value=Value(gainSettings[i]);
                 if(!Active("Exertion")||value==1f){gains[i]?.Dispose();gains[i]=null;}
                 else if(gains[i]==null)gains[i]=MeadworksSkills.AddModifier(Plugin.Guid,gainSkills[i],SkillModifierKind.Experience,value);
                 else if(gains[i].Value!=value)gains[i].Value=value;
@@ -143,6 +145,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.FeastMaster
             finally
             {
                 foreach(var gain in gains)gain?.Dispose();Array.Clear(gains,0,gains.Length);
+                gainSettings=Array.Empty<ConfigEntry<float>>();
                 Bindings.Config.SettingChanged-=Changed;Bindings.Config.ConfigReloaded-=Reloaded;
                 ItemValues.UnhookConfig(Bindings.Config);WorldRates.UnhookConfig(Bindings.Config);
                 PatchSwitch.Shutdown();harmony?.UnpatchSelf();

@@ -92,6 +92,7 @@ namespace ExtraPotions.Cairn.Config
             public static readonly CairnSetting<bool> ShowDay = CairnSetting.Toggle(Section, "Show Day", true, Local, "Shows the world's day number (Day 12) at the start of the HUD's time line. Your own display setting. Default: on.");
             public static readonly CairnSetting<bool> ShowTime = CairnSetting.Toggle(Section, "Show Time", true, Local, "Show the time of day with a sun or moon mark.");
             public static readonly CairnSetting<bool> ShowWeather = CairnSetting.Toggle(Section, "Show Weather", true, Local, "Shows the current weather's name and icon on the HUD's time line, including Tempest events such as Blizzard or Lightning Storm. Your own display setting. Default: on.");
+            public static readonly CairnSetting<bool> ShowForecast = CairnSetting.Toggle(Section, "Show Forecast", true, Local, "Shows the next weather on the HUD clock line for the biome you are in: its name, the minutes until the shared world clock changes it, and the wind direction and strength at that change. The prediction uses the game's environment schedule, so a client matches the host. When Tempest is installed, environments it has switched off are left out. Hidden while a raid, a forced environment or a Tempest event is controlling the weather. The current weather stays on the line when both fit; the clock is never cut. Seasonal names from Solstice, such as Clear Winter, use the same name and icon as the weather they copy. The prediction reads the current season's list, so a change after the season turns can differ. Your own display setting. Default: on.");
             public static readonly CairnSetting<bool> Use24Hour = CairnSetting.Toggle(Section, "Use 24 Hour", true, Local, "24-hour clock; off shows a 12-hour clock.");
             public static readonly CairnSetting<bool> ShowCompass = CairnSetting.Toggle(Section, "Show Compass", true, Local, "Shows the compass strip under the time line: the direction you face in the middle, with N/E/S/W marks and the chosen map pins. Your own display setting. Default: on.");
             public static readonly CairnSetting<int> StripDegrees = CairnSetting.Integer(Section, "Strip Degrees", 120, 60, 360, Local, "Degrees the compass shows at once.");
@@ -108,7 +109,7 @@ namespace ExtraPotions.Cairn.Config
 
             internal static IEnumerable<CairnSetting> Items => new CairnSetting[]
             {
-                Enabled, ToggleKey, SettingsKey, ShowDay, ShowTime, ShowWeather, Use24Hour,
+                Enabled, ToggleKey, SettingsKey, ShowDay, ShowTime, ShowWeather, ShowForecast, Use24Hour,
                 ShowCompass, StripDegrees, CompassWidth, ShowHeading, ShowMarkers, MaxMarkers, MaxDistance, TempestWarnings,
                 GamepadToggle, GamepadSettings,
             };

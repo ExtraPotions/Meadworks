@@ -91,6 +91,11 @@ namespace ExtraPotions.Wildroot {
    return facts.GrowRadius*(options.Minimize?1.1:2)+extra;
   }
  }
+ /// <summary>PlantEasily 2.3.0 grow-space layers. Plant.m_spaceMask stays 0 until HaveGrowSpace runs, and a 0 mask matches nothing.</summary>
+ public static class GrowSpaceCheck {
+  public static readonly string[] Layers={"Default","static_solid","Default_small","piece","piece_nonsolid"};
+  public static bool Clear(int occupants)=>occupants==0;
+ }
  /// <summary>Source of uniform random numbers so scatter stays reproducible in tests.</summary>
  public interface IScatterRandom {double Range(double min,double max);int Range(int min,int maxExclusive);}
  public sealed class SeededScatterRandom:IScatterRandom {

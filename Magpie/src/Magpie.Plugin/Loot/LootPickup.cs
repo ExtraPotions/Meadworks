@@ -94,10 +94,12 @@ namespace ExtraPotions.Magpie.Runtime.Loot
                 clone.m_stack = amount;
                 clone.m_cheated = LootPolicy.ExtraCheated(template.m_cheated);
                 clone.m_equipped = false;
-                if (inventory.CanAddItem(clone, amount) && inventory.AddItem(clone))
+                var added = inventory.CanAddItem(clone, amount) && inventory.AddItem(clone);
+                var overflow = LootPolicy.OverflowDrop(added, clone.m_stack);
+                if (overflow <= 0)
                     continue;
-                // Overflow: dropped at the player, owned by this client, no loot mark (the scope is closed here).
-                ItemDrop.DropItem(clone, amount, transform.position + transform.forward + Vector3.up, transform.rotation);
+                // Remainder only. This client owns the drop, and the loot scope is already closed.
+                ItemDrop.DropItem(clone, overflow, transform.position + transform.forward + Vector3.up, transform.rotation);
             }
         }
 

@@ -19,13 +19,14 @@ namespace ExtraPotions.Thing.Admin
     /// </summary>
     public readonly struct RequestFacts
     {
-        public RequestFacts(ThingRole role, bool fromLocalAuthority, bool requesterIsAdmin, bool delvePresent, bool mischiefGranted = false)
+        public RequestFacts(ThingRole role, bool fromLocalAuthority, bool requesterIsAdmin, bool delvePresent, bool mischiefGranted = false, AdminRight granted = AdminRight.None)
         {
             Role = role;
             FromLocalAuthority = fromLocalAuthority;
             RequesterIsAdmin = requesterIsAdmin;
             DelvePresent = delvePresent;
             MischiefGranted = mischiefGranted;
+            Granted = granted;
         }
 
         public ThingRole Role { get; }
@@ -35,6 +36,9 @@ namespace ExtraPotions.Thing.Admin
 
         /// <summary>Hex's Mischief gate granted the requester (only consulted for the POI service, design C8).</summary>
         public bool MischiefGranted { get; }
+
+        /// <summary>Rights stored for this platform id. The local authority and listed admins do not need a row.</summary>
+        public AdminRight Granted { get; }
     }
 
     /// <summary>The ServerAuthoritative switches the decision reads (design 4.1 and 4.4 and 4.5).</summary>
@@ -80,9 +84,9 @@ namespace ExtraPotions.Thing.Admin
     {
         /// <summary>
         /// The server's decision, in order: actions on other players do not exist in single player; Delve actions need Delve;
-        /// a server switch can turn an action off for everyone; the local authority and listed admins may act; non-admins
-        /// only where a server switch opens a world tool to them (terrain around their own pieces, remove drops) or Hex's
-        /// gate granted the POI service.
+        /// a server switch can turn an action off for everyone; the local authority and listed admins may act; a stored
+        /// grant may allow that one tool; other non-admins only where a server switch opens a world tool to them
+        /// (terrain around their own pieces, remove drops) or Hex's gate granted the POI service.
         /// </summary>
         public static Verdict Decide(ThingAction action, RequestFacts facts, ServerRules rules)
         {
@@ -92,6 +96,7 @@ namespace ExtraPotions.Thing.Admin
             if (!rules.Allows(info.Gate) && !(facts.FromLocalAuthority &&
                 (action == ThingAction.RemoteConfigRead || action == ThingAction.RemoteConfigWrite))) return Verdict.DisabledByServer;
             if (facts.FromLocalAuthority || facts.RequesterIsAdmin) return Verdict.Allowed;
+            if (AdminPermissions.Covers(facts.Granted, action)) return Verdict.Allowed;
             switch (action)
             {
                 case ThingAction.TerrainReset when rules.TerrainNonAdminOwnPieces: return Verdict.AllowedOwnPiecesOnly;

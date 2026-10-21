@@ -121,7 +121,7 @@
     "cfg_chests__reset_opened_name": "Réinitialiser les coffres ouverts",
     "cfg_chests__reset_opened_help": "Activé : un coffre ouvert se remplit après le délai même s'il contient des restes, qui sont remplacés. Désactivé : seuls les coffres vides suivent une horloge.",
     "cfg_chests__restock_loaded_name": "Remplir les coffres chargés",
-    "cfg_chests__restock_loaded_help": "Remplit aussi les coffres qu'un joueur a chargés, sauf si quelqu'un a le coffre ouvert. Les coffres proches d'une base sont chargés la plupart du temps.",
+    "cfg_chests__restock_loaded_help": "Activé : le délai continue tant qu'un joueur a le coffre chargé, et le nouveau contenu est écrit au premier passage après le déchargement du coffre. Désactivé : un coffre chargé est laissé tel quel jusqu'au déchargement, et le délai commence alors. Le contenu n'est jamais remplacé tant qu'une copie chargée est encore en mémoire.",
     "cfg_chests__chest_dry_run_name": "Coffres : simulation",
     "cfg_chests__chest_dry_run_help": "Activé : signale seulement ce qui reviendrait ; ne change rien.",
     "cfg_chests__exclude_name": "Exclure",

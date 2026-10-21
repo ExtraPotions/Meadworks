@@ -32,22 +32,34 @@ internal static class HexDebug
         MeadworksMischief.Cheats.Tag(Plugin.Guid, "Debug.Build", MischiefCategory.Economy);
         MeadworksMischief.Cheats.Tag(Plugin.Guid, "Debug.Kill", MischiefCategory.World);
         MeadworksMischief.Cheats.Tag(Plugin.Guid, "Debug.Drops", MischiefCategory.World);
+        MeadworksMischief.Cheats.Tag(Plugin.Guid, "Debug.Tame", MischiefCategory.World);
+        MeadworksMischief.Cheats.Tag(Plugin.Guid, "Debug.Event", MischiefCategory.World);
         MeadworksMischief.Cheats.Tag(Plugin.Guid, "Debug.Teleport", MischiefCategory.Personal);
         MeadworksMischief.Cheats.Tag(Plugin.Guid, "Debug.View", MischiefCategory.Personal);
     }
     static MischiefCategory Category(string action) => action == "fly" || action == "teleport" || action == "view" ? MischiefCategory.Personal
         : action == "build" ? MischiefCategory.Economy : MischiefCategory.World;
     static string Id(string action) => action == "fly" ? "Debug.Fly" : action == "build" ? "Debug.Build"
-        : action == "kill" ? "Debug.Kill" : action == "teleport" ? "Debug.Teleport" : action == "view" ? "Debug.View" : "Debug.Drops";
+        : action == "kill" ? "Debug.Kill" : action == "tame" ? "Debug.Tame" : action == "event" ? "Debug.Event"
+        : action == "teleport" ? "Debug.Teleport" : action == "view" ? "Debug.View" : "Debug.Drops";
     static bool NativeDebug => Player.m_debugMode && Console.instance != null && Console.instance.IsCheatsEnabled();
-    static bool Permit(string action) => Tools && MeadworksMischief.TryUse(Plugin.Guid, Id(action), Category(action), HexText.Text("debug_" + action));
+    static bool Permit(string action)
+    {
+        if (!Tools) return false;
+        if (action != "kill" && action != "drops" && action != "tame" && action != "event")
+            return MeadworksMischief.TryUse(Plugin.Guid, Id(action), Category(action), HexText.Text("debug_" + action));
+        if (!HexGrantHint.WorldAllowed()) return false;
+        return MeadworksMischief.Decide(Plugin.Guid, MischiefCategory.World).Allowed
+            ? MeadworksMischief.TryUse(Plugin.Guid, Id(action), Category(action), HexText.Text("debug_" + action))
+            : true;
+    }
     static void Capture()
     {
         actor = Player.m_localPlayer; net = ZNet.instance; generation = CruciblePlugin.Session.Generation;
     }
-    internal static string Execute(string action, bool confirm = false)
+    internal static string Execute(string action, bool confirm = false, float radius = 0f)
     {
-        if (action != "fly" && action != "build" && action != "kill" && action != "drops") return HexText.Text("debug_help");
+        if (action != "fly" && action != "build" && action != "kill" && action != "drops" && action != "tame" && action != "event") return HexText.Text("debug_help");
         if (!Tools) return HexText.Text("debug_unavailable");
         if (!Permit(action)) return HexText.Text("actions_denied");
         var currentNet = ZNet.instance;
@@ -59,11 +71,18 @@ internal static class HexDebug
             var setting = Plugin.Settings!.PreferenceEntries()["fly"];
             return Plugin.Settings.SetPreference("fly", !(bool)setting.BoxedValue) ? HexText.Text("debug_applied") : HexText.Text("actions_denied");
         }
+        if (action == "kill" || action == "drops" || action == "tame" || action == "event")
+        {
+            if (!confirm) return HexText.Text("debug_confirm_required");
+            if (action == "event") return HexRemoteDebug.RequestEvent();
+            if (!HexOwnerData.ValidRadius(radius)) return HexText.Text("debug_radius_invalid");
+            var area = action == "kill" ? HexOwnerAction.Kill : action == "drops" ? HexOwnerAction.Drops : HexOwnerAction.Tame;
+            return HexRemoteDebug.Request(area, radius);
+        }
         if (!currentNet.IsServer())
         {
             if (action == "build") return HexText.Text("debug_timbers_owner");
-            // Kill and drops go to the server, which hands each target to the client that owns it.
-            return confirm ? HexRemoteDebug.Request(action == "kill" ? HexOwnerAction.Kill : HexOwnerAction.Drops) : HexText.Text("debug_confirm_required");
+            return HexText.Text("debug_help");
         }
         if (action == "build")
         {
@@ -77,20 +96,7 @@ internal static class HexDebug
             catch { ReleaseBuild(); return HexText.Text("debug_native_unavailable"); }
             return HexText.Text("debug_applied");
         }
-        if (!confirm) return HexText.Text("debug_confirm_required");
-        // Native admission, cheat confirmation, owner routing and exact native selection remain authoritative.
-        var console = Console.instance;
-        if (console == null) return HexText.Text("debug_native_unavailable");
-        try
-        {
-            var name = action == "kill" ? "killenemies" : "removedrops";
-            if (!Terminal.commands.TryGetValue(name, out var command) || command.action == null
-                || command.action.Method.Module.Assembly != typeof(Terminal).Assembly) return HexText.Text("debug_native_unavailable");
-            var valid = command.IsValid(console);
-            console.TryRunCommand(name);
-            return HexText.Text(valid ? "debug_native_submitted" : "debug_native_unavailable");
-        }
-        catch { return HexText.Text("debug_native_uncertain"); }
+        return HexText.Text("debug_help");
     }
     internal static void Tick()
     {
