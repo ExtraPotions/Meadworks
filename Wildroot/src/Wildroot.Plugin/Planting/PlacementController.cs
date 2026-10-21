@@ -112,9 +112,10 @@ namespace ExtraPotions.Wildroot.Runtime {
     // Shared-material cells wait on the provider a few at a time; the rest stay queued instead of overrunning its admission.
     var next=queue.Peek();if(next.SharedResources!=null&&next.PreflightValid&&!SharedPlacementFlow.CanStart(inFlight.Count))break;
     bool planting=PlayerPlanting(next),permitted=next.PreflightValid&&Allowed(next.Position);
-    if(next.SharedResources!=null&&planting&&permitted&&(next.Retry.Waiting(now)||next.Retry.WaitForArea(planting,permitted,!AreaSettling(next),now))){Background(next);queue.Enqueue(queue.Dequeue());continue;}
+    var readiness=next.SharedResources!=null&&planting&&permitted?next.Retry.CheckReadiness(!AreaSettling(next),now):SharedPlacementReadiness.Ready;
+    if(readiness==SharedPlacementReadiness.Waiting){Background(next);queue.Enqueue(queue.Dequeue());continue;}
     var job=queue.Dequeue();PlacementResult result;
-    if(job.SharedResources!=null&&job.Retry.Expired(now))result=new PlacementResult(job.LastUnpaid,job.Cell);
+    if(readiness==SharedPlacementReadiness.Expired)result=new PlacementResult(job.LastUnpaid,job.Cell);
     else if(!job.PreflightValid||!Active(job))result=new PlacementResult(PlacementResultKind.Cancelled,job.Cell);
     else{
      float stamina=(float)AccessTools.Method(typeof(Player),"GetBuildStamina").Invoke(job.Actor,Array.Empty<object>());bool useStamina=settings.Get("PlantEasily.Difficulty.UseStamina",true),useDurability=settings.Get("PlantEasily.Difficulty.UseDurability",true);float durability=(float)AccessTools.Method(typeof(Player),"GetPlaceDurability").Invoke(job.Actor,new object[]{job.Tool});

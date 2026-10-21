@@ -1,6 +1,6 @@
 {
   "name": "Meadworks",
-  "version_number": "0.1.8",
+  "version_number": "0.1.9",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/MeadworksModpack",
   "description": "Meadworks suite: Crucible and all 24 Meadworks products in one install. Contains no code of its own. Required on all peers.",
   "dependencies": [
@@ -28,6 +28,6 @@
     "expDARE-Timber-0.2.1",
     "expDARE-Wayfarer-0.5.12",
     "expDARE-Wildblood-0.5.4",
-    "expDARE-Wildroot-0.1.18"
+    "expDARE-Wildroot-0.1.19"
   ]
 }

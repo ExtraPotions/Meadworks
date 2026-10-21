@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.19 (2026-10-21)
+
+- Requires Crucible 0.3.26 / Crucible.UI 0.3.19.
+- Shared-chest grid cells that become ready after a pick keep planting when their turn returns. Waiting behind other cells no longer consumes the area-readiness timeout or a later unpaid retry. Area waits and unpaid retry counts remain bounded; Escape and unequipping still cancel, and uncertain payments retain their original identity.
+
 ## 0.1.18 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

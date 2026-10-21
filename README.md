@@ -8,7 +8,7 @@ Crucible is the shared library every product requires. The Meadworks modpack dep
 | Mod | Version | Description |
 | --- | --- | --- |
 | [Crucible](meadworks-crucible/) | 0.3.26 | Meadworks shared library: product registration, server authority, the shared interface kit, localization and logging. Adds no gameplay. Required on all peers. |
-| [Meadworks](MeadworksModpack/) | 0.1.8 | Meadworks suite: Crucible and all 24 Meadworks products in one install. Contains no code of its own. Required on all peers. |
+| [Meadworks](MeadworksModpack/) | 0.1.9 | Meadworks suite: Crucible and all 24 Meadworks products in one install. Contains no code of its own. Required on all peers. |
 | [Almanac](Almanac/) | 0.1.16 | Meadworks settings book: one in-game window for every installed mod's settings, showing which ones the server locks and why, with settings imports. Client-optional. |
 | [Beacon](Beacon/) | 0.1.13 | Meadworks saved servers: join without the password prompt, passwords in protected storage, saved servers in Join Game favorites, optional auto-join and reconnect (a server can turn reconnect off), AutoConnector import. Client-optional. |
 | [Bestiary](Bestiary/) | 0.1.15 | Meadworks creatures and bone arsenal: Crypt Mimic, Greydwarf Slinger, Rime Giant, Kraken, the arsenal skeletons, the Skeleton Crossbowman and the Crypt Executioner. Required on all peers. |
@@ -32,7 +32,7 @@ Crucible is the shared library every product requires. The Meadworks modpack dep
 | [Timber](Timber/) | 0.2.1 | Meadworks building: build camera, flooring options and area repair, with server-controlled cheats. Required on all peers. |
 | [Wayfarer](Wayfarer/) | 0.5.12 | Meadworks map travel: Back to Bed for everyone, plus Stones, Anywhere, Boat, Grave and Player travel cheats the server switches on, usable by admins unless the server allows others. Required on all peers. |
 | [Wildblood](Wildblood/) | 0.5.4 | Meadworks wild creatures: difficulty and stars that grow with the world, mutations and modifiers, boss aspects, loot rules and bad-luck protection. Required on all peers. |
-| [Wildroot](Wildroot/) | 0.1.18 | Meadworks gardening: grid planting, snapping, bulk harvest, replanting, a Farming skill with perks, seed crafting and more plantable flora. Required on all peers. |
+| [Wildroot](Wildroot/) | 0.1.19 | Meadworks gardening: grid planting, snapping, bulk harvest, replanting, a Farming skill with perks, seed crafting and more plantable flora. Required on all peers. |
 
 ## Building
 

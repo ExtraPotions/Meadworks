@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.9 (2026-10-21)
+
+- Dependency pins: Wildroot 0.1.19; the other 24 pins are unchanged from 0.1.8.
+- Installer: What's new for Wildroot 0.1.19. The profile updater adds a manager row for a packaged product the profile does not have yet.
+
 ## 0.1.8 (2026-10-21)
 
 - Dependency pins refreshed to the October 21 sixth release: Crucible 0.3.26 (Crucible.UI 0.3.19) and every product: Almanac 0.1.16, Beacon 0.1.13, Bestiary 0.1.15, Burrow 0.3.24, Cairn 0.1.16, Delve 0.1.11, Edge 0.2.11, Ember 0.5.6, Hex 0.1.16, Inscribe 0.2.4, Keel 0.1.13, Kindle 0.1.22, Larder 0.2.12, Magpie 0.1.12, Mantle 0.1.23, Saga 0.1.14, Shepherd 0.1.15, Tempest 0.1.12, Thing 0.1.10, Threshold 0.3.10, Timber 0.2.1, Wayfarer 0.5.12, Wildblood 0.5.4, Wildroot 0.1.18.
