@@ -1,0 +1,48 @@
+// Portions Copyright (C) 2026 Gerald Glasgow.
+// EliteCreaturesPack 0.7.2 / ValheimModLibs at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1: EliteCreaturesPack/EliteCreaturesPack/Core/TwoBoneIk.cs
+// Changed by expDARE, 2026: namespace isolation for Bestiary; reference algorithms retained.
+// SPDX-License-Identifier: GPL-3.0-or-later
+using UnityEngine;
+
+namespace ExtraPotions.Bestiary.Runtime.Adopted.Core
+{
+    /// <summary>
+    /// Bends a two-bone limb so its end reaches a target (the law of cosines at the elbow, then the whole limb turned
+    /// onto the target), rolling it about the shoulder-to-hand line until the elbow points at the hint. The same solver
+    /// the workshop previews with (AssetWorkshop Slinger/TwoBoneIk).
+    /// </summary>
+    public static class TwoBoneIk
+    {
+        private const float Epsilon = 1e-6f;
+
+        public static void Solve(Transform upper, Transform lower, Transform end, Vector3 target, Vector3 hint)
+        {
+            Vector3 a = upper.position, b = lower.position, c = end.position;
+            float ab = (b - a).magnitude, bc = (c - b).magnitude;
+            float at = Mathf.Clamp((target - a).magnitude, Mathf.Abs(ab - bc) + 0.001f, ab + bc - 0.001f);
+            float bend = 0.5f * (Angle((c - a).magnitude, ab, bc) - Angle(at, ab, bc));
+            Vector3 axis = Vector3.Cross(b - a, c - b);
+            if (axis.sqrMagnitude < Epsilon)
+            {
+                axis = Vector3.Cross(hint - a, c - b);
+            }
+            lower.rotation = Quaternion.AngleAxis(2f * bend * Mathf.Rad2Deg, axis.normalized) * lower.rotation;
+            upper.rotation = Quaternion.FromToRotation(end.position - a, target - a) * upper.rotation;
+            TurnElbow(upper, lower, end, hint);
+        }
+
+        private static void TurnElbow(Transform upper, Transform lower, Transform end, Vector3 hint)
+        {
+            Vector3 a = upper.position;
+            Vector3 line = (end.position - a).normalized;
+            Vector3 elbow = Vector3.ProjectOnPlane(lower.position - a, line);
+            Vector3 wanted = Vector3.ProjectOnPlane(hint - a, line);
+            if (elbow.sqrMagnitude > Epsilon && wanted.sqrMagnitude > Epsilon)
+            {
+                upper.rotation = Quaternion.FromToRotation(elbow, wanted) * upper.rotation;
+            }
+        }
+
+        private static float Angle(float a, float b, float c) => Mathf.Acos(Mathf.Clamp((b * b + c * c - a * a) / (2f * b * c), -1f, 1f));
+    }
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adapted from SecondaryAttacks at 4375a2b17297052a773c5b143b0cae21dc655ed8, ILRepack.targets.
+     Copyright (C) sighsorry. SPDX-License-Identifier: GPL-3.0-only
+     Changed by expDARE, 2026: Saga and YamlDotNet inputs; no ServerSync preparation or deployment. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="SagaILRepacker" AfterTargets="Build">
+    <ItemGroup>
+      <SagaMergeInputs Include="$(TargetPath)"/>
+      <SagaMergeInputs Include="$(TargetDir)YamlDotNet.dll"/>
+      <SagaMergeLibraries Include="@(ReferencePath->'%(RootDir)%(Directory)')"/>
+    </ItemGroup>
+    <!-- No merged PDB: with DebugInfo ILRepack records its per-process temp folder in the DLL, so no two builds matched (W87). -->
+    <ILRepack Parallel="true" DebugInfo="false" Internalize="true" InputAssemblies="@(SagaMergeInputs)"
+              OutputFile="$(TargetPath)" TargetKind="SameAsPrimaryAssembly" LibraryPath="@(SagaMergeLibraries)"/>
+  </Target>
+</Project>

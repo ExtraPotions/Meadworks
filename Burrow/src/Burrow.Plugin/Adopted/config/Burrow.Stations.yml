@@ -1,0 +1,20 @@
+# Burrow.Stations.yml - how much each station holds.
+#
+# One entry per station prefab: smelters, kilns, blast furnaces, the eitr refinery, spinning wheels, windmills,
+# hot tubs and every other station of the game or of a mod built the same way. items: is how many items it holds
+# waiting (ore, wood, flax, barley...), fuel: how much fuel (coal, wood). Whole numbers from 1 to 1000; leave a
+# key out to keep the general minimum: Capacity's "Station Minimum Capacity" setting (default 50) raises every station
+# without its own line here to at least that many items and that much fuel; a line here sets that station exactly.
+# A key left out of a line keeps the game's value. A station that takes no items or no fuel keeps it that way: such a key is
+# ignored with a warning in the log. Caps apply to new stations and to every loaded one. Lowering a cap loses
+# nothing: a station holding more keeps it and takes nothing until it is below the cap. Removing an entry, or
+# Capacity's Enabled switch off, brings back the game's values.
+#
+# The file is synced from the server, reloaded a few seconds after it is saved and can be edited in game
+# (Configuration Manager, "Edit YAML"). Extra files named Burrow.Stations<anything>.yml next to this one are
+# read as well. The first time a world loads, every station prefab of the game and of other mods is listed
+# below with its vanilla values, commented out: remove the # of a line and change the numbers.
+stations:
+  # smelter: { items: 10, fuel: 20 }
+  # charcoal_kiln: { items: 25 }
+  # piece_bathtub: { fuel: 10 }

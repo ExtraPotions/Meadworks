@@ -1,0 +1,16 @@
+{
+  "product": "Larder",
+  "productVersion": "0.2.8",
+  "schema": 1,
+  "authoringDirectories": [
+    "larder",
+    "shepherd"
+  ],
+  "modelFile": "larder/models.json",
+  "modelSHA256": "E07059F693F52E299C29C12661D175E57C0D2892AF738B1544D8F8A545D3249A",
+  "builderSHA256": "BB4BC3A82B38FA3930440EDE02B6797906831EFB4D98D25712F06D0AA3F42837",
+  "atlasSHA256": "83F3B012447DA4F44C64943AB26D632E530480D5DEF958FD41D56792937A10C1",
+  "rebuildScript": "Rebuild-OriginalArt.ps1",
+  "rebuildInstructions": "SOURCE-REBUILD.md",
+  "unityVersion": "6000.0.75f1"
+}

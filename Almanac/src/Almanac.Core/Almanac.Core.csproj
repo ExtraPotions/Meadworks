@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Almanac logic (config index, attribute reader, editor selection, value codec, write planning, hotkey coexistence). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Almanac.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Almanac</RootNamespace>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,28 @@
+{
+  "author": "expDARE",
+  "license": "CC-BY-NC-SA-4.0",
+  "method": "Built-in ImageGen",
+  "source": "exec-73e70688-f82b-4312-8e82-7dc72000a788.png",
+  "file": "materials-atlas.png",
+  "sha256": "83F3B012447DA4F44C64943AB26D632E530480D5DEF958FD41D56792937A10C1",
+  "grid": {
+    "columns": 4,
+    "rows": 2,
+    "order": [
+      "wood",
+      "leather",
+      "fur",
+      "bone",
+      "iron",
+      "stone",
+      "parchment",
+      "linen"
+    ]
+  },
+  "prompt": "Use case: stylized-concept. Asset type: ORIGINAL GAME ALBEDO TEXTURE ATLAS, not an illustration or a presentation. Create a wide landscape flat 2D grayscale material texture atlas, EXACTLY four columns by two rows of equal rectangular cells filling the entire image edge-to-edge. No margin, no gutters, NO LABELS, no text, no objects, no icons, no 3D renders, no perspective, no light reflections, no drop shadows, no decorative borders. These are original seamless hand-painted low-resolution albedo surface textures for Nordic survival-game low-poly models. Each cell is an independent tileable texture with a softly worn painted appearance that remains legible downsampled to64x64; clear broad material character with restrained small details, not photographic noise. Use neutral grayscale with overall middle-light gray about70% brightness; dark recess strokes and lighter worn marks but NO directional baked lighting. Surface texture fills every cell, no background. TOP ROW LEFT TO RIGHT: (1) rough aged wood, long uneven grain, occasional subtle knot, fine worn cracks, (2) soft worked leather, irregular pebbled grain, gently mottled worn patches, no stitching or folds, (3) coarse winter animal fur, short overlapping clumps of hair, hand-painted fine directional strokes, no animal features, (4) aged polished bone, subtle porous grain, faint hairline cracks and worn patches, no skulls or anatomy. BOTTOM ROW LEFT TO RIGHT: (5) worn hammered iron, broad irregular hammer facets and restrained scratches with flat diffuse marks, absolutely no metallic reflections or 3D bevels, (6) weathered stone, irregular chipped mottling and subtle fissures, no masonry joints, (7) handmade parchment, fibrous uneven paper grain and a few subtle age marks, no writing or symbols, (8) coarse woven linen cloth, clear small warp-and-weft strands with occasional fiber irregularities, no fabric folds. This atlas will be split into its 8 exact equal cells by the Unity asset importer and tinted with the approved item material colors. Individual cells must read as unlit repeating flat material swatches. No credits or signature.",
+  "metadataRemoved": {
+    "date": "2026-10-20",
+    "originalSha256": "4E828FFA3C3F4763B026B30E8A20D6CB3BCFBBC2B2C625076BDB5E71C96AB6AA",
+    "note": "Embedded metadata removed at the author's request; IHDR and IDAT are byte-identical, so pixels are unchanged. Unity bundles and build-result.json records built from the original hash remain valid."
+  }
+}

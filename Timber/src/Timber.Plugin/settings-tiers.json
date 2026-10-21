@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "product": "Timber",
+  "default": "Advanced",
+  "settings": {
+    "Build Camera/Enabled": "Essential",
+    "Build Camera/Camera Pickup": "Essential",
+    "Build Camera/Toggle Key": "Essential",
+    "Build Camera/Speed": "Essential",
+    "Repair/Area Repair": "Essential",
+    "Flooring/Fires On Floors": "Essential",
+    "Build Camera/Circlet Offset": "FileOnly",
+    "Server/Locked Player Settings": "FileOnly",
+    "Server/Locked Player Values": "FileOnly"
+  }
+}

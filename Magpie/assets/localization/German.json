@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "strings": {
+    "loot_multiplier": "Beute-Multiplikator",
+    "module_pickup": "Magpie-Aufheben",
+    "module_merge": "Magpie-Bodenstapel",
+    "module_float": "Magpie-Treibgut",
+    "module_loot": "Magpie-Beute-Multiplikator",
+    "step_aside_pickup": "Magpie-Aufheben ist aus: {0} ist installiert.",
+    "step_aside_merge": "Magpie-Bodenstapel sind aus: {0} ist installiert.",
+    "step_aside_float": "Magpie-Treibgut ist aus: {0} ist installiert.",
+    "step_aside_loot": "Magpie-Beute-Multiplikator ist aus: {0} ist installiert.",
+    "import_done": "{0} Magpie-Einstellungen importiert. Quelldateien wurden beibehalten.",
+    "import_sync_incomplete": "Der Magpie-Import wurde lokal gespeichert, aber die Synchronisierung wurde nicht abgeschlossen. Prüfe die Synchronisierung; wende diese Vorschau nicht erneut an."
+  }
+}

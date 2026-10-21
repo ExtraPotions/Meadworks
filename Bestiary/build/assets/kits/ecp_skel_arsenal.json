@@ -1,0 +1,432 @@
+[
+ {
+  "name": "ecp_skel_arrow",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_arrow",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_skel_atgeir",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_atgeir",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_skel_axe",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_axe",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_skel_bow",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_bow",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_skel_bow_player",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_bow_player",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_skel_dagger",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_dagger",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_skel_mace",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_mace",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_skel_spear",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_spear",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_skel_sword",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "ecp_skel_sword",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ },
+ {
+  "name": "ecp_spine",
+  "position": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0
+  },
+  "rotation": {
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "w": 1.0
+  },
+  "scale": {
+   "x": 1.0,
+   "y": 1.0,
+   "z": 1.0
+  },
+  "children": [
+   {
+    "name": "col_box_col_spine",
+    "position": {
+     "x": 0.0011690258979797363,
+     "y": 0.1906116008758545,
+     "z": 0.02462553232908249
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   },
+   {
+    "name": "ecp_spine",
+    "position": {
+     "x": -0.0,
+     "y": 0.0,
+     "z": 0.0
+    },
+    "rotation": {
+     "x": 0.0,
+     "y": -0.0,
+     "z": -0.0,
+     "w": 1.0
+    },
+    "scale": {
+     "x": 1.0,
+     "y": 1.0,
+     "z": 1.0
+    },
+    "children": []
+   }
+  ]
+ }
+]

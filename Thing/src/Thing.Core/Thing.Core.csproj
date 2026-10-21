@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Thing logic (admin decision table, action catalog, audit entries, settings table, moderation ledgers, game list files, announcements, shutdown plan, world administration rules, remote configuration guard, step-aside and import plans, text keys). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Thing.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Thing</RootNamespace>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>netstandard2.1</TargetFramework><AssemblyName>Timber</AssemblyName><RootNamespace>ExtraPotions.Timber.Runtime</RootNamespace></PropertyGroup>
+  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
+    <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
+    <Reference Include="assembly_utils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_utils.dll" Private="false"/>
+    <Reference Include="assembly_guiutils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_guiutils.dll" Private="false"/>
+    <Reference Include="Unity.InputSystem" HintPath="$(ValheimManagedDir)/Unity.InputSystem.dll" Private="false"/>
+    <Reference Include="Splatform" HintPath="$(ValheimManagedDir)/Splatform.dll" Private="false"/>
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
+    <ProjectReference GlobalPropertiesToRemove="OutputPath;IntermediateOutputPath" Include="../Timber.Core/Timber.Core.csproj"/>
+    <ProjectReference GlobalPropertiesToRemove="OutputPath;IntermediateOutputPath" Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
+    <ProjectReference GlobalPropertiesToRemove="OutputPath;IntermediateOutputPath" Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false"/>
+    <ProjectReference GlobalPropertiesToRemove="OutputPath;IntermediateOutputPath" Include="$(CrucibleRoot)/src/Crucible.UI/Crucible.UI.csproj" Private="false"/>
+    <ProjectReference GlobalPropertiesToRemove="OutputPath;IntermediateOutputPath" Include="$(CrucibleRoot)/src/Crucible.Contracts/Crucible.Contracts.csproj" Private="false"/>
+  </ItemGroup>
+  <ItemGroup><EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Timber.localization.%(Filename)%(Extension)"/></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="settings-tiers.json" LogicalName="$(AssemblyName).settings-tiers.json" /></ItemGroup>
+</Project>

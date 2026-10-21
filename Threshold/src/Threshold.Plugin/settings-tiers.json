@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "product": "Threshold",
+  "default": "Advanced",
+  "settings": {
+    "1 - General/Enabled": "Essential",
+    "1 - General/Teleport Mode": "Essential",
+    "2 - Hubs/Return To Hub": "Essential",
+    "5 - Map/Show Portal Pins": "Essential",
+    "7 - Jumps/Bring Tames": "Essential",
+    "7 - Jumps/Bring Carts": "Essential",
+    "8 - Sea Gates/Enabled": "Essential",
+    "1 - General/Portal Prefabs": "FileOnly",
+    "1 - General/Locked Player Settings": "FileOnly",
+    "1 - General/Locked Player Values": "FileOnly",
+    "6 - Fuel/Fuel Item": "FileOnly",
+    "8 - Sea Gates/Pillar Recipe": "FileOnly",
+    "9 - Cheats/Listed Items": "FileOnly",
+    "Internal/Imported From": "FileOnly"
+  }
+}

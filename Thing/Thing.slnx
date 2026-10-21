@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Thing.Core/Thing.Core.csproj" />
+    <Project Path="src/Thing.Plugin/Thing.Plugin.csproj" />
+  </Folder>
+</Solution>

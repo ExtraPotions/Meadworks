@@ -1,0 +1,10 @@
+# English words of the Loot area: the loot-find inscriptions (Norns' Favour, Fateweaver, Trophy Taker, Hoardfinder).
+# Key without the $ -> text. Names and tooltip sentences follow features/localization.md ($1 = the value).
+ecf_affix_norns_favour: "Norns' Favor"
+ecf_affix_norns_favour_line: "Gear dropped by enemies you kill rolls a higher rarity $1% more often"
+ecf_affix_fateweaver: "Fateweaver"
+ecf_affix_fateweaver_line: "Enemies you kill are $1% more likely to drop an extra rune"
+ecf_affix_trophy_taker: "Trophy Taker"
+ecf_affix_trophy_taker_line: "Enemies you kill drop their trophy $1% more often"
+ecf_affix_hoardfinder: "Hoardfinder"
+ecf_affix_hoardfinder_line: "Enemies you kill drop coins and treasure $1% more often"

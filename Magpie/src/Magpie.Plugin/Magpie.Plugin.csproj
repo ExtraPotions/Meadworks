@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Magpie</AssemblyName>
+    <RootNamespace>ExtraPotions.Magpie.Runtime</RootNamespace>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+  <!-- BepInEx, Jotunn, Harmony, Unity and game references, shared with Crucible. -->
+  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <ItemGroup>
+    <!-- Publicized game assembly (as Kindle): Magpie reads non-public members such as Player.AutoPickup and ItemDrop.m_nview. -->
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
+    <Reference Remove="assembly_valheim"/>
+    <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
+    <ProjectReference Include="../Magpie.Core/Magpie.Core.csproj"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.UI/Crucible.UI.csproj" Private="false"/>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Magpie.localization.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="settings-tiers.json" LogicalName="$(AssemblyName).settings-tiers.json" />
+  </ItemGroup>
+</Project>

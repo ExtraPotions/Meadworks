@@ -1,0 +1,31 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion><Nullable>enable</Nullable><Deterministic>true</Deterministic>
+    <Version>0.1.20</Version><Authors>expDARE</Authors><Company>ExtraPotions</Company><Copyright>Copyright (C) 2026 expDARE (ExtraPotions Meadworks)</Copyright>
+    <GameDir Condition="'$(GameDir)' == ''">$(VALHEIM_DIR)</GameDir>
+    <!-- Managed game assemblies: the client ships valheim_Data, the dedicated server valheim_server_Data. The client folder wins when both exist. -->
+    <ValheimManagedDir Condition="'$(ValheimManagedDir)' == '' And '$(GameDir)' != '' And Exists('$(GameDir)/valheim_Data/Managed')">$(GameDir)/valheim_Data/Managed</ValheimManagedDir>
+    <ValheimManagedDir Condition="'$(ValheimManagedDir)' == '' And '$(GameDir)' != '' And Exists('$(GameDir)/valheim_server_Data/Managed')">$(GameDir)/valheim_server_Data/Managed</ValheimManagedDir>
+    <DependencyDir Condition="'$(DependencyDir)' == ''">$(MSBuildThisFileDirectory)../assets/dependencies</DependencyDir>
+    <BepInExDir Condition="'$(BepInExDir)' == ''">$(DependencyDir)/BepInExPack_Valheim-5.4.2351/BepInExPack_Valheim/BepInEx</BepInExDir>
+    <JotunnDir Condition="'$(JotunnDir)' == ''">$(DependencyDir)/Jotunn-2.30.2/plugins</JotunnDir>
+    <!-- Crucible checkout: the shared meadworks-crucible main checkout. -->
+    <CrucibleRoot Condition="'$(CrucibleRoot)' == ''">$(MSBuildThisFileDirectory)../meadworks-crucible</CrucibleRoot>
+  </PropertyGroup>
+  <Target Name="MeadworksRequireGameDir" BeforeTargets="ResolveAssemblyReferences;Build">
+    <Error Condition="'$(GameDir)' == '' Or '$(ValheimManagedDir)' == '' Or !Exists('$(ValheimManagedDir)/assembly_valheim.dll')" Text="Set the VALHEIM_DIR environment variable (or pass -p:GameDir=...) to your Valheim install folder (client valheim_Data/Managed or dedicated server valheim_server_Data/Managed). Current GameDir: '$(GameDir)'." />
+  </Target>
+  <!-- Reproducible bytes (W87, 2026-10-13, as Crucible d0bdaaa). Stamp the last commit that changed what the plugin is built from
+       (src, assets, config, these props) instead of HEAD, and map the project path away so two worktrees of one commit build the same bytes. -->
+  <PropertyGroup>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <PathMap>$(MSBuildProjectDirectory)=/_/$(MSBuildProjectName)</PathMap>
+  </PropertyGroup>
+  <Target Name="MeadworksSourceStamp" BeforeTargets="GetAssemblyAttributes">
+    <Exec Command="git log -1 --format=%25%25H -- src assets config Directory.Build.props" WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMSBuild="true" StandardOutputImportance="low" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_MeadworksSourceCommit"/>
+    </Exec>
+    <PropertyGroup><InformationalVersion Condition="'$(_MeadworksSourceCommit)' != ''">$(Version)+$(_MeadworksSourceCommit)</InformationalVersion></PropertyGroup>
+  </Target>
+</Project>

@@ -1,0 +1,2847 @@
+# EliteCrafting - inscriptions
+format: 4
+#
+# Every inscription the mod can roll, which item classes it rolls on, and its tier ladder.
+# Written once, on first run, as a full copy of the built-in defaults; the mod never
+# rewrites it (a file from an older format is renamed to .v<format>.bak and written fresh). The
+# built-in defaults stay underneath this file (set `use_defaults: false` to make the files
+# the whole configuration), so an entry you delete here comes back from the defaults: turn
+# an inscription off with `enabled: false` instead (existing copies go dormant), or stop it
+# rolling with `weight: 0` (existing copies keep working).
+#
+# Extra files named EliteCrafting_inscriptions_<anything>.yml are read after this one, in
+# file-name order. An entry there with an existing id changes only the fields it names; a
+# new id adds an inscription. Lists (classes.best, classes.allowed, tier rows) are replaced whole.
+#
+# Fields: id, name, effect, param, value (percent | flat | flag), unit (ms | deg | m | min,
+# flat only), affix (prefix | suffix), family, category (offense | defense | utility),
+# classes { best: [...], allowed: [...] } (item class ids, see `classes` in the economy file),
+# requires { skill, hands, traits }, exclusion_group,
+# scaled (true: the value is multiplied by the item class's damage_scale when it rolls),
+# weight (default 100), enabled, hook (easy | medium | hard), tiers.
+#
+# Tiers count down: T1 is the strongest. An item rolls any tier its item level has unlocked
+# (item level = the biome of its materials, 1 Meadows ... 8 Deep North), weaker tiers more
+# often (a tier's weight is its number unless a row says otherwise). On a class where the
+# inscription is only `allowed`, the top third of its tiers is closed
+# (`rolling.allowed_closed_fraction` in the economy file).
+#   tiers: { count: 8, from: 1, min: 3, max: 40 }
+#     a ladder: `count` tiers, the weakest unlocked at item level `from`, the strongest at 8,
+#     values spread from `min` (the weakest tier's low end) to `max` (the strongest's high end).
+#   tiers: [ { tier: 1, level: 8, min: 37, max: 40, weight: 1 }, ... ]
+#     explicit rows instead. A flag inscription has no min and max.
+#
+# Rarity limits (economy file): Magic holds 2 (1 prefix and 1 suffix), Rare 3 (at most 2 of each);
+# the Serpent Rune can add one more, to 4 at most.
+
+# Caps on the summed total of a channel across everything you wear. Keys: effect,
+# effect:param. `null` removes a cap.
+caps:
+  health_recovery: 150
+  stamina_recovery: 100
+  eitr_recovery: 100
+  move_speed: 15
+  move_speed_sneak: 50
+  jump_height: 50
+  fall_damage_taken: 80
+  run_stamina_cost: 30
+  jump_stamina_cost: 30
+  attack_stamina_cost: 30
+  block_stamina_cost: 30
+  dodge_stamina_cost: 30
+  home_item_stamina_cost: 30
+  skill_gain: 100
+  attack_eitr_cost: 30
+  draw_stamina_cost: 30
+  reload_speed: 50
+  pickup_radius: 100
+  build_range: 100
+  explore_radius: 100
+  find_rarity: 200
+  find_stones: 200
+  find_trophy: 200
+  find_coins: 200
+  move_speed_sprint: 30
+  move_speed_encumbered: 50
+  move_speed_after_dodge: 40
+  move_speed_paved: 30
+  slope_penalty: 75
+  terrain_slow: 75
+  swimmer: 50
+  noise_made: 75
+  stealth: 75
+  stagger_taken: 75
+  damage_taken: 50
+  ranged_damage_taken: 60
+  avoid_hit: 15
+  knockback_taken: 75
+  debuff_decay: 75
+  frost_slow_taken: 100
+  stagger_recovery: 75
+  skill_loss: 75
+  food_duration: 100
+  rest_comfort: 3
+  forsaken_cooldown: 30
+  mead_cooldown: 30
+  demist_radius: 100
+  taming_speed: 100
+  sail_speed: 50
+  yield_pickable: 100
+  attack_health_cost: 30
+  draw_speed: 50
+  ammo_save: 50
+  perfect_block_window: 150
+  leech: 5
+  attack_speed: 15
+  cast_speed: 25
+  crit_chance: 25
+  crit_damage: 100
+  penetration: 50
+  paralyze: 3
+  knockback_dealt: 100
+  dot_duration: 100
+  chain_lightning: 100
+  explosive_shot: 100
+  mead_duration: 100
+  mead_potency: 50
+  mead_save: 50
+  food_values: 30
+  food_regen: 50
+  rested_duration: 100
+  adrenaline_gain: 100
+  boss_damage_taken: 40
+  burning_taken: 75
+  burning_decay: 75
+  chop_damage: 100
+  pickaxe_damage: 100
+  bait_save: 75
+  fish_size: 100
+  reel_stamina: 60
+  craft_save: 30
+  craft_extra: 30
+  trader_discount: 30
+  ship_damage_taken: 75
+  glass_cannon: 25
+  heavy_hand: 60
+
+inscriptions:
+
+  # --- on hit effects ---
+  - id: thors_chain
+    effect: chain_lightning
+    value: percent
+    affix: prefix
+    family: on_hit_effects
+    category: offense
+    classes:
+      best: [staff_elemental]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+    tiers: { count: 8, from: 1, min: 5, max: 65 }
+
+  - id: ambusher
+    effect: surprise_bonus
+    value: percent
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    hook: easy
+    classes:
+      best: [knife]
+      allowed: [bow, crossbow]
+    tiers: { count: 8, from: 1, min: 1, max: 16 }
+
+  - id: numbing_blow
+    effect: paralyze
+    value: flat
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    classes:
+      best: [sledge, mace_1h]
+      allowed: [fist, crossbow]
+    tiers: { count: 8, from: 3, min: 0.5, max: 6 }
+
+  - id: dazing_blows
+    effect: stagger_duration_dealt
+    value: percent
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    weight: 70
+    hook: medium
+    classes:
+      best: [sledge, mace_1h]
+      allowed: [sword_1h, axe_1h, knife, spear, greatsword, battleaxe, dual_axe, atgeir, fist, buckler, shield, tower]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: staggering_blows
+    effect: stagger_power
+    value: percent
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    hook: easy
+    classes:
+      best: [sledge, mace_1h]
+      allowed: [sword_1h, axe_1h, knife, spear, greatsword, battleaxe, dual_axe, atgeir, fist, buckler, shield, tower]
+    tiers: { count: 8, from: 1, min: 1, max: 12 }
+
+  - id: cruel_opening
+    effect: exploit_stagger
+    value: percent
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    weight: 60
+    hook: medium
+    classes:
+      best: [knife]
+      allowed: [fist]
+    tiers: { count: 8, from: 3, min: 4, max: 24 }
+
+  - id: press_the_advantage
+    effect: staggered_target_damage
+    value: percent
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    hook: easy
+    classes:
+      best: [sledge, mace_1h, fist]
+      allowed: [sword_1h, axe_1h, knife, spear, greatsword, battleaxe, dual_axe, atgeir, bow, crossbow]
+    tiers: { count: 8, from: 1, min: 2, max: 21 }
+
+  - id: hamstring
+    effect: on_hit_slow
+    value: percent
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    weight: 70
+    hook: medium
+    classes:
+      best: [atgeir, spear]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, greatsword, battleaxe, dual_axe, sledge, fist, bow, crossbow]
+    tiers: { count: 8, from: 1, min: 4, max: 24 }
+
+  - id: mighty_blows
+    effect: knockback_dealt
+    value: percent
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    classes:
+      best: [sledge, mace_1h]
+      allowed: [sword_1h, axe_1h, knife, spear, greatsword, battleaxe, dual_axe, atgeir, fist, crossbow]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: heavy_hand
+    effect: heavy_hand
+    value: percent
+    affix: suffix
+    family: on_hit_effects
+    category: offense
+    classes:
+      best: [sledge, mace_1h]
+      allowed: [battleaxe, greatsword, atgeir, fist, axe_1h]
+    tiers: { count: 8, from: 2, min: 10, max: 45 }
+
+
+  # --- movement ---
+  - id: evaders_fury
+    effect: dodge_fury
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 60
+    hook: medium
+    classes:
+      best: [legs]
+      allowed: [cape, trinket]
+    tiers: { count: 8, from: 1, min: 5, max: 35 }
+
+  - id: supple_fit
+    effect: item_no_move_penalty
+    value: flag
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 40
+    hook: easy
+    requires: { traits: [movement_penalty] }
+    classes:
+      best: [chest, legs, tower]
+      allowed: [helmet, shield, buckler, sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood]
+    tiers: { count: 1, from: 1 }
+
+  - id: soft_tread
+    effect: noise_made
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [cape, trinket]
+    tiers: { count: 8, from: 1, min: 2, max: 50 }
+
+  - id: fleetfoot
+    effect: move_speed
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    exclusion_group: move_speed
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [cape, trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 12 }
+
+  - id: long_wind
+    effect: run_stamina_cost
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [cape, trinket]
+    tiers: { count: 8, from: 1, min: 4, max: 24 }
+
+  - id: nimble
+    effect: dodge_stamina_cost
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 20 }
+
+  - id: light_leap
+    effect: jump_stamina_cost
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [trinket]
+    tiers: { count: 8, from: 1, min: 2, max: 21 }
+
+  - id: windstep
+    effect: air_jump
+    value: flag
+    affix: suffix
+    family: movement
+    category: utility
+    classes:
+      best: [legs]
+      allowed: []
+    tiers: { count: 1, from: 5 }
+
+  - id: ravens_glide
+    effect: slow_fall
+    value: flag
+    affix: suffix
+    family: movement
+    category: utility
+    exclusion_group: fall
+    weight: 30
+    hook: easy
+    classes:
+      best: [cape, legs]
+      allowed: []
+    tiers: { count: 1, from: 5 }
+
+  - id: sea_ward
+    effect: ship_damage_taken
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    classes:
+      best: [cape]
+      allowed: [trinket, utility]
+    tiers: { count: 8, from: 1, min: 5, max: 35 }
+
+  - id: ghostwalk
+    effect: move_speed_sneak
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [cape, trinket]
+    tiers: { count: 8, from: 1, min: 3, max: 18 }
+
+  - id: spring_heeled
+    effect: jump_height
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: soft_landing
+    effect: fall_damage_taken
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    exclusion_group: fall
+    hook: easy
+    classes:
+      best: [legs, cape]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: stride
+    effect: move_speed_sprint
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    exclusion_group: move_speed
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [trinket]
+    tiers: { count: 8, from: 1, min: 3, max: 18 }
+
+  - id: pack_mule
+    effect: move_speed_encumbered
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 70
+    hook: easy
+    classes:
+      best: [legs, utility]
+      allowed: [cape]
+    tiers: { count: 8, from: 1, min: 6, max: 36 }
+
+  - id: momentum
+    effect: move_speed_after_dodge
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 70
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 3, max: 18 }
+
+  - id: pathfinder
+    effect: move_speed_paved
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 60
+    hook: medium
+    classes:
+      best: [legs]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 3, max: 18 }
+
+  - id: mountain_goat
+    effect: slope_penalty
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 60
+    hook: medium
+    classes:
+      best: [legs]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 10, max: 100 }
+
+  - id: marshstrider
+    effect: terrain_slow
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 60
+    hook: medium
+    classes:
+      best: [legs]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 10, max: 100 }
+
+  - id: strong_swimmer
+    effect: swimmer
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 70
+    hook: easy
+    classes:
+      best: [cape, legs]
+      allowed: [trinket]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: shadowmeld
+    effect: stealth
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    hook: easy
+    classes:
+      best: [cape, helmet]
+      allowed: [legs]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: fair_winds
+    effect: sail_speed
+    value: percent
+    affix: suffix
+    family: movement
+    category: utility
+    weight: 70
+    hook: medium
+    classes:
+      best: [cape]
+      allowed: [trinket, utility]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+
+  # --- weapon damage ---
+  - id: wrath
+    effect: damage_dealt
+    param: all
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 0.5, max: 6 }
+
+  - id: honed_might
+    effect: damage_dealt
+    param: physical
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    exclusion_group: damage_physical
+    hook: easy
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 2, max: 20 }
+
+  - id: primal_fury
+    effect: damage_dealt
+    param: elemental
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    exclusion_group: damage_elemental
+    hook: easy
+    classes:
+      best: [staff_elemental, staff_blood]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+    tiers: { count: 8, from: 1, min: 2, max: 25 }
+
+  - id: bonebreaker
+    effect: added_damage
+    param: blunt
+    value: flat
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    scaled: true
+    hook: easy
+    classes:
+      best: [mace_1h, sledge]
+      allowed: [fist]
+    tiers: { count: 8, from: 1, min: 1, max: 22 }
+
+  - id: keen_edge
+    effect: added_damage
+    param: slash
+    value: flat
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    scaled: true
+    hook: easy
+    classes:
+      best: [sword_1h, axe_1h, greatsword, battleaxe, dual_axe]
+      allowed: [knife, fist]
+    tiers: { count: 8, from: 1, min: 1, max: 22 }
+
+  - id: needlepoint
+    effect: added_damage
+    param: pierce
+    value: flat
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    scaled: true
+    hook: easy
+    classes:
+      best: [spear, atgeir, bow, crossbow]
+      allowed: [knife]
+    tiers: { count: 8, from: 1, min: 1, max: 22 }
+
+  - id: fafnirs_greed
+    effect: coin_damage
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    weight: 40
+    hook: easy
+    classes:
+      best: [trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 5, min: 4, max: 12 }
+
+  - id: berserkergang
+    effect: damage_dealt
+    param: all
+    value: percent
+    affix: suffix
+    family: weapon_damage
+    category: offense
+    weight: 60
+    hook: easy
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 0.5, max: 6 }
+
+  - id: deathblow
+    effect: low_health_opener
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    hook: medium
+    classes:
+      best: [greatsword, battleaxe, sledge]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, dual_axe, atgeir, fist, bow, crossbow]
+    tiers: { count: 8, from: 5, min: 50, max: 250 }
+
+  - id: godslayer
+    effect: slayer
+    param: boss
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    weight: 50
+    hook: easy
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 2, max: 15 }
+
+  - id: slayer_undead
+    effect: slayer
+    param: undead
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    exclusion_group: slayer
+    hook: easy
+    classes:
+      best: [mace_1h, sledge]
+      allowed: [sword_1h, axe_1h, knife, spear, greatsword, battleaxe, dual_axe, atgeir, fist, bow, crossbow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 3, max: 25 }
+
+  - id: sundering
+    effect: penetration
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    classes:
+      best: [crossbow, spear, knife]
+      allowed: [sword_1h, axe_1h, mace_1h, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 3, min: 2, max: 15 }
+
+  - id: keen_eye
+    effect: crit_chance
+    value: percent
+    affix: suffix
+    family: weapon_damage
+    category: offense
+    classes:
+      best: [knife, bow, crossbow]
+      allowed: [sword_1h, axe_1h, mace_1h, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 1, max: 10 }
+
+  - id: brutal_strikes
+    effect: crit_damage
+    value: percent
+    affix: suffix
+    family: weapon_damage
+    category: offense
+    classes:
+      best: [greatsword, battleaxe, sledge, crossbow]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, dual_axe, atgeir, fist, bow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 10, max: 60 }
+
+  - id: glass_cannon
+    effect: glass_cannon
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    classes:
+      best: [greatsword, battleaxe, sledge, dual_axe, fist]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, atgeir, bow, crossbow, staff_elemental]
+    tiers: { count: 8, from: 3, min: 3, max: 20 }
+
+  - id: nightstalker
+    effect: night_damage
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    hook: easy
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 2, max: 15 }
+
+  - id: slayer_beasts
+    effect: slayer
+    param: beasts
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    exclusion_group: slayer
+    hook: easy
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 4, max: 26 }
+
+  - id: slayer_sea
+    effect: slayer
+    param: sea
+    value: percent
+    affix: prefix
+    family: weapon_damage
+    category: offense
+    exclusion_group: slayer
+    hook: easy
+    classes:
+      best: [bow, spear]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, crossbow, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 4, max: 26 }
+
+
+  # --- item properties ---
+  - id: well_forged
+    effect: item_durability
+    value: percent
+    affix: suffix
+    family: item_properties
+    category: utility
+    exclusion_group: item_wear
+    hook: easy
+    requires: { traits: [wears_out] }
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood, buckler, shield, tower, helmet, chest, legs, cape, light, pickaxe, tool]
+    tiers: { count: 8, from: 1, min: 10, max: 200 }
+
+  - id: lightened
+    effect: item_lighten
+    value: percent
+    affix: suffix
+    family: item_properties
+    category: utility
+    exclusion_group: item_lighten
+    hook: easy
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood, buckler, shield, tower, helmet, chest, legs, cape, light, pickaxe, tool, fishing]
+    tiers: { count: 4, from: 1, min: 10, max: 50 }
+
+  - id: everlasting
+    effect: item_unbreakable
+    value: flag
+    affix: suffix
+    family: item_properties
+    category: utility
+    exclusion_group: item_wear
+    weight: 25
+    hook: medium
+    requires: { traits: [wears_out] }
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood, buckler, shield, tower, helmet, chest, legs, cape, light, pickaxe, tool]
+    tiers: { count: 1, from: 7 }
+
+  - id: gossamer
+    effect: item_zero_weight
+    value: flag
+    affix: suffix
+    family: item_properties
+    category: utility
+    exclusion_group: item_lighten
+    weight: 20
+    hook: easy
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_elemental, staff_blood, buckler, shield, tower, helmet, chest, legs, cape, light, pickaxe, tool, fishing]
+    tiers: { count: 1, from: 5 }
+
+
+  # --- blocking parry ---
+  - id: stalwart
+    effect: item_block
+    value: percent
+    affix: prefix
+    family: blocking_parry
+    category: defense
+    hook: easy
+    classes:
+      best: [buckler, shield, tower]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+    tiers: { count: 8, from: 1, min: 2, max: 24 }
+
+  - id: repelling_guard
+    effect: item_deflection
+    value: percent
+    affix: suffix
+    family: blocking_parry
+    category: defense
+    hook: easy
+    classes:
+      best: [shield, tower]
+      allowed: [buckler]
+    tiers: { count: 8, from: 1, min: 5, max: 24 }
+
+  - id: perfect_guard
+    effect: parry_bonus
+    value: percent
+    affix: prefix
+    family: blocking_parry
+    category: defense
+    hook: easy
+    requires: { traits: [can_parry] }
+    classes:
+      best: [buckler, shield]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+    tiers: { count: 8, from: 1, min: 2, max: 24 }
+
+  - id: tireless_guard
+    effect: block_stamina_cost
+    value: percent
+    affix: suffix
+    family: blocking_parry
+    category: defense
+    hook: easy
+    classes:
+      best: [buckler, shield, tower]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+    tiers: { count: 8, from: 1, min: 2, max: 21 }
+
+  - id: bramblehide
+    effect: thorns
+    value: percent
+    affix: prefix
+    family: blocking_parry
+    category: defense
+    weight: 70
+    hook: medium
+    classes:
+      best: [chest, shield, tower]
+      allowed: [legs, buckler]
+    tiers: { count: 8, from: 1, min: 2, max: 14 }
+
+  - id: mist_veil
+    effect: avoid_hit
+    value: percent
+    affix: suffix
+    family: blocking_parry
+    category: defense
+    exclusion_group: avoid_hit
+    weight: 60
+    hook: easy
+    classes:
+      best: [buckler, chest]
+      allowed: [shield, cape]
+    tiers: { count: 8, from: 1, min: 2, max: 14 }
+
+  - id: lone_blade
+    effect: lone_blade
+    value: percent
+    affix: prefix
+    family: blocking_parry
+    category: defense
+    weight: 40
+    hook: medium
+    requires: { hands: one }
+    classes:
+      best: [sword_1h]
+      allowed: [axe_1h, mace_1h, knife, spear]
+    tiers: { count: 8, from: 1, min: 4, max: 28 }
+
+  - id: anchored_guard
+    effect: block_steadfast
+    value: flag
+    affix: suffix
+    family: blocking_parry
+    category: defense
+    weight: 30
+    hook: medium
+    classes:
+      best: [tower]
+      allowed: [shield]
+    tiers: { count: 1, from: 1 }
+
+  - id: keen_guard
+    effect: perfect_block_window
+    value: flat
+    unit: ms
+    affix: suffix
+    family: blocking_parry
+    category: defense
+    weight: 60
+    hook: medium
+    requires: { traits: [can_parry] }
+    classes:
+      best: [buckler]
+      allowed: [shield, sword_1h, axe_1h, mace_1h, knife, spear]
+    tiers: { count: 8, from: 1, min: 40, max: 100 }
+
+  - id: seidr_riposte
+    effect: parry_restore
+    param: eitr
+    value: flat
+    affix: suffix
+    family: blocking_parry
+    category: defense
+    weight: 60
+    hook: medium
+    requires: { traits: [can_parry] }
+    classes:
+      best: [buckler]
+      allowed: [shield, sword_1h, axe_1h, mace_1h, knife, spear]
+    tiers: { count: 8, from: 3, min: 15, max: 80 }
+
+  - id: shield_mend
+    effect: block_restore
+    param: health
+    value: flat
+    affix: suffix
+    family: blocking_parry
+    category: defense
+    classes:
+      best: [buckler, shield]
+      allowed: [tower]
+    tiers: { count: 8, from: 1, min: 1, max: 12 }
+
+
+  # --- armour resistances ---
+  - id: hardened
+    effect: item_armor
+    value: percent
+    affix: prefix
+    family: armour_resistances
+    category: defense
+    exclusion_group: item_armor
+    hook: easy
+    classes:
+      best: [helmet, chest, legs]
+      allowed: [cape]
+    tiers: { count: 8, from: 1, min: 2, max: 18 }
+
+  - id: flameward
+    effect: damage_taken
+    param: fire
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [cape, chest]
+      allowed: [helmet, legs, buckler, shield, tower, trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: frostward
+    effect: damage_taken
+    param: frost
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [cape, chest]
+      allowed: [helmet, legs, buckler, shield, tower, trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: stormward
+    effect: damage_taken
+    param: lightning
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [cape, chest]
+      allowed: [helmet, legs, buckler, shield, tower, trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: venomward
+    effect: damage_taken
+    param: poison
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [cape, chest]
+      allowed: [helmet, legs, buckler, shield, tower, trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: spiritward
+    effect: damage_taken
+    param: spirit
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    classes:
+      best: [cape, chest]
+      allowed: [helmet, legs, buckler, shield, tower, trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: elemental_ward
+    effect: damage_taken
+    param: elemental
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    weight: 60
+    hook: easy
+    classes:
+      best: [cape]
+      allowed: [chest]
+    tiers: { count: 4, from: 5, min: 2, max: 14 }
+
+  - id: padded
+    effect: damage_taken
+    param: blunt
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [chest]
+      allowed: [helmet, legs, buckler, shield, tower]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: mailed
+    effect: damage_taken
+    param: slash
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [chest]
+      allowed: [helmet, legs, buckler, shield, tower]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: riveted
+    effect: damage_taken
+    param: pierce
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [chest]
+      allowed: [helmet, legs, buckler, shield, tower]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: ironclad
+    effect: damage_taken
+    param: physical
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    weight: 60
+    hook: easy
+    classes:
+      best: [chest]
+      allowed: [tower]
+    tiers: { count: 4, from: 5, min: 2, max: 14 }
+
+  - id: forsaken_ward
+    effect: boss_damage_taken
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    classes:
+      best: [chest, shield, tower]
+      allowed: [helmet, legs, cape, buckler]
+    tiers: { count: 8, from: 1, min: 2, max: 12 }
+
+  - id: ember_skin
+    effect: burning_taken
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    classes:
+      best: [cape, legs]
+      allowed: [chest, helmet]
+    tiers: { count: 8, from: 1, min: 3, max: 25 }
+
+  - id: quench
+    effect: burning_decay
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    classes:
+      best: [cape]
+      allowed: [chest, legs]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: arrowward
+    effect: ranged_damage_taken
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    weight: 70
+    hook: easy
+    classes:
+      best: [chest, tower, shield]
+      allowed: [helmet, legs, buckler, cape]
+    tiers: { count: 8, from: 1, min: 2, max: 16 }
+
+  - id: runic_ward
+    effect: calm_ward
+    value: flat
+    affix: prefix
+    family: armour_resistances
+    category: defense
+    weight: 70
+    hook: medium
+    classes:
+      best: [chest]
+      allowed: [shield]
+    tiers: { count: 8, from: 2, min: 5, max: 45 }
+
+  - id: resolute
+    effect: stagger_taken
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [chest, legs]
+      allowed: [tower]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: ironroot
+    effect: knockback_taken
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [tower]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: quick_recovery
+    effect: stagger_recovery
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    weight: 70
+    hook: medium
+    classes:
+      best: [helmet]
+      allowed: [legs]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: coldblood
+    effect: frost_slow_taken
+    value: percent
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    weight: 70
+    hook: medium
+    classes:
+      best: [legs, cape]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 10, max: 100 }
+
+  - id: bulwark_fire
+    effect: resist_modifier
+    param: fire
+    value: flag
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    exclusion_group: elemental_bulwark
+    weight: 30
+    hook: easy
+    classes:
+      best: [cape]
+      allowed: []
+    tiers: { count: 1, from: 6 }
+
+  - id: bulwark_frost
+    effect: resist_modifier
+    param: frost
+    value: flag
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    exclusion_group: elemental_bulwark
+    weight: 30
+    hook: easy
+    classes:
+      best: [cape]
+      allowed: []
+    tiers: { count: 1, from: 6 }
+
+  - id: bulwark_lightning
+    effect: resist_modifier
+    param: lightning
+    value: flag
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    exclusion_group: elemental_bulwark
+    weight: 30
+    hook: easy
+    classes:
+      best: [cape]
+      allowed: []
+    tiers: { count: 1, from: 6 }
+
+  - id: bulwark_poison
+    effect: resist_modifier
+    param: poison
+    value: flag
+    affix: suffix
+    family: armour_resistances
+    category: defense
+    exclusion_group: elemental_bulwark
+    weight: 30
+    hook: easy
+    classes:
+      best: [cape]
+      allowed: []
+    tiers: { count: 1, from: 6 }
+
+
+  # --- gathering building ---
+  - id: deep_vein
+    effect: yield_mining
+    value: flat
+    affix: suffix
+    family: gathering_building
+    category: utility
+    weight: 70
+    hook: medium
+    requires: { skill: [Pickaxes] }
+    classes:
+      best: [pickaxe]
+      allowed: []
+    tiers: { count: 2, from: 5, min: 1, max: 2 }
+
+  - id: heartwood
+    effect: yield_lumber
+    value: flat
+    affix: suffix
+    family: gathering_building
+    category: utility
+    weight: 70
+    hook: medium
+    requires: { skill: [WoodCutting] }
+    classes:
+      best: [axe_1h, battleaxe]
+      allowed: [dual_axe]
+    tiers: { count: 4, from: 1, min: 1, max: 4 }
+
+  - id: builders_reach
+    effect: build_range
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    hook: easy
+    requires: { traits: [builds] }
+    classes:
+      best: [tool]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 70 }
+
+  - id: mistbane
+    effect: demist_radius
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    weight: 70
+    hook: medium
+    classes:
+      best: [utility]
+      allowed: []
+    tiers: { count: 4, from: 1, min: 25, max: 250 }
+
+  - id: masterbuilder
+    effect: free_build
+    value: flag
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [tool]
+      allowed: []
+    tiers: { count: 1, from: 8 }
+
+  - id: timber_bite
+    effect: chop_damage
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [axe_1h, battleaxe]
+      allowed: [dual_axe]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: stone_bite
+    effect: pickaxe_damage
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [pickaxe]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: butchers_cut
+    effect: butcher_yield
+    value: flat
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [knife]
+      allowed: [bow, tool]
+    tiers: { count: 3, from: 1, min: 1, max: 3 }
+
+  - id: patient_line
+    effect: bait_save
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [fishing]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: big_catch
+    effect: fish_size
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [fishing]
+      allowed: [helmet]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: steady_reel
+    effect: reel_stamina
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [fishing]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 35 }
+
+  - id: thrifty_hands
+    effect: craft_save
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [tool]
+      allowed: [utility, trinket]
+    tiers: { count: 8, from: 1, min: 2, max: 15 }
+
+  - id: bountiful_forge
+    effect: craft_extra
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    classes:
+      best: [tool]
+      allowed: [utility, trinket]
+    tiers: { count: 8, from: 3, min: 2, max: 12 }
+
+  - id: tireless_hands
+    effect: home_item_stamina_cost
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    hook: easy
+    requires: { traits: [builds] }
+    classes:
+      best: [tool]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 3, max: 25 }
+
+  - id: harvester
+    effect: yield_pickable
+    value: percent
+    affix: suffix
+    family: gathering_building
+    category: utility
+    hook: medium
+    classes:
+      best: [utility, trinket]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+
+  # --- life regeneration ---
+  - id: vigor
+    effect: max_health
+    value: flat
+    affix: prefix
+    family: life_regeneration
+    category: defense
+    exclusion_group: max_health
+    hook: easy
+    classes:
+      best: [chest]
+      allowed: [helmet, legs, cape, buckler, shield, tower, trinket]
+    tiers: { count: 8, from: 1, min: 3, max: 40 }
+
+  - id: troll_blood
+    effect: health_recovery
+    value: percent
+    affix: suffix
+    family: life_regeneration
+    category: defense
+    exclusion_group: health_recovery
+    hook: easy
+    classes:
+      best: [helmet]
+      allowed: [chest, legs, cape, trinket]
+    tiers: { count: 8, from: 1, min: 2, max: 24 }
+
+  - id: mending
+    effect: health_recovery_flat
+    value: flat
+    affix: suffix
+    family: life_regeneration
+    category: defense
+    hook: easy
+    classes:
+      best: [chest]
+      allowed: [helmet, legs, cape]
+    tiers: { count: 8, from: 1, min: 0.2, max: 14 }
+
+  - id: stout_heart
+    effect: health_for_regen
+    value: flat
+    affix: prefix
+    family: life_regeneration
+    category: defense
+    exclusion_group: max_health
+    weight: 60
+    hook: easy
+    classes:
+      best: [chest]
+      allowed: [legs]
+    tiers: { count: 8, from: 3, min: 4, max: 58 }
+
+  - id: purity
+    effect: debuff_decay
+    value: percent
+    affix: suffix
+    family: life_regeneration
+    category: defense
+    weight: 70
+    hook: medium
+    classes:
+      best: [helmet, trinket]
+      allowed: [chest]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+
+  # --- weather comfort ---
+  - id: ashen_skin
+    effect: heat_resist
+    value: percent
+    affix: suffix
+    family: weather_comfort
+    category: utility
+    hook: easy
+    classes:
+      best: [cape]
+      allowed: [chest]
+    tiers: { count: 8, from: 5, min: 15, max: 35 }
+
+  - id: oilskin
+    effect: rain_shield
+    value: flag
+    affix: suffix
+    family: weather_comfort
+    category: utility
+    exclusion_group: wet
+    weight: 40
+    hook: medium
+    classes:
+      best: [cape]
+      allowed: [helmet]
+    tiers: { count: 1, from: 5 }
+
+  - id: emberheart
+    effect: cold_immunity
+    value: flag
+    affix: suffix
+    family: weather_comfort
+    category: utility
+    weight: 40
+    hook: medium
+    classes:
+      best: [cape]
+      allowed: [chest]
+    tiers: { count: 1, from: 5 }
+
+  - id: hearthbound
+    effect: rest_comfort
+    value: flat
+    affix: suffix
+    family: weather_comfort
+    category: utility
+    weight: 60
+    hook: easy
+    classes:
+      best: [cape]
+      allowed: [trinket, utility]
+    tiers: { count: 2, from: 5, min: 1, max: 2 }
+
+  - id: hearthlight
+    effect: light_aura
+    value: flag
+    affix: suffix
+    family: weather_comfort
+    category: utility
+    weight: 40
+    hook: medium
+    classes:
+      best: [helmet]
+      allowed: [chest, cape, trinket]
+    tiers: { count: 1, from: 1 }
+
+  - id: winterborn
+    effect: freeze_immunity
+    value: flag
+    affix: suffix
+    family: weather_comfort
+    category: utility
+    weight: 25
+    hook: easy
+    classes:
+      best: [cape]
+      allowed: [chest]
+    tiers: { count: 1, from: 4 }
+
+  - id: sealegs
+    effect: ignore_wet
+    value: flag
+    affix: suffix
+    family: weather_comfort
+    category: utility
+    exclusion_group: wet
+    weight: 40
+    hook: medium
+    classes:
+      best: [chest]
+      allowed: [cape]
+    tiers: { count: 1, from: 3 }
+
+
+  # --- stamina eitr ---
+  - id: endurance
+    effect: max_stamina
+    value: flat
+    affix: prefix
+    family: stamina_eitr
+    category: defense
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [chest, cape, trinket]
+    tiers: { count: 8, from: 1, min: 3, max: 40 }
+
+  - id: wellspring
+    effect: max_eitr
+    value: flat
+    affix: prefix
+    family: stamina_eitr
+    category: defense
+    exclusion_group: max_eitr
+    hook: easy
+    classes:
+      best: [helmet]
+      allowed: [chest, cape, trinket, staff_elemental, staff_blood]
+    tiers: { count: 8, from: 1, min: 4, max: 60 }
+
+  - id: second_wind
+    effect: stamina_recovery
+    value: percent
+    affix: suffix
+    family: stamina_eitr
+    category: defense
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [chest, cape, trinket]
+    tiers: { count: 8, from: 1, min: 2, max: 24 }
+
+  - id: seidr_flow
+    effect: eitr_recovery
+    value: percent
+    affix: suffix
+    family: stamina_eitr
+    category: defense
+    exclusion_group: eitr_recovery
+    hook: easy
+    classes:
+      best: [helmet, staff_elemental, staff_blood]
+      allowed: [chest, legs, cape, trinket]
+    tiers: { count: 8, from: 1, min: 3, max: 36 }
+
+  - id: restless_mind
+    effect: eitr_for_regen
+    value: percent
+    affix: suffix
+    family: stamina_eitr
+    category: defense
+    exclusion_group: eitr_recovery
+    weight: 60
+    hook: easy
+    classes:
+      best: [helmet]
+      allowed: [trinket]
+    tiers: { count: 8, from: 3, min: 10, max: 100 }
+
+
+  # --- charms fortune ---
+  - id: forsaken_favour
+    effect: forsaken_cooldown
+    value: percent
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    weight: 70
+    hook: easy
+    classes:
+      best: [trinket]
+      allowed: [utility, helmet]
+    tiers: { count: 8, from: 1, min: 2, max: 24 }
+
+  - id: brewers_haste
+    effect: mead_cooldown
+    value: percent
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    weight: 70
+    hook: medium
+    classes:
+      best: [trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 1, min: 5, max: 30 }
+
+  - id: swift_draught
+    effect: mead_burst
+    value: flag
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    weight: 30
+    hook: medium
+    classes:
+      best: [trinket]
+      allowed: [utility]
+    tiers: { count: 1, from: 3 }
+
+  - id: magpie
+    effect: pickup_radius
+    value: percent
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    hook: easy
+    classes:
+      best: [utility]
+      allowed: [trinket]
+    tiers: { count: 8, from: 1, min: 10, max: 100 }
+
+  - id: broad_back
+    effect: carry_capacity
+    value: flat
+    affix: prefix
+    family: charms_fortune
+    category: utility
+    hook: easy
+    classes:
+      best: [utility]
+      allowed: [cape, trinket]
+    tiers: { count: 8, from: 1, min: 10, max: 150 }
+
+  - id: hoardfinder
+    effect: find_coins
+    value: percent
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    weight: 70
+    hook: medium
+    classes:
+      best: [trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 1, min: 1, max: 12 }
+
+  - id: norns_favour
+    effect: find_rarity
+    value: percent
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    weight: 50                 # Inscribe keeps Magic Item Drops enabled.
+    hook: medium
+    classes:
+      best: [trinket]
+      allowed: [utility, helmet]
+    tiers: { count: 8, from: 5, min: 1, max: 18 }
+
+  - id: silver_tongue
+    effect: trader_discount
+    value: percent
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    classes:
+      best: [trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 1, min: 2, max: 15 }
+
+  - id: fateweaver
+    effect: find_stones
+    value: percent
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    weight: 50
+    hook: medium
+    classes:
+      best: [trinket]
+      allowed: [utility, helmet]
+    tiers: { count: 8, from: 1, min: 5, max: 35 }
+
+  - id: beast_whisperer
+    effect: taming_speed
+    value: percent
+    affix: suffix
+    family: charms_fortune
+    category: utility
+    weight: 70
+    hook: medium
+    classes:
+      best: [trinket]
+      allowed: [cape, utility]
+    tiers: { count: 8, from: 1, min: 10, max: 100 }
+
+
+  # --- ranged magic ---
+  - id: thrifty_quiver
+    effect: ammo_save
+    value: percent
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    weight: 70
+    hook: medium
+    classes:
+      best: [bow, crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: quick_windlass
+    effect: reload_speed
+    value: percent
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    hook: easy
+    requires: { skill: [Crossbows] }
+    classes:
+      best: [bow, crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 19 }
+
+  - id: swift_casting
+    effect: cast_speed
+    value: percent
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    classes:
+      best: [staff_elemental]
+      allowed: [staff_blood]
+    tiers: { count: 8, from: 1, min: 1, max: 30 }
+
+  - id: true_flight
+    effect: projectile_velocity
+    value: percent
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    hook: easy
+    requires: { traits: [projectile] }
+    classes:
+      best: [bow, crossbow]
+      allowed: [staff_elemental, spear]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: easy_draw
+    effect: draw_stamina_cost
+    value: percent
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    hook: easy
+    requires: { skill: [Bows] }
+    classes:
+      best: [bow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 2, max: 18 }
+
+  - id: bursting_shot
+    effect: explosive_shot
+    value: percent
+    affix: prefix
+    family: ranged_magic
+    category: offense
+    classes:
+      best: [bow, crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 2, max: 18 }
+
+  - id: swift_string
+    effect: draw_speed
+    value: percent
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    weight: 60
+    hook: medium
+    requires: { skill: [Bows] }
+    classes:
+      best: [bow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 2, max: 24 }
+
+  - id: grave_vigor
+    effect: summon_health
+    value: percent
+    affix: prefix
+    family: ranged_magic
+    category: offense
+    hook: medium
+    requires: { skill: [BloodMagic] }
+    classes:
+      best: [staff_blood]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 30 }
+
+  - id: grave_command
+    effect: summon_damage
+    value: percent
+    affix: prefix
+    family: ranged_magic
+    category: offense
+    hook: medium
+    requires: { skill: [BloodMagic] }
+    classes:
+      best: [staff_blood]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 30 }
+
+  - id: twincast
+    effect: twincast
+    value: flag
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    weight: 20
+    hook: medium
+    requires: { skill: [ElementalMagic] }
+    classes:
+      best: [staff_elemental]
+      allowed: []
+    tiers: { count: 1, from: 5 }
+
+  - id: volley
+    effect: multishot
+    value: flag
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    weight: 20
+    hook: medium
+    requires: { skill: [Bows] }
+    classes:
+      best: [bow]
+      allowed: [crossbow]
+    tiers: { count: 1, from: 5 }
+
+  - id: skirmisher
+    effect: draw_move_penalty
+    value: percent
+    affix: suffix
+    family: ranged_magic
+    category: offense
+    weight: 70
+    hook: medium
+    classes:
+      best: [bow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+
+  # --- elemental damage ---
+  - id: emberbrand
+    effect: added_damage
+    param: fire
+    value: flat
+    affix: prefix
+    family: elemental_damage
+    category: offense
+    scaled: true
+    hook: easy
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+      allowed: [light]
+    tiers: { count: 8, from: 1, min: 1, max: 22 }
+
+  - id: rimebrand
+    effect: added_damage
+    param: frost
+    value: flat
+    affix: prefix
+    family: elemental_damage
+    category: offense
+    scaled: true
+    hook: easy
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 22 }
+
+  - id: stormbrand
+    effect: added_damage
+    param: lightning
+    value: flat
+    affix: prefix
+    family: elemental_damage
+    category: offense
+    scaled: true
+    hook: easy
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 22 }
+
+  - id: venombrand
+    effect: added_damage
+    param: poison
+    value: flat
+    affix: prefix
+    family: elemental_damage
+    category: offense
+    scaled: true
+    hook: easy
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 22 }
+
+  - id: spiritbrand
+    effect: added_damage
+    param: spirit
+    value: flat
+    affix: prefix
+    family: elemental_damage
+    category: offense
+    scaled: true
+    weight: 70
+    hook: easy
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 22 }
+
+  - id: lingering_wounds
+    effect: dot_duration
+    value: percent
+    affix: suffix
+    family: elemental_damage
+    category: offense
+    classes:
+      best: [staff_elemental]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow, staff_blood]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+
+  # --- attack speed cost ---
+  - id: seidr_thrift
+    effect: attack_eitr_cost
+    value: percent
+    affix: suffix
+    family: attack_speed_cost
+    category: offense
+    exclusion_group: attack_cost
+    hook: easy
+    classes:
+      best: [staff_elemental, staff_blood]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: blood_thrift
+    effect: attack_health_cost
+    value: percent
+    affix: suffix
+    family: attack_speed_cost
+    category: offense
+    exclusion_group: attack_cost_health
+    hook: easy
+    requires: { skill: [BloodMagic] }
+    classes:
+      best: [staff_blood]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: balanced_grip
+    effect: attack_stamina_cost
+    value: percent
+    affix: suffix
+    family: attack_speed_cost
+    category: offense
+    exclusion_group: attack_cost
+    hook: easy
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+      allowed: [pickaxe]
+    tiers: { count: 8, from: 1, min: 2, max: 24 }
+
+  - id: blood_price
+    effect: blood_price
+    value: flag
+    affix: suffix
+    family: attack_speed_cost
+    category: offense
+    exclusion_group: attack_cost
+    weight: 30
+    hook: medium
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+    tiers: { count: 1, from: 1 }
+
+  - id: quickened
+    effect: attack_speed
+    value: percent
+    affix: suffix
+    family: attack_speed_cost
+    category: offense
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+      allowed: [pickaxe]
+    tiers: { count: 8, from: 1, min: 1, max: 12 }
+
+  - id: steel_rhythm
+    effect: combo_finisher
+    value: percent
+    affix: suffix
+    family: attack_speed_cost
+    category: offense
+    weight: 40
+    hook: medium
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+    tiers: { count: 8, from: 1, min: 15, max: 45 }
+
+  - id: rune_edge
+    effect: rune_edge
+    value: percent
+    affix: prefix
+    family: attack_speed_cost
+    category: offense
+    exclusion_group: attack_cost
+    weight: 30
+    hook: medium
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+    tiers: { count: 8, from: 3, min: 4, max: 30 }
+
+  - id: long_reach
+    effect: attack_reach
+    value: percent
+    affix: suffix
+    family: attack_speed_cost
+    category: offense
+    hook: easy
+    classes:
+      best: [atgeir, spear]
+      allowed: [sword_1h, axe_1h, mace_1h, knife, greatsword, battleaxe, dual_axe, sledge, fist]
+    tiers: { count: 8, from: 1, min: 2, max: 10 }
+
+  - id: sweeping_arc
+    effect: attack_arc
+    value: flat
+    unit: deg
+    affix: suffix
+    family: attack_speed_cost
+    category: offense
+    hook: easy
+    classes:
+      best: [greatsword, battleaxe, sledge, atgeir]
+      allowed: [sword_1h, axe_1h, mace_1h]
+    tiers: { count: 8, from: 1, min: 2, max: 16 }
+
+
+  # --- leech ---
+  - id: blood_drinker
+    effect: leech
+    param: health
+    value: percent
+    affix: prefix
+    family: leech
+    category: offense
+    exclusion_group: leech_health
+    weight: 60
+    hook: medium
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+      allowed: []
+    tiers: { count: 8, from: 3, min: 0.5, max: 4 }
+
+  - id: seidr_siphon
+    effect: leech
+    param: eitr
+    value: percent
+    affix: prefix
+    family: leech
+    category: offense
+    weight: 60
+    hook: medium
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+    tiers: { count: 8, from: 3, min: 0.5, max: 4 }
+
+  - id: wind_siphon
+    effect: leech
+    param: stamina
+    value: percent
+    affix: prefix
+    family: leech
+    category: offense
+    classes:
+      best: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 0.5, max: 4 }
+
+  - id: reaper
+    effect: on_kill_restore
+    param: stamina
+    value: flat
+    affix: suffix
+    family: leech
+    category: offense
+    exclusion_group: on_kill
+    hook: medium
+    classes:
+      best: []
+      allowed: [sword_1h, axe_1h, mace_1h, knife, spear, greatsword, battleaxe, dual_axe, sledge, atgeir, fist, bow, crossbow]
+    tiers: { count: 8, from: 1, min: 3, max: 18 }
+
+  - id: soul_reaper
+    effect: on_kill_restore
+    param: eitr
+    value: flat
+    affix: suffix
+    family: leech
+    category: offense
+    exclusion_group: on_kill
+    hook: medium
+    classes:
+      best: [staff_elemental, staff_blood]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 11, max: 18 }
+
+
+  # --- throwing ---
+  - id: throwing_grip
+    effect: throwable
+    value: flag
+    affix: suffix
+    family: throwing
+    category: offense
+    classes:
+      best: [axe_1h, knife]
+      allowed: [sword_1h, mace_1h]
+    tiers: { count: 1, from: 1 }
+
+  - id: returning
+    effect: recall
+    value: flag
+    affix: suffix
+    family: throwing
+    category: offense
+    classes:
+      best: [spear]
+      allowed: []
+    tiers: { count: 1, from: 3 }
+
+  - id: bifrost_step
+    effect: apportation
+    value: flag
+    affix: suffix
+    family: throwing
+    category: offense
+    classes:
+      best: [spear]
+      allowed: []
+    tiers: { count: 1, from: 3 }
+
+
+  # --- skills ---
+  - id: blade_mastery
+    effect: skill_level
+    param: Swords
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Swords] }
+    classes:
+      best: [sword_1h, greatsword]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: knife_mastery
+    effect: skill_level
+    param: Knives
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Knives] }
+    classes:
+      best: [knife]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: club_mastery
+    effect: skill_level
+    param: Clubs
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Clubs] }
+    classes:
+      best: [mace_1h, sledge]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: polearm_mastery
+    effect: skill_level
+    param: Polearms
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Polearms] }
+    classes:
+      best: [atgeir]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: spear_mastery
+    effect: skill_level
+    param: Spears
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Spears] }
+    classes:
+      best: [spear]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: shield_mastery
+    effect: skill_level
+    param: Blocking
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Blocking] }
+    classes:
+      best: [buckler, shield, tower]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: axe_mastery
+    effect: skill_level
+    param: Axes
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Axes] }
+    classes:
+      best: [axe_1h, battleaxe, dual_axe]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: bow_mastery
+    effect: skill_level
+    param: Bows
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Bows] }
+    classes:
+      best: [bow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: crossbow_mastery
+    effect: skill_level
+    param: Crossbows
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Crossbows] }
+    classes:
+      best: [crossbow]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: blood_mastery
+    effect: skill_level
+    param: BloodMagic
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [BloodMagic] }
+    classes:
+      best: [staff_blood]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: artisan_mastery
+    effect: skill_level
+    param: "Crafting,Cooking"
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    classes:
+      best: [tool]
+      allowed: [utility, trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: elemental_mastery
+    effect: skill_level
+    param: ElementalMagic
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [ElementalMagic] }
+    classes:
+      best: [staff_elemental]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: fist_mastery
+    effect: skill_level
+    param: Unarmed
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Unarmed] }
+    classes:
+      best: [fist]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: pick_mastery
+    effect: skill_level
+    param: Pickaxes
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Pickaxes] }
+    classes:
+      best: [pickaxe]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: fishing_mastery
+    effect: skill_level
+    param: Fishing
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [Fishing] }
+    classes:
+      best: [fishing]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: wanderer_mastery
+    effect: skill_level
+    param: "Run,Jump,Swim,Sneak"
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: woodcutting_mastery
+    effect: skill_level
+    param: WoodCutting
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    hook: easy
+    requires: { skill: [WoodCutting] }
+    classes:
+      best: [axe_1h, battleaxe, dual_axe]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 2, max: 15 }
+
+  - id: farming_mastery
+    effect: skill_level
+    param: Farming
+    value: flat
+    affix: suffix
+    family: skills
+    category: utility
+    exclusion_group: skill_level
+    weight: 60
+    hook: easy
+    requires: { skill: [Farming] }
+    classes:
+      best: [tool]
+      allowed: []
+    tiers: { count: 8, from: 1, min: 2, max: 15 }
+
+
+  # --- perception learning ---
+  - id: mimirs_insight
+    effect: skill_gain
+    param: All
+    value: percent
+    affix: suffix
+    family: perception_learning
+    category: utility
+    hook: easy
+    classes:
+      best: [helmet]
+      allowed: [trinket, utility]
+    tiers: { count: 8, from: 1, min: 1, max: 20 }
+
+  - id: huginns_eye
+    effect: explore_radius
+    value: percent
+    affix: suffix
+    family: perception_learning
+    category: utility
+    hook: easy
+    classes:
+      best: [helmet]
+      allowed: [light, trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 30 }
+
+  - id: trophy_taker
+    effect: find_trophy
+    value: percent
+    affix: suffix
+    family: perception_learning
+    category: utility
+    weight: 70
+    hook: medium
+    classes:
+      best: [helmet]
+      allowed: [trinket]
+    tiers: { count: 8, from: 1, min: 1, max: 18 }
+
+  - id: soulbound
+    effect: skill_loss
+    value: percent
+    affix: suffix
+    family: perception_learning
+    category: utility
+    weight: 70
+    hook: easy
+    classes:
+      best: [helmet, trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 1, min: 10, max: 100 }
+
+
+  # --- meads food ---
+  - id: long_brew
+    effect: mead_duration
+    value: percent
+    affix: suffix
+    family: meads_food
+    category: utility
+    classes:
+      best: [trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: potent_brew
+    effect: mead_potency
+    value: percent
+    affix: suffix
+    family: meads_food
+    category: utility
+    classes:
+      best: [trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 1, min: 5, max: 30 }
+
+  - id: bottomless_flask
+    effect: mead_save
+    value: percent
+    affix: suffix
+    family: meads_food
+    category: utility
+    classes:
+      best: [utility]
+      allowed: [trinket]
+    tiers: { count: 8, from: 3, min: 3, max: 20 }
+
+  - id: hearty_appetite
+    effect: food_values
+    value: percent
+    affix: suffix
+    family: meads_food
+    category: utility
+    classes:
+      best: [chest]
+      allowed: [trinket, utility]
+    tiers: { count: 8, from: 1, min: 2, max: 15 }
+
+  - id: well_fed
+    effect: food_regen
+    value: percent
+    affix: suffix
+    family: meads_food
+    category: utility
+    classes:
+      best: [chest]
+      allowed: [helmet, trinket]
+    tiers: { count: 8, from: 1, min: 5, max: 30 }
+
+  - id: deep_rest
+    effect: rested_duration
+    value: percent
+    affix: suffix
+    family: meads_food
+    category: utility
+    classes:
+      best: [cape]
+      allowed: [helmet, trinket, utility]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: gourmand
+    effect: food_duration
+    value: percent
+    affix: suffix
+    family: meads_food
+    category: utility
+    hook: easy
+    classes:
+      best: [chest, trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+
+  # --- adrenaline ---
+  - id: battle_rush
+    effect: trinket_duration
+    value: percent
+    affix: prefix
+    family: adrenaline
+    category: defense
+    classes:
+      best: [trinket]
+      allowed: [buckler, shield, tower]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+  - id: blood_up
+    effect: adrenaline_gain
+    value: percent
+    affix: suffix
+    family: adrenaline
+    category: defense
+    classes:
+      best: [buckler, shield, tower]
+      allowed: [trinket]
+    tiers: { count: 8, from: 1, min: 5, max: 40 }
+
+
+  # --- MeadWorks additions (batch 3) ---
+  # Prefixes for the thinnest pools, each built from an effect an existing inscription already uses, with that
+  # inscription's ladder, weight and exclusion group, and only on classes that had no inscription with the effect.
+  - id: unshaken
+    effect: stagger_taken
+    value: percent
+    affix: prefix
+    family: armour_resistances
+    category: defense
+    hook: easy
+    classes:
+      best: [helmet]
+      allowed: [cape, buckler, shield]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: steady_breath
+    effect: stamina_recovery
+    value: percent
+    affix: prefix
+    family: stamina_eitr
+    category: defense
+    hook: easy
+    classes:
+      best: [helmet]
+      allowed: [buckler, shield, tower, utility, pickaxe]
+    tiers: { count: 8, from: 1, min: 2, max: 24 }
+
+  - id: hardy
+    effect: max_stamina
+    value: flat
+    affix: prefix
+    family: stamina_eitr
+    category: defense
+    hook: easy
+    classes:
+      best: [helmet]
+      allowed: [buckler, shield, tower, utility]
+    tiers: { count: 8, from: 1, min: 3, max: 40 }
+
+  - id: elusive
+    effect: avoid_hit
+    value: percent
+    affix: prefix
+    family: blocking_parry
+    category: defense
+    exclusion_group: avoid_hit
+    weight: 60
+    hook: easy
+    classes:
+      best: [legs]
+      allowed: [trinket, tower]
+    tiers: { count: 8, from: 1, min: 2, max: 14 }
+
+  - id: warding
+    effect: calm_ward
+    value: flat
+    affix: prefix
+    family: armour_resistances
+    category: defense
+    weight: 70
+    hook: medium
+    classes:
+      best: [cape]
+      allowed: [helmet, legs, tower]
+    tiers: { count: 8, from: 2, min: 5, max: 45 }
+
+  - id: hale
+    effect: health_recovery_flat
+    value: flat
+    affix: prefix
+    family: life_regeneration
+    category: defense
+    hook: easy
+    classes:
+      best: [trinket]
+      allowed: [utility]
+    tiers: { count: 8, from: 1, min: 0.2, max: 14 }
+
+  - id: fleet
+    effect: move_speed
+    value: percent
+    affix: prefix
+    family: movement
+    category: utility
+    exclusion_group: move_speed
+    hook: easy
+    classes:
+      best: [utility]
+    tiers: { count: 8, from: 1, min: 1, max: 12 }
+
+  - id: hearthglow
+    effect: rested_duration
+    value: percent
+    affix: prefix
+    family: meads_food
+    category: utility
+    classes:
+      best: [light]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: purifying
+    effect: debuff_decay
+    value: percent
+    affix: prefix
+    family: life_regeneration
+    category: defense
+    weight: 70
+    hook: medium
+    classes:
+      best: [light]
+      allowed: [legs, cape]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: gleaner
+    effect: yield_pickable
+    value: percent
+    affix: prefix
+    family: gathering_building
+    category: utility
+    hook: medium
+    classes:
+      best: [tool]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }
+
+  - id: seafarer
+    effect: sail_speed
+    value: percent
+    affix: prefix
+    family: movement
+    category: utility
+    weight: 70
+    hook: medium
+    classes:
+      best: [fishing]
+    tiers: { count: 8, from: 1, min: 5, max: 50 }

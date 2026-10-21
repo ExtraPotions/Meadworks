@@ -1,0 +1,7 @@
+# Bestiary workshop example; this .sample.yml is inactive.
+# Copy to creatures_example.yml to enable.
+- prefab: Bestiary_WorkshopBoar
+  clonedFrom: Boar
+  character:
+    name: $bestiary_workshop_boar
+    health: 40, 10

@@ -1,0 +1,25 @@
+# Burrow.Stacks.yml - stack sizes and weights.
+#
+# This file wins over the .cfg: "stack multiplier" and "weight multiplier" replace the .cfg multipliers when they
+# are present, and every entry under items: sets an absolute stack or weight for the items it names, replacing the
+# multiplied value. Keys use the Burrow item vocabulary: a prefab name (Wood), a name token ($item_wood),
+# prefix:Trophy, suffix:Ore, type:Material, group:Ores (a group from the groups: map) or * for everything.
+# A plain name wins over a pattern; among patterns the later entry wins. Items with a vanilla stack of 1 keep it
+# under the multiplier; an absolute stack: applies to them too.
+#
+# The file is synced from the server, reloaded a few seconds after it is saved and can be edited in game
+# (Configuration Manager, "Edit YAML"). Extra files named Burrow.Stacks<anything>.yml next to this one are read
+# as well.
+#
+# The .cfg defaults are Stack Multiplier 4 and Weight Multiplier 0.25: four times the stack at a quarter of the
+# weight, so a full stack weighs what a vanilla full stack weighs (Wood 200 at 0.5 instead of 50 at 2). The weight
+# multiplier applies only to items with a vanilla stack above 1.
+#
+# stack multiplier: 2        # replaces the .cfg Stack Multiplier
+# weight multiplier: 0.5     # replaces the .cfg Weight Multiplier
+groups:
+  Ores: [prefix:CopperOre, TinOre, IronScrap, SilverOre, BlackMetalScrap, FlametalOre, FlametalOreNew, GoldOre]
+items:
+#  Wood: { stack: 100 }
+#  Stone: { stack: 100, weight: 1.0 }
+#  group:Ores: { weight: 5 }

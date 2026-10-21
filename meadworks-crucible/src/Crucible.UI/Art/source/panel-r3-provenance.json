@@ -1,0 +1,103 @@
+{
+  "item": "meadworks_panel_r3",
+  "licence": "CC BY-NC-SA 4.0 (MeadWorks asset licence); CC0 inputs are public domain",
+  "method": "Python (Pillow/numpy); no pixels of PackPanel, of the uploaded look reference or of any game or mod texture, no AI tools; build/build_panel_r3.py (+ r2 modules)",
+  "cc0_inputs": [
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Roughness.jpg",
+    "ambientcg/Wood049/Wood049_1K-JPG_Color.jpg",
+    "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg",
+    "ambientcg/Wood051/Wood051_1K-JPG_Color.jpg",
+    "ambientcg/Wood051/Wood051_1K-JPG_Displacement.jpg",
+    "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg"
+  ],
+  "cc0_sha256": {
+    "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg": "e8b483629421fb725668ef2128e21fa68753fbd40bc25a9c4e871018c014a73d",
+    "ambientcg/Wood051/Wood051_1K-JPG_Color.jpg": "f3c6c5456457e8d05c1fee4d2f186f41d0aea2b8a06859b69ce2934e11aa8798",
+    "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg": "3fcb2a67d00a0fff5171d9a42e720765287a80a76a9e80eaf07405ca6ea1c1a2",
+    "ambientcg/Wood049/Wood049_1K-JPG_Color.jpg": "451ee4dd719628289b4969f75dc583b5f77f8471d5d885ba5015fd90e7e5ce61",
+    "ambientcg/Wood051/Wood051_1K-JPG_Displacement.jpg": "a852d76befbdb66cf17f1b4a18663f4b1fb2c0de03929a4c74752a688e23ff10",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg": "e7846a637fc634e53d174ae8fbfbdffa1de98771530a8a1fb26b711d3b4094e0",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Roughness.jpg": "76dfe4518f375eb1f7bc10cab5b26121f1a46e9b82682e1e1e6143a80ae3c07f"
+  },
+  "changes": "Map frames: the r2 domain-warped wood and bronze plait liner re-used for a wooden ring (round minimap) and a rectangular frame (large map), both transparent inside, with trefoil knot plates; equipment panel, equipment and consumable slot frames, icon plate; Cairn HUD panel, compass strip backdrop, cardinal plate, heading plate with knot ends.",
+  "files": {
+    "cardinal_plate.png": {
+      "size": [
+        64,
+        64
+      ],
+      "sha256": "b33854f8020f571553092cb15835aacee7d23f1be80cb207bdaed1c54027ce5f"
+    },
+    "compass_strip.png": {
+      "size": [
+        480,
+        56
+      ],
+      "sha256": "966b292f0709b243e27c31027b6edb0a5d6762748d96578b7c08b8bd3d535c5c"
+    },
+    "equipment_panel.png": {
+      "size": [
+        420,
+        320
+      ],
+      "sha256": "69b24ada2ea6ecea18862f9403cfe5fe2d8c024f9fa87151bc42e71d1ce353b3"
+    },
+    "heading_plate.png": {
+      "size": [
+        170,
+        46
+      ],
+      "sha256": "dad2091b3c1b3749a81210405335b2c54569ac028422f4cbdf4733624be4cb62"
+    },
+    "hud_panel.png": {
+      "size": [
+        360,
+        128
+      ],
+      "sha256": "7f20a179b3afba7ea8b2af4e6a161834856522ff900ab4db0e72dfe3dee3f350"
+    },
+    "icon_plate.png": {
+      "size": [
+        96,
+        96
+      ],
+      "sha256": "7b892c01358e41fe4d8334f371a01ddf92219932931d7cf34a16819ab40163d3"
+    },
+    "map_frame_large.png": {
+      "size": [
+        1024,
+        576
+      ],
+      "sha256": "a0925c81bdf1b94062a3a4bf99ef82fc47ca199430df7a82cad3dffd27c36c37"
+    },
+    "map_frame_round.png": {
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "b5191d5414648f0c67d783bfa95b670254386ab2e125945d0ca55d320b527054"
+    },
+    "slot_consumable.png": {
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "aa1e9a266b77be23c14f040986a48b57a76409393a255cbd89cd1ee53cf8f81c"
+    },
+    "slot_consumable_selected.png": {
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "647fcae976b0b6c9af0c766d45905ffa0fb737092769a24f105eee5f00ba24eb"
+    },
+    "slot_equipment.png": {
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "ca3b4bd5e4e9866e5f42ad3607d42c664920ac7ea854064a48959c80d67171de"
+    }
+  }
+}

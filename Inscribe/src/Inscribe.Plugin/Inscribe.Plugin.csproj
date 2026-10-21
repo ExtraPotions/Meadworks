@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Inscribe</AssemblyName>
+    <RootNamespace>ExtraPotions.Inscribe.Runtime</RootNamespace>
+    <Nullable>annotations</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <!-- BepInEx, Jotunn, Harmony, Unity and game references, shared with Crucible. -->
+  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="13.7.1"/>
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.46" PrivateAssets="all"/>
+    <Reference Include="assembly_guiutils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_guiutils.dll" Private="false"/>
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
+    <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
+    <Reference Include="assembly_utils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_utils.dll" Private="false"/>
+    <ProjectReference Include="../Inscribe.Core/Inscribe.Core.csproj"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.UI/Crucible.UI.csproj" Private="false"/>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Inscribe.localization.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/migrations/*.yml" LogicalName="Inscribe.migrations.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/config/*.yml" LogicalName="Inscribe.config.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/translations/*.yml" LogicalName="Inscribe.translations.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/bundles/*" LogicalName="Inscribe.assets.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/original-items/mw_inscribe_items.windows" LogicalName="Inscribe.original-items.windows"/>
+    <EmbeddedResource Include="../../assets/original-items/mw_inscribe_items.linux" LogicalName="Inscribe.original-items.linux"/>
+    <EmbeddedResource Include="../../assets/original-items/catalog.json" LogicalName="MeadWorks.OriginalItems.catalog.json"/>
+    <EmbeddedResource Include="settings-tiers.json" LogicalName="$(AssemblyName).settings-tiers.json" />
+  </ItemGroup>
+</Project>

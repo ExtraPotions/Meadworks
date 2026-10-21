@@ -1,0 +1,33 @@
+{
+  "strings": {
+    "off_no_server": "Timber 未启用：此服务器未提供 Timber。",
+    "camera_no_station": "建造相机只能在制作台附近使用",
+    "camera_entry_needs": "建造相机需要",
+    "camera_resting": "休息",
+    "camera_comfort": "舒适度 {0}（当前为 {1}）",
+    "step_aside_camera": "安装了 {0} 时，Timber 建造相机关闭。",
+    "camera_pickup_needs": "相机拾取需要",
+    "step_aside_fires": "Timber 地板放置火源已关闭：已安装 {0}。",
+    "step_aside_flooring": "Timber 地板功能已关闭：已安装 {0}。",
+    "command_help": "Timber：timber import cartur|azumatt|flooring|openkeep [apply]；timber bindings。",
+    "bindings_scope": "检查已加载插件声明的快捷键可能存在的冲突。不推断外部输入情境、游戏原生按键或字符串形式的控制设置。",
+    "bindings_none": "已声明的快捷键中未发现涉及 Timber 的潜在冲突。",
+    "bindings_conflict": "快捷键 {0} 可能冲突：{1}",
+    "bindings_unreadable": "无法读取 {0} 的按键：{1}",
+    "bindings_tip": "通过 r2modman 或 Almanac 修改模组配置中的控制，然后再次运行 timber bindings。Timber 不会自动重新分配按键。",
+    "import_no_changes": "没有需要应用的设置更改。",
+    "import_applied": "已导入 {0} 项设置。Timber 之前的设置已备份，原始文件未更改。",
+    "import_preview_first": "请先预览此来源。",
+    "import_stopped": "导入已停止：{0}",
+    "import_review": "{0} → Timber；应用前请检查。",
+    "import_invalid": "无效：{0}",
+    "import_collision": "快捷键冲突：{0}；请在 Almanac 中提供 binding:<target> 覆盖值。",
+    "import_source_hash": "来源 SHA256：{0}",
+    "import_target_hash": "目标 SHA256：{0}",
+    "import_unknown_target": "已跳过未知目标：{0}",
+    "import_unchanged": "未更改：{0} = {1}",
+    "import_unavailable": "Timber 导入器不可用",
+    "area_repair_done": "已修复相接构件：{0}"
+  },
+  "schema": 1
+}

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Shepherd logic (take protocol, breeding decisions, save-key codecs). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Shepherd.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Shepherd</RootNamespace>
+  </PropertyGroup>
+</Project>

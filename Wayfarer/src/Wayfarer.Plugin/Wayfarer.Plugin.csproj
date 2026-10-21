@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Wayfarer</AssemblyName>
+    <RootNamespace>Wayfarer</RootNamespace>
+  </PropertyGroup>
+  <!-- BepInEx, Jotunn, Harmony, Unity and game references, shared with Crucible. -->
+  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <ItemGroup>
+    <Reference Include="Splatform" HintPath="$(ValheimManagedDir)/Splatform.dll" Private="false"/>
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
+    <Reference Include="assembly_guiutils" HintPath="$(ValheimManagedDir)/assembly_guiutils.dll" Private="false"/>
+    <ProjectReference Include="../Wayfarer.Core/Wayfarer.Core.csproj"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false"/>
+    <!-- Kit UI (C08); ships in the Crucible package, never in Wayfarer's. -->
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.UI/Crucible.UI.csproj" Private="false"/>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- C05 catalog: seven languages embedded, read by CrucibleServices (same shape as Threshold and Edge). -->
+    <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Wayfarer.localization.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="settings-tiers.json" LogicalName="$(AssemblyName).settings-tiers.json" />
+  </ItemGroup>
+</Project>

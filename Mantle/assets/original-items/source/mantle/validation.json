@@ -1,0 +1,258 @@
+{
+  "status": "PASS",
+  "checks": [
+    "21 exact catalog IDs",
+    "finite flat mesh arrays",
+    "all triangle indices valid",
+    "no degenerate triangles",
+    "unit normals and matching winding",
+    "outward signed mesh volumes",
+    "ring and belt holes are uncapped",
+    "UV range",
+    "declared bounds and colliders match geometry",
+    "backpack Spine2 coordinate and clearance envelope",
+    "ring physical dimensions",
+    "material and triangle budgets"
+  ],
+  "assetCount": 21,
+  "triangles": 16474,
+  "items": [
+    {
+      "id": "mantle_deerhidesatchel",
+      "prefab": "Mantle_DeerhideSatchel",
+      "triangles": 576,
+      "materials": 5,
+      "boundsMeters": [
+        0.37,
+        0.6635,
+        0.3313
+      ]
+    },
+    {
+      "id": "mantle_trollhidebackpack",
+      "prefab": "Mantle_TrollhideBackpack",
+      "triangles": 912,
+      "materials": 4,
+      "boundsMeters": [
+        0.44,
+        0.7475,
+        0.3739
+      ]
+    },
+    {
+      "id": "mantle_rootboundpack",
+      "prefab": "Mantle_RootboundPack",
+      "triangles": 926,
+      "materials": 6,
+      "boundsMeters": [
+        0.4368,
+        0.7825,
+        0.3873
+      ]
+    },
+    {
+      "id": "mantle_wolfpeltpack",
+      "prefab": "Mantle_WolfpeltPack",
+      "triangles": 1590,
+      "materials": 7,
+      "boundsMeters": [
+        0.5006,
+        0.7755,
+        0.4309
+      ]
+    },
+    {
+      "id": "mantle_loxhauler",
+      "prefab": "Mantle_LoxHauler",
+      "triangles": 2482,
+      "materials": 7,
+      "boundsMeters": [
+        0.5822,
+        0.7885,
+        0.4819
+      ]
+    },
+    {
+      "id": "mantle_carapacepack",
+      "prefab": "Mantle_CarapacePack",
+      "triangles": 1240,
+      "materials": 7,
+      "boundsMeters": [
+        0.46,
+        0.7755,
+        0.4523
+      ]
+    },
+    {
+      "id": "mantle_asksvinpack",
+      "prefab": "Mantle_AsksvinPack",
+      "triangles": 964,
+      "materials": 6,
+      "boundsMeters": [
+        0.46,
+        0.7755,
+        0.4447
+      ]
+    },
+    {
+      "id": "mantle_moosehidepack",
+      "prefab": "Mantle_MoosehidePack",
+      "triangles": 1880,
+      "materials": 8,
+      "boundsMeters": [
+        0.5086,
+        0.8315,
+        0.4423
+      ]
+    },
+    {
+      "id": "mantle_driftwoodtacklebox",
+      "prefab": "Mantle_DriftwoodTacklebox",
+      "triangles": 466,
+      "materials": 5,
+      "boundsMeters": [
+        0.535,
+        0.2906,
+        0.2965
+      ]
+    },
+    {
+      "id": "mantle_finewoodtacklebox",
+      "prefab": "Mantle_FinewoodTacklebox",
+      "triangles": 358,
+      "materials": 4,
+      "boundsMeters": [
+        0.535,
+        0.271,
+        0.2903
+      ]
+    },
+    {
+      "id": "mantle_carapacetacklebox",
+      "prefab": "Mantle_CarapaceTacklebox",
+      "triangles": 424,
+      "materials": 4,
+      "boundsMeters": [
+        0.551,
+        0.3079,
+        0.3079
+      ]
+    },
+    {
+      "id": "mantle_flametaltacklebox",
+      "prefab": "Mantle_FlametalTacklebox",
+      "triangles": 260,
+      "materials": 3,
+      "boundsMeters": [
+        0.535,
+        0.273,
+        0.308
+      ]
+    },
+    {
+      "id": "mantle_boneband",
+      "prefab": "Mantle_BoneBand",
+      "triangles": 234,
+      "materials": 2,
+      "boundsMeters": [
+        0.032,
+        0.0342,
+        0.013
+      ]
+    },
+    {
+      "id": "mantle_copperring",
+      "prefab": "Mantle_CopperRing",
+      "triangles": 184,
+      "materials": 3,
+      "boundsMeters": [
+        0.032,
+        0.0366,
+        0.0152
+      ]
+    },
+    {
+      "id": "mantle_ironring",
+      "prefab": "Mantle_IronRing",
+      "triangles": 184,
+      "materials": 2,
+      "boundsMeters": [
+        0.034,
+        0.0382,
+        0.012
+      ]
+    },
+    {
+      "id": "mantle_silverring",
+      "prefab": "Mantle_SilverRing",
+      "triangles": 224,
+      "materials": 2,
+      "boundsMeters": [
+        0.032,
+        0.0315,
+        0.0089
+      ]
+    },
+    {
+      "id": "mantle_blackmetalring",
+      "prefab": "Mantle_BlackMetalRing",
+      "triangles": 344,
+      "materials": 2,
+      "boundsMeters": [
+        0.032,
+        0.0328,
+        0.0114
+      ]
+    },
+    {
+      "id": "mantle_eitrring",
+      "prefab": "Mantle_EitrRing",
+      "triangles": 200,
+      "materials": 3,
+      "boundsMeters": [
+        0.032,
+        0.0378,
+        0.0132
+      ]
+    },
+    {
+      "id": "mantle_leatherbelt",
+      "prefab": "Mantle_LeatherBelt",
+      "triangles": 582,
+      "materials": 4,
+      "boundsMeters": [
+        0.2479,
+        0.074,
+        0.2679
+      ]
+    },
+    {
+      "id": "mantle_trollhidebelt",
+      "prefab": "Mantle_TrollHideBelt",
+      "triangles": 638,
+      "materials": 5,
+      "boundsMeters": [
+        0.2479,
+        0.087,
+        0.2684
+      ]
+    },
+    {
+      "id": "mantle_loxbelt",
+      "prefab": "Mantle_LoxBelt",
+      "triangles": 1806,
+      "materials": 4,
+      "boundsMeters": [
+        0.2801,
+        0.1035,
+        0.2875
+      ]
+    }
+  ],
+  "limits": [
+    "No Unity build or rendered icon verification",
+    "Native material borrowing unverified",
+    "No in-game attachment/cape/weapon clipping check"
+  ],
+  "modelsSHA256": "86C21EBD931AF4931F42D9FBEC18ED8AF7DC44D59914EFD6689BE8C7D27E83D5"
+}

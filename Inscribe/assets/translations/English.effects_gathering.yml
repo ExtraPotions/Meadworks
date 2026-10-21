@@ -1,0 +1,4 @@
+# English words of the Phase 3 gathering and crafting effects: feedback the acting player sees. Key without the $ -> text.
+ecf_fx_bait_kept: "Patient Line: the bait is kept"
+ecf_fx_materials_kept: "Thrifty Hands: no materials used"
+ecf_fx_crafted_more: "Bountiful Forge: $1 more crafted"

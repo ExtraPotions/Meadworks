@@ -1,0 +1,2335 @@
+{
+  "schema": 1,
+  "rules": [
+    {
+      "source": "PlantEasily.Controls.EnableModKey",
+      "target": "General.ToggleKey",
+      "type": "KeyboardShortcut",
+      "default": "F8",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": true,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.EnableSnappingKey",
+      "target": "Grid.SnapKey",
+      "type": "KeyboardShortcut",
+      "default": "F10",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": true,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.ToggleAutoReplantKey",
+      "target": "Harvest.ReplantToggleKey",
+      "type": "KeyboardShortcut",
+      "default": "F6",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": true,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.IncreaseXKey",
+      "target": "Input.IncreaseXKey",
+      "type": "KeyboardShortcut",
+      "default": "RightArrow",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": true,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.IncreaseYKey",
+      "target": "Input.IncreaseYKey",
+      "type": "KeyboardShortcut",
+      "default": "UpArrow",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": true,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.DecreaseXKey",
+      "target": "Input.DecreaseXKey",
+      "type": "KeyboardShortcut",
+      "default": "LeftArrow",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": true,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.DecreaseYKey",
+      "target": "Input.DecreaseYKey",
+      "type": "KeyboardShortcut",
+      "default": "DownArrow",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": true,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.KeyboardModifierKey",
+      "target": "Input.KeyboardModifierKey",
+      "type": "KeyboardShortcut",
+      "default": "RightControl",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.GamepadModifierKey",
+      "target": "Input.GamepadModifierKey",
+      "type": "KeyboardShortcut",
+      "default": "JoystickButton4",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Controls.KeyboardHarvestModifierKey",
+      "target": "Input.KeyboardHarvestModifierKey",
+      "type": "KeyboardShortcut",
+      "default": "LeftShift",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Difficulty.PreventPartialPlanting",
+      "target": "Planting.PreventPartialPlanting",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Difficulty.PreventInvalidPlanting",
+      "target": "Planting.PreventInvalidPlanting",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Difficulty.UseStamina",
+      "target": "Planting.UseStamina",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Difficulty.UseDurability",
+      "target": "Planting.UseDurability",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.ModActive",
+      "target": "General.Enabled",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.SnapActive",
+      "target": "Grid.SnappingEnabled",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.Rows",
+      "target": "Grid.Rows",
+      "type": "Int32",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.Columns",
+      "target": "Grid.Columns",
+      "type": "Int32",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.RandomizeRotation",
+      "target": "Planting.RandomizeRotation",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.EnableScatter",
+      "target": "Planting.EnableScatter",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.PositionScatterRadius",
+      "target": "Planting.PositionScatterRadius",
+      "type": "Single",
+      "default": "0",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.RotationScatterAngle",
+      "target": "Planting.RotationScatterAngle",
+      "type": "Single",
+      "default": "0",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.General.EnableDebugMessages",
+      "target": "Planting.EnableDebugMessages",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Grid.GloballyAlignGridDirections",
+      "target": "Grid.GloballyAlignGridDirections",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Grid.MinimizeGridSpacing",
+      "target": "Grid.MinimizeGridSpacing",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Grid.GridSnappingStyle",
+      "target": "Grid.GridSnappingStyle",
+      "type": "GridSnappingStyle",
+      "default": "Intelligent",
+      "constraints": "Intelligent, Legacy",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Grid.ForceAltPlacement",
+      "target": "Grid.ForceAltPlacement",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Grid.PreferCardinalSnapping",
+      "target": "Grid.PreferCardinalSnapping",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Grid.ExtraCropSpacing",
+      "target": "Grid.ExtraCropSpacing",
+      "type": "Single",
+      "default": "0",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Grid.ExtraSaplingSpacing",
+      "target": "Grid.ExtraSaplingSpacing",
+      "type": "Single",
+      "default": "0",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Harvesting.EnableBulkHarvest",
+      "target": "Harvest.Enabled",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Harvesting.HarvestStyle",
+      "target": "Harvest.HarvestStyle",
+      "type": "HarvestStyle",
+      "default": "AllResources",
+      "constraints": "LikeResources, AllResources",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Harvesting.HarvestRadius",
+      "target": "Harvest.Radius",
+      "type": "Single",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Harvesting.ReplantOnHarvest",
+      "target": "Harvest.Replant",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Performance.MaxConcurrentPlacements",
+      "target": "Performance.MaxConcurrentPlacements",
+      "type": "Int32",
+      "default": "500",
+      "constraints": "From 2 to 10000",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Performance.GhostUpdateBatchSize",
+      "target": "Performance.GhostUpdateBatchSize",
+      "type": "Int32",
+      "default": "20",
+      "constraints": "From 1 to 10000",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Performance.BulkPlantingBatchSize",
+      "target": "Performance.BulkPlantingBatchSize",
+      "type": "Int32",
+      "default": "2",
+      "constraints": "From 2 to 10000",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.PreventOverlappingPlacements",
+      "target": "Spacing.Pickables.PreventOverlappingPlacements",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.DefaultGridSpacing",
+      "target": "Spacing.Pickables.DefaultGridSpacing",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.BlueberryBush GridSpacing",
+      "target": "Spacing.Pickables.BlueberryBush GridSpacing",
+      "type": "Single",
+      "default": "1.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.CloudberryBush GridSpacing",
+      "target": "Spacing.Pickables.CloudberryBush GridSpacing",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.LingonberryBush GridSpacing",
+      "target": "Spacing.Pickables.LingonberryBush GridSpacing",
+      "type": "Single",
+      "default": "1.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Branch GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Branch GridSpacing",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Dandelion GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Dandelion GridSpacing",
+      "type": "Single",
+      "default": "0.75",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Fiddlehead GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Fiddlehead GridSpacing",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Flint GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Flint GridSpacing",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Mushroom GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Mushroom GridSpacing",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Mushroom_blue GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Mushroom_blue GridSpacing",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Mushroom_yellow GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Mushroom_yellow GridSpacing",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_SmokePuff GridSpacing",
+      "target": "Spacing.Pickables.Pickable_SmokePuff GridSpacing",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Stone GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Stone GridSpacing",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Pickable_Thistle GridSpacing",
+      "target": "Spacing.Pickables.Pickable_Thistle GridSpacing",
+      "type": "Single",
+      "default": "0.75",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.Placeable_Stone GridSpacing",
+      "target": "Spacing.Pickables.Placeable_Stone GridSpacing",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.Pickables.RaspberryBush GridSpacing",
+      "target": "Spacing.Pickables.RaspberryBush GridSpacing",
+      "type": "Single",
+      "default": "1.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ShowCost",
+      "target": "UI.ShowCost",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.CostDisplayStyle",
+      "target": "Preview.CostDisplayStyle",
+      "type": "CostDisplayStyle",
+      "default": "TotalCount",
+      "constraints": "TotalCount, FullCost",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.CostDisplayLocation",
+      "target": "Preview.CostDisplayLocation",
+      "type": "CostDisplayLocation",
+      "default": "RightSide",
+      "constraints": "LeftSide, RightSide",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ShowHUDKeyHints",
+      "target": "Preview.ShowHUDKeyHints",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ShowHoverKeyHints",
+      "target": "Preview.ShowHoverKeyHints",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ShowHoverReplantHint",
+      "target": "Preview.ShowHoverReplantHint",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ShowGhostsDuringPlacement",
+      "target": "Preview.ShowGhostsDuringPlacement",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ShowGridDirections",
+      "target": "Preview.ShowGridDirections",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ShowSnapDirection",
+      "target": "Preview.ShowSnapDirection",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.HighlightRootGhost",
+      "target": "Preview.HighlightRootGhost",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.RootGhostHighlightColor",
+      "target": "Preview.RootGhostHighlightColor",
+      "type": "Color",
+      "default": "00FF00FF",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.RowStartColor",
+      "target": "Preview.RowStartColor",
+      "type": "Color",
+      "default": "0000FFFF",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.RowEndColor",
+      "target": "Preview.RowEndColor",
+      "type": "Color",
+      "default": "00FFFFFF",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ColumnStartColor",
+      "target": "Preview.ColumnStartColor",
+      "type": "Color",
+      "default": "00FF00FF",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.ColumnEndColor",
+      "target": "Preview.ColumnEndColor",
+      "type": "Color",
+      "default": "FFEB04FF",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.SnapStartColor",
+      "target": "Preview.SnapStartColor",
+      "type": "Color",
+      "default": "FF0000FF",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEasily.UI.SnapEndColor",
+      "target": "Preview.SnapEndColor",
+      "type": "Color",
+      "default": "FF00FFFF",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.RaspberryCost",
+      "target": "Catalog.Vanilla.Berries.RaspberryCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.BlueberryCost",
+      "target": "Catalog.Vanilla.Berries.BlueberryCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.CloudberryCost",
+      "target": "Catalog.Vanilla.Berries.CloudberryCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.LingonberryCost",
+      "target": "Catalog.Vanilla.Berries.LingonberryCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.RaspberryRespawnTime",
+      "target": "Catalog.Vanilla.Berries.RaspberryRespawnTime",
+      "type": "Int32",
+      "default": "300",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.BlueberryRespawnTime",
+      "target": "Catalog.Vanilla.Berries.BlueberryRespawnTime",
+      "type": "Int32",
+      "default": "300",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.CloudberryRespawnTime",
+      "target": "Catalog.Vanilla.Berries.CloudberryRespawnTime",
+      "type": "Int32",
+      "default": "300",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.LingonberryRespawnTime",
+      "target": "Catalog.Vanilla.Berries.LingonberryRespawnTime",
+      "type": "Int32",
+      "default": "300",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.RaspberryReturn",
+      "target": "Catalog.Vanilla.Berries.RaspberryReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.BlueberryReturn",
+      "target": "Catalog.Vanilla.Berries.BlueberryReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.CloudberryReturn",
+      "target": "Catalog.Vanilla.Berries.CloudberryReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Berries.LingonberryReturn",
+      "target": "Catalog.Vanilla.Berries.LingonberryReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.EnableCropOverrides",
+      "target": "Growth.Crops.EnableCropOverrides",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.OverrideModdedCrops",
+      "target": "Growth.Crops.OverrideModdedCrops",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CropMinScale",
+      "target": "Growth.Crops.CropMinScale",
+      "type": "Single",
+      "default": "0.9",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CropMaxScale",
+      "target": "Growth.Crops.CropMaxScale",
+      "type": "Single",
+      "default": "1.1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CropGrowTimeMin",
+      "target": "Growth.Crops.CropGrowTimeMin",
+      "type": "Single",
+      "default": "4000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CropGrowTimeMax",
+      "target": "Growth.Crops.CropGrowTimeMax",
+      "type": "Single",
+      "default": "5000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CropGrowRadius",
+      "target": "Growth.Crops.CropGrowRadius",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CropsRequireCultivation",
+      "target": "Growth.Crops.CropsRequireCultivation",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CropsRequireSunlight",
+      "target": "Growth.Crops.CropsRequireSunlight",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CropsRequireGrowthSpace",
+      "target": "Growth.Crops.CropsRequireGrowthSpace",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.EnemiesTargetCrops",
+      "target": "Growth.Crops.EnemiesTargetCrops",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.BarleyCost",
+      "target": "Catalog.Vanilla.Crops.BarleyCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.BarleyReturn",
+      "target": "Catalog.Vanilla.Crops.BarleyReturn",
+      "type": "Int32",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CarrotCost",
+      "target": "Catalog.Vanilla.Crops.CarrotCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.CarrotReturn",
+      "target": "Catalog.Vanilla.Crops.CarrotReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.FlaxCost",
+      "target": "Catalog.Vanilla.Crops.FlaxCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.FlaxReturn",
+      "target": "Catalog.Vanilla.Crops.FlaxReturn",
+      "type": "Int32",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.OnionCost",
+      "target": "Catalog.Vanilla.Crops.OnionCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.OnionReturn",
+      "target": "Catalog.Vanilla.Crops.OnionReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.SeedCarrotCost",
+      "target": "Catalog.Vanilla.Crops.SeedCarrotCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.SeedCarrotReturn",
+      "target": "Catalog.Vanilla.Crops.SeedCarrotReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.SeedOnionCost",
+      "target": "Catalog.Vanilla.Crops.SeedOnionCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.SeedOnionReturn",
+      "target": "Catalog.Vanilla.Crops.SeedOnionReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.SeedTurnipCost",
+      "target": "Catalog.Vanilla.Crops.SeedTurnipCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.SeedTurnipReturn",
+      "target": "Catalog.Vanilla.Crops.SeedTurnipReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.TurnipCost",
+      "target": "Catalog.Vanilla.Crops.TurnipCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.TurnipReturn",
+      "target": "Catalog.Vanilla.Crops.TurnipReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.MagecapCost",
+      "target": "Catalog.Vanilla.Crops.MagecapCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.MagecapReturn",
+      "target": "Catalog.Vanilla.Crops.MagecapReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.JotunPuffsCost",
+      "target": "Catalog.Vanilla.Crops.JotunPuffsCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.JotunPuffsReturn",
+      "target": "Catalog.Vanilla.Crops.JotunPuffsReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.OatCost",
+      "target": "Catalog.Vanilla.Crops.OatCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.OatReturn",
+      "target": "Catalog.Vanilla.Crops.OatReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.PoteitrCost",
+      "target": "Catalog.Vanilla.Crops.PoteitrCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.PoteitrReturn",
+      "target": "Catalog.Vanilla.Crops.PoteitrReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.KaleCost",
+      "target": "Catalog.Vanilla.Crops.KaleCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.KaleReturn",
+      "target": "Catalog.Vanilla.Crops.KaleReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.SeedKaleCost",
+      "target": "Catalog.Vanilla.Crops.SeedKaleCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Crops.SeedKaleReturn",
+      "target": "Catalog.Vanilla.Crops.SeedKaleReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableBranchCost",
+      "target": "Catalog.Vanilla.Debris.PickableBranchCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableBranchReturn",
+      "target": "Catalog.Vanilla.Debris.PickableBranchReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableBranchRespawnTime",
+      "target": "Catalog.Vanilla.Debris.PickableBranchRespawnTime",
+      "type": "Int32",
+      "default": "240",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableStoneCost",
+      "target": "Catalog.Vanilla.Debris.PickableStoneCost",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableStoneReturn",
+      "target": "Catalog.Vanilla.Debris.PickableStoneReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableStoneRespawnTime",
+      "target": "Catalog.Vanilla.Debris.PickableStoneRespawnTime",
+      "type": "Int32",
+      "default": "0",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableFlintCost",
+      "target": "Catalog.Vanilla.Debris.PickableFlintCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableFlintReturn",
+      "target": "Catalog.Vanilla.Debris.PickableFlintReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Debris.PickableFlintRespawnTime",
+      "target": "Catalog.Vanilla.Debris.PickableFlintRespawnTime",
+      "type": "Int32",
+      "default": "240",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.RequireCultivation",
+      "target": "Restrictions.RequireCultivation",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.PlaceAnywhere",
+      "target": "Restrictions.PlaceAnywhere",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.EnforceBiomes",
+      "target": "Restrictions.EnforceBiomes",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.EnforceBiomesVanilla",
+      "target": "Restrictions.EnforceBiomesVanilla",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.PlantsRequireShielding",
+      "target": "Restrictions.PlantsRequireShielding",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.CanRemoveFlora",
+      "target": "Restrictions.CanRemoveFlora",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.RecoverResources",
+      "target": "Restrictions.RecoverResources",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.ResourcesSpawnEmpty",
+      "target": "Restrictions.ResourcesSpawnEmpty",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Difficulty.EnemiesTargetPieces",
+      "target": "Restrictions.EnemiesTargetPieces",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.ThistleCost",
+      "target": "Catalog.Vanilla.Flowers.ThistleCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.DandelionCost",
+      "target": "Catalog.Vanilla.Flowers.DandelionCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.FiddleheadCost",
+      "target": "Catalog.Vanilla.Flowers.FiddleheadCost",
+      "type": "Int32",
+      "default": "15",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.ThistleRespawnTime",
+      "target": "Catalog.Vanilla.Flowers.ThistleRespawnTime",
+      "type": "Int32",
+      "default": "240",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.DandelionRespawnTime",
+      "target": "Catalog.Vanilla.Flowers.DandelionRespawnTime",
+      "type": "Int32",
+      "default": "240",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.FiddleheadRespawnTime",
+      "target": "Catalog.Vanilla.Flowers.FiddleheadRespawnTime",
+      "type": "Int32",
+      "default": "300",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.ThistleReturn",
+      "target": "Catalog.Vanilla.Flowers.ThistleReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.DandelionReturn",
+      "target": "Catalog.Vanilla.Flowers.DandelionReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Flowers.FiddleheadReturn",
+      "target": "Catalog.Vanilla.Flowers.FiddleheadReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.LockConfiguration",
+      "target": "Authority.LockConfiguration",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.NexusID",
+      "target": "",
+      "type": "Int32",
+      "default": "1042",
+      "constraints": "",
+      "metadataOnly": true,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.EnableDebugMessages",
+      "target": "Catalog.EnableDebugMessages",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.ShowPickableSpawners",
+      "target": "Catalog.ShowPickableSpawners",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.EnableMiscFlora",
+      "target": "Catalog.EnableMiscFlora",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.EnableDebris",
+      "target": "Catalog.EnableDebris",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.EnableExtraResources",
+      "target": "Catalog.EnableExtraResources",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.SnappableVines",
+      "target": "Catalog.SnappableVines",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.EnableLocalization",
+      "target": "Catalog.EnableLocalization",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.Language",
+      "target": "Catalog.Language",
+      "type": "String",
+      "default": "english",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.General.DisabledResourceNames",
+      "target": "Catalog.DisabledResourceNames",
+      "type": "String",
+      "default": "",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.MushroomCost",
+      "target": "Catalog.Vanilla.Mushrooms.MushroomCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.YellowMushroomCost",
+      "target": "Catalog.Vanilla.Mushrooms.YellowMushroomCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.BlueMushroomCost",
+      "target": "Catalog.Vanilla.Mushrooms.BlueMushroomCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.SmokepuffCost",
+      "target": "Catalog.Vanilla.Mushrooms.SmokepuffCost",
+      "type": "Int32",
+      "default": "5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.MushroomRespawnTime",
+      "target": "Catalog.Vanilla.Mushrooms.MushroomRespawnTime",
+      "type": "Int32",
+      "default": "240",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.YellowMushroomRespawnTime",
+      "target": "Catalog.Vanilla.Mushrooms.YellowMushroomRespawnTime",
+      "type": "Int32",
+      "default": "240",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.BlueMushroomRespawnTime",
+      "target": "Catalog.Vanilla.Mushrooms.BlueMushroomRespawnTime",
+      "type": "Int32",
+      "default": "240",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.SmokepuffRespawnTime",
+      "target": "Catalog.Vanilla.Mushrooms.SmokepuffRespawnTime",
+      "type": "Int32",
+      "default": "240",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.MushroomReturn",
+      "target": "Catalog.Vanilla.Mushrooms.MushroomReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.YellowMushroomReturn",
+      "target": "Catalog.Vanilla.Mushrooms.YellowMushroomReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.BlueMushroomReturn",
+      "target": "Catalog.Vanilla.Mushrooms.BlueMushroomReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Mushrooms.SmokepuffReturn",
+      "target": "Catalog.Vanilla.Mushrooms.SmokepuffReturn",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.OverrideModdedSaplings",
+      "target": "Growth.Saplings.OverrideModdedSaplings",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.ModdedSaplingMinScale",
+      "target": "Growth.Saplings.ModdedSaplingMinScale",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.ModdedSaplingMaxScale",
+      "target": "Growth.Saplings.ModdedSaplingMaxScale",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.ModdedSaplingGrowthTime",
+      "target": "Growth.Saplings.ModdedSaplingGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.ModdedSaplingGrowRadius",
+      "target": "Growth.Saplings.ModdedSaplingGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.BirchMinScale",
+      "target": "Growth.Saplings.BirchMinScale",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.BirchMaxScale",
+      "target": "Growth.Saplings.BirchMaxScale",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.OakMinScale",
+      "target": "Growth.Saplings.OakMinScale",
+      "type": "Single",
+      "default": "0.7",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.OakMaxScale",
+      "target": "Growth.Saplings.OakMaxScale",
+      "type": "Single",
+      "default": "0.9",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AncientMinScale",
+      "target": "Growth.Saplings.AncientMinScale",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AncientMaxScale",
+      "target": "Growth.Saplings.AncientMaxScale",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.BirchGrowthTime",
+      "target": "Growth.Saplings.BirchGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.OakGrowthTime",
+      "target": "Growth.Saplings.OakGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AncientGrowthTime",
+      "target": "Growth.Saplings.AncientGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.BirchGrowRadius",
+      "target": "Growth.Saplings.BirchGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.OakGrowRadius",
+      "target": "Growth.Saplings.OakGrowRadius",
+      "type": "Single",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AncientGrowRadius",
+      "target": "Growth.Saplings.AncientGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.BeechGrowthTime",
+      "target": "Growth.Saplings.BeechGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.PineGrowthTime",
+      "target": "Growth.Saplings.PineGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.FirGrowthTime",
+      "target": "Growth.Saplings.FirGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.BeechMinScale",
+      "target": "Growth.Saplings.BeechMinScale",
+      "type": "Single",
+      "default": "0.8",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.BeechMaxScale",
+      "target": "Growth.Saplings.BeechMaxScale",
+      "type": "Single",
+      "default": "1.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.PineMinScale",
+      "target": "Growth.Saplings.PineMinScale",
+      "type": "Single",
+      "default": "1.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.PineMaxScale",
+      "target": "Growth.Saplings.PineMaxScale",
+      "type": "Single",
+      "default": "2.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.FirMinScale",
+      "target": "Growth.Saplings.FirMinScale",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.FirMaxScale",
+      "target": "Growth.Saplings.FirMaxScale",
+      "type": "Single",
+      "default": "2.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.BeechGrowRadius",
+      "target": "Growth.Saplings.BeechGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.PineGrowRadius",
+      "target": "Growth.Saplings.PineGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.FirGrowRadius",
+      "target": "Growth.Saplings.FirGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.YggaMinScale",
+      "target": "Growth.Saplings.YggaMinScale",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.YggaMaxScale",
+      "target": "Growth.Saplings.YggaMaxScale",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.YggaGrowthTime",
+      "target": "Growth.Saplings.YggaGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.YggaGrowRadius",
+      "target": "Growth.Saplings.YggaGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AutumnBirchMinScale",
+      "target": "Growth.Saplings.AutumnBirchMinScale",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AutumnBirchMaxScale",
+      "target": "Growth.Saplings.AutumnBirchMaxScale",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AutumnBirchGrowthTime",
+      "target": "Growth.Saplings.AutumnBirchGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AutumnBirchGrowRadius",
+      "target": "Growth.Saplings.AutumnBirchGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AshwoodMinScale",
+      "target": "Growth.Saplings.AshwoodMinScale",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AshwoodMaxScale",
+      "target": "Growth.Saplings.AshwoodMaxScale",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AshwoodGrowthTime",
+      "target": "Growth.Saplings.AshwoodGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.AshwoodGrowRadius",
+      "target": "Growth.Saplings.AshwoodGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.TimberwoodMinScale",
+      "target": "Growth.Saplings.TimberwoodMinScale",
+      "type": "Single",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.TimberwoodMaxScale",
+      "target": "Growth.Saplings.TimberwoodMaxScale",
+      "type": "Single",
+      "default": "2.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.TimberwoodGrowthTime",
+      "target": "Growth.Saplings.TimberwoodGrowthTime",
+      "type": "Single",
+      "default": "3000",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Saplings.TimberwoodGrowRadius",
+      "target": "Growth.Saplings.TimberwoodGrowRadius",
+      "type": "Single",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Seeds.EnableSeedOverrides",
+      "target": "Drops.EnableSeedOverrides",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Seeds.seedDropMin",
+      "target": "Drops.seedDropMin",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Seeds.seedDropMax",
+      "target": "Drops.seedDropMax",
+      "type": "Int32",
+      "default": "2",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Seeds.treeDropMin",
+      "target": "Drops.treeDropMin",
+      "type": "Int32",
+      "default": "1",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Seeds.treeDropMax",
+      "target": "Drops.treeDropMax",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Seeds.dropChance",
+      "target": "Drops.dropChance",
+      "type": "Single",
+      "default": "0.5",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Seeds.oneOfEach",
+      "target": "Drops.oneOfEach",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.UI.EnablePickableTimers",
+      "target": "Hover.EnablePickableTimers",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.UI.EnablePlantTimers",
+      "target": "Hover.EnablePlantTimers",
+      "type": "Boolean",
+      "default": "true",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.UI.GrowthAsPercentage",
+      "target": "Hover.GrowthAsPercentage",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Vines.EnableVineOverrides",
+      "target": "Growth.Vines.EnableVineOverrides",
+      "type": "Boolean",
+      "default": "false",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Vines.VineAttachDistance",
+      "target": "Growth.Vines.VineAttachDistance",
+      "type": "Single",
+      "default": "1.8",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Vines.VineGrowRadius",
+      "target": "Growth.Vines.VineGrowRadius",
+      "type": "Single",
+      "default": "1.8",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Vines.VineGrowthTime",
+      "target": "Growth.Vines.VineGrowthTime",
+      "type": "Single",
+      "default": "200",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Vines.VineBerryRespawnTime",
+      "target": "Growth.Vines.VineBerryRespawnTime",
+      "type": "Int32",
+      "default": "200",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    },
+    {
+      "source": "PlantEverything.Vines.VineBerryReturn",
+      "target": "Growth.Vines.VineBerryReturn",
+      "type": "Int32",
+      "default": "3",
+      "constraints": "",
+      "metadataOnly": false,
+      "actionBinding": false,
+      "runtimeVerified": false
+    }
+  ]
+}

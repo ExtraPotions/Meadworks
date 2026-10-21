@@ -1,0 +1,15 @@
+# Kindle salvage rules (adopted OpenKeep 3.0.0 schema). Items under deny are never salvageable; overrides set the return fraction for single
+# items or patterns (the cfg Return Fraction applies to everything else). Both use the OpenKeep item vocabulary:
+#   Wood            a prefab name (case-insensitive) or the item's shared name token ($item_wood)
+#   prefix:Trophy   every item whose prefab name starts with the text
+#   suffix:Ore      every item whose prefab name ends with the text
+#   type:Material   every item of that item type
+#   group:Arrows    every item of a group from the groups map below
+#   *               everything
+# Edits are picked up within five seconds; on a server the file is pushed to every client.
+deny: [type:Trophy, prefix:MeadBase]
+# overrides:
+#   ArrowFlint: { fraction: 0.5 }
+#   group:Arrows: { fraction: 0.5 }
+# groups:
+#   Arrows: [suffix:Arrow]

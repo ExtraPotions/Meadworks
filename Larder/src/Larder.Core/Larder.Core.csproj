@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Larder rules (food values, eating, recovery, exertion, cooking perks, cheats). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Larder.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Larder</RootNamespace>
+  </PropertyGroup>
+</Project>

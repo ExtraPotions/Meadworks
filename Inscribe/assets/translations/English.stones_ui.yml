@@ -1,0 +1,29 @@
+# EliteCrafting - words of using runes: refusals, feedback and the confirm dialog (applying-stones.md,
+# localization.md). Owned by the Stones area. Key without the $ -> text.
+# $1, $2, $3 are the game's placeholders, filled with already-localized names.
+# newer_format and unknown_rarity live in English.core.yml.
+
+# refusals: the rune is kept, the item unchanged
+ecf_msg_not_own_inventory: "Runes work only on items in your own inventory."
+ecf_msg_stone_out_of_reach: "Take the rune from your inventory or the chest you have open."
+ecf_msg_not_magic_base: "This item cannot hold inscriptions."
+ecf_msg_stone_disabled: "The $1 is disabled on this server."
+ecf_msg_sealed: "This item is sealed. No rune can change it."
+ecf_msg_equipped: "Unequip this item first."
+ecf_msg_wrong_rarity: "The $1 does not work on $2 items."
+ecf_msg_ascension_top: "The Ascension Rune cannot raise $1 items: it stops at Epic, and Legendary gear comes only from bosses and raids."
+ecf_msg_not_enough_stones: "You need $1 $2 for this."
+ecf_msg_no_eligible_affix: "No inscription can roll on this item."
+ecf_msg_confirm_required: "Hold Shift to use the $1."
+
+# feedback on success
+ecf_msg_promoted: "$1 rises to $2."
+ecf_msg_stripped: "$1 is cleansed."
+ecf_msg_rerolled: "$1 is recast with new inscriptions."
+ecf_msg_corrupt_seal: "The Sealed Rune seals $1. Nothing else changes."
+ecf_msg_corrupt_add: "The Sealed Rune seals $1 and grants $2."
+ecf_msg_corrupt_chaos: "The Sealed Rune seals $1 and twists every inscription."
+
+# confirm dialog (Dialog mode): $1 the rune in the title; $1 the item, $2 the rune in the body
+ecf_ui_confirm_title: "Use the $1?"
+ecf_ui_confirm_body: "$2 cannot be undone."

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "strings": {
+    "loot_multiplier": "Множитель добычи",
+    "module_pickup": "Подбор Magpie",
+    "module_merge": "Стопки на земле Magpie",
+    "module_float": "Плавающие предметы Magpie",
+    "module_loot": "Множитель добычи Magpie",
+    "step_aside_pickup": "Подбор Magpie отключён: установлен {0}.",
+    "step_aside_merge": "Стопки на земле Magpie отключены: установлен {0}.",
+    "step_aside_float": "Плавающие предметы Magpie отключены: установлен {0}.",
+    "step_aside_loot": "Множитель добычи Magpie отключён: установлен {0}.",
+    "import_done": "Импортировано настроек Magpie: {0}. Исходные файлы сохранены.",
+    "import_sync_incomplete": "Импорт Magpie сохранён локально, но синхронизация не завершена. Проверьте синхронизацию; не применяйте этот просмотр повторно."
+  }
+}

@@ -1,0 +1,24 @@
+# Burrow.Containers.yml - container sizes.
+#
+# chests: sizes every chest a player can build (wood, reinforced, personal, black metal, barrel and the chests of other
+# mods) that has no line of its own below: wide (the default: 8 columns like the inventory, with at least twice the game's
+# slots, so a wood chest is 8x3 and a reinforced chest 8x6), double (twice the game's rows), vanilla (the game's size) or
+# WIDTHxROWS such as 6x4. Ships, carts and dungeon or world chests are not buildable chests and keep their size.
+# Shepherd's feeding troughs (Feed Barrel, Plank Trough, Stone Trough) always keep Shepherd's own size; neither this line nor an entry resizes them.
+#
+# One entry per container prefab with the width and height of its grid, or one of the same words:
+#   piece_chest: double      piece_chest_wood: 5x4      piece_chest_private: wide
+# Sizes apply to new containers and to every loaded container of that prefab; a container is never shrunk below a row or column that holds an item
+# (it keeps just enough rows and columns to show every item, and takes the new size once they are moved). Players without the mod, and the vanilla game,
+# do not see items that sit in the extra rows and columns.
+#
+# The file is synced from the server, reloaded a few seconds after it is saved and can be edited in game
+# (Configuration Manager, "Edit YAML"). Extra files named Burrow.Containers<anything>.yml next to this one are
+# read as well. Newly discovered container prefabs are appended with their vanilla size, commented out.
+# Existing entries and comments stay intact. To use a generated entry, remove its # and change the size.
+chests: wide
+containers:
+  # piece_chest_wood: { width: 5, height: 2 }
+  # piece_chest: { width: 6, height: 3 }
+  # VikingShip: { width: 8, height: 2 }
+  # Cart: { width: 6, height: 3 }

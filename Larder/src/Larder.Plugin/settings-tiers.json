@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "product": "Larder",
+  "default": "Advanced",
+  "settings": {
+    "3 - Eating/Food Slots": "Essential",
+    "3 - Eating/Allow Auto Eat": "Essential",
+    "3 - Eating/Auto Eat": "Essential",
+    "3 - Eating/Disable Food Degradation": "Essential",
+    "3 - Eating/Food Timers": "Essential",
+    "6 - Kitchen/Food Can Burn": "Essential",
+    "6 - Kitchen/Fermenter Timer": "Essential",
+    "5 - Exertion/Safe Area Stamina": "Essential",
+    "5 - Exertion/Safe Area Ignored Creatures": "FileOnly",
+    "Import/Preview FeastMaster": "FileOnly",
+    "Import/Preview GrindstoneSkills": "FileOnly",
+    "Import/Apply FeastMaster": "FileOnly",
+    "Import/Apply GrindstoneSkills": "FileOnly",
+    "Import/Source Choices": "FileOnly",
+    "Food: */*": "FileOnly",
+    "Mead: */*": "FileOnly",
+    "Station: */*": "FileOnly"
+  }
+}

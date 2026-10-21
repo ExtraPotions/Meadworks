@@ -1,0 +1,14 @@
+<Project>
+  <!-- Reproducible bytes (W87, 2026-10-13, as Crucible d0bdaaa). Stamp the last commit that changed what the plugin is built from
+       (src, assets, config, these props) instead of HEAD, and map the project path away so two worktrees of one commit build the same bytes. -->
+  <PropertyGroup>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <PathMap>$(MSBuildProjectDirectory)=/_/$(MSBuildProjectName)</PathMap>
+  </PropertyGroup>
+  <Target Name="MeadworksSourceStamp" BeforeTargets="GetAssemblyAttributes">
+    <Exec Command="git log -1 --format=%25%25H -- src assets config Directory.Build.props" WorkingDirectory="$(MSBuildThisFileDirectory)" ConsoleToMSBuild="true" StandardOutputImportance="low" IgnoreExitCode="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="_MeadworksSourceCommit"/>
+    </Exec>
+    <PropertyGroup><InformationalVersion Condition="'$(_MeadworksSourceCommit)' != ''">$(Version)+$(_MeadworksSourceCommit)</InformationalVersion></PropertyGroup>
+  </Target>
+</Project>

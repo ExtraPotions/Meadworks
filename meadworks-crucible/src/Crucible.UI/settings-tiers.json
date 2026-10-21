@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "product": "Crucible UI",
+  "default": "Advanced",
+  "settings": {
+    "General/Meadworks Menu Key": "Essential",
+    "Look/Styled Panels": "Essential",
+    "Look/Panel Theme": "Essential",
+    "Look/Meadworks Screen Layout": "Essential",
+    "Look/Meadworks Map Frames": "Essential",
+    "Look/Theme Game Panels": "Advanced",
+    "Look/Night Shade": "Advanced",
+    "Look/Timber Border Width": "Advanced",
+    "Look/Timber Border Jaggedness": "Advanced",
+    "HUD Layout/*": "FileOnly"
+  }
+}

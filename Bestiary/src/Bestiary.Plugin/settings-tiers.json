@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "product": "Bestiary",
+  "default": "Advanced",
+  "settings": {
+    "1 - General/Enabled": "Essential",
+    "2 - Crypt Mimic/Enabled": "Essential",
+    "3 - Greydwarf Slinger/Enabled": "Essential",
+    "4 - Rime Giant/Enabled": "Essential",
+    "5 - Kraken/Enabled": "Essential",
+    "8 - Skeleton Arsenal/Enabled": "Essential",
+    "25 - Crypt Executioner/Enabled": "Essential",
+    "28 - Bone Ballista/Enabled": "Essential",
+    "1 - General/Workshop Enabled": "FileOnly",
+    "30 - Workshop/Data Folder": "FileOnly",
+    "30 - Workshop/Hot Reload": "FileOnly",
+    "30 - Workshop/Texture Sync": "FileOnly",
+    "30 - Workshop/Texture Cache Limit": "FileOnly",
+    "2 - Crypt Mimic/Chests": "FileOnly",
+    "3 - Greydwarf Slinger/Biomes": "FileOnly",
+    "4 - Rime Giant/Biomes": "FileOnly",
+    "7 - Bone Crossbow/Recipe": "FileOnly",
+    "7 - Bone Crossbow/Bolt Recipe": "FileOnly",
+    "Import/Elite Creatures Pack Imported": "FileOnly",
+    "40 - Server Data/YamlBundle": "FileOnly",
+    "40 - Server Data/ServerLocalization": "FileOnly"
+  }
+}

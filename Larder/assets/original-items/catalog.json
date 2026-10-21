@@ -1,0 +1,53 @@
+{
+  "assets": [
+    {
+      "id": "larder_cooking",
+      "prefabs": []
+    },
+    {
+      "id": "larder_food",
+      "prefabs": []
+    },
+    {
+      "id": "larder_mead",
+      "prefabs": []
+    },
+    {
+      "id": "larder_fermentation",
+      "prefabs": []
+    },
+    {
+      "id": "larder_cook_time",
+      "prefabs": []
+    },
+    {
+      "id": "larder_burn_warning",
+      "prefabs": []
+    },
+    {
+      "id": "larder_health_recovery",
+      "prefabs": []
+    },
+    {
+      "id": "larder_stamina_recovery",
+      "prefabs": []
+    },
+    {
+      "id": "larder_eitr_recovery",
+      "prefabs": []
+    },
+    {
+      "id": "larder_rested",
+      "prefabs": []
+    },
+    {
+      "id": "larder_extra_food",
+      "prefabs": []
+    },
+    {
+      "id": "larder_saved_ingredients",
+      "prefabs": []
+    }
+  ],
+  "materials": []
+}

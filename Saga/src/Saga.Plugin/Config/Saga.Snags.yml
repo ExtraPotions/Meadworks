@@ -1,0 +1,237 @@
+# GrindstoneSkills.Snags.yml - what a fishing line can snag.
+#
+# A cast left in the water for "Snag Wait" seconds (section "54 - Catch And Tackle" of the .cfg) without a fish on the
+# line may snag something: from "Snag Chance At 0" to "Snag Chance At 100", growing with the angler's Fishing level,
+# rolled once per cast. The line then reels in heavy and slow, no fish will bite it, and when it is in, one snag is
+# picked from this file by weight for the biome the float was in. Its items go into the angler's inventory (at their
+# feet when it is full), and everybody near sees "Found <name>!". The world's resource rate does not change snags.
+#
+# The server's copy is sent to every player while the server's "Lock Configuration" is on; edits are picked up a few
+# seconds after saving, no restart needed. Extra files named GrindstoneSkills.Snags<anything>.yml next to this one are
+# read as well; a biome in a later file replaces the same biome in an earlier file.
+#
+# LAYOUT
+#
+#   biomes:            one list of snags per biome. A float uses the list of the biome it floats in.
+#     <Biome>:         Meadows, BlackForest, Swamp, Mountain, Plains, Mistlands, AshLands, DeepNorth or Ocean
+#                      (case does not matter, "Black Forest" works too). A biome that is not listed, or listed with
+#                      nothing after the colon ("Swamp:"), snags only weeds.
+#
+# Each snag in a list:
+#   name:    what the messages show after "Landed" and "Found", for example "a silver necklace". Optional,
+#            "something" if left out.
+#   weight:  how often it is picked compared with the other snags of the same list: weight 20 next to weights that
+#            add up to 100 is picked one time in five. Optional, 1 if left out; 0 switches the snag off.
+#   items:   one or more items that all come in together, each { prefab: <item>, min: <n>, max: <n> }:
+#              prefab  the item's prefab name as the game spells it: Coins, Amber, SilverNecklace, IronScrap...
+#                      A name the game does not know is logged once and skipped.
+#              min     the fewest that come, 0 or more. Optional, 1 if left out.
+#              max     the most that come, at least min, at most 999. Optional, the same as min if left out.
+#
+# The lists below hold what sinks where: lost coins and trinkets everywhere, and the biome's own leftovers, a little
+# richer the further the biome is along the game's progression and richest at sea. Keep the two-space indents: a biome
+# sits two spaces in from "biomes:", each snag starts with "- " four spaces in.
+
+biomes:
+  Meadows:
+    - name: a few lost coins
+      weight: 30
+      items:
+        - { prefab: Coins, min: 5, max: 15 }
+    - name: a lump of resin
+      weight: 25
+      items:
+        - { prefab: Resin, min: 2, max: 4 }
+    - name: some leather scraps
+      weight: 20
+      items:
+        - { prefab: LeatherScraps, min: 2, max: 4 }
+    - name: a few flints
+      weight: 20
+      items:
+        - { prefab: Flint, min: 2, max: 3 }
+    - name: a lump of amber
+      weight: 5
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+
+  BlackForest:
+    - name: a purse of coins
+      weight: 30
+      items:
+        - { prefab: Coins, min: 10, max: 25 }
+    - name: a handful of bronze nails
+      weight: 20
+      items:
+        - { prefab: BronzeNails, min: 5, max: 10 }
+    - name: some greydwarf eyes
+      weight: 25
+      items:
+        - { prefab: GreydwarfEye, min: 2, max: 4 }
+    - name: a sodden troll hide
+      weight: 15
+      items:
+        - { prefab: TrollHide, min: 1, max: 1 }
+    - name: a lump of amber
+      weight: 10
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+
+  Swamp:
+    - name: a purse of coins
+      weight: 25
+      items:
+        - { prefab: Coins, min: 10, max: 30 }
+    - name: a lump of iron scrap
+      weight: 25
+      items:
+        - { prefab: IronScrap, min: 1, max: 2 }
+    - name: a rusty chain
+      weight: 15
+      items:
+        - { prefab: Chain, min: 1, max: 1 }
+    - name: some withered bones
+      weight: 20
+      items:
+        - { prefab: WitheredBone, min: 1, max: 2 }
+    - name: an amber pearl
+      weight: 15
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+
+  Mountain:
+    - name: a purse of coins
+      weight: 30
+      items:
+        - { prefab: Coins, min: 15, max: 35 }
+    - name: some obsidian
+      weight: 25
+      items:
+        - { prefab: Obsidian, min: 2, max: 4 }
+    - name: a lump of silver ore
+      weight: 20
+      items:
+        - { prefab: SilverOre, min: 1, max: 1 }
+    - name: a frozen wolf pelt
+      weight: 15
+      items:
+        - { prefab: WolfPelt, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 10
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+
+  Plains:
+    - name: a heavy purse of coins
+      weight: 30
+      items:
+        - { prefab: Coins, min: 20, max: 40 }
+    - name: some black metal scrap
+      weight: 20
+      items:
+        - { prefab: BlackMetalScrap, min: 1, max: 2 }
+    - name: a sodden sack of barley
+      weight: 20
+      items:
+        - { prefab: Barley, min: 2, max: 4 }
+    - name: a tangle of flax
+      weight: 20
+      items:
+        - { prefab: Flax, min: 2, max: 4 }
+    - name: a silver necklace
+      weight: 10
+      items:
+        - { prefab: SilverNecklace, min: 1, max: 1 }
+
+  # The open sea: shipwrecks and serpents. The richest water to leave a line in.
+  Ocean:
+    - name: a sailor's purse
+      weight: 30
+      items:
+        - { prefab: Coins, min: 20, max: 60 }
+    - name: some chitin
+      weight: 20
+      items:
+        - { prefab: Chitin, min: 1, max: 3 }
+    - name: a serpent scale
+      weight: 15
+      items:
+        - { prefab: SerpentScale, min: 1, max: 2 }
+    - name: a silver necklace
+      weight: 15
+      items:
+        - { prefab: SilverNecklace, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 12
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 8
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  Mistlands:
+    - name: a heavy purse of coins
+      weight: 25
+      items:
+        - { prefab: Coins, min: 30, max: 60 }
+    - name: some soft tissue
+      weight: 20
+      items:
+        - { prefab: Softtissue, min: 1, max: 2 }
+    - name: a sealed jar of sap
+      weight: 15
+      items:
+        - { prefab: Sap, min: 1, max: 2 }
+    - name: a branch of yggdrasil wood
+      weight: 20
+      items:
+        - { prefab: YggdrasilWood, min: 2, max: 4 }
+    - name: a bundle of blue jute
+      weight: 15
+      items:
+        - { prefab: JuteBlue, min: 1, max: 2 }
+    - name: a ruby
+      weight: 5
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  AshLands:
+    - name: a scorched purse of coins
+      weight: 25
+      items:
+        - { prefab: Coins, min: 40, max: 80 }
+    - name: some grausten
+      weight: 25
+      items:
+        - { prefab: Grausten, min: 2, max: 4 }
+    - name: a charred bone
+      weight: 20
+      items:
+        - { prefab: CharredBone, min: 1, max: 2 }
+    - name: a surtling core
+      weight: 15
+      items:
+        - { prefab: SurtlingCore, min: 1, max: 1 }
+    - name: a lump of flametal ore
+      weight: 15
+      items:
+        - { prefab: FlametalOreNew, min: 1, max: 1 }
+
+  DeepNorth:
+    - name: a frozen purse of coins
+      weight: 40
+      items:
+        - { prefab: Coins, min: 40, max: 80 }
+    - name: an amber pearl
+      weight: 30
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 20
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+    - name: a silver necklace
+      weight: 10
+      items:
+        - { prefab: SilverNecklace, min: 1, max: 1 }

@@ -1,0 +1,1081 @@
+// Edge - ExtraPotions Meadworks. SPDX-License-Identifier: GPL-3.0-only
+// Portions from SecondaryAttacks 1.2.17 (sighsorry1029), GPL-3.0, at 4375a2b17297052a773c5b143b0cae21dc655ed8:
+// CopiedThrowProjectileVisualSystem.cs. Source notices retained in THIRD_PARTY_NOTICES.
+// Changed by expDARE, 2026: Edge namespace, diagnostic and native boundary seams; source algorithms retained.
+// Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes.
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Reflection.Emit;
+using HarmonyLib;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+namespace ExtraPotions.Edge.Runtime.Secondaries.Native;
+using ExtraPotions.Edge.Secondaries.Adopted;
+using ExtraPotions.Edge.Runtime.Quickstep;
+
+internal static class CopiedThrowProjectileVisualSystem
+{
+    private const string CopiedThrowProjectileMarkerKey = "SecondaryAttacks_CopiedThrowProjectile";
+    // FearNoSpear carries this projectile tag to the actual drop for auto-pickup filtering only.
+    private const string ThrowerPlayerIdKey = "SecondaryAttacks.ThrowerPlayerID";
+    private const string CopiedThrowProjectileSpinAxisKey = "SecondaryAttacks_CopiedThrowSpinAxis";
+    private const string CopiedThrowProjectileRotationOffsetKey = "SecondaryAttacks_CopiedThrowRotationOffset";
+    private const string CopiedThrowProjectileVisualRootName = "SecondaryAttacks_CopiedThrowVisualRoot";
+    private const string CopiedThrowProjectileSpinRootName = "SecondaryAttacks_CopiedThrowSpinRoot";
+    internal const string EquippedAppearanceKey = "SecondaryAttacks_EquippedThrowAppearance";
+    private const float SpinStateEpsilonSqr = 0.0001f;
+
+    private static readonly List<Attack> ActiveCopiedThrowBursts = new();
+    private static readonly List<Renderer> RendererBuffer = new();
+    private static readonly ConditionalWeakTable<Attack, EquippedAppearance> AttackAppearances = new();
+    private static readonly ConditionalWeakTable<Projectile, AppearanceVisualState> AppearanceVisualStates = new();
+    private static bool _appearanceWarningReported;
+    private static bool _equippedVisualLookupInstalled;
+
+    internal static IEnumerable<CodeInstruction> RewriteVisualPrefabLookup(IEnumerable<CodeInstruction> instructions)
+    {
+        List<CodeInstruction> result = new(instructions);
+        System.Reflection.MethodInfo original = AccessTools.Method(typeof(ObjectDB), nameof(ObjectDB.GetItemPrefab), new[] { typeof(string) });
+        int index = -1;
+        int matches = 0;
+        for (int i = 0; i < result.Count; i++)
+        {
+            if (!result[i].Calls(original)) continue;
+            index = i;
+            matches++;
+        }
+        _equippedVisualLookupInstalled = matches == 1 && ProjectileAccess.CanResetVisual;
+        if (!_equippedVisualLookupInstalled)
+        {
+            ReportAppearanceFailure(new InvalidOperationException($"Projectile.UpdateVisual lookup contract changed ({matches} matches)"));
+            return result;
+        }
+        CodeInstruction call = result[index];
+        CodeInstruction instance = new(OpCodes.Ldarg_0);
+        call.MoveLabelsTo(instance); // Same Harmony label transfer without framework-specific Label type leakage.
+        instance.blocks.AddRange(call.blocks);
+        call.blocks.Clear();
+        call.opcode = OpCodes.Call;
+        call.operand = AccessTools.Method(typeof(CopiedThrowProjectileVisualSystem), nameof(ResolveEquippedVisualPrefab));
+        result.Insert(index, instance);
+        return result;
+    }
+
+    internal static void CaptureAttackAppearance(Attack attack, Humanoid owner, ItemDrop.ItemData weapon)
+    {
+        AttackAppearances.Remove(attack);
+        try
+        {
+            if (attack.m_attackType != Attack.AttackType.Projectile ||
+                !SecondaryAttackRuntimeFacade.TryGetDefinition(weapon, out SecondaryAttackDefinition definition) ||
+                definition.Behavior is not CopiedSecondaryBehavior) return;
+            long packed = ProjectileAccess.CaptureEquippedAppearance(owner, weapon);
+            if (packed != 0L) AttackAppearances.Add(attack, new EquippedAppearance(packed));
+        }
+        catch (Exception exception) { ReportAppearanceFailure(exception); }
+    }
+
+    internal static long GetAttackAppearance(Attack attack) =>
+        AttackAppearances.TryGetValue(attack, out EquippedAppearance? value) ? value.Packed : 0L;
+
+    private static void ReportAppearanceFailure(Exception exception)
+    {
+        if (_appearanceWarningReported) return;
+        _appearanceWarningReported = true;
+        RuleDiagnostics.Warning($"Equipped throw appearance unavailable; using the weapon visual: {exception.Message}");
+    }
+
+    private sealed class EquippedAppearance
+    {
+        internal EquippedAppearance(long packed) { Packed = packed; }
+        internal long Packed { get; }
+    }
+
+    private sealed class AppearanceVisualState
+    {
+        internal long Packed;
+        internal ObjectDB? Database;
+        internal GameObject? Prefab;
+        internal GameObject? VariantVisual;
+        internal GameObject? PreviousVisual;
+        internal bool Applying;
+    }
+
+    internal readonly struct BurstScope
+    {
+        public BurstScope(Attack attack)
+        {
+            Attack = attack;
+        }
+
+        public Attack? Attack { get; }
+
+        public bool Active => Attack != null;
+    }
+
+    internal readonly struct SpawnedProjectileVisualContext
+    {
+        public SpawnedProjectileVisualContext(
+            ItemDrop.ItemData weapon,
+            string visualPrefabName,
+            GameObject? attachPrefab,
+            EffectList.EffectData[]? hitEffectPrefabs,
+            ThrowProjectileVisualSpin.AxisMode spinAxisMode,
+            Vector3 visualRotationOffset,
+            bool skipVisualSwap,
+            long equippedAppearance = 0L)
+        {
+            Weapon = weapon;
+            VisualPrefabName = visualPrefabName;
+            AttachPrefab = attachPrefab;
+            HitEffectPrefabs = hitEffectPrefabs;
+            SpinAxisMode = spinAxisMode;
+            VisualRotationOffset = visualRotationOffset;
+            SkipVisualSwap = skipVisualSwap;
+            EquippedAppearance = equippedAppearance;
+        }
+
+        public ItemDrop.ItemData? Weapon { get; }
+
+        public string VisualPrefabName { get; }
+
+        public GameObject? AttachPrefab { get; }
+
+        public EffectList.EffectData[]? HitEffectPrefabs { get; }
+
+        public ThrowProjectileVisualSpin.AxisMode SpinAxisMode { get; }
+
+        public Vector3 VisualRotationOffset { get; }
+
+        public bool SkipVisualSwap { get; }
+
+        public long EquippedAppearance { get; }
+
+        public bool Active => Weapon?.m_dropPrefab != null && !string.IsNullOrEmpty(VisualPrefabName);
+    }
+
+    internal static BurstScope BeginBurst(Attack attack)
+    {
+        if (!ShouldApplyCopiedThrowVisuals(attack))
+        {
+            return default;
+        }
+
+        ActiveCopiedThrowBursts.Add(attack);
+        return new BurstScope(attack);
+    }
+
+    internal static void EndBurst(BurstScope scope)
+    {
+        if (!scope.Active)
+        {
+            return;
+        }
+
+        int lastIndex = ActiveCopiedThrowBursts.Count - 1;
+        if (lastIndex >= 0 && ActiveCopiedThrowBursts[lastIndex] == scope.Attack)
+        {
+            ActiveCopiedThrowBursts.RemoveAt(lastIndex);
+            return;
+        }
+
+        ActiveCopiedThrowBursts.Remove(scope.Attack!);
+    }
+
+    internal static void EndBurst(ref BurstScope scope)
+    {
+        EndBurst(scope);
+        scope = default;
+    }
+
+    internal static void TryApplyToProjectileSetup(Projectile projectile, ItemDrop.ItemData item)
+    {
+        if (projectile == null || ActiveCopiedThrowBursts.Count == 0)
+        {
+            return;
+        }
+
+        Attack attack = ActiveCopiedThrowBursts[ActiveCopiedThrowBursts.Count - 1];
+        if (attack == null)
+        {
+            return;
+        }
+
+        MarkRecoverableThrower(projectile);
+        ItemDrop.ItemData? visualWeapon = attack.m_weapon ?? item;
+        if (visualWeapon?.m_dropPrefab == null)
+        {
+            return;
+        }
+        MoveProjectileClearOfOwner(projectile, attack);
+
+        SecondaryAttackDefinition? activeDefinition =
+            ResolveCopiedThrowDefinition(attack, visualWeapon, visualWeapon.m_dropPrefab.name);
+        SpawnedProjectileVisualContext visualContext =
+            CreateSpawnedProjectileVisualContext(visualWeapon, attack.m_attackProjectile, activeDefinition, includeHitEffects: false, GetAttackAppearance(attack));
+        ApplyCurrentWeaponVisual(projectile, visualContext);
+        ApplyCurrentWeaponHitEffects(projectile, visualWeapon);
+        ApplyCopiedThrowAttribution(projectile, visualWeapon);
+
+        MeleeBoomerangProjectileSystem.TryApplyToProjectileSetup(projectile, attack, visualWeapon);
+        MeleeProjectileHitCascadeSystem.RegisterOnProjectileHitSource(projectile, attack, visualWeapon);
+    }
+
+    private static void MarkRecoverableThrower(Projectile projectile)
+    {
+        if (!projectile.m_respawnItemOnHit || projectile.m_spawnItem == null ||
+            ProjectileAccess.GetOwner(projectile) is not Player player) return;
+
+        long playerId = player.GetPlayerID();
+        if (playerId == 0L) return;
+        ZNetView? nview = projectile.GetComponent<ZNetView>();
+        if (nview == null || !nview.IsValid() || !nview.IsOwner()) return;
+
+        try
+        {
+            nview.GetZDO().Set(ThrowerPlayerIdKey, playerId);
+        }
+        catch (Exception exception)
+        {
+            RuleDiagnostics.Warning($"Could not tag thrown weapon: {exception.Message}");
+        }
+    }
+
+    internal static void PrepareProjectileIfNeeded(Projectile projectile)
+    {
+        if (projectile == null)
+        {
+            return;
+        }
+
+        ZNetView? nview = projectile.GetComponent<ZNetView>();
+        if (nview == null ||
+            !nview.IsValid() ||
+            nview.GetZDO() == null ||
+            !nview.GetZDO().GetBool(CopiedThrowProjectileMarkerKey))
+        {
+            return;
+        }
+
+        TryApplyHitEffectsFromSyncedVisual(projectile, nview);
+        bool replacingVisual = PrepareEquippedAppearance(projectile, nview);
+        if (projectile.m_changedVisual)
+        {
+            return;
+        }
+
+        if (!replacingVisual) PrepareProjectileForVisualSwap(projectile);
+    }
+
+    private static bool PrepareEquippedAppearance(Projectile projectile, ZNetView view)
+    {
+        if (!_equippedVisualLookupInstalled) return false;
+        try
+        {
+            long packed = view.GetZDO().GetLong(EquippedAppearanceKey);
+            AppearanceVisualState state = AppearanceVisualStates.GetValue(projectile, _ => new AppearanceVisualState());
+            ObjectDB? database = ObjectDB.instance;
+            if (state.Packed == packed && state.Database == database) return false;
+            state.Packed = packed;
+            state.Database = database;
+            state.Prefab = null;
+            if (packed == 0L || database == null || ProjectileAccess.AppearanceVariant(packed) < 0) return false;
+            GameObject? prefab = database.GetItemPrefab(ProjectileAccess.AppearancePrefabHash(packed));
+            if (prefab == null || prefab.GetComponent<ItemDrop>() == null || ResolveAttachGameObject(prefab) == null) return false;
+            state.Prefab = prefab;
+            state.VariantVisual = null;
+            if (!ProjectileAccess.HasChangedVisual(projectile)) return false;
+            ProjectileAccess.ResetVisual(projectile);
+            // Let vanilla replace its current mesh directly, rather than returning to the empty preparation root.
+            return true;
+        }
+        catch (Exception exception)
+        {
+            ReportAppearanceFailure(exception);
+            return false;
+        }
+    }
+
+    // Used only by the UpdateVisual transpiler. The source name remains in the ZDO for gameplay readers.
+    internal static GameObject ResolveEquippedVisualPrefab(ObjectDB database, string sourceName, Projectile projectile)
+    {
+        if (AppearanceVisualStates.TryGetValue(projectile, out AppearanceVisualState? state) && state.Prefab != null)
+        {
+            state.PreviousVisual = projectile.m_visual;
+            state.Applying = true;
+            return state.Prefab;
+        }
+        return database.GetItemPrefab(sourceName);
+    }
+
+    internal static Exception? RestoreAfterAppearanceFailure(Projectile projectile, Exception? exception)
+    {
+        if (exception == null || !AppearanceVisualStates.TryGetValue(projectile, out AppearanceVisualState? state) || !state.Applying)
+            return exception;
+        state.Applying = false;
+        state.Prefab = null;
+        ReportAppearanceFailure(exception);
+        try
+        {
+            if (state.PreviousVisual != null)
+            {
+                projectile.m_visual = state.PreviousVisual;
+                state.PreviousVisual.SetActive(true);
+            }
+            ProjectileAccess.ResetVisual(projectile);
+            ProjectileAccess.RefreshVisual(projectile);
+            return null;
+        }
+        catch (Exception fallbackException) { return fallbackException; }
+    }
+
+    private static void ApplyEquippedAppearanceVariant(Projectile projectile)
+    {
+        if (!AppearanceVisualStates.TryGetValue(projectile, out AppearanceVisualState? state)) return;
+        state.Applying = false;
+        if (state.Prefab == null || projectile.m_visual == null || state.VariantVisual == projectile.m_visual ||
+            !ProjectileAccess.HasChangedVisual(projectile)) return;
+        state.VariantVisual = projectile.m_visual;
+        try
+        {
+            ProjectileAccess.SetEquipmentVisualVariant(projectile.m_visual, ProjectileAccess.AppearanceVariant(state.Packed));
+        }
+        catch (Exception exception) { ReportAppearanceFailure(exception); }
+    }
+
+    internal static void EnsureProjectileVisualSpinIfNeeded(Projectile projectile)
+    {
+        if (!IsMarkedCopiedThrowProjectile(projectile))
+        {
+            return;
+        }
+
+        ApplyEquippedAppearanceVariant(projectile);
+        string? visualPrefabName = TryResolveSyncedVisualPrefabName(projectile);
+        ApplyCopiedThrowVisualSpin(
+            projectile,
+            TryResolveSyncedVisualItem(visualPrefabName)?.m_itemData,
+            visualPrefabName);
+    }
+
+    internal static void ApplyCurrentWeaponVisualForSpawnedProjectile(Projectile projectile, ItemDrop.ItemData weapon)
+    {
+        ApplyCurrentWeaponVisualForSpawnedProjectile(projectile, CreateSpawnedProjectileVisualContext(weapon));
+    }
+
+    internal static void ApplyCurrentWeaponVisualForSpawnedProjectile(Projectile projectile, SpawnedProjectileVisualContext context)
+    {
+        if (projectile == null || !context.Active)
+        {
+            return;
+        }
+
+        if (!context.SkipVisualSwap)
+        {
+            ApplyCurrentWeaponVisual(projectile, context);
+        }
+
+        ApplyHitEffects(projectile, context.HitEffectPrefabs);
+    }
+
+    internal static SpawnedProjectileVisualContext CreateSpawnedProjectileVisualContext(ItemDrop.ItemData weapon)
+    {
+        return CreateSpawnedProjectileVisualContext(weapon, sourceProjectilePrefab: null, definition: null, includeHitEffects: true);
+    }
+
+    internal static SpawnedProjectileVisualContext CreateSpawnedProjectileVisualContext(
+        ItemDrop.ItemData weapon,
+        GameObject? sourceProjectilePrefab,
+        long equippedAppearance = 0L)
+    {
+        return CreateSpawnedProjectileVisualContext(
+            weapon,
+            sourceProjectilePrefab,
+            definition: null,
+            includeHitEffects: true,
+            equippedAppearance);
+    }
+
+    private static SpawnedProjectileVisualContext CreateSpawnedProjectileVisualContext(
+        ItemDrop.ItemData weapon,
+        GameObject? sourceProjectilePrefab,
+        SecondaryAttackDefinition? definition,
+        bool includeHitEffects,
+        long equippedAppearance = 0L)
+    {
+        if (weapon?.m_dropPrefab == null)
+        {
+            return default;
+        }
+
+        if (!_equippedVisualLookupInstalled) equippedAppearance = 0L;
+
+        bool skipVisualSwap = equippedAppearance == 0L && UsesNativeProjectileVisual(weapon, sourceProjectilePrefab);
+        GameObject? attachPrefab = null;
+        if (!skipVisualSwap)
+        {
+            attachPrefab = ResolveAttachGameObject(weapon.m_dropPrefab);
+        }
+
+        definition ??= ResolveCopiedThrowDefinition(weapon, weapon.m_dropPrefab.name);
+        ThrowProjectileVisualSpin.AxisMode spinAxisMode =
+            ResolveConfiguredCopiedThrowSpinAxisMode(definition) ?? ThrowProjectileVisualSpin.AxisMode.None;
+        return new SpawnedProjectileVisualContext(
+            weapon,
+            weapon.m_dropPrefab.name,
+            attachPrefab,
+            includeHitEffects ? CopyHitEffectPrefabs(weapon.m_shared?.m_hitEffect) : null,
+            spinAxisMode,
+            ResolveConfiguredCopiedThrowVisualRotationOffset(definition),
+            skipVisualSwap,
+            equippedAppearance);
+    }
+
+    internal static bool UsesNativeProjectileVisual(ItemDrop.ItemData weapon, GameObject? sourceProjectilePrefab)
+    {
+        if (weapon?.m_dropPrefab == null || sourceProjectilePrefab == null)
+        {
+            return false;
+        }
+
+        return IsSameProjectilePrefab(sourceProjectilePrefab, weapon.m_shared?.m_secondaryAttack?.m_attackProjectile);
+    }
+
+    private static bool IsSameProjectilePrefab(GameObject sourceProjectilePrefab, GameObject? weaponProjectilePrefab)
+    {
+        return weaponProjectilePrefab != null &&
+               (ReferenceEquals(sourceProjectilePrefab, weaponProjectilePrefab) ||
+                string.Equals(
+                    sourceProjectilePrefab.name,
+                    weaponProjectilePrefab.name,
+                    StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static GameObject? ResolveAttachGameObject(GameObject itemPrefab)
+    {
+        Transform? attach = itemPrefab != null ? itemPrefab.transform.Find("attach") : null;
+        if (attach == null)
+        {
+            return null;
+        }
+
+        Transform? attachObject = attach.Find("attachobj");
+        return attachObject != null ? attachObject.gameObject : attach.gameObject;
+    }
+
+    private static bool ShouldApplyCopiedThrowVisuals(Attack attack)
+    {
+        if (attack?.m_weapon?.m_dropPrefab == null ||
+            attack.m_attackProjectile == null ||
+            attack.m_attackType != Attack.AttackType.Projectile)
+        {
+            return false;
+        }
+
+        if (SecondaryAttackStartAttackDispatch.IsProjectilePresetOriginalCooldownFallback(attack))
+        {
+            return false;
+        }
+
+        if (SecondaryAttackRuntimeContext.TryGetActiveAttack(attack, out ActiveSecondaryAttack? activeAttack) &&
+            activeAttack?.Definition.Behavior is CopiedSecondaryBehavior)
+        {
+            return true;
+        }
+
+        if (!IsConfiguredCopiedSecondaryAttack(attack))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool IsConfiguredCopiedSecondaryAttack(Attack attack)
+    {
+        if (!SecondaryAttackRuntimeFacade.TryGetDefinition(attack.m_weapon, out SecondaryAttackDefinition definition) ||
+            definition.Behavior is not CopiedSecondaryBehavior)
+        {
+            return false;
+        }
+
+        if (attack.m_character is Humanoid humanoid && humanoid.m_currentAttack == attack)
+        {
+            return humanoid.m_currentAttackIsSecondary;
+        }
+
+        return ReferenceEquals(attack, attack.m_weapon.m_shared.m_secondaryAttack);
+    }
+
+    private static void MoveProjectileClearOfOwner(Projectile projectile, Attack attack)
+    {
+        Character? owner = ProjectileAccess.GetOwner(projectile) ?? attack.m_character;
+        if (owner == null)
+        {
+            return;
+        }
+
+        Vector3 velocity = ProjectileAccess.GetVelocity(projectile);
+        Vector3 direction = velocity.sqrMagnitude > 0.001f ? velocity.normalized : projectile.transform.forward;
+        if (direction.sqrMagnitude < 0.001f)
+        {
+            return;
+        }
+
+        Vector3 ownerCenter = owner.GetCenterPoint();
+        float clearDistance = Mathf.Max(owner.GetRadius() + Mathf.Max(0.1f, projectile.m_rayRadius) + 0.35f, 1.25f);
+        Vector3 currentPosition = projectile.transform.position;
+        float distanceAlongDirection = Vector3.Dot(currentPosition - ownerCenter, direction);
+        if (distanceAlongDirection >= clearDistance)
+        {
+            return;
+        }
+
+        Vector3 adjustedPosition = currentPosition + direction * (clearDistance - distanceAlongDirection);
+        projectile.transform.position = adjustedPosition;
+    }
+
+    private static void ApplyCopiedThrowAttribution(Projectile projectile, ItemDrop.ItemData weapon)
+    {
+        if (!SecondaryAttackRuntimeFacade.TryGetDefinition(weapon, out SecondaryAttackDefinition definition) ||
+            definition.Behavior is not CopiedSecondaryBehavior)
+        {
+            return;
+        }
+
+        SecondaryAttackRuntimeFacade.SetProjectileAttackAttribution(
+            projectile,
+            definition.PrefabName,
+            secondaryAttack: true,
+            definition,
+            disableCurrentAttackFallback: false);
+        SecondaryAttackProjectileToolTierSystem.ApplyToHitData(
+            ProjectileAccess.GetOriginalHitData(projectile),
+            projectile,
+            weapon);
+    }
+
+    private static void ApplyCurrentWeaponVisual(Projectile projectile, SpawnedProjectileVisualContext context)
+    {
+        if (!context.Active || context.SkipVisualSwap)
+        {
+            return;
+        }
+
+        PrepareProjectileForVisualSwap(projectile);
+        MarkCopiedThrowProjectile(projectile, context);
+
+        ZNetView? nview = projectile.GetComponent<ZNetView>();
+        bool nviewValid = nview != null && nview.IsValid();
+        if (projectile.m_canChangeVisuals && projectile.m_visual != null && nviewValid)
+        {
+            if (nview!.IsOwner())
+            {
+                nview.GetZDO().Set(ZDOVars.s_visual, context.VisualPrefabName);
+            }
+
+            projectile.UpdateVisual();
+            ApplyCopiedThrowVisualSpin(projectile, context);
+            return;
+        }
+
+        ApplyLocalFallbackVisual(projectile, context);
+    }
+
+    private static void ApplyCurrentWeaponHitEffects(Projectile projectile, ItemDrop.ItemData weapon)
+    {
+        ApplyHitEffects(projectile, weapon.m_shared?.m_hitEffect);
+    }
+
+    private static void TryApplyHitEffectsFromSyncedVisual(Projectile projectile, ZNetView nview)
+    {
+        ItemDrop? itemDrop = TryResolveSyncedVisualItem(nview);
+        ApplyHitEffects(projectile, itemDrop?.m_itemData?.m_shared?.m_hitEffect);
+    }
+
+    private static void ApplyHitEffects(Projectile projectile, EffectList? hitEffect)
+    {
+        if (hitEffect == null || !hitEffect.HasEffects())
+        {
+            return;
+        }
+
+        ApplyHitEffects(projectile, CopyHitEffectPrefabs(hitEffect));
+    }
+
+    private static void ApplyHitEffects(Projectile projectile, EffectList.EffectData[]? hitEffectPrefabs)
+    {
+        if (hitEffectPrefabs == null || hitEffectPrefabs.Length == 0)
+        {
+            return;
+        }
+
+        projectile.m_hitEffects = new EffectList
+        {
+            m_effectPrefabs = hitEffectPrefabs
+        };
+    }
+
+    private static EffectList.EffectData[]? CopyHitEffectPrefabs(EffectList? hitEffect)
+    {
+        return hitEffect?.m_effectPrefabs != null && hitEffect.HasEffects()
+            ? (EffectList.EffectData[])hitEffect.m_effectPrefabs.Clone()
+            : null;
+    }
+
+    private static void MarkCopiedThrowProjectile(Projectile projectile, SpawnedProjectileVisualContext context)
+    {
+        ZNetView? nview = projectile.GetComponent<ZNetView>();
+        if (nview == null || !nview.IsValid() || !nview.IsOwner() || nview.GetZDO() == null)
+        {
+            return;
+        }
+
+        ZDO zdo = nview.GetZDO();
+        zdo.Set(CopiedThrowProjectileMarkerKey, true);
+        zdo.Set(CopiedThrowProjectileSpinAxisKey, ToProjectileSpinAxisString(context.SpinAxisMode));
+        zdo.Set(CopiedThrowProjectileRotationOffsetKey, SerializeVector3(context.VisualRotationOffset));
+        // One atomic value; s_visual remains the source weapon used by effects/definition lookup.
+        try { zdo.Set(EquippedAppearanceKey, context.EquippedAppearance); }
+        catch (Exception exception) { ReportAppearanceFailure(exception); }
+    }
+
+    private static bool IsMarkedCopiedThrowProjectile(Projectile projectile)
+    {
+        if (projectile == null)
+        {
+            return false;
+        }
+
+        ZNetView? nview = projectile.GetComponent<ZNetView>();
+        return nview != null &&
+               nview.IsValid() &&
+               nview.GetZDO() != null &&
+               nview.GetZDO().GetBool(CopiedThrowProjectileMarkerKey);
+    }
+
+    private static void PrepareProjectileForVisualSwap(Projectile projectile)
+    {
+        Transform? existingVisualRoot = projectile.transform.Find(CopiedThrowProjectileVisualRootName);
+        if (existingVisualRoot != null)
+        {
+            projectile.m_visual = existingVisualRoot.gameObject;
+            projectile.m_canChangeVisuals = true;
+            return;
+        }
+
+        HideSourcePresentation(projectile);
+
+        GameObject visualRoot = new(CopiedThrowProjectileVisualRootName);
+        visualRoot.transform.SetParent(projectile.transform, false);
+        visualRoot.layer = projectile.gameObject.layer;
+        projectile.m_visual = visualRoot;
+        projectile.m_canChangeVisuals = true;
+    }
+
+    private static void HideSourcePresentation(Projectile projectile)
+    {
+        RendererBuffer.Clear();
+        try
+        {
+            projectile.GetComponentsInChildren(includeInactive: true, RendererBuffer);
+            foreach (Renderer renderer in RendererBuffer)
+            {
+                if (renderer is TrailRenderer || renderer is ParticleSystemRenderer)
+                {
+                    continue;
+                }
+
+                renderer.enabled = false;
+            }
+        }
+        finally
+        {
+            RendererBuffer.Clear();
+        }
+    }
+
+    private static void ApplyLocalFallbackVisual(Projectile projectile, SpawnedProjectileVisualContext context)
+    {
+        if (!context.Active || context.AttachPrefab == null)
+        {
+            return;
+        }
+
+        GameObject attachPrefab = context.AttachPrefab;
+        int variant = context.Weapon!.m_variant;
+        try
+        {
+            if (context.EquippedAppearance != 0L && ObjectDB.instance != null)
+            {
+                GameObject? cosmeticPrefab = ObjectDB.instance.GetItemPrefab(ProjectileAccess.AppearancePrefabHash(context.EquippedAppearance));
+                GameObject? cosmeticAttach = cosmeticPrefab != null ? ResolveAttachGameObject(cosmeticPrefab) : null;
+                if (cosmeticAttach != null)
+                {
+                    attachPrefab = cosmeticAttach;
+                    variant = ProjectileAccess.AppearanceVariant(context.EquippedAppearance);
+                }
+            }
+        }
+        catch (Exception exception) { ReportAppearanceFailure(exception); }
+        GameObject? previousVisual = projectile.m_visual;
+        GameObject visual;
+        try { visual = Object.Instantiate(attachPrefab, projectile.transform, false); }
+        catch (Exception exception) when (attachPrefab != context.AttachPrefab)
+        {
+            ReportAppearanceFailure(exception);
+            visual = Object.Instantiate(context.AttachPrefab, projectile.transform, false);
+            variant = context.Weapon!.m_variant;
+        }
+        visual.name = $"{attachPrefab.name}(ProjectileVisual)";
+        visual.transform.localPosition = Vector3.zero;
+        visual.transform.localRotation = Quaternion.identity;
+        if (previousVisual != null && previousVisual != visual)
+        {
+            previousVisual.SetActive(false);
+        }
+
+        try { ProjectileAccess.SetEquipmentVisualVariant(visual, variant); }
+        catch (Exception exception) { ReportAppearanceFailure(exception); }
+        projectile.m_visual = visual;
+
+        ApplyCopiedThrowVisualSpin(projectile, context);
+    }
+
+    private static void ApplyCopiedThrowVisualSpin(
+        Projectile projectile,
+        ItemDrop.ItemData? weapon,
+        string? visualPrefabName = null)
+    {
+        if (projectile == null)
+        {
+            return;
+        }
+
+        SecondaryAttackDefinition? definition = ResolveCopiedThrowDefinition(weapon, visualPrefabName);
+        bool hasSyncedSpin = TryResolveSyncedProjectileSpin(
+            projectile,
+            out ThrowProjectileVisualSpin.AxisMode syncedAxisMode,
+            out Vector3 syncedRotationOffset);
+        ThrowProjectileVisualSpin.AxisMode? configuredAxisMode = hasSyncedSpin
+            ? syncedAxisMode
+            : ResolveConfiguredCopiedThrowSpinAxisMode(definition);
+        ThrowProjectileVisualSpin.AxisMode axisMode = configuredAxisMode ?? ThrowProjectileVisualSpin.AxisMode.None;
+        Vector3 rotationOffset = hasSyncedSpin
+            ? syncedRotationOffset
+            : ResolveConfiguredCopiedThrowVisualRotationOffset(definition);
+        Vector3 horizontalForward = axisMode == ThrowProjectileVisualSpin.AxisMode.HorizontalSide
+            ? ResolveOwnerHorizontalForward(projectile)
+            : Vector3.zero;
+        ApplyCopiedThrowSpinConfiguration(projectile, axisMode, rotationOffset, horizontalForward);
+    }
+
+    private static void ApplyCopiedThrowVisualSpin(Projectile projectile, SpawnedProjectileVisualContext context)
+    {
+        if (projectile == null || !context.Active)
+        {
+            return;
+        }
+
+        Vector3 horizontalForward = context.SpinAxisMode == ThrowProjectileVisualSpin.AxisMode.HorizontalSide
+            ? ResolveOwnerHorizontalForward(projectile)
+            : Vector3.zero;
+        ApplyCopiedThrowSpinConfiguration(projectile, context.SpinAxisMode, context.VisualRotationOffset, horizontalForward);
+    }
+
+    private static void ApplyCopiedThrowSpinConfiguration(
+        Projectile projectile,
+        ThrowProjectileVisualSpin.AxisMode axisMode,
+        Vector3 rotationOffset,
+        Vector3 horizontalForward)
+    {
+        GameObject? spinVisual = ResolveCopiedThrowSpinVisual(projectile.m_visual);
+        if (spinVisual == null)
+        {
+            return;
+        }
+
+        CopiedThrowSpinState state =
+            spinVisual.GetComponent<CopiedThrowSpinState>() ??
+            spinVisual.AddOwnedEdgeComponent<CopiedThrowSpinState>();
+        if (IsProjectileVisualSpinCleared(projectile) &&
+            state.IsCurrent(axisMode, rotationOffset, horizontalForward))
+        {
+            return;
+        }
+
+        ClearProjectileVisualSpin(projectile);
+        ThrowProjectileVisualRotationOffset.Ensure(spinVisual, rotationOffset);
+        ThrowProjectileVisualSpin.Ensure(spinVisual, axisMode, horizontalForward);
+        state.Configure(axisMode, rotationOffset, horizontalForward);
+    }
+
+    private static SecondaryAttackDefinition? ResolveCopiedThrowDefinition(
+        Attack? attack,
+        ItemDrop.ItemData? weapon,
+        string? visualPrefabName)
+    {
+        if (attack != null &&
+            SecondaryAttackRuntimeContext.TryGetActiveAttack(attack, out ActiveSecondaryAttack? activeAttack) &&
+            activeAttack?.Definition != null)
+        {
+            return activeAttack.Definition;
+        }
+
+        return ResolveCopiedThrowDefinition(weapon, visualPrefabName);
+    }
+
+    private static SecondaryAttackDefinition? ResolveCopiedThrowDefinition(
+        ItemDrop.ItemData? weapon,
+        string? visualPrefabName)
+    {
+        if (weapon != null &&
+            SecondaryAttackRuntimeFacade.TryGetDefinition(weapon, out SecondaryAttackDefinition weaponDefinition))
+        {
+            return weaponDefinition;
+        }
+
+        string visualPrefab = visualPrefabName?.Trim() ?? "";
+        if (visualPrefab.Length > 0 &&
+            SecondaryAttackRuntimeFacade.TryGetDefinition(visualPrefab, out SecondaryAttackDefinition visualDefinition))
+        {
+            return visualDefinition;
+        }
+
+        return null;
+    }
+
+    private static ThrowProjectileVisualSpin.AxisMode? ResolveConfiguredCopiedThrowSpinAxisMode(SecondaryAttackDefinition? definition)
+    {
+        if (definition == null)
+        {
+            return null;
+        }
+
+        if (definition.Boomerang != null &&
+            ProjectileSpinAxis.TryResolveAxisMode(definition.Boomerang.ProjectileSpinAxis, out ThrowProjectileVisualSpin.AxisMode boomerangAxisMode))
+        {
+            return boomerangAxisMode;
+        }
+
+        return definition.OnProjectileHit != null &&
+               ProjectileSpinAxis.TryResolveAxisMode(definition.OnProjectileHit.ProjectileSpinAxis, out ThrowProjectileVisualSpin.AxisMode onHitAxisMode)
+            ? onHitAxisMode
+            : null;
+    }
+
+    private static Vector3 ResolveConfiguredCopiedThrowVisualRotationOffset(SecondaryAttackDefinition? definition)
+    {
+        if (definition?.Boomerang != null)
+        {
+            return definition.Boomerang.ProjectileVisualRotationOffset;
+        }
+
+        return definition?.OnProjectileHit?.ProjectileVisualRotationOffset ?? Vector3.zero;
+    }
+
+    private static GameObject? ResolveCopiedThrowSpinVisual(GameObject? visual)
+    {
+        if (visual == null)
+        {
+            return null;
+        }
+
+        Transform visualTransform = visual.transform;
+        Transform? existingSpinRoot = visualTransform.Find(CopiedThrowProjectileSpinRootName);
+        if (existingSpinRoot != null)
+        {
+            return existingSpinRoot.gameObject;
+        }
+
+        GameObject spinRoot = new(CopiedThrowProjectileSpinRootName);
+        spinRoot.layer = visual.layer;
+        Transform spinTransform = spinRoot.transform;
+        spinTransform.SetParent(visualTransform, false);
+        spinTransform.localPosition = Vector3.zero;
+        spinTransform.localRotation = Quaternion.identity;
+        spinTransform.localScale = Vector3.one;
+
+        bool movedChild = false;
+        for (int childIndex = visualTransform.childCount - 1; childIndex >= 0; childIndex--)
+        {
+            Transform child = visualTransform.GetChild(childIndex);
+            if (child == spinTransform)
+            {
+                continue;
+            }
+
+            child.SetParent(spinTransform, false);
+            movedChild = true;
+        }
+
+        if (movedChild)
+        {
+            return spinRoot;
+        }
+
+        Object.Destroy(spinRoot);
+        return visual;
+    }
+
+    private static bool TryResolveSyncedProjectileSpin(
+        Projectile projectile,
+        out ThrowProjectileVisualSpin.AxisMode axisMode,
+        out Vector3 rotationOffset)
+    {
+        axisMode = default;
+        rotationOffset = Vector3.zero;
+        ZNetView? nview = projectile != null ? projectile.GetComponent<ZNetView>() : null;
+        if (nview == null ||
+            !nview.IsValid() ||
+            nview.GetZDO() == null ||
+            !nview.GetZDO().GetString(CopiedThrowProjectileSpinAxisKey, out string rawAxis) ||
+            !ProjectileSpinAxis.TryResolveAxisMode(rawAxis, out axisMode))
+        {
+            return false;
+        }
+
+        if (nview.GetZDO().GetString(CopiedThrowProjectileRotationOffsetKey, out string rawOffset) &&
+            TryParseVector3(rawOffset, out Vector3 parsedOffset))
+        {
+            rotationOffset = parsedOffset;
+        }
+
+        return true;
+    }
+
+    private static string ToProjectileSpinAxisString(ThrowProjectileVisualSpin.AxisMode axisMode)
+    {
+        return axisMode switch
+        {
+            ThrowProjectileVisualSpin.AxisMode.HorizontalSide => ProjectileSpinAxis.Horizontal,
+            ThrowProjectileVisualSpin.AxisMode.WorldUp => ProjectileSpinAxis.Vertical,
+            _ => ProjectileSpinAxis.None
+        };
+    }
+
+    private static string SerializeVector3(Vector3 value)
+    {
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0},{1},{2}",
+            value.x,
+            value.y,
+            value.z);
+    }
+
+    private static bool TryParseVector3(string raw, out Vector3 value)
+    {
+        value = Vector3.zero;
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return false;
+        }
+
+        string[] parts = raw.Split(',');
+        if (parts.Length != 3)
+        {
+            return false;
+        }
+
+        if (!float.TryParse(parts[0].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float x) ||
+            !float.TryParse(parts[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float y) ||
+            !float.TryParse(parts[2].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out float z))
+        {
+            return false;
+        }
+
+        value = new Vector3(x, y, z);
+        return true;
+    }
+
+    private static Vector3 ResolveOwnerHorizontalForward(Projectile projectile)
+    {
+        Character? owner = ProjectileAccess.GetOwner(projectile);
+        Vector3 forward = owner != null ? owner.transform.forward : projectile.transform.forward;
+        forward = Vector3.ProjectOnPlane(forward, Vector3.up);
+        return forward.sqrMagnitude > 0.001f ? forward.normalized : Vector3.zero;
+    }
+
+    private static void ClearProjectileVisualSpin(Projectile projectile)
+    {
+        projectile.m_rotateVisual = 0f;
+        projectile.m_rotateVisualY = 0f;
+        projectile.m_rotateVisualZ = 0f;
+    }
+
+    private static bool IsProjectileVisualSpinCleared(Projectile projectile)
+    {
+        return Mathf.Approximately(projectile.m_rotateVisual, 0f) &&
+               Mathf.Approximately(projectile.m_rotateVisualY, 0f) &&
+               Mathf.Approximately(projectile.m_rotateVisualZ, 0f);
+    }
+
+    private static string? TryResolveSyncedVisualPrefabName(Projectile projectile)
+    {
+        ZNetView? nview = projectile?.GetComponent<ZNetView>();
+        return nview == null ? null : TryResolveSyncedVisualPrefabName(nview);
+    }
+
+    private static string? TryResolveSyncedVisualPrefabName(ZNetView nview)
+    {
+        if (nview == null ||
+            !nview.IsValid() ||
+            nview.GetZDO() == null ||
+            !nview.GetZDO().GetString(ZDOVars.s_visual, out string visualPrefabName))
+        {
+            return null;
+        }
+
+        return visualPrefabName;
+    }
+
+    private static ItemDrop? TryResolveSyncedVisualItem(ZNetView nview)
+    {
+        return TryResolveSyncedVisualItem(TryResolveSyncedVisualPrefabName(nview));
+    }
+
+    private static ItemDrop? TryResolveSyncedVisualItem(string? visualPrefabName)
+    {
+        if (ObjectDB.instance == null || string.IsNullOrWhiteSpace(visualPrefabName))
+        {
+            return null;
+        }
+
+        return ObjectDB.instance.GetItemPrefab(visualPrefabName)?.GetComponent<ItemDrop>();
+    }
+
+    private sealed class CopiedThrowSpinState : MonoBehaviour
+    {
+        private ThrowProjectileVisualSpin.AxisMode _axisMode;
+        private Vector3 _rotationOffset;
+        private Vector3 _horizontalForward;
+        private bool _configured;
+
+        internal bool IsCurrent(
+            ThrowProjectileVisualSpin.AxisMode axisMode,
+            Vector3 rotationOffset,
+            Vector3 horizontalForward)
+        {
+            return _configured &&
+                   _axisMode == axisMode &&
+                   (_rotationOffset - rotationOffset).sqrMagnitude <= SpinStateEpsilonSqr &&
+                   (_horizontalForward - horizontalForward).sqrMagnitude <= SpinStateEpsilonSqr &&
+                   ThrowProjectileVisualSpin.IsConfigured(gameObject, axisMode, horizontalForward);
+        }
+
+        internal void Configure(
+            ThrowProjectileVisualSpin.AxisMode axisMode,
+            Vector3 rotationOffset,
+            Vector3 horizontalForward)
+        {
+            _axisMode = axisMode;
+            _rotationOffset = rotationOffset;
+            _horizontalForward = horizontalForward;
+            _configured = true;
+        }
+    }
+}

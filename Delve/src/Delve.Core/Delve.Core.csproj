@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Delve logic (settings table, clocks and regeneration engine, room counts, chest refill, spot memory, spawner respawn, step-aside and import plans, text keys). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Delve.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Delve</RootNamespace>
+  </PropertyGroup>
+</Project>

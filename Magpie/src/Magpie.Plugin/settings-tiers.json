@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "product": "Magpie",
+  "default": "Advanced",
+  "settings": {
+    "1 - General/Enabled": "Essential",
+    "1 - General/Merge Enabled": "Essential",
+    "1 - General/Float Enabled": "Essential",
+    "2 - Pickup/Auto Pickup At Start": "Essential",
+    "2 - Pickup/Pickup Range": "Essential",
+    "3 - Messages/Show Pickup Messages": "Essential",
+    "7 - Interface/Pickup Toggle Key": "Essential",
+    "2 - Pickup/Scan Interval": "FileOnly",
+    "2 - Pickup/Max Pickups Per Scan": "FileOnly",
+    "2 - Pickup/Ignore Items": "FileOnly",
+    "4 - Merge/Max Merges Per Scan": "FileOnly",
+    "4 - Merge/Merge Scan Interval": "FileOnly",
+    "4 - Merge/Merge Ignore Items": "FileOnly",
+    "5 - Float/Excluded Items": "FileOnly",
+    "7 - Interface/Locked Player Settings": "FileOnly",
+    "7 - Interface/Locked Player Values": "FileOnly"
+  }
+}

@@ -1,0 +1,692 @@
+// Edge - ExtraPotions Meadworks. SPDX-License-Identifier: GPL-3.0-only
+// Portions from SecondaryAttacks 1.2.17 (sighsorry1029), GPL-3.0, at 4375a2b17297052a773c5b143b0cae21dc655ed8.
+// Changed by expDARE, 2026: Edge ownership and lifecycle boundaries; native source algorithms retained.
+// Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes.
+using ExtraPotions.Edge.Integration;
+using ExtraPotions.Edge.Secondaries.Adopted;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using HarmonyLib;
+using UnityEngine;
+
+namespace ExtraPotions.Edge.Runtime.Secondaries.Native;
+
+internal sealed class SecondaryAttacksCharacterRpc : MonoBehaviour
+{
+    private static readonly HashSet<SecondaryAttacksCharacterRpc> Owned = new();
+    internal static void DisposeAll()
+    {
+        foreach (var rpc in Owned.ToArray()) if (rpc != null) { rpc.Release(); UnityEngine.Object.Destroy(rpc); }
+        Owned.Clear();
+    }
+    internal static void EnsureCharacters()
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        foreach (var character in Character.GetAllCharacters())
+            if (character != null && character.GetComponent<SecondaryAttacksCharacterRpc>() == null)
+                character.gameObject.AddOwnedEdgeComponent<SecondaryAttacksCharacterRpc>();
+    }
+    private bool _registered;
+    private void OnDestroy() { Release(); Owned.Remove(this); }
+    private void Release()
+    {
+        if (!_registered || _nview == null) return;
+        _registered = false;
+        foreach (string name in new[] { StaffRuntimeSystem.ApplySummonEmpowerRpcName, StaffRuntimeSystem.ConvertShieldToHealRpcName,
+            SneakAmbushSystem.RpcName, SneakAmbushSystem.OwnerSmokeRpcName, SweepObserverVisualSystem.RpcName,
+            RiftTrailSystem.ObserverFallbackVisualRpcName, CleavingThrustTrailVisualSystem.CleavingThrustVisualSessionRpcName,
+            BurstObserverPresentationSystem.RpcName, StaffRuntimeSystem.StaffTargetEffectRpcName }) _nview.Unregister(name);
+    }
+    private Character _character = null!;
+    private ZNetView? _nview;
+    private float _nextBurstPresentationAt;
+
+    private void Awake()
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        Owned.Add(this);
+        _character = GetComponent<Character>();
+        _nview = GetComponent<ZNetView>();
+        if (_nview == null || !_nview.IsValid())
+        {
+            return;
+        }
+
+        _registered = true;
+        _nview.Register<float, float, float>(StaffRuntimeSystem.ApplySummonEmpowerRpcName, RPC_ApplySummonEmpower);
+        _nview.Register<float, int>(StaffRuntimeSystem.ConvertShieldToHealRpcName, RPC_ConvertShieldToHeal);
+        _nview.Register<Vector3, float>(SneakAmbushSystem.RpcName, RPC_SpawnSneakAmbushVfx);
+        _nview.Register<ZDOID, float, float, float>(SneakAmbushSystem.OwnerSmokeRpcName, RPC_ApplySneakAmbushSmoke);
+        _nview.Register<int, string>(SweepObserverVisualSystem.RpcName, RPC_SweepVisual);
+        _nview.Register<Vector3, Vector3, string>(RiftTrailSystem.ObserverFallbackVisualRpcName, RPC_RiftTrailVisual);
+        _nview.Register<uint, float, double, double>(CleavingThrustTrailVisualSystem.CleavingThrustVisualSessionRpcName, RPC_CleavingThrustVisualSession);
+        _nview.Register<int, int, Vector3, Vector3>(BurstObserverPresentationSystem.RpcName, RPC_BurstPresentation);
+        _nview.Register(StaffRuntimeSystem.StaffTargetEffectRpcName, RPC_SpawnStaffTargetEffect);
+    }
+
+    private void RPC_ApplySummonEmpower(long sender, float expiry, float moveSpeedFactor, float attackSpeedFactor)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        if (_character == null || _nview == null || !_nview.IsValid() || !_nview.IsOwner())
+        {
+            return;
+        }
+
+        StaffRuntimeSystem.ApplySummonEmpowerState(_character, expiry, moveSpeedFactor, attackSpeedFactor);
+    }
+
+    private void RPC_ConvertShieldToHeal(long sender, float healFactor, int shieldStatusEffectHash)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        if (_character == null || _nview == null || !_nview.IsValid() || !_nview.IsOwner())
+        {
+            return;
+        }
+
+        StaffRuntimeSystem.ApplyShieldConvertToCharacter(_character, healFactor, shieldStatusEffectHash);
+    }
+
+    private void RPC_SpawnSneakAmbushVfx(long sender, Vector3 position, float yaw)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        SneakAmbushSystem.SpawnFromRpc(_character, position, yaw);
+    }
+
+    private void RPC_ApplySneakAmbushSmoke(long sender, ZDOID hiddenPlayerId, float range, float senseBlockDuration, float backstabResetSeconds)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        SneakAmbushSystem.ApplyOwnerSmokeFromRpc(_character, _nview, hiddenPlayerId, range, senseBlockDuration, backstabResetSeconds);
+    }
+
+    private void RPC_SweepVisual(long sender, int action, string payload)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        SweepObserverVisualSystem.HandleRpc(_character, _nview, action, payload);
+    }
+
+    private void RPC_RiftTrailVisual(long sender, Vector3 origin, Vector3 forward, string payload)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        RiftTrailSystem.HandleObserverFallbackVisualRpc(_character, _nview, origin, forward, payload);
+    }
+
+    private void RPC_CleavingThrustVisualSession(
+        long sender,
+        uint sequence,
+        float rangeScale,
+        double startedAt,
+        double expiresAt)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        CleavingThrustTrailVisualSystem.HandleCleavingThrustVisualSessionRpc(
+            _character,
+            _nview,
+            sender,
+            sequence,
+            rangeScale,
+            startedAt,
+            expiresAt);
+    }
+
+    private void RPC_SpawnStaffTargetEffect(long sender)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        StaffRuntimeSystem.CreateStaffTargetEffect(_character);
+    }
+
+    private void RPC_BurstPresentation(
+        long sender,
+        int weaponPrefabHash,
+        int animationTriggerHash,
+        Vector3 spawnPoint,
+        Vector3 aimDirection)
+    {
+        if (!EdgeModules.Active(EdgeModule.Secondaries)) return;
+        BurstObserverPresentationSystem.HandleRpc(
+            _character,
+            _nview,
+            sender,
+            weaponPrefabHash,
+            animationTriggerHash,
+            spawnPoint,
+            aimDirection,
+            ref _nextBurstPresentationAt);
+    }
+}
+
+[HarmonyPatch(typeof(Projectile), "UpdateVisual")]
+internal static class ProjectileUpdateVisualPatch
+{
+    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) =>
+        CopiedThrowProjectileVisualSystem.RewriteVisualPrefabLookup(instructions);
+
+    private static void Prefix(Projectile __instance)
+    {
+        CopiedThrowProjectileVisualSystem.PrepareProjectileIfNeeded(__instance);
+    }
+
+    private static void Postfix(Projectile __instance)
+    {
+        CopiedThrowProjectileVisualSystem.EnsureProjectileVisualSpinIfNeeded(__instance);
+    }
+
+    private static Exception? Finalizer(Projectile __instance, Exception? __exception) =>
+        CopiedThrowProjectileVisualSystem.RestoreAfterAppearanceFailure(__instance, __exception);
+}
+
+[HarmonyPatch(typeof(Attack), nameof(Attack.Start))]
+internal static class AttackStartEquippedThrowAppearancePatch
+{
+    private static void Prefix(Attack __instance, Humanoid character, ItemDrop.ItemData weapon)
+    {
+        CopiedThrowProjectileVisualSystem.CaptureAttackAppearance(__instance, character, weapon);
+    }
+}
+
+[HarmonyPatch(typeof(Projectile), nameof(Projectile.Setup))]
+internal static class ProjectileSetupCopiedThrowVisualPatch
+{
+    [HarmonyPriority(Priority.Last)]
+    private static void Postfix(Projectile __instance, ItemDrop.ItemData item)
+    {
+        SecondaryAttackRuntimeFacade.TryApplyProjectileSetupAttribution(__instance, item);
+        SecondaryAttackAdrenalineSystem.TryApplyAttackUseAdrenalineProjectileHitConversion(__instance, item);
+        CopiedThrowProjectileVisualSystem.TryApplyToProjectileSetup(__instance, item);
+        OverchargedBombSystem.ScaleCreatedVisuals(__instance.gameObject);
+    }
+}
+
+[HarmonyPatch(typeof(Aoe), nameof(Aoe.Setup))]
+internal static class AoeSetupOverchargedBombVisualPatch
+{
+    [HarmonyPriority(Priority.Last)]
+    private static void Postfix(Aoe __instance)
+    {
+        OverchargedBombSystem.ScaleCreatedVisuals(__instance.gameObject);
+    }
+}
+
+[HarmonyPatch(typeof(EffectList), nameof(EffectList.Create))]
+internal static class EffectListCreateOverchargedBombVisualPatch
+{
+    [HarmonyPriority(Priority.Last)]
+    private static void Postfix(GameObject[] __result)
+    {
+        OverchargedBombSystem.ScaleCreatedVisuals(__result);
+    }
+}
+
+[HarmonyPatch(typeof(Projectile), nameof(Projectile.OnHit))]
+internal static class ProjectileOnHitPatch
+{
+    [HarmonyPriority(Priority.Last)]
+    private static bool Prefix(Projectile __instance, Collider collider, Vector3 hitPoint, bool water, Vector3 normal, out SecondaryAttackHarmonyDispatch.ProjectileOnHitState __state)
+    {
+        return SecondaryAttackHarmonyDispatch.ProjectileOnHitPrefix(__instance, collider, hitPoint, water, normal, out __state);
+    }
+
+    [HarmonyPriority(Priority.First)]
+    private static void Postfix(Projectile __instance, Collider collider, Vector3 hitPoint, bool water, Vector3 normal, ref SecondaryAttackHarmonyDispatch.ProjectileOnHitState __state) =>
+        SecondaryAttackHarmonyDispatch.ProjectileOnHitPostfix(__instance, collider, hitPoint, water, normal, ref __state);
+
+    private static void Finalizer(ref SecondaryAttackHarmonyDispatch.ProjectileOnHitState __state) =>
+        SecondaryAttackHarmonyDispatch.ProjectileOnHitFinalizer(ref __state);
+}
+
+[HarmonyPatch(typeof(Projectile), nameof(Projectile.OnHit))]
+internal static class ProjectileOnHitOverchargedBombPatch
+{
+    [HarmonyPriority(Priority.First)]
+    private static void Prefix(Projectile __instance, out OverchargedBombSystem.ProjectileHitScaleState __state)
+    {
+        __state = OverchargedBombSystem.BeginProjectileHit(__instance);
+    }
+
+    [HarmonyPriority(Priority.Last)]
+    private static void Postfix(ref OverchargedBombSystem.ProjectileHitScaleState __state)
+    {
+        OverchargedBombSystem.EndProjectileHit(ref __state);
+    }
+
+    [HarmonyPriority(Priority.Last)]
+    private static void Finalizer(ref OverchargedBombSystem.ProjectileHitScaleState __state)
+    {
+        OverchargedBombSystem.EndProjectileHit(ref __state);
+    }
+}
+
+[HarmonyPatch(typeof(Character), "Awake")]
+internal static class CharacterAwakeSecondaryAttacksPatch
+{
+    private static void Postfix(Character __instance)
+    {
+        if (__instance.GetComponent<ZNetView>() == null)
+        {
+            return;
+        }
+
+        if (EdgeModules.Active(EdgeModule.Secondaries) && __instance.GetComponent<SecondaryAttacksCharacterRpc>() == null)
+        {
+            __instance.gameObject.AddOwnedEdgeComponent<SecondaryAttacksCharacterRpc>();
+        }
+    }
+}
+
+[HarmonyPatch(typeof(Player), nameof(Player.AlwaysRotateCamera))]
+internal static class PlayerAlwaysRotateCameraBurstAimPatch
+{
+    [HarmonyPriority(Priority.Last)]
+    private static void Postfix(Player __instance, ref bool __result)
+    {
+        if (!__result && ProjectileRuntimeSystem.ShouldTrackBurstAim(__instance))
+        {
+            __result = true;
+        }
+    }
+}
+
+[HarmonyPatch(typeof(EnemyHud), "LateUpdate")]
+internal static class EnemyHudLateUpdatePatch
+{
+    private static void Postfix(EnemyHud __instance)
+    {
+        SummonQualityHudSystem.Update(__instance);
+        OverheadStatusUiManager.Update(__instance);
+    }
+}
+
+[HarmonyPatch(typeof(Player), "Update")]
+internal static class PlayerUpdatePendingConfigPatch
+{
+    private static void Postfix(Player __instance, bool ___m_attackHold, bool ___m_secondaryAttackHold, ref bool ___m_blocking)
+    {
+        SecondaryAttackHarmonyDispatch.PlayerUpdatePostfix(__instance, ___m_attackHold, ___m_secondaryAttackHold, ref ___m_blocking);
+    }
+}
+
+[HarmonyPatch(typeof(Skills), nameof(Skills.RaiseSkill))]
+internal static class SkillsRaiseSkillBloodMagicPatch
+{
+    private static bool Prefix(Skills.SkillType skillType, ref float factor)
+    {
+        HarvestSweepSystem.ApplySkillRaiseFactor(skillType, ref factor);
+        return true;
+    }
+}
+
+[HarmonyPatch(typeof(Humanoid), nameof(Humanoid.GetTimeSinceLastAttack))]
+internal static class HumanoidGetTimeSinceLastAttackPatch
+{
+    private static void Postfix(Humanoid __instance, ref float __result)
+    {
+        if (!StaffRuntimeSystem.TryGetSummonEmpowerAttackSpeedFactor(__instance, out float attackSpeedFactor))
+        {
+            return;
+        }
+
+        __result *= attackSpeedFactor;
+    }
+}
+
+[HarmonyPatch(typeof(CharacterAnimEvent), nameof(CharacterAnimEvent.CustomFixedUpdate))]
+internal static class CharacterAnimEventCustomFixedUpdateSummonEmpowerAttackSpeedPatch
+{
+    [HarmonyPriority(Priority.Last)]
+    private static void Postfix(CharacterAnimEvent __instance)
+    {
+        if (__instance?.m_character == null ||
+            __instance.m_animator == null ||
+            !__instance.m_character.InAttack() ||
+            __instance.m_animator.speed <= 0.001f ||
+            !StaffRuntimeSystem.TryGetSummonEmpowerAttackSpeedFactor(__instance.m_character, out float attackSpeedFactor))
+        {
+            return;
+        }
+
+        __instance.m_animator.speed = Mathf.Max(__instance.m_animator.speed, attackSpeedFactor);
+    }
+}
+
+[HarmonyPatch(typeof(Attack), nameof(Attack.Start))]
+internal static class AttackStartCooldownAdjustmentPatch
+{
+    private static void Prefix(Attack __instance, out AttackStartState __state)
+    {
+        __state = __instance != null
+            ? new AttackStartState(__instance.m_attackUseAdrenaline)
+            : default;
+        if (__instance != null &&
+            (SecondaryAttackAdrenalineSystem.ShouldSuppressAttackUseAdrenaline(__instance) ||
+             SecondaryAttackAdrenalineSystem.TryBeginAttackUseAdrenalineProjectileHitConversion(__instance)))
+        {
+            __instance.m_attackUseAdrenaline = 0f;
+        }
+    }
+
+    private static void Postfix(Attack __instance, bool __result, ref AttackStartState __state)
+    {
+        if (__instance == null)
+        {
+            return;
+        }
+
+        RestoreAttackUseAdrenaline(__instance, ref __state);
+
+        if (!__result || __instance.m_character == null || __instance.m_weapon == null)
+        {
+            return;
+        }
+
+        if (!StaffRuntimeSystem.TryGetSummonEmpowerAttackSpeedFactor(__instance.m_character, out float attackSpeedFactor))
+        {
+            return;
+        }
+
+        float intervalReduction = 1f - 1f / attackSpeedFactor;
+        __instance.m_weapon.m_lastAttackTime -= __instance.m_weapon.m_shared.m_aiAttackInterval * intervalReduction;
+    }
+
+    private static void Finalizer(Attack __instance, ref AttackStartState __state)
+    {
+        if (__instance != null)
+        {
+            RestoreAttackUseAdrenaline(__instance, ref __state);
+        }
+    }
+
+    private static void RestoreAttackUseAdrenaline(Attack attack, ref AttackStartState state)
+    {
+        if (!state.Pending)
+        {
+            return;
+        }
+
+        attack.m_attackUseAdrenaline = state.OriginalAttackUseAdrenaline;
+        state = default;
+    }
+
+    private readonly struct AttackStartState
+    {
+        internal AttackStartState(float originalAttackUseAdrenaline)
+        {
+            OriginalAttackUseAdrenaline = originalAttackUseAdrenaline;
+            Pending = true;
+        }
+
+        internal float OriginalAttackUseAdrenaline { get; }
+
+        internal bool Pending { get; }
+    }
+}
+
+[HarmonyPatch(typeof(Attack), "GetAttackEitr", new Type[0])]
+internal static class AttackGetEitrConfiguredCostPatch
+{
+    private static bool Prefix(
+        Attack __instance,
+        Humanoid ___m_character,
+        ItemDrop.ItemData ___m_weapon,
+        ref float __result)
+    {
+        // 1.0.7 delegates to the primary weapon attack even for a secondary clone.
+        // Preserve the configured instance cost without changing the public tooltip overload.
+        if (___m_character == null || ___m_weapon?.m_shared?.m_attack == null ||
+            __instance.m_attackEitr == ___m_weapon.m_shared.m_attack.m_attackEitr ||
+            !SecondaryAttackRuntimeFacade.TryGetDefinition(___m_weapon, out _))
+        {
+            return true;
+        }
+
+        float cost = __instance.m_attackEitr;
+        __result = cost <= 0f
+            ? 0f
+            : cost - cost * 0.33f * ___m_character.GetSkillFactor(___m_weapon.m_shared.m_skillType);
+        return false;
+    }
+}
+
+[HarmonyPatch(typeof(Player), nameof(Player.AddAdrenaline))]
+internal static class PlayerAddAdrenalineSecondaryAttackPatch
+{
+    private static bool Prefix(Player __instance, ref float v)
+    {
+        return SecondaryAttackAdrenalineSystem.TryModify(__instance, ref v);
+    }
+}
+
+[HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.Awake))]
+internal static class ObjectDbAwakePatch
+{
+    private static void Postfix(ObjectDB __instance)
+    {
+        EdgeNativeDefinitions.Tick(force: true);
+    }
+}
+
+[HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.CopyOtherDB))]
+internal static class ObjectDbCopyOtherDbPatch
+{
+    private static void Postfix(ObjectDB __instance)
+    {
+        EdgeNativeDefinitions.Tick(force: true);
+    }
+}
+
+[HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
+[HarmonyAfter("blacks7ar.MagicPlugin")]
+internal static class ZNetSceneAwakeSummonPrefabOverridePatch
+{
+    private static void Postfix(ZNetScene __instance)
+    {
+        EdgeNativeDefinitions.Tick(force: true);
+    }
+}
+
+[HarmonyPatch(typeof(Player), nameof(Player.UpdateAttackBowDraw))]
+internal static class PlayerUpdateAttackBowDrawPatch
+{
+    private static bool Prefix(
+        Player __instance,
+        ItemDrop.ItemData weapon,
+        float dt,
+        ref float ___m_attackDrawTime,
+        ref bool ___m_blocking,
+        ref bool ___m_attackHold,
+        ref bool ___m_secondaryAttackHold,
+        ref bool ___m_secondaryAttack,
+        ZSyncAnimation ___m_zanim,
+        SEMan ___m_seman)
+    {
+        if (weapon == null || !SecondaryAttackRuntimeFacade.ShouldHandleBowDraw(weapon))
+        {
+            return true;
+        }
+
+        SecondaryAttackManager.UpdateCustomBowDraw(
+            __instance,
+            weapon,
+            dt,
+            ref ___m_attackDrawTime,
+            ___m_blocking,
+            ___m_attackHold,
+            ___m_secondaryAttackHold,
+            ___m_secondaryAttack,
+            ___m_zanim,
+            ___m_seman);
+        return false;
+    }
+}
+
+[HarmonyPatch(typeof(Player), nameof(Player.UpdateWeaponLoading))]
+internal static class PlayerUpdateWeaponLoadingReloadStatePatch
+{
+    private static void Prefix(Player __instance, ItemDrop.ItemData weapon)
+    {
+        SecondaryAttackManager.TryRestorePersistedReloadedWeaponState(__instance, weapon);
+    }
+}
+
+[HarmonyPatch(typeof(Player), nameof(Player.SetWeaponLoaded))]
+internal static class PlayerSetWeaponLoadedReloadStatePatch
+{
+    private static void Prefix(Player __instance, out ItemDrop.ItemData? __state)
+    {
+        __state = __instance.m_weaponLoaded;
+    }
+
+    private static void Postfix(Player __instance, ItemDrop.ItemData weapon, ItemDrop.ItemData? __state)
+    {
+        SecondaryAttackManager.OnWeaponLoadedStateChanged(__instance, __state, weapon);
+    }
+}
+
+[HarmonyPatch(typeof(Humanoid), nameof(Humanoid.StartAttack))]
+internal static class HumanoidStartAttackPatch
+{
+    private static bool Prefix(
+        Humanoid __instance,
+        bool secondaryAttack,
+        ref bool __result,
+        out SecondaryAttackStartAttackDispatch.StartAttackState __state)
+    {
+        return SecondaryAttackStartAttackDispatch.Prefix(
+            __instance,
+            secondaryAttack,
+            ref __result,
+            out __state);
+    }
+
+    private static void Postfix(
+        Humanoid __instance,
+        bool secondaryAttack,
+        bool __result,
+        SecondaryAttackStartAttackDispatch.StartAttackState __state) =>
+        SecondaryAttackStartAttackDispatch.Postfix(__instance, secondaryAttack, __result, __state);
+
+    private static Exception? Finalizer(
+        Exception? __exception,
+        Humanoid __instance,
+        bool secondaryAttack,
+        SecondaryAttackStartAttackDispatch.StartAttackState __state)
+    {
+        if (__exception != null)
+        {
+            try
+            {
+                SecondaryAttackStartAttackDispatch.Cleanup(__instance, secondaryAttack, __state);
+            }
+            catch (Exception cleanupException)
+            {
+                RuleDiagnostics.Error(
+                    $"Failed to clean up an interrupted StartAttack: {cleanupException.Message}");
+            }
+        }
+
+        return __exception;
+    }
+}
+
+[HarmonyPatch(typeof(Attack), nameof(Attack.OnAttackTrigger))]
+internal static class AttackOnAttackTriggerPatch
+{
+    [HarmonyPriority(Priority.First)]
+    private static bool Prefix(
+        Attack __instance,
+        out SecondaryAttackManager.ReloadStateConsumptionScope __state)
+    {
+        __state = SecondaryAttackManager.BeginReloadStateConsumption(__instance);
+        return !SecondaryAttackRuntimeFacade.TryHandleCustomAttackTrigger(__instance);
+    }
+
+    private static void Postfix(
+        Attack __instance,
+        ref SecondaryAttackManager.ReloadStateConsumptionScope __state)
+    {
+        SecondaryAttackManager.EndReloadStateConsumption(ref __state);
+        SecondaryAttackRuntimeFacade.TryTriggerRiftTrailAfterAttack(__instance);
+        SecondaryAttackRuntimeFacade.TryTriggerFractureLineAfterAttack(__instance);
+    }
+
+    private static void Finalizer(ref SecondaryAttackManager.ReloadStateConsumptionScope __state)
+    {
+        SecondaryAttackManager.EndReloadStateConsumption(ref __state);
+    }
+}
+
+[HarmonyPatch(typeof(Attack), nameof(Attack.DoMeleeAttack))]
+internal static class AttackDoMeleeAttackSecondaryDurabilityFactorPatch
+{
+    private static void Prefix(Attack __instance, out SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        __state = SecondaryAttackManager.BeginSecondaryAttackDurabilityAdjustment(__instance);
+    }
+
+    private static void Postfix(ref SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        SecondaryAttackManager.EndSecondaryAttackDurabilityAdjustment(ref __state);
+    }
+
+    private static void Finalizer(ref SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        SecondaryAttackManager.EndSecondaryAttackDurabilityAdjustment(ref __state);
+    }
+}
+
+[HarmonyPatch(typeof(Attack), nameof(Attack.DoAreaAttack))]
+internal static class AttackDoAreaAttackSecondaryDurabilityFactorPatch
+{
+    private static void Prefix(Attack __instance, out SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        __state = SecondaryAttackManager.BeginSecondaryAttackDurabilityAdjustment(__instance);
+    }
+
+    private static void Postfix(ref SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        SecondaryAttackManager.EndSecondaryAttackDurabilityAdjustment(ref __state);
+    }
+
+    private static void Finalizer(ref SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        SecondaryAttackManager.EndSecondaryAttackDurabilityAdjustment(ref __state);
+    }
+}
+
+[HarmonyPatch(typeof(Attack), "ProjectileAttackTriggered")]
+internal static class AttackProjectileAttackTriggeredSecondaryDurabilityFactorPatch
+{
+    private static void Prefix(Attack __instance, out SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        __state = SecondaryAttackManager.BeginSecondaryAttackDurabilityAdjustment(__instance);
+    }
+
+    private static void Postfix(ref SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        SecondaryAttackManager.EndSecondaryAttackDurabilityAdjustment(ref __state);
+    }
+
+    private static void Finalizer(ref SecondaryAttackManager.SecondaryAttackDurabilityAdjustmentState __state)
+    {
+        SecondaryAttackManager.EndSecondaryAttackDurabilityAdjustment(ref __state);
+    }
+}
+
+[HarmonyPatch(typeof(Attack), nameof(Attack.FireProjectileBurst))]
+internal static class AttackFireProjectileBurstPatch
+{
+    [HarmonyAfter("blacks7ar.MagicPlugin")]
+    private static bool Prefix(Attack __instance, out CopiedThrowProjectileVisualSystem.BurstScope __state)
+    {
+        return SecondaryAttackHarmonyDispatch.AttackFireProjectileBurstPrefix(__instance, out __state);
+    }
+
+    private static void Postfix(ref CopiedThrowProjectileVisualSystem.BurstScope __state)
+    {
+        SecondaryAttackHarmonyDispatch.AttackFireProjectileBurstPostfix(ref __state);
+    }
+
+    private static void Finalizer(ref CopiedThrowProjectileVisualSystem.BurstScope __state)
+    {
+        SecondaryAttackHarmonyDispatch.AttackFireProjectileBurstPostfix(ref __state);
+    }
+}

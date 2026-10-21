@@ -1,0 +1,229 @@
+// Edge - ExtraPotions Meadworks. SPDX-License-Identifier: GPL-3.0-only
+// Portions from SecondaryAttacks 1.2.17 (sighsorry1029), GPL-3.0, at 4375a2b17297052a773c5b143b0cae21dc655ed8:
+// SneakAmbushChargeSystem.cs. Source notices retained in THIRD_PARTY_NOTICES.
+// Changed by expDARE, 2026: Edge namespace, diagnostic and native boundary seams; source algorithms retained.
+// Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes.
+using System.Runtime.CompilerServices;
+using UnityEngine;
+
+namespace ExtraPotions.Edge.Runtime.Secondaries.Native;
+using ExtraPotions.Edge.Secondaries.Adopted;
+using ExtraPotions.Edge.Runtime.Quickstep;
+
+internal static class SneakAmbushChargeSystem
+{
+    private const string FallbackIconPrefabName = "KnifeWood";
+    private const float ChargeDecayPerSecond = 1f;
+
+    private static readonly ConditionalWeakTable<Player, SneakAmbushChargeState> States = new();
+
+    internal static float ReadChargeRate(float level, float factor) => Mathf.Lerp(1f, Mathf.Max(0f, factor), Mathf.Clamp(level, 0f, 100f) / 100f);
+
+    internal static void ResetForEdge() { States.Clear(); }
+
+    internal static void Update(Player player)
+    {
+        if (player == null || player != Player.m_localPlayer)
+        {
+            return;
+        }
+
+        SneakAmbushChargeState state = States.GetValue(player, _ => new SneakAmbushChargeState());
+        bool secondaryAttackActive = IsSecondaryAttackActive(player);
+        if (!secondaryAttackActive)
+        {
+            state.ClearPendingAttack();
+        }
+
+        if (!TryResolveCurrentSneakAmbush(player, out ItemDrop.ItemData? weapon, out SneakAmbushDefinition? sneakAmbush))
+        {
+            state.Clear();
+            return;
+        }
+
+        if (secondaryAttackActive ||
+            MeleePresetCooldownSystem.IsCooldownActive(
+                player,
+                "sneakAmbush",
+                sneakAmbush!.PresetCooldown,
+                out _))
+        {
+            state.ChargeSeconds = 0f;
+            state.ClearDisplay();
+            return;
+        }
+
+        float maxSeconds = Mathf.Max(0f, sneakAmbush!.ChargeMaxSeconds);
+        if (maxSeconds <= 0f)
+        {
+            state.Clear();
+            return;
+        }
+
+        float dt = Mathf.Max(0f, Time.deltaTime);
+        bool isSneaking = player.IsCrouching() && !QuickstepSystem.IsActive(player);
+        if (dt > 0f)
+        {
+            if (isSneaking)
+            {
+                float sneakLevel = Mathf.Clamp(player.GetSkillLevel(Skills.SkillType.Sneak), 0f, 100f);
+                float chargeRate = ReadChargeRate(sneakLevel, sneakAmbush.ChargeSkillFactor);
+                state.ChargeSeconds += dt * chargeRate;
+            }
+            else
+            {
+                state.ChargeSeconds -= dt * ChargeDecayPerSecond;
+            }
+        }
+
+        state.ChargeSeconds = Mathf.Clamp(state.ChargeSeconds, 0f, maxSeconds);
+        state.MaxSeconds = maxSeconds;
+        state.Display = isSneaking || state.ChargeSeconds > 0f;
+    }
+
+    internal static void BeginSecondaryAttack(Player player, ItemDrop.ItemData? weapon)
+    {
+        if (player == null || weapon == null)
+        {
+            return;
+        }
+
+        SecondaryAttackManager.EnsureRuntimeWeaponDefinitionApplied(weapon);
+        if (!SecondaryAttackRuntimeFacade.TryGetDefinition(weapon, out SecondaryAttackDefinition definition) ||
+            definition.SneakAmbush == null)
+        {
+            return;
+        }
+
+        SneakAmbushDefinition sneakAmbush = definition.SneakAmbush;
+        SneakAmbushChargeState state = States.GetValue(player, _ => new SneakAmbushChargeState());
+        float maxSeconds = Mathf.Max(0f, sneakAmbush.ChargeMaxSeconds);
+        state.PendingAttackChargeSeconds = Mathf.Clamp(state.ChargeSeconds, 0f, maxSeconds);
+        state.HasPendingAttackCharge = true;
+        state.ChargeSeconds = 0f;
+        state.ClearDisplay();
+    }
+
+    internal static float GetPreparedSeconds(Player player, SneakAmbushDefinition sneakAmbush)
+    {
+        if (player == null || sneakAmbush == null || !States.TryGetValue(player, out SneakAmbushChargeState state))
+        {
+            return 0f;
+        }
+
+        if (state.HasPendingAttackCharge)
+        {
+            return Mathf.Clamp(state.PendingAttackChargeSeconds, 0f, Mathf.Max(0f, sneakAmbush.ChargeMaxSeconds));
+        }
+
+        return Mathf.Clamp(state.ChargeSeconds, 0f, Mathf.Max(0f, sneakAmbush.ChargeMaxSeconds));
+    }
+
+    internal static void Consume(Player player)
+    {
+        if (player == null || !States.TryGetValue(player, out SneakAmbushChargeState state))
+        {
+            return;
+        }
+
+        state.ChargeSeconds = 0f;
+        state.ClearPendingAttack();
+        state.ClearDisplay();
+    }
+
+    internal static void CollectHudEntries(Player player, System.Collections.Generic.List<NativeCooldownEntry> entries)
+    {
+        if (player == null ||
+            entries == null ||
+            !States.TryGetValue(player, out SneakAmbushChargeState state) ||
+            !state.Display ||
+            state.MaxSeconds <= 0f)
+        {
+            return;
+        }
+
+        TryResolveCurrentSneakAmbush(player, out ItemDrop.ItemData? weapon, out _);
+        float chargeSeconds = Mathf.Clamp(state.ChargeSeconds, 0f, state.MaxSeconds);
+        entries.Add(new NativeCooldownEntry(
+            ResolveWeaponIcon(weapon) ?? ResolveFallbackIcon(),
+            chargeSeconds,
+            state.MaxSeconds,
+            "",
+            NativeCooldownFillMode.Charge, "sneakAmbush"));
+    }
+
+    private static bool TryResolveCurrentSneakAmbush(Player player, out ItemDrop.ItemData? weapon, out SneakAmbushDefinition? sneakAmbush)
+    {
+        weapon = null;
+        sneakAmbush = null;
+        weapon = ((Humanoid)player).GetCurrentWeapon();
+        if (weapon == null)
+        {
+            return false;
+        }
+
+        SecondaryAttackManager.EnsureRuntimeWeaponDefinitionApplied(weapon);
+        if (!SecondaryAttackRuntimeFacade.TryGetDefinition(weapon, out SecondaryAttackDefinition definition) ||
+            definition.SneakAmbush == null)
+        {
+            return false;
+        }
+
+        sneakAmbush = definition.SneakAmbush;
+        return true;
+    }
+
+    private static bool IsSecondaryAttackActive(Player player)
+    {
+        Humanoid humanoid = player;
+        return player.InAttack() && humanoid.m_currentAttack != null && humanoid.m_currentAttackIsSecondary;
+    }
+
+    private static Sprite? ResolveIcon(ObjectDB objectDb, string itemPrefabName)
+    {
+        ItemDrop? itemDrop = objectDb.GetItemPrefab(itemPrefabName)?.GetComponent<ItemDrop>();
+        return itemDrop?.m_itemData?.m_shared?.m_icons is { Length: > 0 } icons ? icons[0] : null;
+    }
+
+    private static Sprite? ResolveWeaponIcon(ItemDrop.ItemData? weapon)
+    {
+        return weapon?.m_shared?.m_icons is { Length: > 0 } icons ? icons[0] : null;
+    }
+
+    private static Sprite? ResolveFallbackIcon()
+    {
+        return ObjectDB.instance != null ? ResolveIcon(ObjectDB.instance, FallbackIconPrefabName) : null;
+    }
+
+    private sealed class SneakAmbushChargeState
+    {
+        public float ChargeSeconds { get; set; }
+
+        public float PendingAttackChargeSeconds { get; set; }
+
+        public bool HasPendingAttackCharge { get; set; }
+
+        public float MaxSeconds { get; set; }
+
+        public bool Display { get; set; }
+
+        public void ClearDisplay()
+        {
+            MaxSeconds = 0f;
+            Display = false;
+        }
+
+        public void ClearPendingAttack()
+        {
+            PendingAttackChargeSeconds = 0f;
+            HasPendingAttackCharge = false;
+        }
+
+        public void Clear()
+        {
+            ChargeSeconds = 0f;
+            ClearPendingAttack();
+            ClearDisplay();
+        }
+    }
+}

@@ -1,0 +1,133 @@
+{
+  "sourceSha256": "E07059F693F52E299C29C12661D175E57C0D2892AF738B1544D8F8A545D3249A",
+  "files": [
+    {
+      "file": "mw_larder_items.windows",
+      "sha256": "CCF9347BDF81982B27AB34E77104717454F71F16821AF65C9C6D0BE58FCE54B3"
+    },
+    {
+      "file": "mw_larder_items.linux",
+      "sha256": "228DEA3C939415CE778205D4718870010B3B7B6D1804A3637D7C6747A76C8241"
+    },
+    {
+      "file": "icons/larder_cooking_icon.png",
+      "sha256": "E7A1F723AA5CB746AFABE277FB7F36998DA9D2779F2AA565A728457338EDC319"
+    },
+    {
+      "file": "icons/larder_food_icon.png",
+      "sha256": "E8F31FD321F2D1EB3E1B4C4C4B5E2FCC8B7281A5A24B6B1853AB0D20C614CA11"
+    },
+    {
+      "file": "icons/larder_mead_icon.png",
+      "sha256": "5F135DC8CC40089297D21DC2E4512A5BED5870482735CE055CB57BDDB3A8F620"
+    },
+    {
+      "file": "icons/larder_fermentation_icon.png",
+      "sha256": "DDB3B125B686CACF02A15567B6EEA3AA565A1E98951E484CBFBD13717BFF8692"
+    },
+    {
+      "file": "icons/larder_cook_time_icon.png",
+      "sha256": "4612D32421455B0D7001B76D089BC374477EDC1AFE9BECC9D6EE7F5949B204C9"
+    },
+    {
+      "file": "icons/larder_burn_warning_icon.png",
+      "sha256": "CA9D5EB61E136581DE49108A836F982A85254D4EF9001BFA1C169421C8068F4A"
+    },
+    {
+      "file": "icons/larder_health_recovery_icon.png",
+      "sha256": "B5BF0669070713A0EBFA12EF437BC9FC9C90F5D53ED1C87FDF33643569D9B494"
+    },
+    {
+      "file": "icons/larder_stamina_recovery_icon.png",
+      "sha256": "9937976267309E5DB44805EAAAE723B44449FAA28875A374EF33F02E6106D323"
+    },
+    {
+      "file": "icons/larder_eitr_recovery_icon.png",
+      "sha256": "4DDFA592A9EE3BB7F01B0DA9E4438385830C34ED495454FD3B625ACF916E3CAF"
+    },
+    {
+      "file": "icons/larder_rested_icon.png",
+      "sha256": "21E3A8BFE18D51FEFD6A41B08D0521A54C1DCA5431D40C5B778D5BBCFC7DFFB1"
+    },
+    {
+      "file": "icons/larder_extra_food_icon.png",
+      "sha256": "7B44ECA9898AC8528CF9E52556DF1C48A88DAD3B2EDBA49269F98F6E04393DDC"
+    },
+    {
+      "file": "icons/larder_saved_ingredients_icon.png",
+      "sha256": "A19EF8271F1049180ED6ECF75A2AB14CDE2BF358B27CB0F6ECBE4B2DA5F4ECD2"
+    },
+    {
+      "file": "source/larder/generate.py",
+      "sha256": "A51E641151BA1B29309F43EB8EB044AB4E672FAD42FF3EC9B52E6E88D536BEC4"
+    },
+    {
+      "file": "source/larder/models.json",
+      "sha256": "E07059F693F52E299C29C12661D175E57C0D2892AF738B1544D8F8A545D3249A"
+    },
+    {
+      "file": "source/larder/README.md",
+      "sha256": "9CEAD19A1EA36A12D8ECEA141C0EE0DBB79C7687A06387FB13EAADAF6D133211"
+    },
+    {
+      "file": "source/shepherd/check_models.py",
+      "sha256": "B41848BF4EC5B084076FCA52CC73A1B18BDA0C2E48AABF5078270C214574B5C6"
+    },
+    {
+      "file": "source/shepherd/generate.py",
+      "sha256": "1EE93031EE489520D41C98E57F666C7CB3FC3A62817820B8D84578F07B4A608E"
+    },
+    {
+      "file": "source/shepherd/geometry.py",
+      "sha256": "311CDD5C565B0099380507D31E68988C24156A477C9F12E742B081E7A05FF2F5"
+    },
+    {
+      "file": "source/shepherd/models.json",
+      "sha256": "C1A761254F66D42814C1ECB4FAC52555D2FF09755784E1F66FBD160F4D462D75"
+    },
+    {
+      "file": "source/shepherd/preview_source.py",
+      "sha256": "DE59B5CB152B7BAA53699E8CE9FF2B3F489DA37F20FA2B09F7F60145BDECF98C"
+    },
+    {
+      "file": "source/shepherd/README.md",
+      "sha256": "A67B261D44E4288641898EB053B73A23CB6FF32F098F3C4FB83343D5A3C46DF8"
+    },
+    {
+      "file": "source/shepherd/SOURCE-CHECKS.json",
+      "sha256": "C03146399656964A88350273FA354DF5FD526735128B2D06D6F0CA7340D28759"
+    },
+    {
+      "file": "source/BuildCustomItems.cs",
+      "sha256": "BB4BC3A82B38FA3930440EDE02B6797906831EFB4D98D25712F06D0AA3F42837"
+    },
+    {
+      "file": "source/OriginalItemArt.cs",
+      "sha256": "3F33CA68E6F084105521AE0FF2572B4601B1A85ED16208F5598DC3CB2B00C1F4"
+    },
+    {
+      "file": "source/README.md",
+      "sha256": "0DE3AB4668FFF32919A87B5919D2575F68FD49305575FF48FB3318E02AA4247A"
+    },
+    {
+      "file": "source/Rebuild-OriginalArt.ps1",
+      "sha256": "CD41B87CCE6647D979FCC7B570457B4E324395BA141979623B66032ADFD97052"
+    },
+    {
+      "file": "source/SOURCE-REBUILD.md",
+      "sha256": "B18BD02878D7CE8D2C31A963D1E72FE62147EF7208843B4E4BFD9FDD96684D0E"
+    },
+    {
+      "file": "source/textures/materials-atlas.png",
+      "sha256": "83F3B012447DA4F44C64943AB26D632E530480D5DEF958FD41D56792937A10C1"
+    },
+    {
+      "file": "source/textures/provenance.json",
+      "sha256": "4B5454F1FC5A5ECA9615213DB391F79DF0362BB8F0C84755D1C7E8617AA0E01B"
+    },
+    {
+      "file": "source/source-kit.json",
+      "sha256": "99C77A788D0B5FE72884E0805DBE8F9B81DB76E19A3C81446FD2C83DE74D5B82"
+    }
+  ]
+}

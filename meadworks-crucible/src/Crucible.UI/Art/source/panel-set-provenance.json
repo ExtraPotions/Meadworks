@@ -1,0 +1,229 @@
+{
+  "item": "meadworks_ui_set",
+  "licence": "CC BY-NC-SA 4.0 (MeadWorks asset licence); CC0 inputs are public domain",
+  "method": "Python (Pillow/numpy) merge and repaint of CC0 maps; no pixels of PackPanel or of the uploaded look reference, no AI tools; build/build_panel_set.py",
+  "cc0_inputs": [
+    "ambientcg/Leather033C/Leather033C_1K-JPG_Color.jpg",
+    "ambientcg/Leather033C/Leather033C_1K-JPG_Displacement.jpg",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Roughness.jpg",
+    "ambientcg/Paper001/Paper001_1K-JPG_Color.jpg",
+    "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg",
+    "ambientcg/Wood051/Wood051_1K-JPG_Color.jpg",
+    "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg"
+  ],
+  "cc0_sha256": {
+    "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg": "e8b483629421fb725668ef2128e21fa68753fbd40bc25a9c4e871018c014a73d",
+    "ambientcg/Wood051/Wood051_1K-JPG_Color.jpg": "f3c6c5456457e8d05c1fee4d2f186f41d0aea2b8a06859b69ce2934e11aa8798",
+    "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg": "3fcb2a67d00a0fff5171d9a42e720765287a80a76a9e80eaf07405ca6ea1c1a2",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg": "e7846a637fc634e53d174ae8fbfbdffa1de98771530a8a1fb26b711d3b4094e0",
+    "ambientcg/Leather033C/Leather033C_1K-JPG_Color.jpg": "08edfb6a4249fc894359c2694cdc64122d7748fa1601009768aafb2e86a12511",
+    "ambientcg/Leather033C/Leather033C_1K-JPG_Displacement.jpg": "bb29c6cbfce2969893f4f994c0163ae8474d844bd592f69243eded94caafbde3",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Roughness.jpg": "76dfe4518f375eb1f7bc10cab5b26121f1a46e9b82682e1e1e6143a80ae3c07f",
+    "ambientcg/Paper001/Paper001_1K-JPG_Color.jpg": "e8db6f5b91f7882f4711ab5b2dc5c2e91f822d4f80a7d0081991532cf5cd9b9a"
+  },
+  "changes": "Plank, leather, steel, paper and bronze materials are each merged from two or three CC0 maps (regraded to hand-set palettes, planks and seams added in code); frames, bevels, studs, diamonds, stitching, brackets and the rope divider are drawn from signed-distance fields; hover and selected add a subtle warm inner edge, no glow.",
+  "files": {
+    "set/button_hover.png": {
+      "size": [
+        468,
+        156
+      ],
+      "sha256": "161755dd7d8666b7cdfb411a52d970871178182b93fac5361b02b536b9bf3a63",
+      "nine_slice_border_px_lrtb": [
+        66,
+        66,
+        44,
+        44
+      ]
+    },
+    "set/button_normal.png": {
+      "size": [
+        468,
+        156
+      ],
+      "sha256": "99f5999340120f0b3fcd2d10071c4f649c874b49378aaddce988374b3c41af33",
+      "nine_slice_border_px_lrtb": [
+        66,
+        66,
+        44,
+        44
+      ]
+    },
+    "set/button_pressed.png": {
+      "size": [
+        468,
+        156
+      ],
+      "sha256": "c8c56ff09f0842130f2851cc6438e1af0e1450ddfa879e6ffda95a3a326aa299",
+      "nine_slice_border_px_lrtb": [
+        66,
+        66,
+        44,
+        44
+      ]
+    },
+    "set/divider_bronze.png": {
+      "size": [
+        424,
+        70
+      ],
+      "sha256": "576b37b5f392dd427e7313a76e1203247f4e72313b7dc7d83e5dd009aa9c6955",
+      "nine_slice_border_px_lrtb": null
+    },
+    "set/panel_forged_iron.png": {
+      "size": [
+        376,
+        280
+      ],
+      "sha256": "2e51d08dd7e96862575670ffd4c2f18c03e3be3ef4b44bde03520006c4990522",
+      "nine_slice_border_px_lrtb": [
+        45,
+        45,
+        42,
+        42
+      ]
+    },
+    "set/panel_leather.png": {
+      "size": [
+        384,
+        286
+      ],
+      "sha256": "7a9fae0e38703fa23c39e44d28d7fb53a8c63408b1900e970b15e094051565fb",
+      "nine_slice_border_px_lrtb": [
+        46,
+        46,
+        43,
+        43
+      ]
+    },
+    "set/panel_parchment.png": {
+      "size": [
+        368,
+        298
+      ],
+      "sha256": "2dea355a645fcc79c74d6ce7b4afe2d909b68d1aa5ef77bf2a57d2b303364f93",
+      "nine_slice_border_px_lrtb": [
+        44,
+        44,
+        45,
+        45
+      ]
+    },
+    "set/panel_timber.png": {
+      "size": [
+        380,
+        356
+      ],
+      "sha256": "7ff3794018cfc4c1360cb09ac05c2d580f6225d9e13a419ef379460d9650f7bc",
+      "nine_slice_border_px_lrtb": [
+        45,
+        45,
+        53,
+        53
+      ]
+    },
+    "set/slot_iron.png": {
+      "size": [
+        260,
+        252
+      ],
+      "sha256": "b5583f3064eec574f7ed84895f8639c400d49181838a238ffe41c9818b25e96c",
+      "nine_slice_border_px_lrtb": [
+        49,
+        49,
+        48,
+        48
+      ]
+    },
+    "set/slot_selected.png": {
+      "size": [
+        260,
+        252
+      ],
+      "sha256": "60a67069d00816367d337e075e9ce8fb8ca264cb3210231bdfe35d7f26590bd1",
+      "nine_slice_border_px_lrtb": [
+        50,
+        50,
+        48,
+        48
+      ]
+    },
+    "set/slot_timber.png": {
+      "size": [
+        260,
+        252
+      ],
+      "sha256": "5fe161d5681643586c822f9a80c28d9efb00d9439736fd2f2322dbcf0c6ee418",
+      "nine_slice_border_px_lrtb": [
+        49,
+        49,
+        48,
+        48
+      ]
+    },
+    "set/tab_active.png": {
+      "size": [
+        316,
+        96
+      ],
+      "sha256": "f2842e90137800cba4e20c5d2beadd6fa1ad85d857eb392d026f031115e82efe",
+      "nine_slice_border_px_lrtb": [
+        44,
+        44,
+        27,
+        27
+      ]
+    },
+    "kit/button.png": {
+      "size": [
+        64,
+        32
+      ],
+      "sha256": "af17bf445c1624e0d8cbf53389004b6ba426085b869ba4c68beeb7af0fee5d1a",
+      "nine_slice_border_px_lrtb": null
+    },
+    "kit/button_hover.png": {
+      "size": [
+        64,
+        32
+      ],
+      "sha256": "8a1491926e1ac42a21088b571db6d07d8e4da2f2845ddb3333256bcae4550a49",
+      "nine_slice_border_px_lrtb": [
+        66,
+        66,
+        44,
+        44
+      ]
+    },
+    "kit/button_pressed.png": {
+      "size": [
+        64,
+        32
+      ],
+      "sha256": "8d06441cb2aa270af9adeb5c282e7df3dd92db2859d14259b3169dc2399387e3",
+      "nine_slice_border_px_lrtb": [
+        66,
+        66,
+        44,
+        44
+      ]
+    },
+    "kit/cell.png": {
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "3e28bc9d51da2a56e1526ea3984eb2a0b895b991f3a84a1dfa4619e17e4bb4dd",
+      "nine_slice_border_px_lrtb": null
+    },
+    "kit/panel.png": {
+      "size": [
+        128,
+        128
+      ],
+      "sha256": "a4d4738229df71d66a42de29a1984dfa777c074a6926a3a2e7ee107ac08fd0a6",
+      "nine_slice_border_px_lrtb": null
+    }
+  }
+}

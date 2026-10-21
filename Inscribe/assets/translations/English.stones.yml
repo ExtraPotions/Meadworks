@@ -1,0 +1,13 @@
+# EliteCrafting - the five runes' names and descriptions. Owned by the Stones area (the code's word for a rune); its
+# refusal and feedback messages ($ecf_msg_...) are in English.stones_ui.yml.
+
+ecf_stone_awakening: "Awakening Rune"
+ecf_stone_awakening_desc: "An old rune from an earlier Inscribe: it becomes an Ascension Rune as soon as it loads."
+ecf_stone_recasting: "Recasting Rune"
+ecf_stone_recasting_desc: "Recasts an Uncommon item: both inscriptions are replaced by two new ones. It stays Uncommon."
+ecf_stone_ascension: "Ascension Rune"
+ecf_stone_ascension_desc: "Raises an item one rarity step and keeps its inscriptions: Common becomes Uncommon with two inscriptions; Uncommon becomes Rare and Rare becomes Epic, with one more each. At the Rune Table an essence chooses what it adds. Legendary gear comes only from bosses and raids."
+ecf_stone_cleansing: "Cleansing Rune"
+ecf_stone_cleansing_desc: "Wipes an Uncommon or better item back to Common. Every inscription is lost. Cannot be undone."
+ecf_stone_serpent: "Sealed Rune"
+ecf_stone_serpent_desc: "Corrupts an Uncommon or better item, then seals it for good: it stays as it is, gains one more inscription past its limit, or has every inscription rerolled. No rune works on it again."

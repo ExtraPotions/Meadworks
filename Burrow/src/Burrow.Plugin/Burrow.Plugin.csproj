@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework><AssemblyName>Burrow</AssemblyName><RootNamespace>Burrow</RootNamespace>
+    <Nullable>annotations</Nullable><AllowUnsafeBlocks>true</AllowUnsafeBlocks><CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
+    <PackageReference Include="YamlDotNet" Version="13.7.1"/>
+    <ProjectReference Include="../Burrow.Core/Burrow.Core.csproj"/>
+    <Reference Include="Crucible" HintPath="$(CrucibleRoot)/src/Crucible.Plugin/bin/Release/netstandard2.1/Crucible.dll" Private="false"/>
+    <Reference Include="Crucible.Core" HintPath="$(CrucibleRoot)/src/Crucible.Plugin/bin/Release/netstandard2.1/Crucible.Core.dll" Private="false"/>
+    <Reference Include="Crucible.UI" HintPath="$(CrucibleRoot)/src/Crucible.UI/bin/Release/netstandard2.1/Crucible.UI.dll" Private="false"/>
+    <Reference Include="assembly_valheim" Publicize="true" HintPath="$(GameDir)/valheim_Data/Managed/assembly_valheim.dll" Private="false"/>
+    <Reference Include="assembly_utils" Publicize="true" HintPath="$(GameDir)/valheim_Data/Managed/assembly_utils.dll" Private="false"/>
+    <Reference Include="assembly_guiutils" Publicize="true" HintPath="$(GameDir)/valheim_Data/Managed/assembly_guiutils.dll" Private="false"/>
+    <Reference Include="gui_framework" HintPath="$(GameDir)/valheim_Data/Managed/gui_framework.dll" Private="false"/>
+    <Reference Include="Unity.TextMeshPro" HintPath="$(GameDir)/valheim_Data/Managed/Unity.TextMeshPro.dll" Private="false"/>
+  </ItemGroup>
+  <ItemGroup><EmbeddedResource Include="Adopted/config/*.yml" LogicalName="Burrow.config.%(Filename)%(Extension)"/><EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Burrow.localization.%(Filename)%(Extension)"/><EmbeddedResource Include="settings-tiers.json" LogicalName="$(AssemblyName).settings-tiers.json" /></ItemGroup>
+</Project>

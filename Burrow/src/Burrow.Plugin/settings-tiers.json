@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "product": "Burrow",
+  "default": "Advanced",
+  "settings": {
+    "1. Reach/Enabled": "Essential",
+    "2. Stow/Enabled": "Essential",
+    "2. Stow/Quick Stack Key": "Essential",
+    "2. Stow/Store All Key": "Essential",
+    "2. Stow/Sort Inventory Key": "Essential",
+    "2. Stow/Sort Order": "Essential",
+    "4. Stacks/Stack Multiplier": "Essential",
+    "5a. Chest Preview/Enabled": "Essential",
+
+    "General/Lock Configuration": "FileOnly",
+    "General/Hotkey Defaults Version": "FileOnly",
+    "General/Setting Defaults Version": "FileOnly",
+    "0. Containers/Shared Chests": "FileOnly",
+    "2. Stow/Main Inventory Rows": "FileOnly",
+    "4. Stacks/Per Item Config Entries": "FileOnly",
+    "4a. Item Stacks/*": "FileOnly",
+    "4b. Item Weights/*": "FileOnly",
+    "5a. Chest Preview/Capacity Format": "FileOnly",
+    "8. Shared Materials/Player Inventory": "FileOnly",
+    "8. Shared Materials/Nearby Chests": "FileOnly",
+    "9. Shared/Transfer Radius": "FileOnly",
+    "9. Shared/Request Timeout": "FileOnly"
+  }
+}

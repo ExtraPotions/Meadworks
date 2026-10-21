@@ -1,0 +1,35 @@
+# EliteCrafting - English words shared by every feature (localization.md section 2).
+# Key without the $ -> text. $1, $2 are the game's placeholders.
+# Each feature area keeps its own words in its own English.<area>.yml next to this file.
+
+# rarities
+ecf_rarity_normal: "Normal"
+ecf_rarity_magic: "Magic"
+ecf_rarity_rare: "Rare"
+
+# tooltip vocabulary
+ecf_ui_affix_line: "$1 $2"
+ecf_ui_tier: "T$1"
+ecf_ui_range: "[$1-$2]"
+ecf_ui_dormant: "(dormant)"
+ecf_ui_unreadable: "Unreadable: $1"
+ecf_ui_newer_format: "Changed by a newer version of EliteCrafting"
+
+# categories and slots
+ecf_ui_category_offense: "Offense"
+ecf_ui_category_defense: "Defense"
+ecf_ui_category_utility: "Utility"
+ecf_ui_slot_melee_weapon: "Melee weapon"
+ecf_ui_slot_ranged_weapon: "Ranged weapon"
+ecf_ui_slot_magic_weapon: "Magic weapon"
+ecf_ui_slot_shield: "Shield"
+ecf_ui_slot_head: "Head"
+ecf_ui_slot_chest: "Chest"
+ecf_ui_slot_legs: "Legs"
+ecf_ui_slot_cape: "Cape"
+ecf_ui_slot_utility_item: "Utility item"
+ecf_ui_slot_tool: "Tool"
+
+# general messages
+ecf_msg_newer_format: "This item was changed by a newer version of EliteCrafting."
+ecf_msg_unknown_rarity: "This item's rarity is not known on this server."

@@ -1,0 +1,131 @@
+{
+  "assets": [
+    {
+      "id": "awakening",
+      "prefabs": [
+        "ECF_Awakening"
+      ]
+    },
+    {
+      "id": "recasting",
+      "prefabs": [
+        "ECF_Recasting"
+      ]
+    },
+    {
+      "id": "ascension",
+      "prefabs": [
+        "ECF_Ascension"
+      ]
+    },
+    {
+      "id": "cleansing",
+      "prefabs": [
+        "ECF_Cleansing"
+      ]
+    },
+    {
+      "id": "serpent",
+      "prefabs": [
+        "ECF_Serpent"
+      ]
+    },
+    {
+      "id": "dvergr_chisel",
+      "prefabs": [
+        "ECF_DvergrChisel"
+      ]
+    },
+    {
+      "id": "scroll_tier_1",
+      "prefabs": [
+        "ScrollEnhance_Tier1"
+      ]
+    },
+    {
+      "id": "scroll_tier_2",
+      "prefabs": [
+        "ScrollEnhance_Tier2"
+      ]
+    },
+    {
+      "id": "scroll_tier_3",
+      "prefabs": [
+        "ScrollEnhance_Tier3"
+      ]
+    },
+    {
+      "id": "scroll_tier_4",
+      "prefabs": [
+        "ScrollEnhance_Tier4"
+      ]
+    },
+    {
+      "id": "gem_surtr",
+      "prefabs": [
+        "ECF_GemSurtr"
+      ]
+    },
+    {
+      "id": "gem_ymir",
+      "prefabs": [
+        "ECF_GemYmir"
+      ]
+    },
+    {
+      "id": "gem_thor",
+      "prefabs": [
+        "ECF_GemThor"
+      ]
+    },
+    {
+      "id": "gem_nidhogg",
+      "prefabs": [
+        "ECF_GemNidhogg"
+      ]
+    },
+    {
+      "id": "gem_hel",
+      "prefabs": [
+        "ECF_GemHel"
+      ]
+    },
+    {
+      "id": "gem_tyr",
+      "prefabs": [
+        "ECF_GemTyr"
+      ]
+    },
+    {
+      "id": "gem_freyja",
+      "prefabs": [
+        "ECF_GemFreyja"
+      ]
+    },
+    {
+      "id": "gem_odin",
+      "prefabs": [
+        "ECF_GemOdin"
+      ]
+    },
+    {
+      "id": "gem_skadi",
+      "prefabs": [
+        "ECF_GemSkadi"
+      ]
+    },
+    {
+      "id": "gem_heimdall",
+      "prefabs": [
+        "ECF_GemHeimdall"
+      ]
+    },
+    {
+      "id": "gem_sleipnir",
+      "prefabs": [
+        "ECF_GemSleipnir"
+      ]
+    }
+  ],
+  "materials": []
+}

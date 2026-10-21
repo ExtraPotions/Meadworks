@@ -1,0 +1,131 @@
+{
+  "assets": [
+    {
+      "id": "mantle_deerhidesatchel",
+      "prefabs": [
+        "Mantle_DeerhideSatchel"
+      ]
+    },
+    {
+      "id": "mantle_trollhidebackpack",
+      "prefabs": [
+        "Mantle_TrollhideBackpack"
+      ]
+    },
+    {
+      "id": "mantle_rootboundpack",
+      "prefabs": [
+        "Mantle_RootboundPack"
+      ]
+    },
+    {
+      "id": "mantle_wolfpeltpack",
+      "prefabs": [
+        "Mantle_WolfpeltPack"
+      ]
+    },
+    {
+      "id": "mantle_loxhauler",
+      "prefabs": [
+        "Mantle_LoxHauler"
+      ]
+    },
+    {
+      "id": "mantle_carapacepack",
+      "prefabs": [
+        "Mantle_CarapacePack"
+      ]
+    },
+    {
+      "id": "mantle_asksvinpack",
+      "prefabs": [
+        "Mantle_AsksvinPack"
+      ]
+    },
+    {
+      "id": "mantle_moosehidepack",
+      "prefabs": [
+        "Mantle_MoosehidePack"
+      ]
+    },
+    {
+      "id": "mantle_driftwoodtacklebox",
+      "prefabs": [
+        "Mantle_DriftwoodTacklebox"
+      ]
+    },
+    {
+      "id": "mantle_finewoodtacklebox",
+      "prefabs": [
+        "Mantle_FinewoodTacklebox"
+      ]
+    },
+    {
+      "id": "mantle_carapacetacklebox",
+      "prefabs": [
+        "Mantle_CarapaceTacklebox"
+      ]
+    },
+    {
+      "id": "mantle_flametaltacklebox",
+      "prefabs": [
+        "Mantle_FlametalTacklebox"
+      ]
+    },
+    {
+      "id": "mantle_boneband",
+      "prefabs": [
+        "Mantle_BoneBand"
+      ]
+    },
+    {
+      "id": "mantle_copperring",
+      "prefabs": [
+        "Mantle_CopperRing"
+      ]
+    },
+    {
+      "id": "mantle_ironring",
+      "prefabs": [
+        "Mantle_IronRing"
+      ]
+    },
+    {
+      "id": "mantle_silverring",
+      "prefabs": [
+        "Mantle_SilverRing"
+      ]
+    },
+    {
+      "id": "mantle_blackmetalring",
+      "prefabs": [
+        "Mantle_BlackMetalRing"
+      ]
+    },
+    {
+      "id": "mantle_eitrring",
+      "prefabs": [
+        "Mantle_EitrRing"
+      ]
+    },
+    {
+      "id": "mantle_leatherbelt",
+      "prefabs": [
+        "Mantle_LeatherBelt"
+      ]
+    },
+    {
+      "id": "mantle_trollhidebelt",
+      "prefabs": [
+        "Mantle_TrollHideBelt"
+      ]
+    },
+    {
+      "id": "mantle_loxbelt",
+      "prefabs": [
+        "Mantle_LoxBelt"
+      ]
+    }
+  ],
+  "materials": []
+}

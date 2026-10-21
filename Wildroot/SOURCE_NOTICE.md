@@ -1,0 +1,7 @@
+# Source availability notice
+
+Product author: expDARE.
+
+Wildroot.Core.dll and Wildroot.dll contain original Meadworks code and code adapted from PlantEverything 1.21.3, PlantEasily 2.2.2 and GrindstoneSkills Farming. The pinned sources, adapted files and retained upstream licenses are listed in THIRD_PARTY_NOTICES/.
+
+The Corresponding Source for this version is at https://github.com/ExtraPotions/Meadworks/tree/main/Wildroot. Original upstream copyright and license notices remain intact.

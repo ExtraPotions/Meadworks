@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Portions Copyright (C) sighsorry1029. From CreatureManager 1.2.5 ILRepack.targets at 47e45a6e8c3b389a51e42fc7387d1a4fb90af473.
+     SPDX-License-Identifier: GPL-3.0-only. Changed by expDARE, 2026: Bestiary + YamlDotNet only; no ServerSync/deploy. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="BestiaryILRepacker" AfterTargets="Build">
+    <ItemGroup>
+      <BestiaryMergeInputs Include="$(TargetPath)"/>
+      <BestiaryMergeInputs Include="$(TargetDir)YamlDotNet.dll"/>
+      <BestiaryMergeLibraries Include="@(ReferencePath->'%(RootDir)%(Directory)')"/>
+    </ItemGroup>
+    <!-- No merged PDB: with DebugInfo ILRepack records its per-process temp folder in the DLL, so no two builds matched (W87). -->
+    <ILRepack Parallel="true" DebugInfo="false" Internalize="true" InputAssemblies="@(BestiaryMergeInputs)"
+              OutputFile="$(TargetPath)" TargetKind="SameAsPrimaryAssembly" LibraryPath="@(BestiaryMergeLibraries)"/>
+  </Target>
+</Project>

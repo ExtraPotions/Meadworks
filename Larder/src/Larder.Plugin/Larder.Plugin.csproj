@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Larder</AssemblyName>
+    <RootNamespace>ExtraPotions.Larder.Runtime</RootNamespace>
+  </PropertyGroup>
+  <!-- BepInEx, Jotunn, Harmony, Unity and game references, shared with Crucible. -->
+  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
+    <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
+    <Reference Include="assembly_utils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_utils.dll" Private="false"/>
+    <Reference Include="assembly_guiutils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_guiutils.dll" Private="false"/>
+    <Reference Include="gui_framework" HintPath="$(ValheimManagedDir)/gui_framework.dll" Private="false"/>
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
+    <ProjectReference Include="../Larder.Core/Larder.Core.csproj"/>
+    <!-- Development pin: crucible-skills (build/crucible-skills = foundations plus CS1). Repoint to the shared checkout once those branches merge to main. -->
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.UI/Crucible.UI.csproj" Private="false"/>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="settings-tiers.json" LogicalName="$(AssemblyName).settings-tiers.json" />
+    <EmbeddedResource Include="../../assets/skill_cooking.png" LogicalName="Larder.skill_cooking.png"/>
+    <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Larder.localization.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/original-items/mw_larder_items.windows" LogicalName="Larder.original-items.windows"/>
+    <EmbeddedResource Include="../../assets/original-items/mw_larder_items.linux" LogicalName="Larder.original-items.linux"/>
+    <EmbeddedResource Include="../../assets/original-items/catalog.json" LogicalName="MeadWorks.OriginalItems.catalog.json"/>
+  </ItemGroup>
+</Project>

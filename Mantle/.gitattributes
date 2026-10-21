@@ -1,0 +1,4 @@
+# Text files check out with CRLF line endings on every platform, as the released assemblies were built.
+* text=auto eol=crlf
+# Stored byte for byte as committed.
+THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt -text

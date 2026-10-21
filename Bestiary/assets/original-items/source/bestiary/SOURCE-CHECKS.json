@@ -1,0 +1,24 @@
+{
+  "result": "PASS",
+  "models": 17,
+  "triangles": 7470,
+  "modelsSha256": "8B9191B724DDB6173F0CB639C01675AACE59C31339BF6DC2AEE0BB20B6703743",
+  "checks": [
+    "actual ItemCatalog coverage",
+    "finite nondegenerate outward meshes",
+    "exact assembled/loose axehead including socket and edge",
+    "concave caps both outline windings",
+    "one arrow/bolt with native nock/forward axis/length",
+    "native held axes and bow origin",
+    "matching beak loot and shield boss",
+    "volumetric beak crown, single tapered ivory hook and native envelope",
+    "paired head and beak local UV wear patterns",
+    "crossbow native anchors and animated unitcord contract",
+    "matching source-render camera and collider bounds",
+    "native opaque nonemissive material intentions",
+    "invalid geometry rejected"
+  ],
+  "limits": [
+    "Source checks and software geometry preview only; Unity build/materials, equip poses, animation and native play remain root verification."
+  ]
+}

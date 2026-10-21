@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "product": "Beacon",
+  "default": "Advanced",
+  "settings": {
+    "General/Skip Password Prompt": "Essential",
+    "General/Offer To Save Passwords": "Essential",
+    "Auto Join/Auto Join": "Essential",
+    "Reconnect/Reconnect On Disconnect": "Essential"
+  }
+}

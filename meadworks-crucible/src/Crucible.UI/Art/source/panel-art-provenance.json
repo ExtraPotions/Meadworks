@@ -1,0 +1,53 @@
+{
+  "item": "meadworks_panel_timber",
+  "licence": "CC BY-NC-SA 4.0 (MeadWorks asset licence); CC0 inputs are public domain",
+  "method": "Python (Pillow/numpy) merge and repaint of CC0 maps; no PackPanel pixels, no AI tools; build/build_panel_art.py",
+  "assets": [
+    {
+      "file": "panel_background.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "567a97ac43b1641945c9a7d395d4b69eff3e504820c119f8ac953381c4bdd46d",
+      "cc0_inputs": [
+        "ambientcg/Wood049/Wood049_1K-JPG_Color.jpg",
+        "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg",
+        "ambientcg/Wood051/Wood051_1K-JPG_Displacement.jpg",
+        "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg",
+        "polyhaven/brown_leather/brown_leather_disp_1k.png"
+      ],
+      "cc0_sha256": {
+        "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg": "e8b483629421fb725668ef2128e21fa68753fbd40bc25a9c4e871018c014a73d",
+        "ambientcg/Wood049/Wood049_1K-JPG_Color.jpg": "451ee4dd719628289b4969f75dc583b5f77f8471d5d885ba5015fd90e7e5ce61",
+        "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg": "3fcb2a67d00a0fff5171d9a42e720765287a80a76a9e80eaf07405ca6ea1c1a2",
+        "ambientcg/Wood051/Wood051_1K-JPG_Displacement.jpg": "a852d76befbdb66cf17f1b4a18663f4b1fb2c0de03929a4c74752a688e23ff10",
+        "polyhaven/brown_leather/brown_leather_disp_1k.png": "3da0d0926efdc124a09961b966b83f42607c1e8a834e9ed5981456d663696c59"
+      },
+      "changes": "Two walnut colour maps reduced to luminance, stretched 1.6x/1.9x along the grain, flipped and offset so grains never align, blended by a slow noise mask; two relief maps and the leather pore map added as low-gain detail; hand-set palette ramp (101,71,52 mid), slow tonal drift, five soft knots, paint grain. Not a recolour of any single input."
+    },
+    {
+      "file": "panel_button.png",
+      "size": [
+        1983,
+        793
+      ],
+      "sha256": "e89029b6b753514d4ffd597faba573d3bc875f12e931269b044b774bf3d32654",
+      "cc0_inputs": [
+        "ambientcg/Leather030/Leather030_1K-JPG_Displacement.jpg",
+        "ambientcg/Leather031/Leather031_1K-JPG_Color.jpg",
+        "ambientcg/Metal024/Metal024_1K-JPG_Color.jpg",
+        "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg",
+        "ambientcg/Metal046A/Metal046A_1K-JPG_Roughness.jpg"
+      ],
+      "cc0_sha256": {
+        "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg": "e7846a637fc634e53d174ae8fbfbdffa1de98771530a8a1fb26b711d3b4094e0",
+        "ambientcg/Metal024/Metal024_1K-JPG_Color.jpg": "a50e70af65e69665af106e1dac3cdbeed7465d2ef70b78f6d141ecf16c692f89",
+        "ambientcg/Metal046A/Metal046A_1K-JPG_Roughness.jpg": "76dfe4518f375eb1f7bc10cab5b26121f1a46e9b82682e1e1e6143a80ae3c07f",
+        "ambientcg/Leather031/Leather031_1K-JPG_Color.jpg": "ee1312c66dd864fbef7ef8f8bcc0ee5fbd77a7fd35ac53aa9304ac1189e1f359",
+        "ambientcg/Leather030/Leather030_1K-JPG_Displacement.jpg": "dc1d4ad320908d9bf75ffccd2a42e92f142d15b906c0007274d4fa3da1af9125"
+      },
+      "changes": "Chamfered-rectangle signed-distance frame lit from the top left; bronze made from a dark-steel map merged with an oxidised-steel map, brushed streaks, edge wear and patina painted from noise; recessed inset from two black-leather maps with inner shadow; four domed rivets and dark outline/groove drawn in code; soft drop shadow in the alpha margin."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+# Mantle.Backpacks.yml - what each of Mantle's backpacks gives and costs.
+#
+# One backpack per biome. Wear one by putting it in the Backpack slot of the inventory (section 2. Slots,
+# Backpack Slot): it hangs on your back and adds its slots to the bottom of the grid and its carry weight to what you
+# can carry. Taking it off moves what its slots hold into free cells of the grid and drops what does not fit.
+#
+# Every key of an entry is optional; a key left out (or a line commented out) keeps the value shown here.
+#   station: the prefab name of the crafting station (piece_workbench, forge, blackforge, piece_artisanstation, ...)
+#   level:   the station level needed, 1 to 10
+#   cost:    prefab:amount pairs separated by commas; a pack's recipe takes the pack before it, so it is upgraded
+#   slots:   inventory slots it adds while worn, 0 to 40 (a row is as wide as the grid: 8 at the game's width)
+#   carry:   carry weight it adds while worn, 0 to 1000
+#   portal:  true lets the items in its slots through portals, but only while Backpack Portal Pass is on in the .cfg
+#
+# The file is synced from the server, reloaded a few seconds after it is saved and can be edited in game
+# (Configuration Manager, "Edit YAML"). Extra files named Mantle.Backpacks<anything>.yml are read as well.
+backpacks:
+  # Meadows
+  Mantle_DeerhideSatchel: { station: piece_workbench, level: 2, cost: "DeerHide:10, LeatherScraps:8", slots: 4, carry: 0 }
+  # Black Forest
+  Mantle_TrollhideBackpack: { station: forge, level: 1, cost: "Mantle_DeerhideSatchel:1, TrollHide:20, Bronze:2", slots: 4, carry: 50 }
+  # Swamp
+  Mantle_RootboundPack: { station: forge, level: 2, cost: "Mantle_TrollhideBackpack:1, Iron:5, Root:10, Guck:4", slots: 8, carry: 50 }
+  # Mountains
+  Mantle_WolfpeltPack: { station: forge, level: 3, cost: "Mantle_RootboundPack:1, WolfPelt:12, Silver:6", slots: 8, carry: 100 }
+  # Plains
+  Mantle_LoxHauler: { station: forge, level: 4, cost: "Mantle_WolfpeltPack:1, LoxPelt:8, BlackMetal:8, LinenThread:12", slots: 12, carry: 100 }
+  # Mistlands
+  Mantle_CarapacePack: { station: blackforge, level: 1, cost: "Mantle_LoxHauler:1, Carapace:12, ScaleHide:8, JuteBlue:6", slots: 12, carry: 150 }
+  # Ashlands
+  Mantle_AsksvinPack: { station: blackforge, level: 2, cost: "Mantle_CarapacePack:1, AskHide:10, FlametalNew:6, MorgenSinew:4", slots: 16, carry: 150 }
+  # Deep North
+  Mantle_MoosehidePack: { station: blackforge, level: 4, cost: "Mantle_AsksvinPack:1, MooseHide:10, MooseSinew:4, Gold:5", slots: 16, carry: 200, portal: true }

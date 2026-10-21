@@ -1,0 +1,26 @@
+# Mantle.Tackleboxes.yml - what each of Mantle's tackleboxes gives and costs.
+#
+# Put a tacklebox in the Tacklebox slot of the inventory (right of the key ring button; section 6. Tacklebox in the
+# .cfg) and right click it there to open it: its cells hang in a pop-up under the slot panel. Bait you pick up goes into
+# them first and the fishing rod takes its bait from them first. Taking the box out moves what its cells hold into free
+# cells of the grid and drops what does not fit.
+#
+# Every key of an entry is optional; a key left out (or a line commented out) keeps the value shown here.
+#   station: the prefab name of the crafting station (piece_workbench, forge, blackforge, piece_artisanstation, ...)
+#   level:   the station level needed, 1 to 10
+#   cost:    prefab:amount pairs separated by commas; a box's recipe takes the box before it, so it is upgraded
+#   cells:   cells it adds for bait while it is in the Tacklebox slot, 0 to 20
+#
+# The file is synced from the server, reloaded a few seconds after it is saved and can be edited in game
+# (Configuration Manager, "Edit YAML"). Extra files named Mantle.Tackleboxes<anything>.yml are read as well.
+tackleboxes:
+  # Meadows: a plain wooden box covered in furs
+  Mantle_DriftwoodTacklebox: { station: piece_workbench, level: 2, cost: "Wood:10, LeatherScraps:10, DeerHide:5", cells: 1 }
+  # Black Forest: fine wood wrapped in troll leather, bronze corners and clasp
+  Mantle_FinewoodTacklebox: { station: piece_workbench, level: 3, cost: "Mantle_DriftwoodTacklebox:1, FineWood:10, TrollHide:10, Bronze:2", cells: 2 }
+  # Mistlands: Yggdrasil wood coated in carapace plates
+  Mantle_CarapaceTacklebox: { station: blackforge, level: 1, cost: "Mantle_FinewoodTacklebox:1, Carapace:10, YggdrasilWood:10", cells: 6 }
+  # Ashlands: flametal covered in asksvin hide
+  Mantle_FlametalTacklebox: { station: blackforge, level: 3, cost: "Mantle_CarapaceTacklebox:1, FlametalNew:5, AskHide:10", cells: 8 }
+  # Deep North: timberwood (the game's Frostwood) lined with seal pelt, gold fittings
+  Mantle_TimberwoodTacklebox: { station: blackforge, level: 4, cost: "Mantle_FlametalTacklebox:1, Frostwood:10, SealHide:8, Gold:2", cells: 12 }

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Cairn logic (settings table, gate policy, exploration radius, skill math, visibility catalog, HUD text and compass math, step-aside and import plans, hook targets, text keys). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Cairn.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Cairn</RootNamespace>
+  </PropertyGroup>
+</Project>

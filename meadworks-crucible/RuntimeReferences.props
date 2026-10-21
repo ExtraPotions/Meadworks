@@ -1,0 +1,19 @@
+<Project><PropertyGroup>
+  <!-- Reproducible product bytes across worktrees of one commit: the PDB path in the DLL names the project, not the checkout. -->
+  <PathMap Condition="'$(PathMap)' == ''">$(MSBuildProjectDirectory)=/_/$(MSBuildProjectName)</PathMap>
+  <!-- Crucible's Directory.Build.props sets ValheimManagedDir. Products that import only this file (Burrow, Mantle, Wildroot)
+       get the same resolution here: client valheim_Data/Managed first, then dedicated server valheim_server_Data/Managed,
+       else the client path so a missing install still names the expected folder. -->
+  <ValheimManagedDir Condition="'$(ValheimManagedDir)' == '' And '$(GameDir)' != '' And Exists('$(GameDir)/valheim_Data/Managed')">$(GameDir)/valheim_Data/Managed</ValheimManagedDir>
+  <ValheimManagedDir Condition="'$(ValheimManagedDir)' == '' And '$(GameDir)' != '' And Exists('$(GameDir)/valheim_server_Data/Managed')">$(GameDir)/valheim_server_Data/Managed</ValheimManagedDir>
+  <ValheimManagedDir Condition="'$(ValheimManagedDir)' == '' And '$(GameDir)' != ''">$(GameDir)/valheim_Data/Managed</ValheimManagedDir>
+</PropertyGroup><ItemGroup>
+  <!-- ValheimManagedDir: valheim_Data/Managed (client) or valheim_server_Data/Managed (dedicated server). -->
+  <Reference Include="BepInEx" HintPath="$(BepInExDir)/core/BepInEx.dll" Private="false"/>
+  <Reference Include="Jotunn" HintPath="$(JotunnDir)/Jotunn.dll" Private="false"/>
+  <Reference Include="0Harmony" HintPath="$(BepInExDir)/core/0Harmony.dll" Private="false"/>
+  <Reference Include="$(ValheimManagedDir)/UnityEngine*.dll" Private="false"/>
+  <Reference Include="assembly_valheim" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
+  <Reference Include="assembly_utils" HintPath="$(ValheimManagedDir)/assembly_utils.dll" Private="false"/>
+  <Reference Include="Newtonsoft.Json" HintPath="$(ValheimManagedDir)/Newtonsoft.Json.dll" Private="false"/>
+</ItemGroup></Project>

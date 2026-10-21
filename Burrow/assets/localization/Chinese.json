@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "strings": {
+    "step_aside_stow_buttons": "已安装 {0}：Burrow 隐藏其快速堆叠、全部存放、补足和整理按钮、其快捷键（包括 Alt+D）以及自动整理。移除 {0} 即可使用。",
+    "chest_preview_on": "Burrow：箱子预览 开",
+    "chest_preview_off": "Burrow：箱子预览 关",
+    "step_aside_multi_user_chests": "已安装 {0}：Burrow 将共用箱子的处理交给它，不会打开其他玩家正在使用的箱子。移除 {0} 即可使用 Burrow 的多人共用箱子功能。"
+  }
+}

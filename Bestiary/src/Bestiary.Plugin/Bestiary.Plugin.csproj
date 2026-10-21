@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Bestiary</AssemblyName>
+    <RootNamespace>ExtraPotions.Bestiary.Runtime</RootNamespace>
+    <Nullable>annotations</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <!-- BepInEx, Jotunn, Harmony, Unity and game references, shared with Crucible. -->
+  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="16.3.0"/>
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.46" PrivateAssets="all"/>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
+    <Reference Include="assembly_guiutils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_guiutils.dll" Private="false"/>
+    <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
+    <Reference Include="assembly_utils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_utils.dll" Private="false"/>
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
+    <ProjectReference Include="../Bestiary.Core/Bestiary.Core.csproj"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false" GlobalPropertiesToRemove="OutputPath"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false" GlobalPropertiesToRemove="OutputPath"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.UI/Crucible.UI.csproj" Private="false" GlobalPropertiesToRemove="OutputPath"/>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../../assets/original-items/*.windows" LogicalName="Bestiary.original-items.windows"/>
+    <EmbeddedResource Include="../../assets/original-items/*.linux" LogicalName="Bestiary.original-items.linux"/>
+    <EmbeddedResource Include="../../assets/original-items/catalog.json" LogicalName="MeadWorks.OriginalItems.catalog.json"/>
+    <EmbeddedResource Include="../../assets/workshop/*.sample.yml" LogicalName="Bestiary.workshop.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Bestiary.localization.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="settings-tiers.json" LogicalName="$(AssemblyName).settings-tiers.json" />
+    <!-- Only independently rebuilt bundles. Linux is added by the same glob once its editor module is installed. -->
+    <EmbeddedResource Include="../../build/bundles/*/*.bundle">
+      <LogicalName>Bestiary.bundles.$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName('%(FullPath)')))).%(Filename)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <!-- build/bundles is gitignored Unity output (docs/corresponding-source.md). The DLL embeds it, so the build refuses
+       bundles that differ from the tracked ledger: a missing, changed or unlisted bundle would silently change the plugin bytes. -->
+  <UsingTask TaskName="BestiaryCheckBundles" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Ledger ParameterType="System.String" Required="true"/>
+      <BundleDir ParameterType="System.String" Required="true"/>
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO"/><Using Namespace="System.Linq"/><Using Namespace="System.Security.Cryptography"/><Using Namespace="System.Text.RegularExpressions"/>
+      <Code Type="Fragment" Language="cs"><![CDATA[
+// Key path of every "sha256" string in the ledger (no JSON library in the inline task): bundles/<bundle>/platforms/<platform>/sha256.
+var expected = new System.Collections.Generic.Dictionary<string, string>();
+var path = new System.Collections.Generic.List<string>(); string key = null;
+foreach (Match m in Regex.Matches(File.ReadAllText(Ledger), @"""((?:[^""\\]|\\.)*)""\s*:|""((?:[^""\\]|\\.)*)""|[{}\[\]]"))
+{
+    if (m.Groups[1].Success) key = m.Groups[1].Value;
+    else if (m.Value == "{" || m.Value == "[") { path.Add(key ?? ""); key = null; }
+    else if (m.Value == "}" || m.Value == "]") { path.RemoveAt(path.Count - 1); key = null; }
+    else if (m.Groups[2].Success)
+    {
+        if (key == "sha256" && path.Count == 5 && path[1] == "bundles" && path[3] == "platforms") expected[path[2] + "/" + path[4] + ".bundle"] = m.Groups[2].Value.ToLowerInvariant();
+        key = null;
+    }
+}
+if (expected.Count == 0) Log.LogError("Bestiary bundle ledger lists no bundles: " + Ledger);
+var root = Path.GetFullPath(BundleDir);
+var found = Directory.Exists(root) ? Directory.GetFiles(root, "*.bundle", SearchOption.AllDirectories) : new string[0];
+var actual = found.ToDictionary(f => f.Substring(root.Length + 1).Replace('\\', '/'), f => f);
+foreach (var name in expected.Keys.Where(n => !actual.ContainsKey(n)))
+    Log.LogError("Bestiary bundle missing: build/bundles/" + name + " (ledger assets/bestiary/records/bundles.json)");
+foreach (var name in actual.Keys.Where(n => !expected.ContainsKey(n)))
+    Log.LogError("Bestiary bundle not in the ledger: build/bundles/" + name);
+using (var sha = SHA256.Create())
+    foreach (var pair in actual.Where(p => expected.ContainsKey(p.Key)))
+    {
+        var hash = string.Concat(sha.ComputeHash(File.ReadAllBytes(pair.Value)).Select(b => b.ToString("x2")));
+        if (hash != expected[pair.Key]) Log.LogError("Bestiary bundle differs from the ledger: build/bundles/" + pair.Key + " " + hash);
+    }
+]]></Code>
+    </Task>
+  </UsingTask>
+  <Target Name="BestiaryCheckBundles" BeforeTargets="BeforeBuild">
+    <BestiaryCheckBundles Ledger="$(MSBuildThisFileDirectory)../../assets/bestiary/records/bundles.json" BundleDir="$(MSBuildThisFileDirectory)../../build/bundles"/>
+  </Target>
+</Project>

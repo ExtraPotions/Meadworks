@@ -1,0 +1,38 @@
+# Burrow.Reach.yml - reachable container rules for crafting, building and station feeding.
+#
+# Every prefab with a Container component is reachable unless it is listed here with enabled: false. A prefab
+# entry may also set its own range (metres from the player, replacing the Range of the .cfg) and allow / deny
+# lists (deny wins; an empty allow list allows everything). allow and deny use the Burrow item vocabulary:
+# a prefab name (Wood), a name token ($item_wood), prefix:Trophy, suffix:Ore, type:Material, group:Ores (a group
+# from the groups: map) or * for everything. Ships, carts and the private chest also follow the switches of the
+# .cfg section "0. Containers". A prefab disabled here is ignored by every other Burrow module too.
+#
+# The stations: map narrows station feeding (interact, Fill, Pull and the "From storage" hover line) per station
+# prefab, without touching what crafting and building see. enabled: false leaves a station entirely alone; allow
+# and deny use the same item vocabulary and work like the container lists (deny wins; an empty allow list allows
+# everything). An unlisted station takes everything it accepts, as before.
+#
+# The file is synced from the server, reloaded a few seconds after it is saved and can be edited in game
+# (Configuration Manager, "Edit YAML"). Extra files named Burrow.Reach<anything>.yml next to this one are read
+# as well.
+#
+# range: 20                       # replaces the .cfg Range when present
+groups:
+  Ores: [prefix:CopperOre, TinOre, IronScrap, SilverOre, BlackMetalScrap, FlametalOre, FlametalOreNew, GoldOre]
+containers:
+  piece_chest_private:
+    enabled: false
+#  Cart:
+#    enabled: true
+#    range: 10
+#  VikingShip:
+#    deny: [type:Trophy]
+#  piece_chest_blackmetal:
+#    allow: [group:Ores, type:Material]
+#stations:
+#  piece_cookingstation:
+#    deny: [NeckTail]                # never pulled onto the cooking station; crafting still sees it
+#  smelter:
+#    allow: [group:Ores]
+#  charcoal_kiln:
+#    enabled: false                  # no feeding, filling, pulling or hover line for this station

@@ -1,0 +1,15 @@
+{
+  "product": "Shepherd",
+  "productVersion": "0.1.11",
+  "schema": 1,
+  "authoringDirectories": [
+    "shepherd"
+  ],
+  "modelFile": "shepherd/models.json",
+  "modelSHA256": "C1A761254F66D42814C1ECB4FAC52555D2FF09755784E1F66FBD160F4D462D75",
+  "builderSHA256": "BB4BC3A82B38FA3930440EDE02B6797906831EFB4D98D25712F06D0AA3F42837",
+  "atlasSHA256": "83F3B012447DA4F44C64943AB26D632E530480D5DEF958FD41D56792937A10C1",
+  "rebuildScript": "Rebuild-OriginalArt.ps1",
+  "rebuildInstructions": "SOURCE-REBUILD.md",
+  "unityVersion": "6000.0.75f1"
+}

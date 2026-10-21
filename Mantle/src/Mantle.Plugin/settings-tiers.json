@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "product": "Mantle",
+  "default": "Advanced",
+  "settings": {
+    "1. Inventory/Enabled": "Essential",
+    "1. Inventory/Inventory Rows": "Essential",
+    "2. Slots/Food Key": "Essential",
+    "3. Key Ring/Key Ring": "Essential",
+    "4. Backpacks/Backpacks": "Essential",
+    "4. Backpacks/Show Worn Backpack": "Essential",
+    "5. Look/Weight Under Minimap": "Essential",
+    "5. Look/Food And Mead Bar": "Essential",
+    "General/Lock Configuration": "FileOnly",
+    "2. Slots/Backpack Items": "FileOnly",
+    "2. Slots/Slots Per Group": "FileOnly",
+    "3. Key Ring/Key Items": "FileOnly",
+    "6. Tacklebox/Tackle Items": "FileOnly"
+  }
+}

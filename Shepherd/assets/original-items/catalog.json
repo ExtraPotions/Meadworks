@@ -1,0 +1,64 @@
+{
+  "assets": [
+    {
+      "id": "shepherd_feed_barrel",
+      "prefabs": [
+        "shepherd_feed_barrel"
+      ]
+    },
+    {
+      "id": "shepherd_trough_plank",
+      "prefabs": [
+        "shepherd_trough_plank"
+      ]
+    },
+    {
+      "id": "shepherd_trough_stone",
+      "prefabs": [
+        "shepherd_trough_stone"
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "id": "wood_784924",
+      "nativePrefab": "wood_beam_1"
+    },
+    {
+      "id": "wood_5c3418",
+      "nativePrefab": "wood_beam_1"
+    },
+    {
+      "id": "wood_3c200f",
+      "nativePrefab": "wood_beam_1"
+    },
+    {
+      "id": "iron_2b2e2b",
+      "nativePrefab": "SerpentScale"
+    },
+    {
+      "id": "wood_241409",
+      "nativePrefab": "wood_beam_1"
+    },
+    {
+      "id": "stone_4a4c46",
+      "nativePrefab": "stone_wall_1x1"
+    },
+    {
+      "id": "stone_4f514a",
+      "nativePrefab": "stone_wall_1x1"
+    },
+    {
+      "id": "stone_53564e",
+      "nativePrefab": "stone_wall_1x1"
+    },
+    {
+      "id": "stone_585b53",
+      "nativePrefab": "stone_wall_1x1"
+    },
+    {
+      "id": "stone_5d5f57",
+      "nativePrefab": "stone_wall_1x1"
+    }
+  ]
+}

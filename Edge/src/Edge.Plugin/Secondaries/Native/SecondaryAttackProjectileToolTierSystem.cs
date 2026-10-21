@@ -1,0 +1,156 @@
+// Edge - ExtraPotions Meadworks. SPDX-License-Identifier: GPL-3.0-only
+// Portions from SecondaryAttacks 1.2.17 (sighsorry1029), GPL-3.0, at 4375a2b17297052a773c5b143b0cae21dc655ed8:
+// SecondaryAttackProjectileToolTierSystem.cs (tool tier scoped helper only). Source notices retained in THIRD_PARTY_NOTICES.
+// Changed by expDARE, 2026: Edge namespaces, canonical catalogs, Crucible settings and diagnostics;
+// native source algorithms retained. Candidate stage, dispatch and prefab application are a separate unit.
+// Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes.
+using HarmonyLib;
+using UnityEngine;
+
+namespace ExtraPotions.Edge.Runtime.Secondaries.Native;
+using ExtraPotions.Edge.Secondaries;
+using ExtraPotions.Edge.Secondaries.Adopted;
+using ExtraPotions.Edge.Config;
+
+internal static class SecondaryAttackProjectileToolTierSystem
+{
+    internal static void ApplyCurrentProjectileHitToolTierIfNeeded(HitData? hit)
+    {
+        if (hit == null ||
+            !SecondaryAttackRuntimeContext.TryPeekProjectileHitContext(out ProjectileHitContext context) ||
+            context.Projectile == null ||
+            !ShouldApplyToProjectile(context.Attribution))
+        {
+            return;
+        }
+
+        ApplyToHitData(hit, context.Projectile, ProjectileAccess.GetWeapon(context.Projectile));
+    }
+
+    internal static void ApplyToHitData(HitData? hit, Projectile? projectile, ItemDrop.ItemData? weapon)
+    {
+        if (hit == null)
+        {
+            return;
+        }
+
+        short toolTier = ResolveToolTier(projectile, weapon);
+        byte itemWorldLevel = ResolveItemWorldLevel(projectile, weapon);
+        if (toolTier > hit.m_toolTier)
+        {
+            hit.m_toolTier = toolTier;
+        }
+
+        if (itemWorldLevel > hit.m_itemWorldLevel)
+        {
+            hit.m_itemWorldLevel = itemWorldLevel;
+        }
+    }
+
+    private static bool ShouldApplyToProjectile(ProjectileAttackAttribution? attribution)
+    {
+        return attribution?.SecondaryAttack == true ||
+               attribution?.Definition?.BehaviorType is SecondaryAttackBehaviorType.Projectile
+                   or SecondaryAttackBehaviorType.CopiedSecondary;
+    }
+
+    private static short ResolveToolTier(Projectile? projectile, ItemDrop.ItemData? weapon)
+    {
+        short toolTier = 0;
+        HitData? originalHitData = projectile != null ? ProjectileAccess.GetOriginalHitData(projectile) : null;
+        if (originalHitData != null)
+        {
+            toolTier = originalHitData.m_toolTier;
+        }
+
+        ItemDrop.ItemData? projectileWeapon = projectile != null ? ProjectileAccess.GetWeapon(projectile) : null;
+        if (projectileWeapon?.m_shared != null)
+        {
+            toolTier = (short)Mathf.Max(toolTier, projectileWeapon.m_shared.m_toolTier);
+        }
+
+        if (weapon?.m_shared != null)
+        {
+            toolTier = (short)Mathf.Max(toolTier, weapon.m_shared.m_toolTier);
+        }
+
+        return toolTier;
+    }
+
+    private static byte ResolveItemWorldLevel(Projectile? projectile, ItemDrop.ItemData? weapon)
+    {
+        byte itemWorldLevel = 0;
+        HitData? originalHitData = projectile != null ? ProjectileAccess.GetOriginalHitData(projectile) : null;
+        if (originalHitData != null)
+        {
+            itemWorldLevel = originalHitData.m_itemWorldLevel;
+        }
+
+        ItemDrop.ItemData? projectileWeapon = projectile != null ? ProjectileAccess.GetWeapon(projectile) : null;
+        if (projectileWeapon != null)
+        {
+            itemWorldLevel = (byte)Mathf.Max(itemWorldLevel, projectileWeapon.m_worldLevel);
+        }
+
+        if (weapon != null)
+        {
+            itemWorldLevel = (byte)Mathf.Max(itemWorldLevel, weapon.m_worldLevel);
+        }
+
+        return itemWorldLevel;
+    }
+}
+
+[HarmonyPatch(typeof(Destructible), nameof(Destructible.Damage))]
+internal static class DestructibleDamageProjectileToolTierPatch
+{
+    private static void Prefix(HitData hit)
+    {
+        SecondaryAttackProjectileToolTierSystem.ApplyCurrentProjectileHitToolTierIfNeeded(hit);
+    }
+}
+
+[HarmonyPatch(typeof(MineRock), nameof(MineRock.Damage))]
+internal static class MineRockDamageProjectileToolTierPatch
+{
+    private static void Prefix(HitData hit)
+    {
+        SecondaryAttackProjectileToolTierSystem.ApplyCurrentProjectileHitToolTierIfNeeded(hit);
+    }
+}
+
+[HarmonyPatch(typeof(MineRock5), nameof(MineRock5.Damage))]
+internal static class MineRock5DamageProjectileToolTierPatch
+{
+    private static void Prefix(HitData hit)
+    {
+        SecondaryAttackProjectileToolTierSystem.ApplyCurrentProjectileHitToolTierIfNeeded(hit);
+    }
+}
+
+[HarmonyPatch(typeof(TreeBase), nameof(TreeBase.Damage))]
+internal static class TreeBaseDamageProjectileToolTierPatch
+{
+    private static void Prefix(HitData hit)
+    {
+        SecondaryAttackProjectileToolTierSystem.ApplyCurrentProjectileHitToolTierIfNeeded(hit);
+    }
+}
+
+[HarmonyPatch(typeof(TreeLog), nameof(TreeLog.Damage))]
+internal static class TreeLogDamageProjectileToolTierPatch
+{
+    private static void Prefix(HitData hit)
+    {
+        SecondaryAttackProjectileToolTierSystem.ApplyCurrentProjectileHitToolTierIfNeeded(hit);
+    }
+}
+
+[HarmonyPatch(typeof(WearNTear), nameof(WearNTear.Damage))]
+internal static class WearNTearDamageProjectileToolTierPatch
+{
+    private static void Prefix(HitData hit)
+    {
+        SecondaryAttackProjectileToolTierSystem.ApplyCurrentProjectileHitToolTierIfNeeded(hit);
+    }
+}

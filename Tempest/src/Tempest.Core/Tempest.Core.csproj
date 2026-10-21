@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Tempest logic (settings table, event model, scheduler, timeline, environment plan, strike planning, weather filter table, step-aside and import plans, text keys). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Tempest.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Tempest</RootNamespace>
+  </PropertyGroup>
+</Project>

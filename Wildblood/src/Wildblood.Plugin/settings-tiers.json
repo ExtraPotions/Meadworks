@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "product": "Wildblood",
+  "default": "Advanced",
+  "settings": {
+    "1 - General/Enabled": "Essential",
+    "2 - Stars/Difficulty": "Essential",
+    "10 - Display/Show Trait Names": "Essential",
+    "10 - Display/Boss Hints": "Essential",
+    "10 - Display/Show Karma Under Minimap": "Essential",
+    "11 - Recap/Record Deaths": "Essential",
+    "11 - Recap/Recap Key": "Essential",
+    "1 - General/Protected Prefabs": "FileOnly",
+    "2 - Stars/Respect Enemy Level Up Rate": "FileOnly",
+    "3 - World Tier/Boss Keys": "FileOnly",
+    "6 - Loot/Extra Roll Chance": "FileOnly",
+    "6 - Loot/Defer To DropNSpawn": "FileOnly",
+    "7 - Luck/Persist Counters": "FileOnly",
+    "7 - Luck/Attribute To Killer": "FileOnly",
+    "8 - Pressure/Yield Scaling To": "FileOnly",
+    "10 - Display/Palette": "FileOnly",
+    "10 - Display/Lore Window Pad Chord": "FileOnly",
+    "Meadworks/NativeRulesSnapshot": "FileOnly"
+  }
+}

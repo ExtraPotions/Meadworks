@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Bestiary logic (creature and item tables, settings, spawn rules, interop tables, import plans). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Bestiary.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Bestiary</RootNamespace>
+  </PropertyGroup>
+</Project>

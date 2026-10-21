@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Threshold logic (settings table, cheat gate, access reasons, portal list and version hash, access modes, hubs, routing, carry and fuel rules, picker list, favourites, step-aside and import plans, hook targets, text keys). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Threshold.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Threshold</RootNamespace>
+  </PropertyGroup>
+</Project>

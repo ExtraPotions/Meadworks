@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Magpie logic (item identity, merge planner, loot classification). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Magpie.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Magpie</RootNamespace>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,38 @@
+{
+  "result": "PASS",
+  "assetCount": 21,
+  "triangleCount": 9070,
+  "checks": [
+    "actual StoneCatalog scope",
+    "exact saved prefab identities",
+    "flat JsonUtility mesh schema",
+    "finite indexed triangles",
+    "outward overall signed volumes",
+    "native hand-item meter scale",
+    "collider encloses visual geometry",
+    "unique names and referenced materials",
+    "Cleansing-only nonemissive weathered gold inlay",
+    "minimum 3:1 source albedo contrast against all ivory facets"
+  ],
+  "cleansingInlay": {
+    "rgb": [
+      104,
+      80,
+      45
+    ],
+    "emission": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "sourceAlbedoContrasts": {
+      "inscribe_ivory": 4.018368898668014,
+      "inscribe_ivory_light": 4.976919452381657,
+      "inscribe_ivory_dark": 3.146744662656502
+    }
+  },
+  "modelsSha256": "A180EADF8324B7B0C793BEBBC957F092C666ED6C23C9D59D03068D121FE00FFC",
+  "limits": [
+    "No rendered visual approval, Unity import, native material validation, or in-game evidence in this source check."
+  ]
+}

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- C08 PackPanel UI kit: a separate BepInEx plugin assembly (Crucible.UI.dll) next to Crucible.dll. GPL-3.0-or-later
+       code adopted from PackPanel 0.12.0 with its art embedded once here; see docs/packpanel-ui-provenance.json. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Crucible.UI</AssemblyName>
+    <Version>0.3.17</Version>
+    <RootNamespace>ExtraPotions.Meadworks.Crucible.UI</RootNamespace>
+    <!-- Adopted PackPanel code is written without nullable flow analysis; annotations stay legal. -->
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+  <Import Project="../../RuntimeReferences.props"/>
+  <ItemGroup>
+    <ProjectReference Include="../Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
+    <ProjectReference Include="../Crucible.Core/Crucible.Core.csproj" Private="false"/>
+    <Reference Include="assembly_guiutils" HintPath="$(ValheimManagedDir)/assembly_guiutils.dll" Private="false"/>
+    <Reference Include="gui_framework" HintPath="$(ValheimManagedDir)/gui_framework.dll" Private="false"/>
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- UI images decoded at runtime by the adopted EmbeddedSprite; KitArtCatalog names the resources. -->
+    <EmbeddedResource Include="Art/*.png" LogicalName="Crucible.UI.assets.%(Filename)%(Extension)"/>
+    <None Remove="Art/source/**"/>
+    <!-- Settings tiers read by Crucible (Essential settings on the MeadWorks menu page). -->
+    <EmbeddedResource Include="settings-tiers.json" LogicalName="$(AssemblyName).settings-tiers.json"/>
+  </ItemGroup>
+</Project>

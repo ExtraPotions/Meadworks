@@ -1,0 +1,16 @@
+PlantEasily 2.2.2 native input adoption
+
+Source repository: https://github.com/AdvizeGH/Advize_ValheimMods
+Source commit: 1deeb3962eb8681394961b0f35a4dfbc315c6f99
+Source file: Advize_PlantEasily/Patches/InputPatches.cs
+Adapted file: src/Wildroot.Plugin/Adopted/PlantEasilyInputPatches.cs
+Native key-read adaptation: src/Wildroot.Plugin/InputController.cs
+
+The adopted portions retain the upstream GNU General Public License version 3
+terms. The complete, unmodified license from this same source revision is in
+PlantEverything-GPL-3.0.txt. The original Wildroot portions' later-version option
+does not extend the upstream grant. Source provenance and adaptation limits are
+recorded in src/Wildroot.Plugin/Adopted/PlantEasilyInput.PROVENANCE.md in the
+source archive.
+
+Wildroot product author: expDARE.

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "product": "Inscribe",
+  "default": "Advanced",
+  "settings": {
+    "1 - General/Enabled": "Essential",
+    "2 - Runes/Confirm Destructive Runes": "Essential",
+    "2 - Runes/Gems And Sockets": "Essential",
+    "6 - Display/Colored Item Names": "Essential",
+    "6 - Display/Tooltip Detail": "Essential",
+    "7 - Ground Glow/Ground Glow": "Essential",
+    "7 - Ground Glow/Loot Beam": "Essential",
+    "4 - Drops/Wildblood Star Synergy": "FileOnly",
+    "5 - Commands/Read-Only Commands For Everyone": "FileOnly",
+    "7 - Ground Glow/Glow Refresh Seconds": "FileOnly"
+  }
+}

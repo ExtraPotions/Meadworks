@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "product": "Shepherd",
+  "default": "Advanced",
+  "settings": {
+    "1 - General/Enabled": "Essential",
+    "2 - Feeding/Container Feeding": "Essential",
+    "2 - Feeding/Show Food On Troughs": "Essential",
+    "4 - Husbandry/Lore Detail": "Essential",
+    "4 - Husbandry/Show Callouts": "Essential",
+    "11 - Interface/Herd Book Key": "Essential",
+    "2 - Feeding/Disallow Feed": "FileOnly",
+    "2 - Feeding/Disallow Animals": "FileOnly",
+    "3 - Troughs/Plank Trough Recipe": "FileOnly",
+    "3 - Troughs/Stone Trough Recipe": "FileOnly",
+    "3 - Troughs/Feed Barrel Recipe": "FileOnly",
+    "5 - Taming/Taming Levels": "FileOnly",
+    "6 - Breeding/Mutation Chance": "FileOnly",
+    "7 - Herd/Land Pen Recipe": "FileOnly",
+    "12 - Cheats/Breeding Commands": "FileOnly",
+    "Import/Imported Sources": "FileOnly"
+  }
+}

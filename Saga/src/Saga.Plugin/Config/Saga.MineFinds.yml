@@ -1,0 +1,195 @@
+# GrindstoneSkills.MineFinds.yml - what broken rock can hide.
+#
+# Every time a miner breaks a chunk of rock (a piece of a copper deposit, a boulder, a mud pile) or a whole
+# single-piece rock (tin, obsidian, small stones), there is a chance of a find: from "Find Chance At 0" to "Find Chance
+# At 100" in section "18 - Mine Finds" of the .cfg, growing with the miner's Pickaxes level. Small chunks get a share
+# of it by their health (50 or more: all of it; a boulder's 30: 60%; a mud pile's 5: 10%), so rocks of tiny chunks are
+# no find farm. Chunks broken by splash damage, and chunks that fall when the ones under them are mined away, count
+# too. One find is then picked from this file by weight, its items pop out of the broken chunk towards the miner, and
+# everybody near sees "Found <name>!" there. Ore deposits and plain stone alike; the world's resource rate does not
+# change finds.
+#
+# The server's copy is sent to every player while the server's "Lock Configuration" is on; edits are picked up a few
+# seconds after saving, no restart needed. Extra files named GrindstoneSkills.MineFinds<anything>.yml next to this one
+# are read as well; a biome or deposit in a later file replaces the same one in an earlier file.
+#
+# LAYOUT
+#
+#   biomes:            one list of finds per biome. A rock uses the list of the biome it stands in.
+#     <Biome>:         Meadows, BlackForest, Swamp, Mountain, Plains, Mistlands, AshLands, DeepNorth or Ocean
+#                      (case does not matter, "Black Forest" works too). A biome that is not listed, or listed with
+#                      nothing after the colon ("Swamp:"), hides nothing.
+#   deposits:          optional: one list of finds per kind of rock. A listed kind uses its own list instead of its
+#     <Kind>:          biome's, wherever it stands. The kind is the rock's prefab name without "_frac", so a deposit
+#                      is one kind whole and broken open (rock4_copper and rock4_copper_frac are both rock4_copper;
+#                      either spelling works here). A few whole rocks break open into another rock's form and take
+#                      its kind: mudpile_beacon is mudpile, rock1_mistlands is rock1_mountain, BigRock is
+#                      rock4_bigrock, and the giants' armour is giant_helmet1_destruction and the like.
+#                      The game's ore deposits: rock4_copper, MineRock_Tin (Black Forest); mudpile, mudpile2 (Swamp);
+#                      silvervein, rock3_silver, MineRock_Obsidian (Mountain); giant_ribs, giant_skull,
+#                      giant_helmet1_destruction, giant_helmet2_destruction, giant_sword1_destruction,
+#                      giant_sword2_destruction (Mistlands); LeviathanLava, FlametalRockstand (Ashlands); Leviathan
+#                      (Ocean). Some plain stone: rock4_forest, rock4_heath, rock1_mountain, rock3_mountain,
+#                      rock_mistlands1, rock4_ashlands, Rock_3_deepnorth. Rocks added by other mods work too, by their
+#                      prefab name.
+#
+# Each find in a list:
+#   name:    what the callout shows after "Found", for example "a ruby". Optional, "something" if left out.
+#   weight:  how often it is picked compared with the other finds of the same list: weight 20 next to weights that
+#            add up to 100 is picked one time in five. Optional, 1 if left out; 0 switches the find off.
+#   items:   one or more items that all drop together, each { prefab: <item>, min: <n>, max: <n> }:
+#              prefab  the item's prefab name as the game spells it: Amber, AmberPearl, Ruby, Coins, SilverNecklace...
+#                      A name the game does not know is logged once and skipped.
+#              min     the fewest that drop, 0 or more. Optional, 1 if left out.
+#              max     the most that drop, at least min, at most 999. Optional, the same as min if left out.
+#
+# The lists below hold only the game's own valuables, one at a time: amber, amber pearls and rubies, with more pearls
+# and rubies the further the biome is along the game's progression. To add a biome or a deposit, copy one of the lists
+# under a new key and change it. Keep the two-space indents: a biome sits two spaces in from "biomes:", each find
+# starts with "- " four spaces in.
+
+biomes:
+  Meadows:
+    - name: a lump of amber
+      weight: 85
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 12
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 3
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  BlackForest:
+    - name: a lump of amber
+      weight: 75
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 20
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 5
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  Swamp:
+    - name: a lump of amber
+      weight: 65
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 27
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 8
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  Mountain:
+    - name: a lump of amber
+      weight: 55
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 33
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 12
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  Plains:
+    - name: a lump of amber
+      weight: 45
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 38
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 17
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  Mistlands:
+    - name: a lump of amber
+      weight: 35
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 42
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 23
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  AshLands:
+    - name: a lump of amber
+      weight: 25
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 45
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 30
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  DeepNorth:
+    - name: a lump of amber
+      weight: 25
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 45
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 30
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  # The sea's rocks: a Leviathan's back and the stones standing in the shallows. Pearls wash up here.
+  Ocean:
+    - name: a lump of amber
+      weight: 40
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+    - name: an amber pearl
+      weight: 50
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+    - name: a ruby
+      weight: 10
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+# A list for one kind of deposit, instead of its biome's. Remove the "# " in front of the lines below to use it:
+# silver veins then hide rubies more often than the mountain stone around them.
+#
+# deposits:
+#   silvervein:
+#     - name: a ruby in the silver
+#       weight: 40
+#       items:
+#         - { prefab: Ruby, min: 1, max: 1 }
+#     - name: an amber pearl
+#       weight: 40
+#       items:
+#         - { prefab: AmberPearl, min: 1, max: 1 }
+#     - name: a lump of amber
+#       weight: 20
+#       items:
+#         - { prefab: Amber, min: 1, max: 1 }

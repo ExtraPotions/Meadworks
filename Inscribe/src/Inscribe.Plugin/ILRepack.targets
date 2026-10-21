@@ -1,0 +1,14 @@
+<Project>
+  <!-- Portions Copyright (C) 2026 Gerald Glasgow. EliteCrafting 0.7.0 at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1.
+       SPDX-License-Identifier: GPL-3.0-or-later
+       Changed by expDARE, 2026: merge only the private YAML parser; no installation or dist copies. -->
+  <Target Name="ILRepacker" AfterTargets="Build">
+    <ItemGroup>
+      <InputAssemblies Include="$(TargetPath)" />
+      <InputAssemblies Include="$(OutDir)YamlDotNet.dll" />
+      <LibraryPaths Include="$(OutDir);$(ValheimManagedDir);$(BepInExDir)/core;$(JotunnDir);$(CrucibleRoot)/src/Crucible.Plugin/bin/Release/netstandard2.1;$(CrucibleRoot)/src/Crucible.Core/bin/Release/netstandard2.1;$(CrucibleRoot)/src/Crucible.UI/bin/Release/netstandard2.1" />
+    </ItemGroup>
+    <ILRepack Parallel="true" DebugInfo="false" Internalize="true" InputAssemblies="@(InputAssemblies)"
+              OutputFile="$(TargetPath)" TargetKind="SameAsPrimaryAssembly" LibraryPath="@(LibraryPaths)" />
+  </Target>
+</Project>

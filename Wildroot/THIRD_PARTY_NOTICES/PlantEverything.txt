@@ -1,0 +1,52 @@
+PlantEverything PlaceAnywhere lifecycle source
+
+Upstream project: AdvizeGH/Advize_ValheimMods, PlantEverything 1.21.3
+Official source: https://github.com/AdvizeGH/Advize_ValheimMods
+Frozen commit: 1deeb3962eb8681394961b0f35a4dfbc315c6f99
+Frozen archive: https://github.com/AdvizeGH/Advize_ValheimMods/archive/1deeb3962eb8681394961b0f35a4dfbc315c6f99.zip
+Upstream license: GNU General Public License, version 3. The exact upstream
+LICENSE is preserved alongside this notice as PlantEverything-GPL-3.0.txt.
+Upstream assembly notice: Copyright © 2021
+
+Source files used:
+  Advize_PlantEverything/Patches/PieceCreationPatches.cs
+  Advize_PlantEverything/Patches/ApplyZDOPatches.cs
+  Advize_PlantEverything/Patches/CheckZDOPatches.cs
+  Advize_PlantEverything/Patches/PlantPatches.cs
+  Advize_PlantEverything/Framework/PluginUtils.cs
+  Advize_PlantEverything/Framework/PluginInitUtils.cs (InitSaplings and InitModdedSaplings)
+  Advize_PlantEverything/Patches/ModInitPatches.cs (TreeBase sapling classification)
+  Advize_PlantEverything/Framework/StaticContent.cs (explicit fixed-ground entries)
+
+Wildroot adaptation:
+  src/Wildroot.Plugin/Adopted/PlaceAnywhere.cs
+  src/Wildroot.Plugin/Catalog/PrefabRegistrar.cs
+  src/Wildroot.Core/Catalog/CatalogPolicy.cs
+
+The native fall flag, ZDO persistence, TreeBase.Grow propagation and native
+Piece/TreeBase reload hooks retain the upstream behavior. Wildroot uses its own
+marker, the existing active/session/coexistence gate and existing catalog
+eligibility. The placement marker is written synchronously after the existing
+receipt scope proves one valid correlated owner object, rather than the
+upstream Piece.SetCreator hook. It records native placement support and does
+not authorize payment, growth or yield. Existing pending receipt guards remain
+in force; a rejected payment still removes that same correlated object.
+Wildroot's configuration, payment, cancellation and receipt handling remain its own.
+The pinned sapling survival setting is retained: PlaceAnywhere clears
+Plant.m_destroyIfCantGrow for catalog saplings and external cultivator plants
+with TreeBase grown prefabs. Wildroot captures and restores the original field
+through its existing prefab ledger when the option or product is disabled.
+FernAshlands, Pickable_Branch, Pickable_Stone and Pickable_Flint retain the
+reference's explicit fixed-ground flags even with PlaceAnywhere enabled.
+
+Ashlands crop masks (src/Wildroot.Core/Catalog/ReferenceTraits.cs) follow
+PlantEverything 1.21.4, same upstream repository and license, commit
+864defe2f471f3c10e0ddd8237fc8fee74190433 (Framework/StaticMembers.cs
+StandardCropBiomes and HardyCropBiomes; Framework/StaticContent.cs
+GenerateCropRefs). Only the biome mask values are used; no 1.21.4 source text
+is copied. Pinned snapshot: assets/references/compat-overhaul-20261018/
+azumatt-advize/AdvizeGH-Advize_ValheimMods-864defe2 (archive SHA256
+1F0394B848C27B193F29A3475F1DDCD7E34251892D716C98798AB0F4A8CB6CA2).
+
+This notice records third-party source provenance and license preservation;
+it does not change Wildroot's project authorship.

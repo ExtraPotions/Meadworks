@@ -1,0 +1,2 @@
+﻿Reference: ../ecp_skel_arsenal/out/remake/ecp_skel_arrow_icon_reference.png
+Exact current low-poly carved bone arrow: one larger bone carved to thin shaft, integral asymmetric point with two small edge chips and three short thick irregular bone fins. No feathers, attached head, vertebra rings, bindings, wood or metal. Muted ivory and tan bone; full diagonal arrow lower-left nock to upper-right tip. Square transparent RGBA, 5 percent margin, no shadow floor text or frame, readable at 128/64 px. Preserve rendered proportions.

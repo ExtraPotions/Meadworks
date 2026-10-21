@@ -1,0 +1,301 @@
+# GrindstoneSkills.Finds.yml - what a felled tree can hide.
+#
+# When a woodcutter fells a tree (a domino fell counts too), there is a chance of a find: from "Find Chance At 0" to
+# "Find Chance At 100" in section "13 - Finds" of the .cfg, growing with the woodcutter's Woodcutting level. One find
+# is then picked from this file by weight, its items drop a few metres up the trunk and tumble out of the crown, and
+# everybody near sees "Found <name>!" above the tree.
+#
+# The server's copy is sent to every player while the server's "Lock Configuration" is on; edits are picked up a few
+# seconds after saving, no restart needed. Extra files named GrindstoneSkills.Finds<anything>.yml next to this one are
+# read as well; a biome or tree in a later file replaces the same one in an earlier file.
+#
+# LAYOUT
+#
+#   biomes:            one list of finds per biome. A tree uses the list of the biome it stands in.
+#     <Biome>:         Meadows, BlackForest, Swamp, Mountain, Plains, Mistlands, AshLands, DeepNorth or Ocean
+#                      (case does not matter, "Black Forest" works too). A biome that is not listed, or listed with
+#                      nothing after the colon ("Swamp:"), hides nothing.
+#   trees:             optional: one list of finds per tree prefab. A listed tree uses its own list instead of its
+#     <TreePrefab>:    biome's, wherever it grows. The game's trees: Beech1, Oak1, Birch1, Birch2, Birch1_aut,
+#                      Birch2_aut, FirTree, Pinetree_01, SwampTree1, YggaShoot1, YggaShoot2, YggaShoot3,
+#                      AshlandsTree1, AshlandsTree3, AshlandsTree4, AshlandsTree5, AshlandsTree6, AshlandsTree6_big,
+#                      FirTree_big, SnowFirTree, Pinetree_Snow, Pinetree_Snow_dead. Trees added by other mods work
+#                      too, by their prefab name.
+#
+# Each find in a list:
+#   name:    what the callout shows after "Found", for example "a bird's nest". Optional, "something" if left out.
+#   weight:  how often it is picked compared with the other finds of the same list: weight 20 next to weights that
+#            add up to 100 is picked one time in five. Optional, 1 if left out; 0 switches the find off.
+#   items:   one or more items that all drop together, each { prefab: <item>, min: <n>, max: <n> }:
+#              prefab  the item's prefab name as the game spells it: Feathers, Honey, QueenBee, Coins, Amber...
+#                      A name the game does not know is logged once and skipped.
+#              min     the fewest that drop, 0 or more. Optional, 1 if left out.
+#              max     the most that drop, at least min, at most 999. Optional, the same as min if left out.
+#
+# To add a biome or a tree, copy one of the lists below under a new key and change it. Keep the two-space indents:
+# a biome sits two spaces in from "biomes:", each find starts with "- " four spaces in.
+
+biomes:
+  Meadows:
+    - name: a bird's nest
+      weight: 40
+      items:
+        - { prefab: Feathers, min: 2, max: 4 }
+    - name: a wild hive
+      weight: 20
+      items:
+        - { prefab: Honey, min: 2, max: 4 }
+    - name: a queen bee's hive
+      weight: 2
+      items:
+        - { prefab: Honey, min: 1, max: 3 }
+        - { prefab: QueenBee, min: 1, max: 1 }
+    - name: a squirrel's stash
+      weight: 15
+      items:
+        - { prefab: Raspberry, min: 3, max: 6 }
+    - name: a knot of resin
+      weight: 10
+      items:
+        - { prefab: Resin, min: 3, max: 6 }
+    - name: a hollow with a few coins
+      weight: 8
+      items:
+        - { prefab: Coins, min: 3, max: 10 }
+    - name: a lump of amber
+      weight: 5
+      items:
+        - { prefab: Amber, min: 1, max: 1 }
+
+  BlackForest:
+    - name: a bird's nest
+      weight: 35
+      items:
+        - { prefab: Feathers, min: 2, max: 4 }
+    - name: a greydwarf's hoard
+      weight: 20
+      items:
+        - { prefab: GreydwarfEye, min: 2, max: 4 }
+        - { prefab: Resin, min: 2, max: 3 }
+    - name: a mushroom hollow
+      weight: 15
+      items:
+        - { prefab: Mushroom, min: 2, max: 4 }
+        - { prefab: MushroomYellow, min: 0, max: 2 }
+    - name: a squirrel's stash
+      weight: 15
+      items:
+        - { prefab: Blueberries, min: 3, max: 6 }
+    - name: a wild hive
+      weight: 8
+      items:
+        - { prefab: Honey, min: 1, max: 3 }
+    - name: a hollow with a few coins
+      weight: 8
+      items:
+        - { prefab: Coins, min: 5, max: 15 }
+    - name: a lump of amber
+      weight: 5
+      items:
+        - { prefab: Amber, min: 1, max: 2 }
+
+  Swamp:
+    - name: a leech's leavings
+      weight: 25
+      items:
+        - { prefab: Bloodbag, min: 1, max: 3 }
+    - name: a clump of guck
+      weight: 25
+      items:
+        - { prefab: Guck, min: 2, max: 4 }
+    - name: a bird's nest
+      weight: 20
+      items:
+        - { prefab: Feathers, min: 2, max: 4 }
+    - name: a draugr's stash
+      weight: 15
+      items:
+        - { prefab: Entrails, min: 2, max: 4 }
+        - { prefab: Coins, min: 5, max: 15 }
+    - name: a pocket of ooze
+      weight: 10
+      items:
+        - { prefab: Ooze, min: 1, max: 3 }
+    - name: an amber pearl
+      weight: 4
+      items:
+        - { prefab: AmberPearl, min: 1, max: 1 }
+
+  Mountain:
+    - name: an eagle's nest
+      weight: 35
+      items:
+        - { prefab: Feathers, min: 3, max: 5 }
+    - name: a frozen hollow
+      weight: 12
+      items:
+        - { prefab: FreezeGland, min: 1, max: 2 }
+    - name: a wolf's cache
+      weight: 12
+      items:
+        - { prefab: WolfFang, min: 1, max: 2 }
+    - name: a shard of obsidian
+      weight: 12
+      items:
+        - { prefab: Obsidian, min: 2, max: 4 }
+    - name: a lost purse
+      weight: 8
+      items:
+        - { prefab: Coins, min: 10, max: 20 }
+    - name: a crystal cluster
+      weight: 6
+      items:
+        - { prefab: Crystal, min: 1, max: 2 }
+    - name: a lump of amber
+      weight: 5
+      items:
+        - { prefab: Amber, min: 1, max: 2 }
+
+  Plains:
+    - name: a bird's nest
+      weight: 35
+      items:
+        - { prefab: Feathers, min: 2, max: 4 }
+    - name: a squirrel's stash
+      weight: 15
+      items:
+        - { prefab: Cloudberry, min: 3, max: 6 }
+    - name: a wild hive
+      weight: 12
+      items:
+        - { prefab: Honey, min: 2, max: 4 }
+    - name: a queen bee's hive
+      weight: 2
+      items:
+        - { prefab: Honey, min: 1, max: 2 }
+        - { prefab: QueenBee, min: 1, max: 1 }
+    - name: a deathsquito's nest
+      weight: 12
+      items:
+        - { prefab: Needle, min: 2, max: 4 }
+    - name: a fuling's stash
+      weight: 8
+      items:
+        - { prefab: Coins, min: 15, max: 30 }
+    - name: a ruby in the roots
+      weight: 3
+      items:
+        - { prefab: Ruby, min: 1, max: 1 }
+
+  Mistlands:
+    - name: a bird's nest
+      weight: 25
+      items:
+        - { prefab: Feathers, min: 2, max: 4 }
+    - name: a sap blister
+      weight: 15
+      items:
+        - { prefab: Sap, min: 2, max: 4 }
+    - name: a seeker's cache
+      weight: 15
+      items:
+        - { prefab: RoyalJelly, min: 2, max: 4 }
+    - name: a magecap cluster
+      weight: 12
+      items:
+        - { prefab: MushroomMagecap, min: 2, max: 3 }
+    - name: a tuft of Jotun puffs
+      weight: 12
+      items:
+        - { prefab: MushroomJotunPuffs, min: 2, max: 3 }
+    - name: a dvergr's purse
+      weight: 8
+      items:
+        - { prefab: Coins, min: 20, max: 40 }
+    - name: a wisp caught in the branches
+      weight: 4
+      items:
+        - { prefab: Wisp, min: 1, max: 1 }
+
+  AshLands:
+    - name: a charred hollow
+      weight: 20
+      items:
+        - { prefab: CharcoalResin, min: 3, max: 5 }
+    - name: a scorched nest
+      weight: 20
+      items:
+        - { prefab: Feathers, min: 2, max: 4 }
+    - name: a vineberry cluster
+      weight: 15
+      items:
+        - { prefab: Vineberry, min: 2, max: 4 }
+    - name: a tangle of fiddleheads
+      weight: 12
+      items:
+        - { prefab: Fiddleheadfern, min: 2, max: 3 }
+    - name: a warrior's remains
+      weight: 10
+      items:
+        - { prefab: CharredBone, min: 2, max: 4 }
+        - { prefab: Coins, min: 10, max: 20 }
+    - name: a pocket of sulfur
+      weight: 10
+      items:
+        - { prefab: SulfurStone, min: 2, max: 4 }
+    - name: a cluster of smoke puffs
+      weight: 10
+      items:
+        - { prefab: MushroomSmokePuff, min: 2, max: 3 }
+
+  DeepNorth:
+    - name: a frozen nest
+      weight: 30
+      items:
+        - { prefab: Feathers, min: 2, max: 4 }
+    - name: a squirrel's stash
+      weight: 20
+      items:
+        - { prefab: Lingonberry, min: 3, max: 6 }
+    - name: a hollow full of ice
+      weight: 12
+      items:
+        - { prefab: Ice, min: 2, max: 4 }
+    - name: a timberwood cone
+      weight: 12
+      items:
+        - { prefab: FirConeFrost, min: 1, max: 2 }
+    - name: a frozen purse
+      weight: 8
+      items:
+        - { prefab: Coins, min: 20, max: 40 }
+    - name: an amber pearl
+      weight: 4
+      items:
+        - { prefab: AmberPearl, min: 1, max: 2 }
+
+trees:
+  # The old oaks of the Meadows are bigger and older than the trees around them, so they get their own list.
+  Oak1:
+    - name: an owl's nest
+      weight: 35
+      items:
+        - { prefab: Feathers, min: 3, max: 6 }
+    - name: a squirrel's hoard
+      weight: 20
+      items:
+        - { prefab: Acorn, min: 2, max: 4 }
+    - name: a wild hive
+      weight: 15
+      items:
+        - { prefab: Honey, min: 2, max: 5 }
+    - name: a queen bee's hive
+      weight: 3
+      items:
+        - { prefab: Honey, min: 2, max: 3 }
+        - { prefab: QueenBee, min: 1, max: 1 }
+    - name: an old oak's hollow
+      weight: 8
+      items:
+        - { prefab: Coins, min: 10, max: 25 }
+        - { prefab: Amber, min: 1, max: 1 }

@@ -1,0 +1,5 @@
+# Source availability
+
+Product author: expDARE. Wayfarer is an original Meadworks product distributed under GPL-3.0-or-later, with original artwork/documentation under the separate retained CC BY-NC-SA 4.0 terms. No EasyTeleport source, binaries, artwork or documentation are included. Game/BepInEx/Jotunn/Harmony/shared Crucible assemblies are build/runtime references, not bundled consumer DLLs. The Corresponding Source for this version is at https://github.com/ExtraPotions/Meadworks/tree/main/Wayfarer. No rights transfer is inferred.
+
+Tombstone hints are adapted from BetterTombstoneHints 1.0.0 by JevMods (https://github.com/JevMods/BetterTombstoneHints, commit 808f97ed19ef8b65c5b49ca9c6bfee53c795e7ec), Copyright (c) 2026 JevMods, under the MIT licence; the licence text is kept in licenses/BetterTombstoneHints-MIT.txt and must accompany copies. Adapted files: src/Wayfarer.Core/TombstoneHints.cs, src/Wayfarer.Plugin/TombstoneHintsFeature.cs. The cause texts are now the game's own localized strings; the adapted tomb_* texts were removed. Wayfarer's modifications are GPL-3.0-or-later. No BetterTombstoneHints binary or icon is included.

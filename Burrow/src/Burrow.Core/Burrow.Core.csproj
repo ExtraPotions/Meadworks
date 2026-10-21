@@ -1,0 +1,1 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><AssemblyName>Burrow.Core</AssemblyName><RootNamespace>ExtraPotions.Burrow</RootNamespace></PropertyGroup><ItemGroup><ProjectReference Include="$(CrucibleRoot)/src/Crucible.Contracts/Crucible.Contracts.csproj"/></ItemGroup></Project>

@@ -1,0 +1,107 @@
+{
+  "assets": [
+    {
+      "id": "bestiary_dagger",
+      "prefabs": [
+        "ECP_BoneDagger"
+      ]
+    },
+    {
+      "id": "bestiary_sword",
+      "prefabs": [
+        "ECP_BoneSword"
+      ]
+    },
+    {
+      "id": "bestiary_axe",
+      "prefabs": [
+        "ECP_BoneAxe"
+      ]
+    },
+    {
+      "id": "bestiary_mace",
+      "prefabs": [
+        "ECP_BoneMace"
+      ]
+    },
+    {
+      "id": "bestiary_spear",
+      "prefabs": [
+        "ECP_BoneSpear"
+      ]
+    },
+    {
+      "id": "bestiary_atgeir",
+      "prefabs": [
+        "ECP_BoneAtgeir"
+      ]
+    },
+    {
+      "id": "bestiary_bow",
+      "prefabs": [
+        "ECP_BoneBow"
+      ]
+    },
+    {
+      "id": "bestiary_crossbow",
+      "prefabs": [
+        "ECP_BoneCrossbow"
+      ]
+    },
+    {
+      "id": "bestiary_executioner",
+      "prefabs": [
+        "ECP_ExecutionerGreataxe"
+      ]
+    },
+    {
+      "id": "bestiary_spine",
+      "prefabs": [
+        "ECP_Spine"
+      ]
+    },
+    {
+      "id": "bestiary_arrow",
+      "prefabs": [
+        "ECP_ArrowBone"
+      ]
+    },
+    {
+      "id": "bestiary_bolt",
+      "prefabs": [
+        "ECP_BoltBoneBlunt"
+      ]
+    },
+    {
+      "id": "bestiary_axehead",
+      "prefabs": [
+        "ECP_ExecutionerAxehead"
+      ]
+    },
+    {
+      "id": "bestiary_beak",
+      "prefabs": [
+        "ECP_KrakenBeak"
+      ]
+    },
+    {
+      "id": "bestiary_meat_raw",
+      "prefabs": [
+        "ECP_KrakenMeat"
+      ]
+    },
+    {
+      "id": "bestiary_meat_cooked",
+      "prefabs": [
+        "ECP_KrakenMeatCooked"
+      ]
+    },
+    {
+      "id": "bestiary_shield",
+      "prefabs": [
+        "ECP_ShieldKraken"
+      ]
+    }
+  ],
+  "materials": []
+}

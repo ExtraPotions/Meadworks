@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "strings": {
+    "loot_multiplier": "战利品倍率",
+    "module_pickup": "Magpie 拾取",
+    "module_merge": "Magpie 地面堆叠",
+    "module_float": "Magpie 漂浮物品",
+    "module_loot": "Magpie 战利品倍率",
+    "step_aside_pickup": "Magpie 拾取已关闭：已安装 {0}。",
+    "step_aside_merge": "Magpie 地面堆叠已关闭：已安装 {0}。",
+    "step_aside_float": "Magpie 漂浮物品已关闭：已安装 {0}。",
+    "step_aside_loot": "Magpie 战利品倍率已关闭：已安装 {0}。",
+    "import_done": "已导入 {0} 项 Magpie 设置。源文件已保留。",
+    "import_sync_incomplete": "Magpie 导入已在本地保存，但同步未完成。请检查同步；不要再次应用此预览。"
+  }
+}

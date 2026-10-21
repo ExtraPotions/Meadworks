@@ -1,0 +1,36 @@
+{
+  "item": "meadworks_panel_r6",
+  "licence": "CC BY-NC-SA 4.0 (MeadWorks asset licence); CC0 inputs are public domain",
+  "method": "Python (Pillow/numpy); no pixels of PackPanel, of any game or mod texture or of the concept sketches, no AI tools; build/build_panel_r6.py (+ r2/r4/set modules)",
+  "cc0_inputs": [
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Roughness.jpg",
+    "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg",
+    "ambientcg/Wood051/Wood051_1K-JPG_Color.jpg",
+    "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg"
+  ],
+  "cc0_sha256": {
+    "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg": "e8b483629421fb725668ef2128e21fa68753fbd40bc25a9c4e871018c014a73d",
+    "ambientcg/Wood051/Wood051_1K-JPG_Color.jpg": "f3c6c5456457e8d05c1fee4d2f186f41d0aea2b8a06859b69ce2934e11aa8798",
+    "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg": "3fcb2a67d00a0fff5171d9a42e720765287a80a76a9e80eaf07405ca6ea1c1a2",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg": "e7846a637fc634e53d174ae8fbfbdffa1de98771530a8a1fb26b711d3b4094e0",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Roughness.jpg": "76dfe4518f375eb1f7bc10cab5b26121f1a46e9b82682e1e1e6143a80ae3c07f"
+  },
+  "changes": "Cairn compass re-picked as option 2, iron-bound wood (user, 2026-10-14 10:39): one seamless plank of the set wood, dark forged-iron straps along the top and bottom with two rivets each, and iron end caps that stand proud of the straps with an orange rim (186, 112, 28) and a rivet top and bottom (Cairn adds the middle one); the heading inset restyled in the strap iron. Replaces r4's compass_plank and compass_inset; r4's iron_rivet is unchanged.",
+  "files": {
+    "compass_inset.png": {
+      "size": [
+        256,
+        56
+      ],
+      "sha256": "40fb95670843e407c9a908dce3dd03eb8d375e10feef6b82784b2fff951b8696"
+    },
+    "compass_plank.png": {
+      "size": [
+        960,
+        204
+      ],
+      "sha256": "e7e3a26f22f1e21e93da649fda923d4d5aaea8bfac86f7f8bde6c4ed2aa2baa5"
+    }
+  }
+}

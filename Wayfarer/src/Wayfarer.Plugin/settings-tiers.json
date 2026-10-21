@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "product": "Wayfarer",
+  "default": "Advanced",
+  "settings": {
+    "General/Enabled": "Essential",
+    "General/CloseMap": "Essential",
+    "General/TombstoneHints": "Essential",
+    "General/Language": "FileOnly",
+    "Meadworks/SchemaVersion": "FileOnly"
+  }
+}

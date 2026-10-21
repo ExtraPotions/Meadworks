@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Ember logic (sleep window, rate, boost, recount, HUD math, peer command codecs; door kinds, rules, distance, tracker). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Ember.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Ember</RootNamespace>
+  </PropertyGroup>
+</Project>

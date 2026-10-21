@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "product": "Crucible",
+  "default": "Advanced",
+  "settings": {
+    "Network/AdmissionMode": "Advanced",
+    "Mischief/Personal": "Advanced",
+    "Mischief/Economy": "Advanced",
+    "Mischief/World": "Advanced",
+    "Mischief/Information": "Advanced",
+    "Mischief/Travel": "Advanced",
+    "Mischief/Progress": "Advanced",
+    "Achievements/SyncPastStats": "Advanced",
+    "Achievements/ResyncKey": "Advanced",
+    "Skills/ExperienceMultiplier": "Advanced",
+    "Authority/VanillaServerTimeoutSeconds": "FileOnly",
+    "Network/PeerClassHandshake": "FileOnly",
+    "Mischief/ListedPlayers": "FileOnly",
+    "Mischief/Players May Use": "FileOnly",
+    "Logging/Level": "FileOnly",
+    "Logging/ProductOverrides": "FileOnly",
+    "Logging/RepeatWindowSeconds": "FileOnly",
+    "Logging/ConsoleFilterEnabled": "FileOnly",
+    "Logging/ConsoleFilterRules": "FileOnly",
+    "Logging/ConsoleFilterAppliesToDiskLog": "FileOnly",
+    "Logging/ShowAllConsoleMessages": "FileOnly",
+    "Meadworks/SchemaVersion": "FileOnly",
+    "StepAside/NoticesShown": "FileOnly"
+  }
+}

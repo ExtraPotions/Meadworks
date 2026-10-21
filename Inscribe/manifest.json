@@ -1,0 +1,11 @@
+{
+  "name": "Inscribe",
+  "version_number": "0.2.2",
+  "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Inscribe",
+  "description": "Meadworks gear inscriptions: item rarity, inscriptions, runes, gems and sockets. Old enhancement levels and scrolls convert to Honing Runes. Required on all peers.",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2351",
+    "ValheimModding-Jotunn-2.30.2",
+    "expDARE-Crucible-0.3.24"
+  ]
+}

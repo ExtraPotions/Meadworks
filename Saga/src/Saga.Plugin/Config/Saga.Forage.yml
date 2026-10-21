@@ -1,0 +1,50 @@
+# GrindstoneSkills.Forage.yml - what counts as foraging.
+#
+# Picking a wild plant or a loose stone whose item is listed here trains the Foraging skill, and the Foraging perks
+# (extra yield, sweep picking) apply to it.
+#
+# Crops are never foraging: a pickable that any plant can grow (carrots, turnips, onions, barley, flax, Jotun puffs,
+# magecap, seed carrots and the like, planted or wild) belongs to Farming, even when its item is listed here.
+#
+# The server's copy is sent to every player while the server's "Lock Configuration" is on; edits are picked up a few
+# seconds after saving, no restart needed. Extra files named GrindstoneSkills.Forage<anything>.yml next to this one
+# are read as well; an item in a later file replaces the same item in an earlier file.
+#
+# LAYOUT
+#
+#   forage:
+#     <ItemPrefab>:      the picked item's prefab name as the game spells it: Raspberry, Thistle, Flint...
+#                        Items added by other mods work too. "Raspberry:" with nothing after it counts the item as
+#                        forage with every value below left at its default.
+#       experience:      Foraging experience of one pick, as a factor of "Experience Per Pick" (section 33).
+#                        Optional, 1 if left out; 0 gives none.
+
+forage:
+  # Berries.
+  Raspberry:
+  Blueberries:
+  Cloudberry:
+  Lingonberry:
+
+  # Mushrooms.
+  Mushroom:
+  MushroomYellow:
+  MushroomBlue:
+  MushroomSmokePuff:
+
+  # Herbs and greens.
+  Thistle:
+  Dandelion:
+  Fiddleheadfern:
+  RoyalJelly:
+
+  # Gathered from the ground: half the experience.
+  Flint: { experience: 0.5 }
+  Stone: { experience: 0.5 }
+  Grausten: { experience: 0.5 }
+  Wood: { experience: 0.5 }
+  Frostwood: { experience: 0.5 }
+
+  # Wild grain and fibre (Pickable_Barley_Wild, Pickable_Flax_Wild).
+  Barley: { experience: 1 }
+  Flax: { experience: 1 }

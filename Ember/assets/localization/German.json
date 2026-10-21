@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "strings": {
+    "step_aside_sleep": "Ember-Schlaf ist aus: {0} ist installiert.",
+    "step_aside_torches": "Ember-Fackeln sind aus: {0} ist installiert.",
+    "step_aside_doors": "Automatische Türen von Ember sind aus: {0} ist installiert.",
+    "off_no_crucible": "Ember ist aus: Dieser Server nutzt Meadworks nicht.",
+    "off_no_ember": "Ember ist aus: Dieser Server verwendet Ember nicht.",
+    "doors_on": "Ember: automatische Türen an",
+    "doors_off": "Ember: automatische Türen aus",
+    "doors_not_allowed": "Der Server hat automatische Türen ausgeschaltet.",
+    "hud_sleeping": "Schlafend {0}/{1}",
+    "hud_boost": "+{0} %",
+    "import_done": "Ember hat {0} Einstellungen aus {1} übernommen.",
+    "cheat_sleep_any_time": "Jederzeit schlafen",
+    "cheat_testing_mode": "Testmodus",
+    "cheat_endless_torches": "Ewige Fackeln",
+    "torch_nightfall": "Leuchtet bei Einbruch der Nacht.",
+    "torch_keep": "Tag und Nacht brennen lassen",
+    "torch_schedule": "Nachtzeitplan verwenden",
+    "torch_kept": "Ember: Dauerlicht aktiviert.",
+    "torch_scheduled": "Ember: Nachtzeitplan wiederhergestellt.",
+    "torch_refused": "Ember: Fackeländerung abgelehnt.",
+    "bed_choice_countdown": "Bett wählen ({0}s)",
+    "bed_choice_nearest": "Nach Ablauf der Zeit erwachst du im nächsten bekannten Bett.",
+    "bed_choice_click": "Klicke auf ein Bett, um es zu wählen. Ein Doppelklick setzt eine Kartenmarkierung.",
+    "bed_choice_keys": "Karte, Esc oder Gamepad-B: bestätigen. Gamepad-A: in der Kartenmitte wählen."
+  }
+}

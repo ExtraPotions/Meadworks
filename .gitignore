@@ -1,0 +1,8 @@
+# Build output
+**/bin/
+**/obj/
+dist/
+.vs/
+*.user
+# Build dependencies (see BUILDING.md)
+/assets/dependencies/

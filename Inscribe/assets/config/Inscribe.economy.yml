@@ -1,0 +1,602 @@
+# EliteCrafting - economy
+#
+# Rarities, rolling rules, runes, item classes, item tiers, biome tiers and drop tables.
+format: 3
+# Written once, on first run, as a full copy of the built-in defaults; the mod never
+# rewrites it (a file from an older format is renamed to .v<format>.bak and written fresh). The
+# built-in defaults stay underneath this file (set
+# `use_defaults: false` to make the files the whole configuration).
+#
+# Extra files named EliteCrafting_economy_<anything>.yml are read after this one, in
+# file-name order, and change only what they name:
+#   - rarities and runes merge by `id`, field by field;
+#   - maps (cost, weights, item_tiers.*, biomes, drops.runes, drops.bosses, ...)
+#     merge by key; a key set to null is removed;
+#   - classes merge by `id`, field by field;
+#   - lists (applies_to, items, outcomes, a rune's drop weights) are replaced whole.
+#
+# Chances are percent numbers (4 means 4%). Weights are relative. Lists indexed by
+# tier have eight entries: tier 1 (meadows) first, tier 8 (deep north) last. A list of
+# seven still loads; its last value then counts for tier 8 too.
+
+# The ladder, lowest first. The first entry is the base rarity (no inscriptions, never
+# glows). `drop_weight` multiplies the rarity's weight in every drop table; 0 means it
+# never drops.
+rarities:
+  - id: normal
+    color: "#FFFFFF"
+    glow: false
+    inscriptions: { min: 0, max: 0 }
+    drop_weight: 0
+  - id: magic
+    color: "#1EFF00"
+    inscriptions: { min: 2, max: 2 }
+    prefixes: 1                # at most this many prefix inscriptions
+    suffixes: 1
+  - id: rare
+    color: "#0070DD"
+    inscriptions: { min: 3, max: 3 }
+    prefixes: 2
+    suffixes: 2
+  # MeadWorks tiers (batch 3). Shown names: normal Common, magic Uncommon, rare Rare, mw_epic Epic, mw_legendary
+  # Legendary; the stored ids never change. `tier_floor` keeps only the best that-many open tiers when an item is rolled
+  # fresh at the rarity (as a rune's tier_floor does). `source_only: true` never drops from creatures or chests, never
+  # comes from a rune or a promotion: only Wildblood bosses and raids hand it out (meadworks.inscribe.legendary_reward).
+  - id: mw_epic
+    color: "#A335EE"
+    inscriptions: { min: 4, max: 4 }
+    prefixes: 2
+    suffixes: 2
+    tier_floor: 4
+  - id: mw_legendary
+    color: "#FFB400"
+    inscriptions: { min: 5, max: 5 }
+    prefixes: 3
+    suffixes: 3
+    tier_floor: 2
+    drop_weight: 0
+    source_only: true
+
+# How inscriptions are drawn. Each item has an item level (1 meadows ... 8 deep north, see
+# item_tiers) and an item class (see classes). An inscription rolls on the classes it lists,
+# at any tier the item level has unlocked, weaker tiers more often; on a class where it is
+# only `allowed`, the top `allowed_closed_fraction` of its tiers stays closed (0.334: health
+# on a helmet stops at T3 of 8). A promotion (the Ascension Rune) adds what the new
+# rarity's minimum needs, and at least `promote_adds_at_least`. `count_weights` biases how
+# many inscriptions a fresh roll (a dropped item) gets.
+rolling:
+  allowed_closed_fraction: 0.334
+  promote_adds_at_least: 1
+
+# The five runes. Click a rune onto an item in your own inventory. Fields: id (one of the five),
+# verb, applies_to (rarities), cost (per rarity, default 1), tier_floor, enabled,
+# confirm (hold Shift / dialog first), stack (default 50), item_weight (the item weight of
+# one rune, default 0.2), name, description (loc key or text), tint.
+# Verbs: promote (one rarity up), reroll (every inscription replaced: the item rolled fresh at its rarity, a new count in its range),
+# strip (back to the base rarity, every inscription gone), corrupt (one outcome, then the
+# item is sealed for good: no rune works on it again). `tier_floor` is the weakest
+# inscription tier the rune rolls, counted like the tooltip: 1 = the best tier the item
+# allows. enabled: false keeps a rune from dropping and from being used; its prefab (and
+# every stack of it) stays. The Awakening and Tempering Runes were folded into Ascension and Honing (2026-10-19): rows,
+# drop weights and boss bonuses that still name them are read as their successor, and owned stacks convert one for one.
+runes:
+  # One rarity step at any tier: Common -> Uncommon (two inscriptions), Uncommon -> Rare and Rare -> Epic (one more each).
+  # Never into Legendary, which only Wildblood bosses and raids hand out.
+  - { id: ascension,   verb: promote, applies_to: [normal, magic, rare] }
+  - { id: recasting,   verb: reroll,  applies_to: [magic] }        # both inscriptions replaced by two new
+  # MeadWorks (batch 3): one inscription the player picks, one tier stronger (never past the best tier the item's level
+  # opens), its value rolled again in that tier. Flags have no value and refuse it.
+  - { id: honing,      verb: hone,    applies_to: [magic, rare, mw_epic, mw_legendary] }
+  - id: cleansing                                                  # back to Normal
+    verb: strip
+    applies_to: [magic, rare, mw_epic, mw_legendary]
+    confirm: true
+  - id: serpent                                                    # sealed for good, one of three outcomes
+    verb: corrupt
+    applies_to: [magic, rare, mw_epic, mw_legendary]
+    confirm: true
+    overflow: 1                # add_inscription may go this many past the rarity's maximum
+    outcomes:
+      - { outcome: seal_only,       weight: 35 }   # sealed as it is
+      - { outcome: add_inscription, weight: 35 }   # one more inscription, past the cap
+      - { outcome: chaotic_reroll,  weight: 30 }   # every inscription rerolled at any tier
+  # Sockets and gems (switch `Gems and sockets`): the Dvergr Chisel cuts 1-3 sockets into a weapon,
+  # pickaxe, staff, armour piece, shield or backpack that has none; a gem fills a socket with a stat that depends on
+  # the item (fixed in code), its tier rolled for the item when it is set.
+  - { id: dvergr_chisel, verb: socket, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_surtr,     verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_ymir,      verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_thor,      verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_nidhogg,   verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_hel,       verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_tyr,       verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_freyja,    verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_odin,      verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_skadi,     verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_heimdall,  verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+  - { id: gem_sleipnir,  verb: gem, applies_to: [normal, magic, rare, mw_epic, mw_legendary] }
+
+# Item classes: what an item is, for inscriptions (each inscription lists the classes it rolls
+# on) and gear drops. An item belongs to the first class that names it in `items`; otherwise
+# to the first class, in this order, with a `match` rule it meets. A rule meets when every key
+# it has holds: types (the game's item types), skills, two_handed, stackable, prefixes (of the
+# prefab name), name_contains. PackPanel's backpacks match no rule; a class must list them, or
+# a mod must claim them through the API. `rolls: false` classes never become magic.
+# Fields: id, group, name, rolls, damage_scale (multiplies scaled inscriptions such as
+# +X fire damage), drop_weight (gear drops), match (a list of rules, any of them), items.
+classes:
+  - id: unused
+    group: none
+    rolls: false
+    match:
+      - { prefixes: [FW_, SP_, DvergerArbalest_] }
+    items: [PlayerUnarmed, SwordCheat, SledgeCheat, ShieldKnight, CapeTest, IceShoes, IceSkates, SwordIronFire, DvergerArbalest]
+  - id: throwable
+    group: none
+    rolls: false
+    match:
+      - { stackable: true }
+      - { prefixes: [Bomb, Snowball] }
+  - id: tankard
+    group: none
+    rolls: false
+    match:
+      - { prefixes: [Tankard] }
+  - id: practice
+    group: none
+    rolls: false
+    items: [AtgeirWood, AxeWood, BattleaxeWood, KnifeWood, MaceWood, SledgeWood, SpearWood, SwordWood, THSwordWood]
+  - id: cosmetic
+    group: none
+    rolls: false
+    items: [ArmorDress1, ArmorDress10, ArmorDress2, ArmorDress3, ArmorDress4, ArmorDress5, ArmorDress6, ArmorDress7, ArmorDress8, ArmorDress9, ArmorHarvester1, ArmorHarvester2, ArmorTunic1, ArmorTunic10, ArmorTunic2, ArmorTunic3, ArmorTunic4, ArmorTunic5, ArmorTunic6, ArmorTunic7, ArmorTunic8, ArmorTunic9, CapeOdin, HelmetCelebration, HelmetHat1, HelmetHat10, HelmetHat2, HelmetHat3, HelmetHat4, HelmetHat5, HelmetHat6, HelmetHat7, HelmetHat8, HelmetHat9, HelmetMidsummerCrown, HelmetOdin, HelmetPointyHat, HelmetRootCrown, HelmetStrawHat, HelmetSweatBand, HelmetYule]
+  - id: helmet
+    group: armour
+    match:
+      - { types: [Helmet] }
+  - id: chest
+    group: armour
+    match:
+      - { types: [Chest] }
+  - id: legs
+    group: armour
+    match:
+      - { types: [Legs] }
+  - id: cape
+    group: armour
+    match:
+      - { types: [Shoulder] }
+  - id: trinket
+    group: jewel
+    match:
+      - { types: [Trinket] }
+  # Inscribe: the backpack class a pack product (Mantle) claims its packs into through meadworks.items.classes;
+  # rune-made magic and sockets only, never a pre-rolled drop (EliteCrafting 0.10.0's PackPanel class, built in).
+  - id: backpack
+    group: jewel
+    drop_weight: 0
+  - id: utility
+    group: jewel
+    drop_weight: 0.5
+    match:
+      - { types: [Utility] }
+  - id: buckler
+    group: offhand
+    match:
+      - { types: [Shield], name_contains: [Buckler] }
+  - id: tower
+    group: offhand
+    match:
+      - { types: [Shield], name_contains: [Tower] }
+  - id: shield
+    group: offhand
+    match:
+      - { types: [Shield] }
+  - id: light
+    group: offhand
+    damage_scale: 0.5
+    drop_weight: 0.25
+    match:
+      - { types: [Torch] }
+  - id: tool
+    group: tools
+    drop_weight: 0.5
+    match:
+      - { types: [Tool] }
+    items: [Scythe, Shovel, KnifeButcher, GrapplingHook]
+  - id: fishing
+    group: tools
+    drop_weight: 0.25
+    items: [FishingRod]
+  - id: pickaxe
+    group: tools
+    match:
+      - { skills: [Pickaxes] }
+  - id: crossbow
+    group: ranged
+    damage_scale: 1.4
+    match:
+      - { skills: [Crossbows] }
+  - id: bow
+    group: ranged
+    damage_scale: 0.6
+    match:
+      - { skills: [Bows] }
+  - id: staff_elemental
+    group: magic
+    match:
+      - { skills: [ElementalMagic] }
+  - id: staff_blood
+    group: magic
+    match:
+      - { skills: [BloodMagic] }
+  - id: knife
+    group: onehand
+    damage_scale: 0.7
+    match:
+      - { skills: [Knives] }
+  - id: spear
+    group: onehand
+    match:
+      - { skills: [Spears] }
+  - id: atgeir
+    group: twohand
+    damage_scale: 1.3
+    match:
+      - { skills: [Polearms] }
+  - id: fist
+    group: twohand
+    damage_scale: 0.7
+    match:
+      - { skills: [Unarmed] }
+  - id: greatsword
+    group: twohand
+    damage_scale: 1.3
+    match:
+      - { skills: [Swords], two_handed: true }
+  - id: sword_1h
+    group: onehand
+    match:
+      - { skills: [Swords] }
+  - id: dual_axe
+    group: twohand
+    damage_scale: 0.8
+    match:
+      - { skills: [Axes], prefixes: [AxeBerzerkr, AxeEarly] }
+  - id: battleaxe
+    group: twohand
+    damage_scale: 1.3
+    match:
+      - { skills: [Axes], two_handed: true }
+  - id: axe_1h
+    group: onehand
+    match:
+      - { skills: [Axes] }
+  - id: sledge
+    group: twohand
+    damage_scale: 1.3
+    match:
+      - { skills: [Clubs], two_handed: true }
+  - id: mace_1h
+    group: onehand
+    match:
+      - { skills: [Clubs] }
+
+# The item level of each item (1 meadows ... 8 deep north): an explicit entry in
+# `items` wins; otherwise the highest tier among its recipe's materials (crafted
+# intermediates followed `material_depth` deep; the lowest of several recipes);
+# otherwise its crafting station; otherwise `fallback_tier`. Names that match no
+# prefab are ignored with a warning, so one map can serve several modpacks.
+# `ecraft tiers` lists every item with its tier and why.
+item_tiers:
+  fallback_tier: 1
+  material_depth: 3
+
+  items:                       # no recipe, or a recipe whose materials mislead
+    BeltStrength: 3
+    HelmetDverger: 6
+    FishingRod: 1
+    Wishbone: 3
+    ArmorLeatherChest: 1
+    ArmorLeatherLegs: 1
+    HelmetLeather: 1
+    CapeDeerHide: 1
+    Club: 1
+    CrossbowArbalest: 6
+    SledgeIron: 3
+    Shovel: 7
+    ShieldRoots: 3
+    HelmetLox: 5
+    HelmetFishingHat: 1
+    Lantern: 6
+    TorchMist: 6
+    Lantern_hooded: 6
+    Lantern_DN: 8
+    AxeEarly: 2
+    HelmetBerserkerHood: 2
+    SledgeStagbreaker: 1
+    Demister: 6
+    HelmetCrownofValheim: 8
+    KnifeVoid: 8
+
+  materials:
+    # 1 meadows
+    Wood: 1
+    Stone: 1
+    Flint: 1
+    Resin: 1
+    LeatherScraps: 1
+    DeerHide: 1
+    Feathers: 1
+    HardAntler: 1
+    # 2 black_forest
+    RoundLog: 2
+    FineWood: 2
+    Copper: 2
+    CopperOre: 2
+    CopperScrap: 2             # verify
+    Tin: 2
+    TinOre: 2
+    Bronze: 2
+    BronzeNails: 2
+    TrollHide: 2
+    GreydwarfEye: 2
+    SurtlingCore: 2
+    BoneFragments: 2
+    AncientSeed: 2
+    Thistle: 2
+    Coal: 2
+    CryptKey: 2                # verify
+    # 3 swamp
+    Iron: 3
+    IronScrap: 3
+    IronOre: 3                 # verify
+    IronNails: 3
+    Chain: 3
+    ElderBark: 3
+    Guck: 3
+    Ooze: 3
+    Bloodbag: 3
+    Entrails: 3
+    WitheredBone: 3
+    Root: 3
+    Wishbone: 3
+    # 4 mountain (and ocean)
+    Silver: 4
+    SilverOre: 4
+    WolfPelt: 4
+    WolfFang: 4
+    WolfClaw: 4                # verify
+    Obsidian: 4
+    FreezeGland: 4
+    DragonTear: 4
+    Crystal: 4
+    JuteRed: 4                 # verify
+    YmirRemains: 4             # verify
+    SerpentScale: 4            # ocean, verify
+    Chitin: 4                  # ocean, verify
+    # 5 plains
+    BlackMetal: 5
+    BlackMetalScrap: 5
+    LinenThread: 5
+    Flax: 5
+    Needle: 5
+    LoxPelt: 5
+    Tar: 5
+    YagluthDrop: 5             # verify
+    # 6 mistlands
+    Eitr: 6
+    Sap: 6
+    Softtissue: 6
+    BlackCore: 6
+    Carapace: 6
+    ScaleHide: 6
+    Mandible: 6
+    BlackMarble: 6
+    YggdrasilWood: 6
+    JuteBlue: 6
+    Wisp: 6
+    Bilebag: 6
+    RoyalJelly: 6
+    QueenDrop: 6
+    Iolite: 6                  # verify
+    DvergrNeedle: 6            # verify
+    DvergrKeyFragment: 6       # verify
+    # 7 ashlands
+    FlametalNew: 7
+    FlametalOreNew: 7
+    Flametal: 7                # legacy name, verify
+    FlametalOre: 7             # legacy name, verify
+    CharredBone: 7
+    AskHide: 7
+    AskBladder: 7
+    CelestialFeather: 7
+    MoltenCore: 7
+    GemstoneRed: 7
+    GemstoneBlue: 7
+    GemstoneGreen: 7
+    Grausten: 7
+    Blackwood: 7
+    CharcoalResin: 7
+    CharredCogwheel: 7
+    MorgenSinew: 7
+    MorgenHeart: 7
+    ProustitePowder: 7
+    SulfurStone: 7
+    BellFragment: 7
+    FaderDrop: 7               # verify
+    FaderEmber: 7
+    # 8 deep north
+    Gold: 8
+    Frostwood: 8
+    MooseHide: 8
+    MooseSinew: 8
+    NornThread: 8
+    ElakingHairBundle: 8
+    SealHide: 8
+    SealBlubber: 8
+    OrbThunderBlood: 8
+    OrbFrostFire: 8
+    BarkaBranch: 8
+    TrophyMoose: 8
+    TrophyJotunWitch: 8
+    MoleClaws: 8
+    Leatherstraps: 8
+    CrownJewel: 8
+    FrostCore: 8
+    FrozenFuel: 8
+    WrithanRoots: 8
+    OozeMork: 8
+    Ice: 8
+    FrozenKingDrop: 8
+
+  stations:                    # fallback only; all names verify in game
+    piece_workbench: 1
+    forge: 2
+    piece_artisanstation: 5
+    blackforge: 6
+    piece_magetable: 6
+  # station_levels:
+  #   forge: { 1: 2, 3: 3, 5: 4, 7: 5 }
+
+# Biome -> tier, for creatures and (later) chests that have no entry of their own.
+biomes:
+  meadows: 1
+  black_forest: 2
+  swamp: 3
+  mountain: 4
+  plains: 5
+  mistlands: 6
+  ashlands: 7
+  ocean: 4                     # judgement call
+  deep_north: 8
+
+# What creatures drop. The on/off switches are `Rune Drops` and `Magic Item Drops` in Inscribe's
+# settings (4 - Drops); Inscribe keeps EliteCrafting 0.7.0's magic gear drops.
+drops:
+  tamed: false                 # tamed creatures drop our loot
+  require_player: true         # a player (or a player's tamed creature) must have hit it
+  max_runes_per_kill: 5
+  max_gear_per_kill: 2
+  star_multipliers: [1, 2, 3]  # by stars; index 0 = no stars
+  star_step: 1                 # added per star beyond the list
+
+  chances:                     # base chance per kill, by tier
+    rune: [15, 19, 22, 26, 29, 33, 36, 40]   # Inscribe (user, 2026-10-10): 15-40% a kill; EliteCrafting 0.9.1 is 35-70%
+    gear: [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75]
+
+  runes:                       # which rune drops, by tier; a disabled rune never drops
+    # Each column adds to 100, so a weight is that rune's percent of the drops at the tier. Ascension holds the old
+    # Awakening and Ascension shares and Honing the old Honing and Tempering shares (2026-10-19), so the columns and the
+    # other runes' odds are unchanged.
+    #               T1  T2  T3  T4  T5  T6  T7  T8
+    ascension:     [37, 36, 33, 31, 28, 26, 24, 21]
+    recasting:     [48, 45, 43, 42, 40, 40, 38, 38]
+    honing:        [ 2,  5,  7,  8, 10, 10, 12, 12]
+    cleansing:     [ 3,  3,  3,  3,  4,  4,  4,  5]
+    serpent:       [ 0,  0,  2,  3,  4,  5,  6,  7]
+    # The Dvergr Chisel; with `Gems and sockets` off its share goes to the runes. Gems drop only from bosses
+    # (50% for one, plus 50% for one more per boss star; fixed in code).
+    dvergr_chisel: [10, 11, 12, 13, 14, 15, 16, 17]
+
+  rarity_weights:              # the rarity of dropped gear, by tier
+    #          T1  T2  T3  T4  T5  T6  T7  T8
+    magic:   [ 80, 70, 60, 50, 45, 40, 35, 30]
+    rare:    [ 20, 30, 40, 50, 55, 60, 65, 70]
+    mw_epic: [  0,  1,  2,  3,  5,  6,  8, 10]
+    # mw_legendary is source_only: it has no row here and never drops from creatures or chests.
+
+  boss_rarity_weights:
+    magic:   [ 40, 30, 20, 15, 10,  5,  0,  0]
+    rare:    [ 60, 70, 80, 85, 90, 95, 100, 100]
+    mw_epic: [  5,  8, 10, 12, 15, 18, 20, 25]
+
+  gear:
+    require_recipe: true       # only bases a player could craft
+    tiers_below: 1             # bases this many tiers below the drop tier may drop too
+    same_tier_weight: 3
+    lower_tier_weight: 1
+    exclude: []                # item prefabs that never drop
+    include: {}                # item prefab -> tier, always in the pool at that tier
+
+  bosses:                      # every boss may also drop gems and the Dvergr Chisel 25% (fixed in code)
+    Eikthyr:
+      tier: 1
+      rune_rolls: 2
+      gear_rolls: 1
+      bonus:
+        - { rune: ascension, chance: 100, amount: 2 }
+        - { rune: recasting, chance: 100, amount: 1 }
+    gd_king:
+      tier: 2
+      rune_rolls: 2
+      gear_rolls: 1
+      bonus:
+        - { rune: ascension, chance: 100, amount: 1 }
+    Bonemass:
+      tier: 3
+      rune_rolls: 3
+      gear_rolls: 1
+      bonus:
+        - { rune: serpent, chance: 50, amount: 1 }
+        - { rune: ascension, chance: 50, amount: 1 }
+    Dragon:
+      tier: 4
+      rune_rolls: 3
+      gear_rolls: 1
+      bonus:
+        - { rune: ascension, chance: 100, amount: 1 }
+    GoblinKing:
+      tier: 5
+      rune_rolls: 4
+      gear_rolls: 1
+      bonus:
+        - { rune: ascension, chance: 100, amount: 1 }
+        - { rune: serpent, chance: 25, amount: 1 }
+    SeekerQueen:
+      tier: 6
+      rune_rolls: 4
+      gear_rolls: 1
+      bonus:
+        - { rune: ascension, chance: 100, amount: 2 }
+    Fader:                     # verify prefab name
+      tier: 7
+      rune_rolls: 5
+      gear_rolls: 1
+      bonus:
+        - { rune: ascension, chance: 100, amount: 2 }
+        - { rune: serpent, chance: 50, amount: 1 }
+    FrozenKing_p3:             # Kall Fimbulbringer's last phase; FrozenKing and FrozenKing_p2 are earlier phases
+      tier: 8
+      rune_rolls: 6
+      gear_rolls: 1
+      bonus:
+        - { rune: ascension, chance: 100, amount: 2 }
+        - { rune: serpent, chance: 75, amount: 1 }
+
+  # Per creature prefab: tier override, multipliers and bonus runes. Examples:
+  #   Troll:   { rune_multiplier: 2 }                                   # trolls pay double runes
+  #   Hen:     { multiplier: 0 }                                        # never drops our loot
+  #   Wolf:    { tier: 4, bonus: [ { rune: serpent, chance: 20, amount: 1 } ] }
+  creatures: {}
+
+  # World containers the game fills with default loot (dungeon and ruin chests, buried treasure) roll once, when the
+  # game fills them: chances in percent per container, the tier of the biome at the container (dungeons: the surface
+  # biome), the same rune and rarity tables and per-kill caps as creatures. Player-built chests never roll; containers
+  # generated before the mod was installed were filled then and do not roll.
+  chests:
+    rune_chance: 25            # Inscribe: half of EliteCrafting 0.9.1's 50%, as the kill chances
+    gear_chance: 10
+
+  # Elite Creatures Reborn (read only where ECR is installed; ecr-integration.md). With the .cfg switch
+  # "8 - Elite Creatures Reborn / Synergy" on, ECR's elite stars replace the game level on their own table below.
+  # The tier lists are indexed by ECR's world tier (0-7); ECR does not record one yet, so they do nothing until it does.
+  # skip_worthless applies whenever ECR is installed, switch or not: its Cloven twin and Phantom husks drop nothing here.
+  ecr:
+    star_multipliers: [1, 1, 1.5, 2, 2.5, 3]   # by ECR stars; index 0 = no stars
+    star_step: 0.5                             # added per star beyond the list
+    star_rarity_bonus: 0                       # percent per ECR star on gear rarities above Magic
+    tier_rune_multipliers: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7]
+    tier_rarity_bonus:      [0, 5, 10, 15, 20, 25, 30, 35]
+    skip_worthless: true
+

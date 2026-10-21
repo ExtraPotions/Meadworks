@@ -1,0 +1,7 @@
+* text=auto
+*.cs text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.csproj text eol=lf
+licenses/* whitespace=-blank-at-eof
+*.png binary

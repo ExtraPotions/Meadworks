@@ -1,0 +1,94 @@
+{
+  "item": "meadworks_panel_r2",
+  "licence": "CC BY-NC-SA 4.0 (MeadWorks asset licence); CC0 inputs are public domain",
+  "method": "Python (Pillow/numpy); no pixels of PackPanel or of the uploaded look reference, no AI tools; build/build_panel_r2.py, wood_r2.py, knotwork.py",
+  "cc0_inputs": [
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg",
+    "ambientcg/Wood049/Wood049_1K-JPG_Color.jpg",
+    "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg",
+    "ambientcg/Wood051/Wood051_1K-JPG_Color.jpg",
+    "ambientcg/Wood051/Wood051_1K-JPG_Displacement.jpg",
+    "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg"
+  ],
+  "cc0_sha256": {
+    "ambientcg/Wood066/Wood066_1K-JPG_Color.jpg": "e8b483629421fb725668ef2128e21fa68753fbd40bc25a9c4e871018c014a73d",
+    "ambientcg/Wood049/Wood049_1K-JPG_Color.jpg": "451ee4dd719628289b4969f75dc583b5f77f8471d5d885ba5015fd90e7e5ce61",
+    "ambientcg/Wood051/Wood051_1K-JPG_Displacement.jpg": "a852d76befbdb66cf17f1b4a18663f4b1fb2c0de03929a4c74752a688e23ff10",
+    "ambientcg/Wood051/Wood051_1K-JPG_Color.jpg": "f3c6c5456457e8d05c1fee4d2f186f41d0aea2b8a06859b69ce2934e11aa8798",
+    "ambientcg/Wood049/Wood049_1K-JPG_Displacement.jpg": "3fcb2a67d00a0fff5171d9a42e720765287a80a76a9e80eaf07405ca6ea1c1a2",
+    "ambientcg/Metal046A/Metal046A_1K-JPG_Color.jpg": "e7846a637fc634e53d174ae8fbfbdffa1de98771530a8a1fb26b711d3b4094e0"
+  },
+  "changes": "Background: three CC0 wood maps merged, then sampled through a periodic domain-warp flow field (FFT-filtered noise) so the grain bends; eight knots each pull the grain round them (sample rows move towards the knot row) and add growth rings and a dark heart; colour and tone drift from low-frequency noise; seamless. Timber pieces: planks with bevelled seams and butt joints, frame bars with carved groove, end-grain corner blocks with off-centre rings, pegs, nail heads, edge chips. Knotwork: (2,3) and (2,5) torus-knot projections and two-strand plaits drawn procedurally as shaded bronze tubes with an alternating over-under gap, embossed on corner caps, plait liner, divider, tab and button ends and the four corners of the timber button. Hover is a subtle warm edge.",
+  "files": {
+    "button_hover.png": {
+      "size": [
+        468,
+        156
+      ],
+      "sha256": "3c0669600fd33fa5e6080ae79d35fd9f88f3c3b2bb0a60cf75e8bcd199b37299"
+    },
+    "button_normal.png": {
+      "size": [
+        468,
+        156
+      ],
+      "sha256": "b808ebb36dbaf96820bba28d7e79683f9c21e16e1337433c3bc9ada6a89a6662"
+    },
+    "button_pressed.png": {
+      "size": [
+        468,
+        156
+      ],
+      "sha256": "7fd53780485023f157ba8ebcc0bc083f54a49900a1edefc829de3d1bae18cda7"
+    },
+    "divider_bronze.png": {
+      "size": [
+        424,
+        70
+      ],
+      "sha256": "8abcf06fb7e43e3e9f77c2f7c2f7188ca65642398d9321d2a3153d8795c939bd"
+    },
+    "panel_background.png": {
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "c86f7479d600989079aa91e24b5e0cd30b8b59282be37cc226f8f7fa790d7560"
+    },
+    "panel_button.png": {
+      "size": [
+        1983,
+        793
+      ],
+      "sha256": "182fe336acb08e107f32c9f3cecea1e867b14c1eb5b2789cc72863c1318ab3d6"
+    },
+    "panel_timber.png": {
+      "size": [
+        380,
+        356
+      ],
+      "sha256": "c110f78d346cf43fd2bf7e6b638fbf216fad19cbbb34daf8de8d075ff28753dd"
+    },
+    "slot_selected.png": {
+      "size": [
+        262,
+        254
+      ],
+      "sha256": "ad1a2d2416e8fcbc29b2cea0dcab0f81070bf13a965d550c074742062e5432eb"
+    },
+    "slot_timber.png": {
+      "size": [
+        260,
+        252
+      ],
+      "sha256": "99d547ce2cfbc9d527d6a8e30895a474515e6a40ff24e0f825a1f2c06a93c52a"
+    },
+    "tab_active.png": {
+      "size": [
+        316,
+        96
+      ],
+      "sha256": "9fd4a76446c9d4290928f54216328b4371a0c4924d8628e88506cdd689d3e4de"
+    }
+  }
+}

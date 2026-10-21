@@ -1,0 +1,3 @@
+* text=auto eol=lf
+THIRD_PARTY_NOTICES/aedenthorn-public-domain.txt -text whitespace=-blank-at-eol
+THIRD_PARTY_NOTICES/OpenKeep-LICENSE.txt -text whitespace=-blank-at-eol

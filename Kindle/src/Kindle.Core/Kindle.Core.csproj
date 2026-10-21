@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Kindle logic (recipe query, sort, favourites, pipeline, settings model). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Kindle.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Kindle</RootNamespace>
+  </PropertyGroup>
+</Project>

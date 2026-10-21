@@ -1,0 +1,33 @@
+{
+  "strings": {
+    "off_no_server": "Timber неактивен: на этом сервере нет Timber.",
+    "camera_no_station": "Камера строительства работает только рядом с ремесленной стойкой",
+    "camera_entry_needs": "Камере строительства требуется",
+    "camera_resting": "Отдых",
+    "camera_comfort": "комфорт {0} (у вас {1})",
+    "step_aside_camera": "Камера строительства Timber отключена, пока установлен {0}.",
+    "camera_pickup_needs": "Подбор камерой требует",
+    "step_aside_fires": "Костры Timber на полу отключены: установлен {0}.",
+    "step_aside_flooring": "Функции полов Timber отключены: установлен {0}.",
+    "command_help": "Timber: timber import cartur|azumatt|flooring|openkeep [apply]; timber bindings.",
+    "bindings_scope": "Возможные конфликты объявленных сочетаний загруженных плагинов. Внешние контексты ввода, клавиши игры и текстовые настройки управления не определяются.",
+    "bindings_none": "Возможных конфликтов с Timber среди объявленных сочетаний не найдено.",
+    "bindings_conflict": "Возможный конфликт сочетания {0}: {1}",
+    "bindings_unreadable": "Не удалось прочитать управление {0}: {1}",
+    "bindings_tip": "Измените управление в конфигурации мода через r2modman или Almanac, затем снова выполните timber bindings. Timber никогда не переназначает клавиши автоматически.",
+    "import_no_changes": "Нет изменений настроек для применения.",
+    "import_applied": "Импортировано настроек: {0}. Прежние настройки Timber сохранены в резервной копии, исходные файлы не изменены.",
+    "import_preview_first": "Сначала выполните просмотр этого источника.",
+    "import_stopped": "Импорт остановлен: {0}",
+    "import_review": "{0} → Timber; проверьте перед применением.",
+    "import_invalid": "Недопустимо: {0}",
+    "import_collision": "Конфликт сочетания: {0}; укажите замену binding:<target> в Almanac.",
+    "import_source_hash": "SHA256 источника: {0}",
+    "import_target_hash": "SHA256 цели: {0}",
+    "import_unknown_target": "Неизвестная цель пропущена: {0}",
+    "import_unchanged": "Без изменений: {0} = {1}",
+    "import_unavailable": "Импорт Timber недоступен",
+    "area_repair_done": "Починено соприкасающихся деталей: {0}"
+  },
+  "schema": 1
+}

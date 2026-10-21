@@ -1,0 +1,89 @@
+{
+  "result": "PASS",
+  "explicitIndexedUvParts": 10,
+  "pairedExpandedUvChecks": [
+    {
+      "part": "executioner_axehead",
+      "expandedUvCount": 108
+    },
+    {
+      "part": "blade_worn_edge",
+      "expandedUvCount": 72
+    },
+    {
+      "part": "head_haft_socket",
+      "expandedUvCount": 240
+    },
+    {
+      "part": "hooked_beak",
+      "expandedUvCount": 1452
+    },
+    {
+      "part": "beak_horn_tip",
+      "expandedUvCount": 276
+    }
+  ],
+  "historicalExpandedCountGuardWouldRejectParts": 10,
+  "dropCenters": [
+    {
+      "prefab": "ECP_ArrowBone",
+      "localOffset": [
+        -0.0,
+        -0.0,
+        -0.58
+      ],
+      "dropCenter": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "prefab": "ECP_BoltBoneBlunt",
+      "localOffset": [
+        -0.0,
+        -0.0,
+        -0.285
+      ],
+      "dropCenter": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "projectileTips": [
+    {
+      "prefab": "ECP_ArrowBone_projectile",
+      "tipZ": 0.032,
+      "nativeTipZ": 0.032
+    },
+    {
+      "prefab": "ECP_SkeletonArrow_projectile",
+      "tipZ": 0.032,
+      "nativeTipZ": 0.032
+    },
+    {
+      "prefab": "ECP_BoltBoneBlunt_projectile",
+      "tipZ": 0.05,
+      "nativeTipZ": 0.05
+    }
+  ],
+  "modelsSha256": "8B9191B724DDB6173F0CB639C01675AACE59C31339BF6DC2AEE0BB20B6703743",
+  "builderSha256": "7B70A0C5D70C07CC0C4A0E4E79AFEEA9869AF2B03A4D6823650C5A06145467D2",
+  "runtimeSha256": "AAC153B9B5A0EBF5C72C8E702721C6ACA645B8E29C4719CE6CB89E846FD8847A",
+  "checks": [
+    "Actual builder accepts UVs by indexed input count",
+    "Actual builder expands vertices and UVs through identical triangle indices",
+    "Nontrivial indexed quad has exact expected reordered UVs",
+    "All ten actual indexed UV arrays survive source expansion",
+    "Paired heads and beaks retain identical expanded wear coordinates",
+    "Malformed supplied UVs rejected",
+    "Only dropped arrow and bolt models centered on item origin",
+    "Three projectile tips retain native positions",
+    "Foreign projectile ownership protected"
+  ],
+  "limits": [
+    "Source contract regression only; does not execute Unity Mesh/CombineMeshes or inspect bundle output."
+  ]
+}

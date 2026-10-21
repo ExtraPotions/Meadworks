@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "strings": {
+    "step_aside_sleep": "Ember 睡眠已关闭：已安装 {0}。",
+    "step_aside_torches": "Ember 火把已关闭：已安装 {0}。",
+    "step_aside_doors": "Ember 自动门已关闭：已安装 {0}。",
+    "off_no_crucible": "Ember 已关闭：此服务器未运行 Meadworks。",
+    "off_no_ember": "Ember 已关闭：此服务器未运行 Ember。",
+    "doors_on": "Ember：自动门已开启",
+    "doors_off": "Ember：自动门已关闭",
+    "doors_not_allowed": "服务器已关闭自动门。",
+    "hud_sleeping": "睡眠中 {0}/{1}",
+    "hud_boost": "+{0}%",
+    "import_done": "Ember 已从 {1} 导入 {0} 项设置。",
+    "cheat_sleep_any_time": "随时睡眠",
+    "cheat_testing_mode": "测试模式",
+    "cheat_endless_torches": "永燃火把",
+    "torch_nightfall": "入夜时点亮。",
+    "torch_keep": "昼夜保持点亮",
+    "torch_schedule": "使用夜间计划",
+    "torch_kept": "Ember：已启用保持点亮。",
+    "torch_scheduled": "Ember：已恢复夜间计划。",
+    "torch_refused": "Ember：火把更改被拒绝。",
+    "bed_choice_countdown": "选择床铺（{0}秒）",
+    "bed_choice_nearest": "时间结束后，在最近的已知床铺醒来。",
+    "bed_choice_click": "单击床铺以选择，双击以放置地图标记。",
+    "bed_choice_keys": "地图键、Esc 或手柄 B：确认。手柄 A：选择地图中心的床铺。"
+  }
+}

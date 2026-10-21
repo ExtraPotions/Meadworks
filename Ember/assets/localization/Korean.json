@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "strings": {
+    "step_aside_sleep": "Ember 수면 기능 꺼짐: {0}이(가) 설치되어 있습니다.",
+    "step_aside_torches": "Ember 횃불 기능 꺼짐: {0}이(가) 설치되어 있습니다.",
+    "step_aside_doors": "Ember 자동문 기능 꺼짐: {0}이(가) 설치되어 있습니다.",
+    "off_no_crucible": "Ember 꺼짐: 이 서버는 Meadworks를 실행하지 않습니다.",
+    "off_no_ember": "Ember 꺼짐: 이 서버는 Ember를 실행하지 않습니다.",
+    "doors_on": "Ember: 자동문 켜짐",
+    "doors_off": "Ember: 자동문 꺼짐",
+    "doors_not_allowed": "서버에서 자동문을 껐습니다.",
+    "hud_sleeping": "수면 중 {0}/{1}",
+    "hud_boost": "+{0}%",
+    "import_done": "Ember가 {1}에서 설정 {0}개를 가져왔습니다.",
+    "cheat_sleep_any_time": "언제든 수면",
+    "cheat_testing_mode": "테스트 모드",
+    "cheat_endless_torches": "꺼지지 않는 횃불",
+    "torch_nightfall": "해가 지면 켜집니다.",
+    "torch_keep": "낮과 밤에 계속 켜 두기",
+    "torch_schedule": "야간 일정 사용",
+    "torch_kept": "Ember: 항상 켜 두기가 활성화되었습니다.",
+    "torch_scheduled": "Ember: 야간 일정으로 돌아갔습니다.",
+    "torch_refused": "Ember: 횃불 변경이 거부되었습니다.",
+    "bed_choice_countdown": "침대 선택 ({0}초)",
+    "bed_choice_nearest": "시간이 지나면 알고 있는 가장 가까운 침대에서 깨어납니다.",
+    "bed_choice_click": "침대를 클릭해 선택하세요. 두 번 클릭하면 지도 핀을 놓습니다.",
+    "bed_choice_keys": "지도, Esc 또는 게임패드 B: 확인. 게임패드 A: 지도 중앙의 침대 선택."
+  }
+}

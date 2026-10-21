@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "product": "Thing",
+  "default": "Advanced",
+  "settings": {
+    "General/Admin Window Key": "Essential",
+    "General/Confirm Destructive Actions": "Essential",
+    "General/Admin List Editable In Game": "Essential",
+    "Communication/Message Of The Day": "Essential",
+    "Remote Configuration/Remote Config Editing": "Essential",
+    "General/Audit Log Days": "FileOnly",
+    "General/Locked Player Settings": "FileOnly",
+    "General/Allow Admin Settings Editing": "FileOnly",
+    "General/Admin Settings Editing Status": "FileOnly",
+    "General/Locked Player Values": "FileOnly",
+    "Remote Configuration/Remote Config Scope": "FileOnly",
+    "Remote Configuration/Remote Config Allow List": "FileOnly",
+    "Remote Configuration/Remote Backup Count": "FileOnly",
+    "Import/Imported Sources": "FileOnly"
+  }
+}

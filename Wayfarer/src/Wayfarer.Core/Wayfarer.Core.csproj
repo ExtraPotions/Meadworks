@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Wayfarer logic (destinations, teleport policy and authorization, grant ledger, panel layout, tombstone hints, language setting, per-frame cache). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Wayfarer.Core</AssemblyName>
+    <RootNamespace>Wayfarer.Core</RootNamespace>
+  </PropertyGroup>
+</Project>

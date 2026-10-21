@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Wildblood logic (settings table, star presets and power, traits and blob codec, aspects, loot math, luck codec and attribution, step-aside and import plans, text keys). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Wildblood.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Wildblood</RootNamespace>
+  </PropertyGroup>
+</Project>

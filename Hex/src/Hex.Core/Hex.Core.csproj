@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Hex identity, feature inventory and character contribution rules. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Hex.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Hex</RootNamespace>
+  </PropertyGroup>
+</Project>

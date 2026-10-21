@@ -1,0 +1,150 @@
+// Edge - ExtraPotions Meadworks. SPDX-License-Identifier: GPL-3.0-only
+// Portions from SecondaryAttacks 1.2.17 (sighsorry1029), GPL-3.0, at 4375a2b17297052a773c5b143b0cae21dc655ed8:
+// SecondaryAttackManager.StaffSpecialDefinitions.cs (native definition types and compilation; game algorithms retained). Source notices retained in THIRD_PARTY_NOTICES.
+// Changed by expDARE, 2026: Edge namespace, portable config/canonical catalog and diagnostics boundaries;
+// portable rotation values converted at the native boundary. No ServerSync or source UI/config ownership.
+// Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes.
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+namespace ExtraPotions.Edge.Runtime.Secondaries.Native;
+using ExtraPotions.Edge.Secondaries;
+using ExtraPotions.Edge.Secondaries.Adopted;
+
+internal static partial class SecondaryAttackManager
+{
+    internal static bool TryCreateSummonEmpowerDefinition(
+        string prefabName,
+        ItemDrop.ItemData.SharedData sharedData,
+        Attack primaryAttack,
+        NormalizedWeaponConfig weaponConfig,
+        out SecondaryAttackDefinition? definition)
+    {
+        definition = null;
+        if (!TryResolveSummonSourcePrefabs(primaryAttack, out List<string> summonSourcePrefabs))
+        {
+            RuleDiagnostics.Warning($"Skipping {prefabName}: summon empower requires a summon projectile with a SpawnAbility payload.");
+            return false;
+        }
+
+        string resolvedAttackAnimation = GetNormalizedAttackAnimation(weaponConfig);
+        bool hasCustomAttackAnimation = !string.IsNullOrWhiteSpace(resolvedAttackAnimation);
+        string attackAnimation = hasCustomAttackAnimation
+            ? resolvedAttackAnimation.Trim()
+            : primaryAttack.m_attackAnimation.Trim();
+        NormalizedSummonEmpowerSecondaryConfig summonEmpowerConfig = weaponConfig.Secondary?.SummonEmpower ?? new NormalizedSummonEmpowerSecondaryConfig();
+        float summonEmpowerMoveSpeedFactor = summonEmpowerConfig.MoveSpeedFactor;
+        float summonEmpowerAttackSpeedFactor = summonEmpowerConfig.AttackSpeedFactor;
+
+        definition = new SecondaryAttackDefinition
+        {
+            PrefabName = prefabName,
+            AppliesSecondaryOverride = true,
+            Behavior = new SummonEmpowerSecondaryBehavior
+            {
+                SummonSourcePrefabs = summonSourcePrefabs,
+                PresetCooldown = CreatePresetCooldown(
+                    summonEmpowerConfig.Cooldown,
+                    summonEmpowerConfig.CooldownReductionFactor,
+                    ResolveBloodMagicCooldownSkill(summonEmpowerConfig.CooldownSkill)),
+                Radius = Mathf.Max(0f, summonEmpowerConfig.Radius),
+                Duration = Mathf.Max(0.1f, summonEmpowerConfig.Duration),
+                MoveSpeedFactor = Mathf.Max(0.05f, summonEmpowerMoveSpeedFactor),
+                AttackSpeedFactor = Mathf.Max(0.05f, summonEmpowerAttackSpeedFactor)
+            },
+            AttackAnimation = attackAnimation,
+            HasCustomAttackAnimation = hasCustomAttackAnimation,
+            ResourceMultiplier = Mathf.Max(0f, GetNormalizedResourceMultiplier(weaponConfig)),
+            DurabilityFactor = Mathf.Max(0f, GetNormalizedDurabilityFactor(weaponConfig))
+        };
+        ApplyCoreDefinitionFeatures(definition, weaponConfig);
+        ApplyAttackResourceScaling(definition, primaryAttack, GetNormalizedResourceMultiplier(weaponConfig));
+        return true;
+    }
+
+    internal static bool TryCreateShieldConvertDefinition(
+        string prefabName,
+        ItemDrop.ItemData.SharedData sharedData,
+        Attack primaryAttack,
+        NormalizedWeaponConfig weaponConfig,
+        out SecondaryAttackDefinition? definition)
+    {
+        definition = null;
+        NormalizedShieldConvertSecondaryConfig shieldConvertConfig = weaponConfig.Secondary?.ShieldConvert ?? new NormalizedShieldConvertSecondaryConfig();
+        int shieldStatusEffectHash = sharedData.m_attackStatusEffect ? sharedData.m_attackStatusEffect.NameHash() : 0;
+        if (shieldStatusEffectHash == 0)
+        {
+            RuleDiagnostics.Warning($"Skipping {prefabName}: shield convert requires a primary attack shield status effect.");
+            return false;
+        }
+
+        string resolvedAttackAnimation = GetNormalizedAttackAnimation(weaponConfig);
+        bool hasCustomAttackAnimation = !string.IsNullOrWhiteSpace(resolvedAttackAnimation);
+        string attackAnimation = hasCustomAttackAnimation
+            ? resolvedAttackAnimation.Trim()
+            : primaryAttack.m_attackAnimation.Trim();
+
+        definition = new SecondaryAttackDefinition
+        {
+            PrefabName = prefabName,
+            AppliesSecondaryOverride = true,
+            Behavior = new ShieldConvertSecondaryBehavior
+            {
+                ShieldStatusEffectHash = shieldStatusEffectHash,
+                PresetCooldown = CreatePresetCooldown(
+                    shieldConvertConfig.Cooldown,
+                    shieldConvertConfig.CooldownReductionFactor,
+                    ResolveBloodMagicCooldownSkill(shieldConvertConfig.CooldownSkill)),
+                Radius = Mathf.Max(0f, shieldConvertConfig.Radius),
+                HealFactor = Mathf.Max(0f, shieldConvertConfig.HealFactor)
+            },
+            AttackAnimation = attackAnimation,
+            HasCustomAttackAnimation = hasCustomAttackAnimation,
+            ResourceMultiplier = Mathf.Max(0f, GetNormalizedResourceMultiplier(weaponConfig)),
+            DurabilityFactor = Mathf.Max(0f, GetNormalizedDurabilityFactor(weaponConfig))
+        };
+        ApplyCoreDefinitionFeatures(definition, weaponConfig);
+        ApplyAttackResourceScaling(definition, primaryAttack, GetNormalizedResourceMultiplier(weaponConfig));
+        return true;
+    }
+
+    private static string ResolveBloodMagicCooldownSkill(string cooldownSkill)
+    {
+        return string.IsNullOrWhiteSpace(cooldownSkill)
+            ? "bloodMagic"
+            : cooldownSkill.Trim();
+    }
+
+    private static bool TryResolveSummonSourcePrefabs(Attack primaryAttack, out List<string> summonSourcePrefabs)
+    {
+        summonSourcePrefabs = new List<string>();
+        if (primaryAttack?.m_attackProjectile == null)
+        {
+            return false;
+        }
+
+        SpawnAbility spawnAbility = primaryAttack.m_attackProjectile.GetComponent<SpawnAbility>();
+        if (spawnAbility == null || spawnAbility.m_spawnPrefab == null || spawnAbility.m_spawnPrefab.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (GameObject spawnPrefab in spawnAbility.m_spawnPrefab)
+        {
+            if (spawnPrefab == null)
+            {
+                continue;
+            }
+
+            string prefabName = Utils.GetPrefabName(spawnPrefab);
+            if (!string.IsNullOrWhiteSpace(prefabName) && !summonSourcePrefabs.Any(existing => string.Equals(existing, prefabName, StringComparison.OrdinalIgnoreCase)))
+            {
+                summonSourcePrefabs.Add(prefabName);
+            }
+        }
+
+        return summonSourcePrefabs.Count > 0;
+    }
+}

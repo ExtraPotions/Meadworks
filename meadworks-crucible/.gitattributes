@@ -1,0 +1,19 @@
+# Text files check out with CRLF line endings on every platform, as the released assemblies were built.
+* text=auto eol=crlf
+# Stored byte for byte as committed.
+src/Crucible.UI/Art/source/build_panel_r2.py -text
+src/Crucible.UI/Art/source/build_panel_r4.py -text
+src/Crucible.UI/Art/source/build_panel_r5.py -text
+src/Crucible.UI/Art/source/knotwork.py -text
+src/Crucible.UI/Art/source/panel-art-provenance.json -text
+src/Crucible.UI/Art/source/panel-r2-provenance.json -text
+src/Crucible.UI/Art/source/panel-r3-provenance.json -text
+src/Crucible.UI/Art/source/panel-r4-provenance.json -text
+src/Crucible.UI/Art/source/panel-r5-provenance.json -text
+src/Crucible.UI/Art/source/panel-r6-provenance.json -text
+src/Crucible.UI/Art/source/panel-set-provenance.json -text
+src/Crucible.UI/Art/source/panel_art_build.py -text
+src/Crucible.UI/Art/source/panel_set_build.py -text
+tools/Meadworks.TestBridge/EdgeArcheryScenarios.cs -text
+tools/Meadworks.TestBridge/KindleFinalScenarios.cs -text
+tools/Meadworks.TestBridge/ThresholdTeleportScenarios.cs -text

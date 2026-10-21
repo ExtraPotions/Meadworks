@@ -1,0 +1,149 @@
+{
+  "sourceSha256": "A180EADF8324B7B0C793BEBBC957F092C666ED6C23C9D59D03068D121FE00FFC",
+  "files": [
+    {
+      "file": "mw_inscribe_items.windows",
+      "sha256": "BA226330B44345C1183D77FC9E016DD4C73ACC71B0FA728BC99BCFC23E0CF979"
+    },
+    {
+      "file": "mw_inscribe_items.linux",
+      "sha256": "3AA58D8BD9F740138E8D4D774DACE477358156E502C9D39954CDE09C1169580B"
+    },
+    {
+      "file": "icons/awakening_icon.png",
+      "sha256": "CD12EFAF15C04D3EEA6CD932C6336FD40C72B993C1D91EF25BD65E13DF68F22B"
+    },
+    {
+      "file": "icons/recasting_icon.png",
+      "sha256": "67C3CB5BA9F402BE67AD7068C408BEFC88B3DC6036DEE9827FE2FFE12B092823"
+    },
+    {
+      "file": "icons/ascension_icon.png",
+      "sha256": "A84CAA0566F15D2B0CA3ABC67FA4D73D609F941ABD1480BFB5CE30B7ABB2B0CE"
+    },
+    {
+      "file": "icons/cleansing_icon.png",
+      "sha256": "BEE364DE1FD1A26E260061633663523AB25EF16A81DDA0F41DA88A7CB5EE0959"
+    },
+    {
+      "file": "icons/serpent_icon.png",
+      "sha256": "82C302443CC5BDDDC5FC08A0FC7C7D7A2FC7B5156260CFAC1EB1A43C14AD6878"
+    },
+    {
+      "file": "icons/dvergr_chisel_icon.png",
+      "sha256": "82F983093FEF51DD5303E9360B40FA3B1C3EE7DDF419441E9FCF2865297CF675"
+    },
+    {
+      "file": "icons/scroll_tier_1_icon.png",
+      "sha256": "81B20A3569E93D366E46E7E2F79EA10CE3DCBEF2E4B6EAE50DEF9471DC4334B7"
+    },
+    {
+      "file": "icons/scroll_tier_2_icon.png",
+      "sha256": "0E060427C10D31D44153CFF889FF192D4D676335E5CBFF257707CFFB98CCB9EE"
+    },
+    {
+      "file": "icons/scroll_tier_3_icon.png",
+      "sha256": "C8293C537C8424D1E1B0AF7A52E335F577F18780D2AC69FAEB583A6C5E33E4F3"
+    },
+    {
+      "file": "icons/scroll_tier_4_icon.png",
+      "sha256": "70310BA57A5716B514FE172FCD6323828090FC9950ACCD8E7D12157BE127DE0B"
+    },
+    {
+      "file": "icons/gem_surtr_icon.png",
+      "sha256": "A8DE924B6F65D59A4AE2235E3AC5958C2F3F580A5847F2392F57F671CBEFC800"
+    },
+    {
+      "file": "icons/gem_ymir_icon.png",
+      "sha256": "C8C21495843FA60BAE7DA0E1F3209B04940CA420DD327F3B6250C0647AA658C7"
+    },
+    {
+      "file": "icons/gem_thor_icon.png",
+      "sha256": "543BD9F0E069C610221EF82AFBF1AA20E1FAD0C8F8899EB8C9FA51B813254B15"
+    },
+    {
+      "file": "icons/gem_nidhogg_icon.png",
+      "sha256": "10BA1BD824AD02EB9454E69D79217D78D1A826348434C6AD598FA0BE43E8203E"
+    },
+    {
+      "file": "icons/gem_hel_icon.png",
+      "sha256": "6E785A539A999C7864AB57576D3ADFC58F4F6C41B3BD30CBC4F82AC6DC473A43"
+    },
+    {
+      "file": "icons/gem_tyr_icon.png",
+      "sha256": "DCB3779B4F1A7ED970ED378004928B1547FEB8574CB39B8226DC6968542E723D"
+    },
+    {
+      "file": "icons/gem_freyja_icon.png",
+      "sha256": "EDDC0C0BAB62EEE0DE5F5C2620FC5EA6BB8F9958DDC4BC45758C2EC3133DC4E6"
+    },
+    {
+      "file": "icons/gem_odin_icon.png",
+      "sha256": "24FDA0D1E14007F98B864BBF396D90510713786DEAF4F7F39CAF95D4F867DD83"
+    },
+    {
+      "file": "icons/gem_skadi_icon.png",
+      "sha256": "2C9BEEC2A31E103F37C55A75948B4F1B0326C38BC07226FB0E15F71CFC07BF00"
+    },
+    {
+      "file": "icons/gem_heimdall_icon.png",
+      "sha256": "E61666D0C36138ACAD2B02F8309F9D576B2D11654E0714C6EC7FFF10FACA8CDC"
+    },
+    {
+      "file": "icons/gem_sleipnir_icon.png",
+      "sha256": "A85B53A7F5CF46F66EBAA4A79991F6010F4975A17F37593B6CCC8D1D8C3102B0"
+    },
+    {
+      "file": "source/inscribe/check_inscribe.py",
+      "sha256": "A284E01E1D3352CB05EDAED70B68477DC4340711609EA021937B6E7628EE119E"
+    },
+    {
+      "file": "source/inscribe/generate_inscribe.py",
+      "sha256": "AA45F9E55E8F69CC6CD4212BECDE1F0BC4267161BB3350000B4A937097BEDC83"
+    },
+    {
+      "file": "source/inscribe/manifest.json",
+      "sha256": "259D9ED8119263616796112F82FBA6C26A1A57FA6AF803785564DCCB5A60B68A"
+    },
+    {
+      "file": "source/inscribe/models.json",
+      "sha256": "A180EADF8324B7B0C793BEBBC957F092C666ED6C23C9D59D03068D121FE00FFC"
+    },
+    {
+      "file": "source/inscribe/SOURCE-CHECKS.json",
+      "sha256": "A8CDA957C297F193BA645D7F6F52EB6A057BF3142546B494D7284C1506D41089"
+    },
+    {
+      "file": "source/BuildCustomItems.cs",
+      "sha256": "BB4BC3A82B38FA3930440EDE02B6797906831EFB4D98D25712F06D0AA3F42837"
+    },
+    {
+      "file": "source/OriginalItemArt.cs",
+      "sha256": "3F33CA68E6F084105521AE0FF2572B4601B1A85ED16208F5598DC3CB2B00C1F4"
+    },
+    {
+      "file": "source/README.md",
+      "sha256": "0DE3AB4668FFF32919A87B5919D2575F68FD49305575FF48FB3318E02AA4247A"
+    },
+    {
+      "file": "source/Rebuild-OriginalArt.ps1",
+      "sha256": "CD41B87CCE6647D979FCC7B570457B4E324395BA141979623B66032ADFD97052"
+    },
+    {
+      "file": "source/SOURCE-REBUILD.md",
+      "sha256": "B18BD02878D7CE8D2C31A963D1E72FE62147EF7208843B4E4BFD9FDD96684D0E"
+    },
+    {
+      "file": "source/textures/materials-atlas.png",
+      "sha256": "83F3B012447DA4F44C64943AB26D632E530480D5DEF958FD41D56792937A10C1"
+    },
+    {
+      "file": "source/textures/provenance.json",
+      "sha256": "4B5454F1FC5A5ECA9615213DB391F79DF0362BB8F0C84755D1C7E8617AA0E01B"
+    },
+    {
+      "file": "source/source-kit.json",
+      "sha256": "5D5890FCFB2AA26BCADCE5E48B487C4F03D7A2BD7F73DB881A3F23EB23312CE2"
+    }
+  ]
+}

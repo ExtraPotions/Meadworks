@@ -1,0 +1,259 @@
+{
+ "version": "2026-10-13.1",
+ "note": "Known-harmless vanilla and Unity console messages. Used by Crucible to keep the BepInEx console quiet (the disk log keeps everything) and by the test runner to separate them from mod-sourced and unknown lines. Matching is exact text or an anchored pattern on the whole message, on one source, at the listed levels. Never Fatal, never a message with a stack trace, never a Meadworks source.",
+ "rules": [
+  {
+   "id": "ai.fish-invalid-swim-direction",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Invalid swim direction$",
+   "emitter": "Fish.SwimDirection (ZLog.LogWarning) in assembly_valheim: a wild fish's AI was given a direction with no horizontal part; no MeadWorks product patches Fish (seen in KeelCrew network-b8510e67)",
+   "sample": "10/13/2026 13:25:14: Invalid swim direction"
+  },
+  {
+   "id": "worldgen.failed-to-place",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Failed to place all [A-Za-z0-9_]+, placed \\d+ out of \\d+ with \\d+ tries in \\d\\d:\\d\\d:\\d\\d(?:\\.\\d+)?$",
+   "emitter": "ZoneSystem.GenerateLocations (ZLog.LogWarning): a location could not reach its full count on this world seed",
+   "sample": "10/10/2026 04:20:49: Failed to place all SwampHut1_1, placed 31 out of 50 with 0 tries in 00:00:00.2612931"
+  },
+  {
+   "id": "worldgen.location-slow",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Location [A-Za-z0-9_]+ took more than \\d+(?:\\.\\d+)? seconds to place, check spawn conditions to improve! \\(placed \\d+ out of \\d+ with \\d+\\)$",
+   "emitter": "ZoneSystem.GenerateLocations: developer timing hint",
+   "sample": "10/10/2026 04:20:50: Location GoblinHut01 took more than 0.5 seconds to place, check spawn conditions to improve! (placed 18 out of 30 with 0)"
+  },
+  {
+   "id": "worldgen.slow-summary",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?There are \\d+ that take a long time to generate \\(over \\d+(?:\\.\\d+)? sec\\)\\. Total slow location time is \\d+(?:\\.\\d+)? seconds that could be saved on world gen!$",
+   "emitter": "ZoneSystem.GenerateLocations: summary of the slow-location hints",
+   "sample": "10/10/2026 04:20:54: There are 8 that take a long time to generate (over 0.5 sec). Total slow location time is 6.8 seconds that could be saved on world gen!"
+  },
+  {
+   "id": "worldgen.altbiome-placed",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Loading: Placed \\d+/\\d+-\\d+ of '[A-Za-z0-9_ ]+' altbiome\\. \\(Valid, sectors: \\d+, combos: \\d+\\)$",
+   "emitter": "AltBiomeWorldData (ZLog.LogWarning): alternate biome count summary on world load",
+   "sample": "10/10/2026 03:33:33: Loading: Placed 0/1-2 of 'Fortress Mountain' altbiome. (Valid, sectors: 0, combos: 2)"
+  },
+  {
+   "id": "audio.missing-music-clip",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Missing audio clip in music respawn$",
+   "emitter": "MusicMan: no music clip on a machine without audio (server, -nographics)",
+   "sample": "10/10/2026 04:20:18: Missing audio clip in music respawn"
+  },
+  {
+   "id": "audio.main-menu-filters",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "exact",
+   "text": "Only custom filters can be played. Please add a custom filter or an audioclip to the audiosource (Amb_MainMenu).",
+   "emitter": "Native Unity audio warning for the vanilla main-menu ambience object",
+   "sample": "Only custom filters can be played. Please add a custom filter or an audioclip to the audiosource (Amb_MainMenu)."
+  },
+  {
+   "id": "chat.character-id-skipping",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Character ID for player \\([^\\r\\n]{0,200}\\) was \\d+:\\d+\\. Skipping\\.$",
+   "emitter": "Chat.cs (ZLog.LogWarning): a peer in the join list has no character yet",
+   "sample": "10/10/2026 04:20:54: Character ID for player ([Meadworks Probe, 0:0], [expDARE, Steam_76561198024437362, B503D0CBB83F32F8], expDARE) was 0:0. Skipping."
+  },
+  {
+   "id": "gfx.hdr-reflection-probe",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "exact",
+   "text": "HDR Render Texture not supported, disabling HDR on reflection probe.",
+   "emitter": "Native Unity on a -nographics dedicated server",
+   "sample": "HDR Render Texture not supported, disabling HDR on reflection probe."
+  },
+  {
+   "id": "gfx.async-resource-upload",
+   "source": "Unity Log",
+   "levels": [
+    "Error"
+   ],
+   "match": "exact",
+   "text": "AsyncResourceUpload failed.",
+   "emitter": "Native Unity on a -nographics dedicated server",
+   "sample": "AsyncResourceUpload failed."
+  },
+  {
+   "id": "gfx.custom-render-path",
+   "source": "Unity Log",
+   "levels": [
+    "Error"
+   ],
+   "match": "exact",
+   "text": "This custom render path shader needs to have at least 1 passes.",
+   "emitter": "Native Unity on a -nographics dedicated server",
+   "sample": "This custom render path shader needs to have at least 1 passes."
+  },
+  {
+   "id": "gfx.video-material-missing",
+   "source": "Unity Log",
+   "levels": [
+    "Error"
+   ],
+   "match": "regex",
+   "text": "^Could not find material Hidden/Video(?:Decode|Composite)\\. Make sure the Video shaders are included in your build, in the Built-in Shader Settings section of the Graphics Settings\\.$",
+   "emitter": "Native Unity VideoPlayer init on a -nographics dedicated server",
+   "sample": "Could not find material Hidden/VideoDecode. Make sure the Video shaders are included in your build, in the Built-in Shader Settings section of the Graphics Settings."
+  },
+  {
+   "id": "gfx.video-pass-missing",
+   "source": "Unity Log",
+   "levels": [
+    "Error"
+   ],
+   "match": "regex",
+   "text": "^Could not find video decode shader pass [A-Za-z0-9_]+ in shader <not found>$",
+   "emitter": "Native Unity VideoPlayer init on a -nographics dedicated server",
+   "sample": "Could not find video decode shader pass Flip_RGBASplit_To_RGBA in shader <not found>"
+  },
+  {
+   "id": "gfx.amplify-copytexture",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "exact",
+   "text": "[AmplifyOcclusion] System does not support CopyTexture. CacheAware will be disabled.",
+   "emitter": "Vanilla AmplifyOcclusion image effect on -nographics",
+   "sample": "[AmplifyOcclusion] System does not support CopyTexture. CacheAware will be disabled."
+  },
+  {
+   "id": "gfx.amplify-gbuffer",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "exact",
+   "text": "[AmplifyOcclusion] GBuffer Normals only available in Camera Deferred Shading mode. Switched to Camera source.",
+   "emitter": "Vanilla AmplifyOcclusion image effect on -nographics",
+   "sample": "[AmplifyOcclusion] GBuffer Normals only available in Camera Deferred Shading mode. Switched to Camera source."
+  },
+  {
+   "id": "gfx.image-effect-disabled",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^The image effect Main Camera \\(UnityStandardAssets\\.ImageEffects\\.(?:DepthOfField|SunShafts)\\) has been disabled as it's not supported on the current platform\\.$",
+   "emitter": "UnityStandardAssets image effects on -nographics",
+   "sample": "The image effect Main Camera (UnityStandardAssets.ImageEffects.DepthOfField) has been disabled as it's not supported on the current platform."
+  },
+  {
+   "id": "container.discovered-rpc",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Failed to find rpc method 327122920$",
+   "emitter": "Container.Interact invokes \"discovered\" while Container registers \"RPC_Discovered\" (327122920 is \"discovered\".GetStableHashCode()): the chest owner's client logs the miss when a player first opens a treasure chest",
+   "sample": "10/10/2026 20:25:51: Failed to find rpc method 327122920"
+  },
+  {
+   "id": "player.local-destroyed",
+   "source": "Unity Log",
+   "levels": [
+    "Warning"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Local player destroyed$",
+   "emitter": "Player.OnDestroy (ZLog.LogWarning) on every logout",
+   "sample": "10/10/2026 04:07:28: Local player destroyed"
+  },
+  {
+   "id": "steam.stat-accumulative",
+   "source": "Unity Log",
+   "levels": [
+    "Error"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Stat with name \"(?:PlayerSpawn|FoodEaten)\" is of type Accumulative, but was treated as SetMax\\. The stat was ignored\\.$",
+   "emitter": "Steam stats layer (not in assembly_valheim): vanilla stat declared Accumulative but written as SetMax",
+   "sample": "10/10/2026 04:07:43: Stat with name \"PlayerSpawn\" is of type Accumulative, but was treated as SetMax. The stat was ignored."
+  },
+  {
+   "id": "menu.intro-cinematic",
+   "source": "Unity Log",
+   "levels": [
+    "Error"
+   ],
+   "match": "regex",
+   "text": "^(?:[0-9/.\\-]{8,10} [0-9:]{8}(?: ?[AaPp][Mm])?: )?Failed to play intro cinematic$",
+   "emitter": "FejdStartup: the intro VideoPlayer cannot start without the video shaders",
+   "sample": "10/09/2026 05:04:07: Failed to play intro cinematic"
+  },
+  {
+   "id": "jotunn.ambiguous-stone1_huge",
+   "source": "Jotunn.Managers.AssetManager",
+   "levels": [
+    "Warning"
+   ],
+   "match": "exact",
+   "text": "Ambiguous asset name for path. old: Assets/world/Props/stone/Stone1_huge.prefab, new: Assets/world/Props/DeepNorth/HotSpring/Stone1_huge.prefab, using old path",
+   "emitter": "Jotunn indexes the game's own bundles; these three vanilla prop names exist twice in Valheim (not from a Meadworks bundle). Third-party source, exact text only.",
+   "sample": "Ambiguous asset name for path. old: Assets/world/Props/stone/Stone1_huge.prefab, new: Assets/world/Props/DeepNorth/HotSpring/Stone1_huge.prefab, using old path"
+  },
+  {
+   "id": "jotunn.ambiguous-caverock_pillar",
+   "source": "Jotunn.Managers.AssetManager",
+   "levels": [
+    "Warning"
+   ],
+   "match": "exact",
+   "text": "Ambiguous asset name for path. old: Assets/world/Props/Caverocks/caverock_pillar.prefab, new: Assets/world/Props/DeepNorth/HotSpring/caverock_pillar.prefab, using old path",
+   "emitter": "Jotunn indexes the game's own bundles; these three vanilla prop names exist twice in Valheim (not from a Meadworks bundle). Third-party source, exact text only.",
+   "sample": "Ambiguous asset name for path. old: Assets/world/Props/Caverocks/caverock_pillar.prefab, new: Assets/world/Props/DeepNorth/HotSpring/caverock_pillar.prefab, using old path"
+  },
+  {
+   "id": "jotunn.ambiguous-highstone",
+   "source": "Jotunn.Managers.AssetManager",
+   "levels": [
+    "Warning"
+   ],
+   "match": "exact",
+   "text": "Ambiguous asset name for path. old: Assets/world/Props/Rocks/highstone.prefab, new: Assets/world/Props/DeepNorth/HotSpring/highstone.prefab, using old path",
+   "emitter": "Jotunn indexes the game's own bundles; these three vanilla prop names exist twice in Valheim (not from a Meadworks bundle). Third-party source, exact text only.",
+   "sample": "Ambiguous asset name for path. old: Assets/world/Props/Rocks/highstone.prefab, new: Assets/world/Props/DeepNorth/HotSpring/highstone.prefab, using old path"
+  }
+ ]
+}

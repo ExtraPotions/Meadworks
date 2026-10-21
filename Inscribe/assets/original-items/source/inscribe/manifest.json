@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "product": "Inscribe",
+  "models": [
+    {
+      "id": "awakening",
+      "displayName": "Awakening Rune",
+      "prefabNames": [
+        "ECF_Awakening"
+      ],
+      "file": "models/awakening.json",
+      "triangleCount": 472,
+      "sha256": "8AF762C8DF1DD55CBA8B5705BC560015E377688E54356C031318E778F473FA9E"
+    },
+    {
+      "id": "recasting",
+      "displayName": "Recasting Rune",
+      "prefabNames": [
+        "ECF_Recasting"
+      ],
+      "file": "models/recasting.json",
+      "triangleCount": 820,
+      "sha256": "AA403CA25A50AAA03CE36E104E76C459A371AE329F4CC89B3817227F0BBD47C5"
+    },
+    {
+      "id": "ascension",
+      "displayName": "Ascension Rune",
+      "prefabNames": [
+        "ECF_Ascension"
+      ],
+      "file": "models/ascension.json",
+      "triangleCount": 400,
+      "sha256": "F6C4AC5C1F5CB9863319CA932364B2A3494134087A9A61F49BDDE30CBA2E4ADB"
+    },
+    {
+      "id": "cleansing",
+      "displayName": "Cleansing Rune",
+      "prefabNames": [
+        "ECF_Cleansing"
+      ],
+      "file": "models/cleansing.json",
+      "triangleCount": 472,
+      "sha256": "BCF3D7755D8E0C9236E7D9A200CD603AC1597E90E4FE7C84A823C10B36E68BAC"
+    },
+    {
+      "id": "serpent",
+      "displayName": "Serpent Rune",
+      "prefabNames": [
+        "ECF_Serpent"
+      ],
+      "file": "models/serpent.json",
+      "triangleCount": 1088,
+      "sha256": "39CD69D6E4B05A3156C660ACD0B47C6A4EF57E731D0A7C9B7D0A59D361B1C059"
+    },
+    {
+      "id": "dvergr_chisel",
+      "displayName": "Dvergr Chisel",
+      "prefabNames": [
+        "ECF_DvergrChisel"
+      ],
+      "file": "models/dvergr_chisel.json",
+      "triangleCount": 272,
+      "sha256": "D3223044C26D13006C7B063CCC73420F0EE44FDF7591B29931E5FF9A078B25E9"
+    },
+    {
+      "id": "scroll_tier_1",
+      "displayName": "Enhancement Scroll Tier 1",
+      "prefabNames": [
+        "ScrollEnhance_Tier1"
+      ],
+      "file": "models/scroll_tier_1.json",
+      "triangleCount": 880,
+      "sha256": "16092EE502A671E9CD44DAB4E55EBDDE872C5EB0DD638AE3D02424D4D87BE01A"
+    },
+    {
+      "id": "scroll_tier_2",
+      "displayName": "Enhancement Scroll Tier 2",
+      "prefabNames": [
+        "ScrollEnhance_Tier2"
+      ],
+      "file": "models/scroll_tier_2.json",
+      "triangleCount": 892,
+      "sha256": "9541892DA30785F687F56F9D99D3EEC9339A7521085EB4B8DC4426061E9568CE"
+    },
+    {
+      "id": "scroll_tier_3",
+      "displayName": "Enhancement Scroll Tier 3",
+      "prefabNames": [
+        "ScrollEnhance_Tier3"
+      ],
+      "file": "models/scroll_tier_3.json",
+      "triangleCount": 904,
+      "sha256": "9A897553CC7AF19BDDF6F0D00CFACB7A9948F29F5EE736F2A788FADC4C1C8847"
+    },
+    {
+      "id": "scroll_tier_4",
+      "displayName": "Enhancement Scroll Tier 4",
+      "prefabNames": [
+        "ScrollEnhance_Tier4"
+      ],
+      "file": "models/scroll_tier_4.json",
+      "triangleCount": 1188,
+      "sha256": "8F348711835C84EE893A006F4703B12DBFCA4ACDBE1BAD79A3AD8F449D9D1604"
+    },
+    {
+      "id": "gem_surtr",
+      "displayName": "Surtr Gem",
+      "prefabNames": [
+        "ECF_GemSurtr"
+      ],
+      "file": "models/gem_surtr.json",
+      "triangleCount": 196,
+      "sha256": "C961E3F83D0732C11980CD7F079B2C20D9689FB89A338434399D99AB25177BFF"
+    },
+    {
+      "id": "gem_ymir",
+      "displayName": "Ymir Gem",
+      "prefabNames": [
+        "ECF_GemYmir"
+      ],
+      "file": "models/gem_ymir.json",
+      "triangleCount": 208,
+      "sha256": "5EA8792D9D58B1FD13835A0D1CDC5CFD26423DE013AB4F3A22505199A94AA32E"
+    },
+    {
+      "id": "gem_thor",
+      "displayName": "Thor Gem",
+      "prefabNames": [
+        "ECF_GemThor"
+      ],
+      "file": "models/gem_thor.json",
+      "triangleCount": 100,
+      "sha256": "CF2B3E8D51E148FCE0F07FB3702821103BC407A0CC7B1548A00647C2E4ADC671"
+    },
+    {
+      "id": "gem_nidhogg",
+      "displayName": "Nidhogg Gem",
+      "prefabNames": [
+        "ECF_GemNidhogg"
+      ],
+      "file": "models/gem_nidhogg.json",
+      "triangleCount": 136,
+      "sha256": "4888C0E69D280E9C6E3EEB2BE4B0BBD3ED7ABE9CEA4A0738CE2E89C30755BB86"
+    },
+    {
+      "id": "gem_hel",
+      "displayName": "Hel Gem",
+      "prefabNames": [
+        "ECF_GemHel"
+      ],
+      "file": "models/gem_hel.json",
+      "triangleCount": 160,
+      "sha256": "5FB6ED92488CE14D603B280CE49BAE6B1BAF6A3666C2B256CE9B58A3192DDDE7"
+    },
+    {
+      "id": "gem_tyr",
+      "displayName": "Tyr Gem",
+      "prefabNames": [
+        "ECF_GemTyr"
+      ],
+      "file": "models/gem_tyr.json",
+      "triangleCount": 58,
+      "sha256": "1CC0AE4B1821315815CF91BFC677CE2C5555688F3D7A551DFEA33619263F218F"
+    },
+    {
+      "id": "gem_freyja",
+      "displayName": "Freyja Gem",
+      "prefabNames": [
+        "ECF_GemFreyja"
+      ],
+      "file": "models/gem_freyja.json",
+      "triangleCount": 214,
+      "sha256": "9556D0499101689E6C36EB5F63227CB8D52A3687F7948411F8A6A17AD2ABBCAC"
+    },
+    {
+      "id": "gem_odin",
+      "displayName": "Odin Gem",
+      "prefabNames": [
+        "ECF_GemOdin"
+      ],
+      "file": "models/gem_odin.json",
+      "triangleCount": 154,
+      "sha256": "5D7EDFBD15942DA4EE9661290FF8B5DB29AAD8674B293FBD1D55765F3DB9F431"
+    },
+    {
+      "id": "gem_skadi",
+      "displayName": "Skadi Gem",
+      "prefabNames": [
+        "ECF_GemSkadi"
+      ],
+      "file": "models/gem_skadi.json",
+      "triangleCount": 94,
+      "sha256": "345BD0E383B2D5AC9780AE8A2BBE3204F3429504F4E0B65E7DD7FE688392108C"
+    },
+    {
+      "id": "gem_heimdall",
+      "displayName": "Heimdall Gem",
+      "prefabNames": [
+        "ECF_GemHeimdall"
+      ],
+      "file": "models/gem_heimdall.json",
+      "triangleCount": 190,
+      "sha256": "E1C7824B3B034C12944CCCD0CBDDA175D16C7CE69781A92272B9E269E5E0ECC6"
+    },
+    {
+      "id": "gem_sleipnir",
+      "displayName": "Sleipnir Gem",
+      "prefabNames": [
+        "ECF_GemSleipnir"
+      ],
+      "file": "models/gem_sleipnir.json",
+      "triangleCount": 172,
+      "sha256": "A34FA96698C1E869B4318B0CF0CB0EA768D22E0570E505730B96A2C73C17602C"
+    }
+  ]
+}

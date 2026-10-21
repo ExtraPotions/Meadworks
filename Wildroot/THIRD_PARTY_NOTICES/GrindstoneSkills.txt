@@ -1,0 +1,38 @@
+GrindstoneSkills Farming module adaptation
+
+Source repository: ValheimMods (GrindstoneSkills), Copyright (C) 2026 Gerald Glasgow
+Source commit: 9da28eb58adbe065be1e4baef779a448acd38e0f
+Source files read: GrindstoneSkills/Core/FarmingSettings.cs, FarmingPerkSettings.cs,
+FarmingExperienceSettings.cs; GrindstoneSkills/Farming/Core/FarmSkill.cs,
+PlantKeys.cs, PlantClock.cs, CropPlant.cs, CropCatalog.cs, CropValues.cs,
+KitchenUses.cs; Farming/Experience/FarmXp.cs, FarmDiscovery.cs, PlantingScope.cs;
+Farming/Growing/GrowTime.cs, PlantTraits.cs, RainGrowth.cs; Farming/Harvest/CropPick.cs,
+SeedReturn.cs; Farming/Planting/PlantPlacing.cs, AutoReplant.cs, RowPlanting.cs;
+Skills/Pages/FarmingPage.cs (the page's lines, order and tip text);
+Skills/Book/PageText.cs and Skills/Book/SkillPage.cs (the one-decimal percent format,
+the "unlocked" / "at level N" perk states and their colours #9BD46A and #A08E74).
+
+Adapted Wildroot files: src/Wildroot.Core/Farming/FarmingRules.cs,
+src/Wildroot.Core/Farming/FarmingPage.cs, src/Wildroot.Plugin/Farming/FarmingRuntime.cs,
+FarmingPatches.cs, FarmingFeatures.cs.
+
+What was adapted: the Farming perk rules (level share, milestones, growth speed,
+grow-space reduction capped at 80%, bonus-yield and seed-return chances, rain growth
+credit once per 60 s capped at 90 s, heat and cold tolerance), the experience
+scaling (multiplier, crop tier from food value, first-pick discovery kept in the
+character's custom data), the planter mark on the plant's ZDO, the crop index and
+crop value resolution, and the setting defaults. Wildroot rewrote these against its
+own boundaries: Crucible MeadworksSkills for experience and the skill page,
+Wildroot's grid (rows apply only to a 1 x 1 grid), Wildroot's paid harvest-replant
+path for auto replant, and Wildroot's bulk harvest receipts for seed return.
+Giant crops, tending and the compost bin were not adopted.
+
+The adapted portions retain the upstream GNU General Public License version 3 (or,
+at your option, any later version) terms. The upstream license, including its
+copyright notice, is in GrindstoneSkills-LICENSE.txt.
+
+SeedCrafting 1.0.2 (MIT): behaviour only. The five workbench recipes (one carrot,
+turnip, onion, kale or poteitr into two of its seeds) were reimplemented from the
+observed behaviour; no SeedCrafting code is included.
+
+Wildroot product author: expDARE.

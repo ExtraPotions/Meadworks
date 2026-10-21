@@ -1,0 +1,67 @@
+# EliteCrafting - the Rune Table: the piece, its window, the essences. Owned by the Table area.
+
+ecf_table_name: "Rune Table"
+ecf_table_desc: "Holds runes, takes trophies as essence and works runes into your gear, steered by an essence."
+ecf_table_off: "The Rune Table is switched off on this server."
+
+ecf_table_tab_inscribe: "Inscribe"
+ecf_table_tab_sacrifice: "Sacrifice"
+
+ecf_table_label_rune: "Rune"
+ecf_table_label_essence: "Essence"
+ecf_table_pool: "Essence in the table: $1"
+
+ecf_table_inscribe: "Inscribe"
+ecf_table_sacrifice: "Sacrifice"
+ecf_table_sacrifice_all: "Sacrifice all trophies"
+ecf_table_store_all: "Store all"
+
+ecf_table_no_gear: "No gear"
+ecf_table_no_gear_desc: "Weapons, armor, shields, tools and trinkets you carry show here. Pick one, a rune and, if you like, an essence."
+ecf_table_gear_line: "$1 · item level $2 ($3)"
+ecf_table_plain: "A plain item: no inscriptions yet."
+ecf_table_no_steer: "Essence works with the Ascension Rune only."
+ecf_table_pick_essence: "Pick an essence to make the new inscription one of its own ($1 essence on this item), or none for a plain roll."
+ecf_table_steer: "With $1 the new inscription is one of its own: $2 of the $3 this item can roll. Costs $4 essence."
+ecf_table_steer_none: "None of $1's inscriptions can roll on this item: pick another essence or another item."
+ecf_table_steer_magic_only: "The Ascension Rune does not raise Epic or Legendary items. What $1 can give this kind of item:"
+ecf_table_rune_counts: "In the table: $1\nIn your inventory: $2\nShift + click it here to take some out. Ctrl + click one in your inventory to put it in."
+
+ecf_table_no_trophies: "No trophies"
+ecf_table_no_trophies_desc: "Creature trophies you carry show here. Sacrificed at the table, each adds essence to its pool: more the later its creature's biome, most for a boss."
+ecf_table_trophy_worth: "Each one gives $1 essence."
+ecf_table_trophy_all: "You carry $1: all of them give $2. Hold Shift to sacrifice them all."
+ecf_table_trophy_boss: "A boss trophy also unlocks a Forsaken power at the altar. Sacrifice all trophies leaves it alone."
+ecf_table_sacrificed: "+$1 essence"
+ecf_table_taken: "$1 taken from the Rune Table"
+ecf_table_take_noroom: "No room in your inventory"
+ecf_table_stored: "$1 stored in the Rune Table"
+
+ecf_table_level_1: "Meadows"
+ecf_table_level_2: "Black Forest"
+ecf_table_level_3: "Swamp"
+ecf_table_level_4: "Mountains"
+ecf_table_level_5: "Plains"
+ecf_table_level_6: "Mistlands"
+ecf_table_level_7: "Ashlands"
+ecf_table_level_8: "Deep North"
+
+ecf_essence_beast: "Beast"
+ecf_essence_stone: "Stone"
+ecf_essence_spirit: "Spirit"
+ecf_essence_grave: "Grave"
+
+ecf_msg_table_lost: "The Rune Table is no longer in your hands. Open it again."
+ecf_msg_not_enough_essence: "Not enough essence: this needs $1."
+
+ecf_essence_item: "Essence"
+ecf_essence_item_desc: "The essence of a creature, drawn from its trophy at the Rune Table. Spent with the Ascension Rune to choose what the new inscription will be."
+ecf_essence_elemental: "Elemental"
+ecf_essence_mist: "Mist"
+ecf_essence_ash: "Ash"
+ecf_essence_frost: "Frost"
+
+ecf_table_pill_rolls: "Rolls $1 to $2 on this item ($3 to $4)"
+ecf_table_pill_prefix: "Prefix"
+ecf_table_pill_suffix: "Suffix"
+ecf_table_pill_more: "+$1 more"

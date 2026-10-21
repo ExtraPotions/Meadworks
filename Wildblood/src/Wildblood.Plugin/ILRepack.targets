@@ -1,0 +1,12 @@
+<!-- Copyright (C) 2026 expDARE. SPDX-License-Identifier: GPL-3.0-or-later -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="WildbloodPrivateYaml" AfterTargets="Build">
+    <ItemGroup>
+      <WildbloodMergeInput Include="$(TargetPath);$(TargetDir)YamlDotNet.dll"/>
+      <WildbloodMergeLibrary Include="@(ReferencePath->'%(RootDir)%(Directory)')"/>
+    </ItemGroup>
+    <!-- No merged PDB: with DebugInfo ILRepack records its per-process temp folder in the DLL, so no two builds matched (W87). -->
+    <ILRepack InputAssemblies="@(WildbloodMergeInput)" OutputFile="$(TargetPath)"
+              Internalize="true" DebugInfo="false" TargetKind="SameAsPrimaryAssembly" LibraryPath="@(WildbloodMergeLibrary)"/>
+  </Target>
+</Project>

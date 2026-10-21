@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "product": "Keel",
+  "default": "Advanced",
+  "settings": {
+    "Sailing/Sailing Enabled": "Essential",
+    "Wind Call/Wind Call Key": "Essential",
+    "Lookout/Lookout Key": "Essential",
+    "Display/Ship Panel": "Essential",
+    "Display/Speed Unit": "Essential",
+    "Display/Boat Camera Max Distance": "Essential",
+    "Display/Sail Opacity": "Essential",
+    "Cheats/Ashlands Immune List": "FileOnly",
+    "Cheats/Invulnerable List": "FileOnly",
+    "Fast Karve/Recipe": "FileOnly",
+    "Fast Longship/Recipe": "FileOnly",
+    "Knarr/Recipe": "FileOnly",
+    "Busse/Recipe": "FileOnly",
+    "Big Busse/Recipe": "FileOnly",
+    "Small Byrding/Recipe": "FileOnly",
+    "Byrding/Recipe": "FileOnly",
+    "Greater Byrding/Recipe": "FileOnly",
+    "Server/Locked Player Settings": "FileOnly",
+    "Server/Locked Player Values": "FileOnly",
+    "Import/Imported Sources": "FileOnly",
+    "Import/Pending Ship Values": "FileOnly",
+    "Ships/*": "FileOnly"
+  }
+}

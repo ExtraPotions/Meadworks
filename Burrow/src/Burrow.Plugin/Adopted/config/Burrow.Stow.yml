@@ -1,0 +1,25 @@
+# Burrow stow rules: item groups and container rules for quick stack, routing and ground pickup.
+# Every entry uses the Burrow item vocabulary:
+#   Wood            a prefab name (case-insensitive) or the item's shared name token ($item_wood)
+#   prefix:Trophy   every item whose prefab name starts with the text
+#   suffix:Ore      every item whose prefab name ends with the text
+#   type:Material   every item of that item type
+#   group:Ores      every item of a group from the groups map below
+#   *               everything
+# Groups are also used by routing (Route Modifier + click): a container holding an item of the same group is a
+# target. Container keys are prefab names (piece_chest_wood, piece_chest, piece_chest_blackmetal, VikingShip, Cart).
+#   pickup: true    the prefab takes items from the ground (needs the cfg master switch Ground Pickup)
+#   accept: [...]   taken from the ground and routed here even when the container does not hold them yet
+#   refuse: [...]   never taken, never routed here (refuse wins)
+# Edits are picked up within five seconds; on a server the file is pushed to every client.
+# groups:
+#   Ores: [prefix:CopperOre, TinOre, IronScrap, SilverOre, BlackMetalScrap, FlametalOre]
+#   Metals: [Copper, Tin, Bronze, Iron, Silver, BlackMetal, Flametal]
+#   Trophies: [type:Trophy]
+# containers:
+#   piece_chest_blackmetal:
+#     pickup: true
+#     accept: [group:Ores]
+#     refuse: [type:Trophy]
+#   piece_chest_wood:
+#     pickup: false

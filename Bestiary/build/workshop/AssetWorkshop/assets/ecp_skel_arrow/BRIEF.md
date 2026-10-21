@@ -1,0 +1,64 @@
+﻿# Low-poly bone remake: ecp_skel_arrow
+
+## 1. Identity and setting
+Existing Elite Creatures Pack bone arrow; preserve gameplay tier, distribution and undead theme.
+Black Forest/Swamp bone palette, shared with the approved Executioner's Greataxe.
+
+## 2. Category
+ammo.arrow. See codex/models/weapons.md and codex/data/items.json for the measured game range.
+
+## 3. References
+ArrowFlint: base-game silhouette, texture coarseness and bone colours; Executioner's Greataxe for the approved new treatment.
+
+## 4. Silhouette
+Arrow carved from one large bone: continuous shaft and asymmetric notched point.
+Three short thick irregular bone fins; no feathers or separate vertebral head.
+
+## 5. Parts and placement
+Keep model.py's existing length, origin, hold transforms and attachment constants.
+Shaft, head and fins are carved bone. Keep current length and nock origin.
+Bows/crossbows keep the exact string endpoints. Bone collars replace fine cord wraps.
+No building-piece or terrain placement fields apply.
+
+## 6. Budget
+Target at most 350 triangles, 64px atlas, coarse paint features at 65 px/m.
+AO 0.2. Albedo-only material, no new normal-map detail; shading comes from the facets.
+
+## 7. Materials
+low_paint bone recipe: warm ivory/tan, linear midtone (.30,.235,.15), broad soft blotches,
+dark bone joints and pale ground blade edges. No metal or wood. Existing Custom/Creature dressing retained.
+
+## 8. Regions
+Bone region for the entire mesh. No recolour variants requested.
+
+## 9. Rig and animation
+Rigid item. Preserve game hold frames, bow string points and crossbow sockets.
+No new attack clips, rig, animator events or root motion.
+
+## 10. Effects
+No changes; existing gameplay effects remain outside this model revision.
+
+## 11. Sounds
+No new sounds; existing gameplay audio remains unchanged.
+
+## 12. Integration
+Workshop-only rebuild of Blender, FBX, atlas and inventory icon. Existing bundle builders
+consume the same names on a later release. No install or mod code changes.
+Physics, recipe, config and multiplayer state remain unchanged.
+
+## 13. Validation
+Check final mesh triangles, dimensions and finite geometry; compare attachment constants
+with the archived source. Review coloured preview and game reference lineup. Run style
+report and record exceptions in out/remake/report.md. Icons must be transparent and
+readable at inventory scale. In-game multiplayer validation is not part of this asset review.
+
+Result: 282 triangles, 64 px atlas; mesh and attachment checks pass.
+Reference lineup and coloured review inspected. Remaining style exceptions are
+listed in ../ecp_skel_arsenal/out/remake/report.md. Not installed or tested in game.
+
+Carved revision: 282 triangles; all-bone material; length 1.169 m. Fins about 9.6 cm
+long, previously 16.5 cm, with radial extent about 2 cm instead of 3 cm.
+Two small asymmetric edge chips are intentional carving detail. Current size is retained
+from the approved model; comparison length warning uses enlarged dropped vanilla items.
+Bone blotch-size/local-contrast exceptions retain the established arsenal paint treatment.
+Coloured whole-arrow, point and fin previews and ArrowFlint lineup inspected.

@@ -1,0 +1,1135 @@
+{
+  "schema": 1,
+  "entries": [
+    {
+      "id": "sapling_turnip",
+      "prefab": "sapling_turnip",
+      "grownPrefab": "Pickable_Turnip",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "TurnipSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Turnip",
+      "yield": 1,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_seedturnip",
+      "prefab": "sapling_seedturnip",
+      "grownPrefab": "Pickable_SeedTurnip",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "Turnip",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "TurnipSeeds",
+      "yield": 3,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_onion",
+      "prefab": "sapling_onion",
+      "grownPrefab": "Pickable_Onion",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "OnionSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Onion",
+      "yield": 1,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_seedonion",
+      "prefab": "sapling_seedonion",
+      "grownPrefab": "Pickable_SeedOnion",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "Onion",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "OnionSeeds",
+      "yield": 3,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_carrot",
+      "prefab": "sapling_carrot",
+      "grownPrefab": "Pickable_Carrot",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "CarrotSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Carrot",
+      "yield": 1,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_seedcarrot",
+      "prefab": "sapling_seedcarrot",
+      "grownPrefab": "Pickable_SeedCarrot",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "Carrot",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "CarrotSeeds",
+      "yield": 3,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_barley",
+      "prefab": "sapling_barley",
+      "grownPrefab": "Pickable_Barley",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "Barley",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Barley",
+      "yield": 2,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_flax",
+      "prefab": "sapling_flax",
+      "grownPrefab": "Pickable_Flax",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "Flax",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Flax",
+      "yield": 2,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_jotunpuffs",
+      "prefab": "sapling_jotunpuffs",
+      "grownPrefab": "Pickable_Mushroom_JotunPuffs",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "MushroomJotunPuffs",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "MushroomJotunPuffs",
+      "yield": 1,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_magecap",
+      "prefab": "sapling_magecap",
+      "grownPrefab": "Pickable_Mushroom_Magecap",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "MushroomMagecap",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "MushroomMagecap",
+      "yield": 1,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_oat",
+      "prefab": "sapling_oat",
+      "grownPrefab": "Pickable_Oat",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "OatSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "OatSeeds",
+      "yield": 3,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_poteitr",
+      "prefab": "sapling_poteitr",
+      "grownPrefab": "Pickable_Poteitr",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "PoteitrSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Poteitr",
+      "yield": 3,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_Kale",
+      "prefab": "sapling_Kale",
+      "grownPrefab": "Pickable_Kale",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "KaleSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Kale",
+      "yield": 3,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "sapling_seedkale",
+      "prefab": "sapling_seedkale",
+      "grownPrefab": "Pickable_SeedKale",
+      "kind": "Crop",
+      "costs": [
+        {
+          "item": "KaleSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "KaleSeeds",
+      "yield": 3,
+      "growMin": 4000.0,
+      "growMax": 5000.0,
+      "respawnSeconds": 0.0,
+      "radius": 0.5,
+      "scaleMin": 0.9,
+      "scaleMax": 1.1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Beech_Sapling",
+      "prefab": "Beech_Sapling",
+      "grownPrefab": "Beech1",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "BeechSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 0.8,
+      "scaleMax": 1.5,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Birch_Sapling",
+      "prefab": "Birch_Sapling",
+      "grownPrefab": "Birch1",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "BirchSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 0.5,
+      "scaleMax": 1.0,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Autumn_Birch_Sapling",
+      "prefab": "Autumn_Birch_Sapling",
+      "grownPrefab": "Birch1_aut",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "BirchSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 0.5,
+      "scaleMax": 1.0,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Ancient_Sapling",
+      "prefab": "Ancient_Sapling",
+      "grownPrefab": "SwampTree1",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "AncientSeed",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 0.5,
+      "scaleMax": 2.0,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Ygga_Sapling",
+      "prefab": "Ygga_Sapling",
+      "grownPrefab": "YggaShoot1",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "Sap",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 0.5,
+      "scaleMax": 2.0,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Ashwood_Sapling",
+      "prefab": "Ashwood_Sapling",
+      "grownPrefab": "AshlandsTree3",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "BeechSeeds",
+          "amount": 1
+        },
+        {
+          "item": "SulfurStone",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 0.5,
+      "scaleMax": 2.0,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Oak_Sapling",
+      "prefab": "Oak_Sapling",
+      "grownPrefab": "Oak1",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "Acorn",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 3.0,
+      "scaleMin": 0.7,
+      "scaleMax": 0.9,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "FirTree_Sapling",
+      "prefab": "FirTree_Sapling",
+      "grownPrefab": "FirTree",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "FirCone",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 1.0,
+      "scaleMax": 2.5,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "PineTree_Sapling",
+      "prefab": "PineTree_Sapling",
+      "grownPrefab": "Pinetree_01",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "PineCone",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 1.5,
+      "scaleMax": 2.5,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "FirTree_big_Sapling",
+      "prefab": "FirTree_big_Sapling",
+      "grownPrefab": "FirTree_big",
+      "kind": "Sapling",
+      "costs": [
+        {
+          "item": "FirConeFrost",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 3000.0,
+      "growMax": 3000.0,
+      "respawnSeconds": 0,
+      "radius": 2.0,
+      "scaleMin": 1.0,
+      "scaleMax": 2.5,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "VineAsh_sapling",
+      "prefab": "VineAsh_sapling",
+      "grownPrefab": "VineAsh",
+      "kind": "Vine",
+      "costs": [
+        {
+          "item": "VineberrySeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Vineberry",
+      "yield": 3,
+      "growMin": 200.0,
+      "growMax": 300.0,
+      "respawnSeconds": 12000.0,
+      "radius": 0.5,
+      "scaleMin": 1.0,
+      "scaleMax": 1.0,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "VineGreen_sapling",
+      "prefab": "VineGreen_sapling",
+      "grownPrefab": "VineGreen",
+      "kind": "Vine",
+      "costs": [
+        {
+          "item": "VineGreenSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Vineberry",
+      "yield": 3,
+      "growMin": 200.0,
+      "growMax": 300.0,
+      "respawnSeconds": 12000.0,
+      "radius": 0.5,
+      "scaleMin": 1.0,
+      "scaleMax": 1.0,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "RaspberryBush",
+      "prefab": "RaspberryBush",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Raspberry",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Raspberry",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 18000.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "BlueberryBush",
+      "prefab": "BlueberryBush",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Blueberries",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Blueberries",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 18000.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "CloudberryBush",
+      "prefab": "CloudberryBush",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Cloudberry",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Cloudberry",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 18000.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "LingonberryBush",
+      "prefab": "LingonberryBush",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Lingonberry",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Lingonberry",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 18000.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Mushroom",
+      "prefab": "Pickable_Mushroom",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Mushroom",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Mushroom",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 14400.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Mushroom_yellow",
+      "prefab": "Pickable_Mushroom_yellow",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "MushroomYellow",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "MushroomYellow",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 14400.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Mushroom_blue",
+      "prefab": "Pickable_Mushroom_blue",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "MushroomBlue",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "MushroomBlue",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 14400.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Thistle",
+      "prefab": "Pickable_Thistle",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Thistle",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Thistle",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 14400.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Dandelion",
+      "prefab": "Pickable_Dandelion",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Dandelion",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Dandelion",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 14400.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_SmokePuff",
+      "prefab": "Pickable_SmokePuff",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "MushroomSmokePuff",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "MushroomSmokePuff",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 14400.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Fiddlehead",
+      "prefab": "Pickable_Fiddlehead",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Fiddleheadfern",
+          "amount": 15
+        }
+      ],
+      "harvestItem": "Fiddleheadfern",
+      "yield": 3,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 18000.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Beech_small1",
+      "prefab": "Beech_small1",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "BeechSeeds",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "FirTree_small",
+      "prefab": "FirTree_small",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "FirCone",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "FirTree_small_dead",
+      "prefab": "FirTree_small_dead",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "FirCone",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Bush01",
+      "prefab": "Bush01",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "Wood",
+          "amount": 2
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Bush01_heath",
+      "prefab": "Bush01_heath",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "Wood",
+          "amount": 2
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Bush02_en",
+      "prefab": "Bush02_en",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "Wood",
+          "amount": 3
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "shrub_2",
+      "prefab": "shrub_2",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "Wood",
+          "amount": 2
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "shrub_2_heath",
+      "prefab": "shrub_2_heath",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "Wood",
+          "amount": 2
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "YggaShoot_small1",
+      "prefab": "YggaShoot_small1",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "YggdrasilWood",
+          "amount": 1
+        },
+        {
+          "item": "Wood",
+          "amount": 2
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "vines",
+      "prefab": "vines",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "Wood",
+          "amount": 2
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "FernAshlands",
+      "prefab": "FernAshlands",
+      "grownPrefab": "",
+      "kind": "Decorative",
+      "costs": [
+        {
+          "item": "Wood",
+          "amount": 2
+        }
+      ],
+      "harvestItem": "",
+      "yield": 0,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Branch",
+      "prefab": "Pickable_Branch",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Wood",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Wood",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 14400.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Stone",
+      "prefab": "Pickable_Stone",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Stone",
+          "amount": 1
+        }
+      ],
+      "harvestItem": "Stone",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 0.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    },
+    {
+      "id": "Pickable_Flint",
+      "prefab": "Pickable_Flint",
+      "grownPrefab": "",
+      "kind": "Pickable",
+      "costs": [
+        {
+          "item": "Flint",
+          "amount": 5
+        }
+      ],
+      "harvestItem": "Flint",
+      "yield": 1,
+      "growMin": 0,
+      "growMax": 0,
+      "respawnSeconds": 14400.0,
+      "radius": 1,
+      "scaleMin": 1,
+      "scaleMax": 1,
+      "enabled": true,
+      "free": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "sourceSha256": "C1A761254F66D42814C1ECB4FAC52555D2FF09755784E1F66FBD160F4D462D75",
+  "checks": [
+    {
+      "asset": "shepherd_feed_barrel",
+      "clearBasinVerticalRays": 5,
+      "collidableShellParts": 21,
+      "frontRimHeight": 0.44,
+      "foodSurfaceHeight": 0.15
+    },
+    {
+      "asset": "shepherd_trough_plank",
+      "clearBasinVerticalRays": 5,
+      "collidableShellParts": 19,
+      "frontRimHeight": 0.46,
+      "foodSurfaceHeight": 0.205
+    },
+    {
+      "asset": "shepherd_trough_stone",
+      "clearBasinVerticalRays": 5,
+      "collidableShellParts": 17,
+      "frontRimHeight": 0.514,
+      "foodSurfaceHeight": 0.217
+    }
+  ],
+  "limit": "Structural source checks only. Physics interaction and animal access require native runtime verification."
+}

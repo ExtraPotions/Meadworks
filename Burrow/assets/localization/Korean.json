@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "strings": {
+    "step_aside_stow_buttons": "{0}이(가) 설치되어 있어 Burrow의 빠른 쌓기, 모두 보관, 채우기, 정렬 버튼과 단축키(Alt+D 포함)를 숨기고 자동 정렬을 끕니다. 사용하려면 {0}을(를) 제거하세요.",
+    "chest_preview_on": "Burrow: 상자 미리보기 켬",
+    "chest_preview_off": "Burrow: 상자 미리보기 끔",
+    "step_aside_multi_user_chests": "{0}이(가) 설치되어 있어 Burrow는 상자 공동 사용을 해당 모드에 맡기고 다른 플레이어가 사용 중인 상자를 열지 않습니다. Burrow의 다중 사용자 상자 기능을 사용하려면 {0}을(를) 제거하세요."
+  }
+}

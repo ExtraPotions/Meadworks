@@ -1,0 +1,157 @@
+{
+  "sourceSha256": "86C21EBD931AF4931F42D9FBEC18ED8AF7DC44D59914EFD6689BE8C7D27E83D5",
+  "files": [
+    {
+      "file": "mw_mantle_items.windows",
+      "sha256": "8EF556884008262EA5A6ED2C02E2AA4777E5BF403C2008FC5BC5FB373F36C67B"
+    },
+    {
+      "file": "mw_mantle_items.linux",
+      "sha256": "B6614434E550643F01EBF3178AB33E669ACE1B5A3B17875AD41B6C2EFD4D80FF"
+    },
+    {
+      "file": "icons/mantle_deerhidesatchel_icon.png",
+      "sha256": "D4FB18408C252CF6422F99EB3BD3FEC4529D8CD060E431468F347C4B391E4394"
+    },
+    {
+      "file": "icons/mantle_trollhidebackpack_icon.png",
+      "sha256": "793562470BB3DECBAC0813FB07A6EF137FD8CBBDC591700EA3C4454C731FCB97"
+    },
+    {
+      "file": "icons/mantle_rootboundpack_icon.png",
+      "sha256": "885882054F0ED74232AB6CF9B6A84EDECDAA6A9068C821EB96C6571058462837"
+    },
+    {
+      "file": "icons/mantle_wolfpeltpack_icon.png",
+      "sha256": "3F3E0BAEFE48BD53B6020C98C708B8C3B9C0C05A67005F7BC4835F2D2A079986"
+    },
+    {
+      "file": "icons/mantle_loxhauler_icon.png",
+      "sha256": "62F81ECAD84C0E2AF88F8CA0ADB658A9BEC6F90728832E2AEFB836AF3C498492"
+    },
+    {
+      "file": "icons/mantle_carapacepack_icon.png",
+      "sha256": "BAEF0AFD3B6F1481C9228C471F530162BF28986864A19C7AE8B7B446652C18E9"
+    },
+    {
+      "file": "icons/mantle_asksvinpack_icon.png",
+      "sha256": "888B9107E22A3467D046D01F2917B38E5CC71BC7FBFA13DF9DB8836EC58035E1"
+    },
+    {
+      "file": "icons/mantle_moosehidepack_icon.png",
+      "sha256": "B4332CD2FED76C6956589FC0D75B4A813C8F28ED1B7C29FCF52129396A2FD3BB"
+    },
+    {
+      "file": "icons/mantle_driftwoodtacklebox_icon.png",
+      "sha256": "430DD94D422F757875EFC9ED8BCC884F7F88E25138B7DBF1E88F7D9484AAE212"
+    },
+    {
+      "file": "icons/mantle_finewoodtacklebox_icon.png",
+      "sha256": "B614A8D899461D574F2C60B9E8F42BEC9A35F16B8AF70B35E459A62F934DEAAA"
+    },
+    {
+      "file": "icons/mantle_carapacetacklebox_icon.png",
+      "sha256": "96B80F176DD49BDDDD01C5B8982E0B4A05BB4691438693B263DC071EC94F73D1"
+    },
+    {
+      "file": "icons/mantle_flametaltacklebox_icon.png",
+      "sha256": "1A80DD987E561EF5C3E5E9DD65E76366B9D486D1F99875A2F1A753A89EAA0788"
+    },
+    {
+      "file": "icons/mantle_boneband_icon.png",
+      "sha256": "24CBB420719DA1DD3E1A1870E4F92883DC6427508EF427D895E4E2EA8E8AF7DF"
+    },
+    {
+      "file": "icons/mantle_copperring_icon.png",
+      "sha256": "B024AF6E125BA05B80CF095548C78BF59F44582653422875AAE4E70A2C32FB0E"
+    },
+    {
+      "file": "icons/mantle_ironring_icon.png",
+      "sha256": "538DA153BE8E91CC1970DB0974A0BD15B47AD5C07A3E01EECAEE4C70C62DA47A"
+    },
+    {
+      "file": "icons/mantle_silverring_icon.png",
+      "sha256": "89656C3B7C83BDC9CBD69BDC67DD6FF02BC0743E8FA440EC0FF6FDA2CEB73E85"
+    },
+    {
+      "file": "icons/mantle_blackmetalring_icon.png",
+      "sha256": "98FBCA7AF249B08898B940F65096C268F6906EF96F79E5154940CF9D9986B840"
+    },
+    {
+      "file": "icons/mantle_eitrring_icon.png",
+      "sha256": "101662F4ECDF5AE9698CF374BDDB9A3976F103BFD50EE5B05161C67DFE583AD6"
+    },
+    {
+      "file": "icons/mantle_leatherbelt_icon.png",
+      "sha256": "5783C4581CDCB78B5B4E2D9114F8C336933072DD3E189736DD49BD8FD95A8D40"
+    },
+    {
+      "file": "icons/mantle_trollhidebelt_icon.png",
+      "sha256": "1DD8215BE827D9668543C82FDF89888FA5A68A48299B7E3B587A2413288D7A21"
+    },
+    {
+      "file": "icons/mantle_loxbelt_icon.png",
+      "sha256": "12BCFCB0B08A0AE7F4E54ECB351BC14E203EFF2EE6DA9EC0A9E3F34B5641A358"
+    },
+    {
+      "file": "source/mantle/generate.py",
+      "sha256": "13F44800FF32DDCC7A959CF941C06F53EE8BDDF4C05F092AE8F7C19F69DEA9E6"
+    },
+    {
+      "file": "source/mantle/mantle_geometry.py",
+      "sha256": "502603E4548B924AB7B28A406C9F5C79CA207335FFAA90DA8CDD164E680FFCA1"
+    },
+    {
+      "file": "source/mantle/models.json",
+      "sha256": "86C21EBD931AF4931F42D9FBEC18ED8AF7DC44D59914EFD6689BE8C7D27E83D5"
+    },
+    {
+      "file": "source/mantle/preview_source.py",
+      "sha256": "6864F692B2993D2D5590CEF8FE6C4AB72C73F5B81A5E61B8B995C53395C3E707"
+    },
+    {
+      "file": "source/mantle/README.md",
+      "sha256": "30A2500E708CDBF3AD126D96A94ACE94414264AB77A0B4F2AD6B44AF9649C3C0"
+    },
+    {
+      "file": "source/mantle/validate_source.py",
+      "sha256": "1009F940B172F3237B021D3BF45A472FCC2E03C8386FDE5496C47DC6833280F5"
+    },
+    {
+      "file": "source/mantle/validation.json",
+      "sha256": "1B2B8D31E91E35A009C3BB992CDEC4B11E3C0370A35AC2D0CE05DE7BF4D42020"
+    },
+    {
+      "file": "source/BuildCustomItems.cs",
+      "sha256": "BB4BC3A82B38FA3930440EDE02B6797906831EFB4D98D25712F06D0AA3F42837"
+    },
+    {
+      "file": "source/OriginalItemArt.cs",
+      "sha256": "3F33CA68E6F084105521AE0FF2572B4601B1A85ED16208F5598DC3CB2B00C1F4"
+    },
+    {
+      "file": "source/README.md",
+      "sha256": "0DE3AB4668FFF32919A87B5919D2575F68FD49305575FF48FB3318E02AA4247A"
+    },
+    {
+      "file": "source/Rebuild-OriginalArt.ps1",
+      "sha256": "CD41B87CCE6647D979FCC7B570457B4E324395BA141979623B66032ADFD97052"
+    },
+    {
+      "file": "source/SOURCE-REBUILD.md",
+      "sha256": "B18BD02878D7CE8D2C31A963D1E72FE62147EF7208843B4E4BFD9FDD96684D0E"
+    },
+    {
+      "file": "source/textures/materials-atlas.png",
+      "sha256": "83F3B012447DA4F44C64943AB26D632E530480D5DEF958FD41D56792937A10C1"
+    },
+    {
+      "file": "source/textures/provenance.json",
+      "sha256": "4B5454F1FC5A5ECA9615213DB391F79DF0362BB8F0C84755D1C7E8617AA0E01B"
+    },
+    {
+      "file": "source/source-kit.json",
+      "sha256": "7FF9B3F572DF5843A77D6E1330D8A8A16AFE1C03B4F1521CFD39D8FE345CCFA6"
+    }
+  ]
+}

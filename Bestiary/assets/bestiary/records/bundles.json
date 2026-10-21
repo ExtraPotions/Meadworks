@@ -1,0 +1,4800 @@
+{
+ "workshop_pin": "a8ea29008f23dcebfd3afe93c157c6bf6e8d7be1",
+ "unity": "6000.0.75f1 (26349cd2a5c8)",
+ "blender": "5.2.1 LTS",
+ "bestiary_tools": [
+  "tools/assets/workshop.py",
+  "tools/assets/unity_build.py",
+  "tools/assets/clip_curves.py",
+  "tools/assets/unity/Assets/Editor/Bestiary/*.cs"
+ ],
+ "excluded_clips": [
+  "ecp_atgeir_player_attack0",
+  "ecp_atgeir_player_attack1",
+  "ecp_atgeir_player_attack2",
+  "ecp_headsman_idle",
+  "ecp_headsman_run",
+  "ecp_headsman_walk",
+  "ecp_xbow_idle",
+  "ecp_xbow_run",
+  "ecp_xbow_walk"
+ ],
+ "pending": {},
+ "bundles": {
+  "ecp_kraken_loot": {
+   "sources": [
+    "assets/kraken_beak_set/present.py",
+    "assets/kraken_food/present.py",
+    "unity/Assets/Editor/{BundleBuild,PrefabBuilder,ImportSettings,AssetManifest}.cs"
+   ],
+   "platforms": {
+    "windows": {
+     "bytes": 1072266,
+     "sha256": "3d9df0ef0435501cef6ab63bd1418e2c2e2e39ebae2b719be1306e4c27c5003b",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_kraken_beak": {
+       "triangles": 1224,
+       "size": [
+        0.409,
+        0.429,
+        0.536
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_kraken_beak_shield": {
+       "triangles": 4536,
+       "size": [
+        0.658,
+        0.762,
+        1.045
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_kraken_meat": {
+       "triangles": 1028,
+       "size": [
+        0.109,
+        0.182,
+        0.189
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_kraken_meat_cooked": {
+       "triangles": 1028,
+       "size": [
+        0.098,
+        0.166,
+        0.172
+       ],
+       "blender": true,
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_kraken_beak_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_kraken_beak_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_kraken_beak_shield_albedo": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_beak_shield_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_kraken_meat_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_kraken_meat_cooked_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_kraken_meat_cooked_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_kraken_meat_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      }
+     },
+     "clips": {},
+     "kits": {
+      "ecp_kraken_beak": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_kraken_beak_shield": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_kraken_meat": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_kraken_meat_cooked": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       4,
+       4
+      ],
+      "Texture2D": [
+       8,
+       8
+      ],
+      "Material": [
+       4,
+       4
+      ],
+      "Sprite": [
+       4,
+       4
+      ],
+      "MeshRenderer": [
+       4,
+       4
+      ],
+      "BoxCollider": [
+       4,
+       4
+      ]
+     },
+     "problems": []
+    },
+    "linux": {
+     "bytes": 1139081,
+     "sha256": "8fb31cc217d692db71ca636e1c1c30d19fcc211f6b1d189299678c762e006a88",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_kraken_beak": {
+       "triangles": 1224,
+       "size": [
+        0.409,
+        0.429,
+        0.536
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_kraken_beak_shield": {
+       "triangles": 4536,
+       "size": [
+        0.658,
+        0.762,
+        1.045
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_kraken_meat": {
+       "triangles": 1028,
+       "size": [
+        0.109,
+        0.182,
+        0.189
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_kraken_meat_cooked": {
+       "triangles": 1028,
+       "size": [
+        0.098,
+        0.166,
+        0.172
+       ],
+       "blender": true,
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_kraken_beak_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_kraken_beak_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_kraken_beak_shield_albedo": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_beak_shield_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_kraken_meat_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_kraken_meat_cooked_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_kraken_meat_cooked_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_kraken_meat_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      }
+     },
+     "clips": {},
+     "kits": {
+      "ecp_kraken_beak": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_kraken_beak_shield": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_kraken_meat": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_kraken_meat_cooked": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       4,
+       4
+      ],
+      "Texture2D": [
+       8,
+       8
+      ],
+      "Material": [
+       4,
+       4
+      ],
+      "Sprite": [
+       4,
+       4
+      ],
+      "MeshRenderer": [
+       4,
+       4
+      ],
+      "BoxCollider": [
+       4,
+       4
+      ]
+     },
+     "problems": []
+    }
+   },
+   "unity_report": [
+    "platform windows built: 1072266 bytes",
+    "platform linux built: 1139081 bytes"
+   ]
+  },
+  "ecp_skel_arsenal": {
+   "sources": [
+    "blender/run.py on assets/ecp_skel_* and ecp_spine",
+    "assets/ecp_spine/icon.py",
+    "unity/Assets/Editor/{PrefabBuilder,ImportSettings,AssetManifest}.cs"
+   ],
+   "platforms": {
+    "windows": {
+     "bytes": 972571,
+     "sha256": "2c043ceb6ec0cce1371a1876fe85a0842f849aa74ba3931919562810616c0339",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_skel_arrow": {
+       "triangles": 282,
+       "size": [
+        0.032,
+        0.035,
+        1.169
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_atgeir": {
+       "triangles": 1440,
+       "size": [
+        0.449,
+        1.073,
+        2.864
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_axe": {
+       "triangles": 964,
+       "size": [
+        0.066,
+        0.31,
+        0.915
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_bow": {
+       "triangles": 1412,
+       "size": [
+        0.713,
+        0.759,
+        0.968
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_bow_player": {
+       "triangles": 1412,
+       "size": [
+        0.238,
+        0.44,
+        1.357
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_dagger": {
+       "triangles": 518,
+       "size": [
+        0.043,
+        0.108,
+        0.478
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_mace": {
+       "triangles": 1188,
+       "size": [
+        0.239,
+        0.253,
+        0.98
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_spear": {
+       "triangles": 1354,
+       "size": [
+        0.071,
+        0.151,
+        2.446
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_sword": {
+       "triangles": 1218,
+       "size": [
+        0.084,
+        0.162,
+        1.133
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_spine": {
+       "triangles": 1516,
+       "size": [
+        0.372,
+        0.385,
+        0.882
+       ],
+       "blender": true,
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_skel_arrow_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_arrow_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_atgeir_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_atgeir_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_axe_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_axe_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_bow_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_bow_player_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_bow_player_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_dagger_albedo": {
+       "size": [
+        32,
+        32
+       ],
+       "format": "25",
+       "ecp_size": [
+        32,
+        32
+       ]
+      },
+      "ecp_skel_dagger_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_mace_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_mace_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_spear_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_spear_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_sword_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_sword_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_spine_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_spine_icon": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "4",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_spine_normal": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      }
+     },
+     "clips": {},
+     "kits": {
+      "ecp_skel_arrow": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_atgeir": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_axe": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_bow": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_bow_player": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_dagger": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_mace": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_spear": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_sword": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_spine": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       10,
+       10
+      ],
+      "Texture2D": [
+       20,
+       20
+      ],
+      "Material": [
+       10,
+       10
+      ],
+      "AnimationClip": [
+       0,
+       3
+      ],
+      "Sprite": [
+       9,
+       9
+      ],
+      "MeshRenderer": [
+       10,
+       10
+      ],
+      "BoxCollider": [
+       1,
+       1
+      ]
+     },
+     "problems": []
+    },
+    "linux": {
+     "bytes": 1106327,
+     "sha256": "7ce2c5a03ea4cc5497254c8839c2d8040aab9aad8d95f2bae9663e7d9742c517",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_skel_arrow": {
+       "triangles": 282,
+       "size": [
+        0.032,
+        0.035,
+        1.169
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_atgeir": {
+       "triangles": 1440,
+       "size": [
+        0.449,
+        1.073,
+        2.864
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_axe": {
+       "triangles": 964,
+       "size": [
+        0.066,
+        0.31,
+        0.915
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_bow": {
+       "triangles": 1412,
+       "size": [
+        0.713,
+        0.759,
+        0.968
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_bow_player": {
+       "triangles": 1412,
+       "size": [
+        0.238,
+        0.44,
+        1.357
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_dagger": {
+       "triangles": 518,
+       "size": [
+        0.043,
+        0.108,
+        0.478
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_mace": {
+       "triangles": 1188,
+       "size": [
+        0.239,
+        0.253,
+        0.98
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_spear": {
+       "triangles": 1354,
+       "size": [
+        0.071,
+        0.151,
+        2.446
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_skel_sword": {
+       "triangles": 1218,
+       "size": [
+        0.084,
+        0.162,
+        1.133
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_spine": {
+       "triangles": 1516,
+       "size": [
+        0.372,
+        0.385,
+        0.882
+       ],
+       "blender": true,
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_skel_arrow_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_arrow_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_atgeir_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_atgeir_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_axe_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_axe_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_bow_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_bow_player_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_bow_player_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_dagger_albedo": {
+       "size": [
+        32,
+        32
+       ],
+       "format": "25",
+       "ecp_size": [
+        32,
+        32
+       ]
+      },
+      "ecp_skel_dagger_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_mace_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_mace_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_spear_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_spear_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_skel_sword_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_skel_sword_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_spine_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_spine_icon": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "4",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_spine_normal": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      }
+     },
+     "clips": {},
+     "kits": {
+      "ecp_skel_arrow": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_atgeir": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_axe": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_bow": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_bow_player": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_dagger": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_mace": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_spear": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_skel_sword": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_spine": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       10,
+       10
+      ],
+      "Texture2D": [
+       20,
+       20
+      ],
+      "Material": [
+       10,
+       10
+      ],
+      "AnimationClip": [
+       0,
+       3
+      ],
+      "Sprite": [
+       9,
+       9
+      ],
+      "MeshRenderer": [
+       10,
+       10
+      ],
+      "BoxCollider": [
+       1,
+       1
+      ]
+     },
+     "problems": []
+    }
+   },
+   "unity_report": [
+    "platform windows built: 972571 bytes",
+    "platform linux built: 1106327 bytes"
+   ]
+  },
+  "ecp_kraken": {
+   "sources": [
+    "assets/ecp_kraken/{textures.py,kraken.py}",
+    "unity/Assets/Editor/Kraken/*.cs (KrakenBuild steps)"
+   ],
+   "platforms": {
+    "windows": {
+     "bytes": 3642417,
+     "sha256": "4d876a12015c483185aa437dd79510a6ba620414325ea46e29cc34c560994f7f",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_kraken_head_mesh_eyes": {
+       "triangles": 792,
+       "size": [
+        0.982,
+        0.995,
+        3.395
+       ],
+       "ecp": true
+      },
+      "ecp_kraken_head_mesh_skin": {
+       "triangles": 10611,
+       "size": [
+        3.575,
+        4.751,
+        11.508
+       ],
+       "ecp": true
+      },
+      "ecp_kraken_tentacle_mesh_tentacle": {
+       "triangles": 2754,
+       "size": [
+        0.917,
+        1.04,
+        8.05
+       ],
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_kraken_eye_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_kraken_ink_0": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_ink_1": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_ink_2": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_ink_3": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_skin_albedo": {
+       "size": [
+        1024,
+        1024
+       ],
+       "format": "25",
+       "ecp_size": [
+        1024,
+        1024
+       ]
+      },
+      "ecp_kraken_skin_normal": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_tentacle_albedo": {
+       "size": [
+        1024,
+        1024
+       ],
+       "format": "25",
+       "ecp_size": [
+        1024,
+        1024
+       ]
+      },
+      "ecp_kraken_tentacle_normal": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      }
+     },
+     "clips": {},
+     "kits": {
+      "ecp_kraken_head": {
+       "transforms": 22,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_kraken_tentacle": {
+       "transforms": 19,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       3,
+       3
+      ],
+      "Texture2D": [
+       9,
+       9
+      ],
+      "Material": [
+       3,
+       3
+      ],
+      "SkinnedMeshRenderer": [
+       3,
+       3
+      ]
+     },
+     "problems": []
+    },
+    "linux": {
+     "bytes": 3780143,
+     "sha256": "4d025d298f8ee14b5f4069e836c85314786be5ed0d161ac3a816721c173251ce",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_kraken_head_mesh_eyes": {
+       "triangles": 792,
+       "size": [
+        0.982,
+        0.995,
+        3.395
+       ],
+       "ecp": true
+      },
+      "ecp_kraken_head_mesh_skin": {
+       "triangles": 10611,
+       "size": [
+        3.575,
+        4.751,
+        11.508
+       ],
+       "ecp": true
+      },
+      "ecp_kraken_tentacle_mesh_tentacle": {
+       "triangles": 2754,
+       "size": [
+        0.917,
+        1.04,
+        8.05
+       ],
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_kraken_eye_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_kraken_ink_0": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_ink_1": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_ink_2": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_ink_3": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_skin_albedo": {
+       "size": [
+        1024,
+        1024
+       ],
+       "format": "25",
+       "ecp_size": [
+        1024,
+        1024
+       ]
+      },
+      "ecp_kraken_skin_normal": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecp_kraken_tentacle_albedo": {
+       "size": [
+        1024,
+        1024
+       ],
+       "format": "25",
+       "ecp_size": [
+        1024,
+        1024
+       ]
+      },
+      "ecp_kraken_tentacle_normal": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      }
+     },
+     "clips": {},
+     "kits": {
+      "ecp_kraken_head": {
+       "transforms": 22,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_kraken_tentacle": {
+       "transforms": 19,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       3,
+       3
+      ],
+      "Texture2D": [
+       9,
+       9
+      ],
+      "Material": [
+       3,
+       3
+      ],
+      "SkinnedMeshRenderer": [
+       3,
+       3
+      ]
+     },
+     "problems": []
+    }
+   },
+   "unity_report": [
+    "kraken contract check passed (KrakenCheck)",
+    "platform windows built: 3642417 bytes",
+    "platform linux built: 3780143 bytes"
+   ]
+  },
+  "ecr_cryptmimic": {
+   "sources": [
+    "assets/crypt_mimic/export_unity.py (via tools/assets/no_reference.py)",
+    "unity/Assets/Editor/Creature/{CreatureImport,CreatureAnimator,CreaturePrefab,RootMotionCheck}.cs"
+   ],
+   "platforms": {
+    "windows": {
+     "bytes": 120443,
+     "sha256": "082bf7cc770c82e8f52088a4ea1cd72c3b9576ac1dcb300b22a18c2eb19034a2",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "eye_l": {
+       "triangles": 168,
+       "size": [
+        0.084,
+        0.084,
+        0.084
+       ],
+       "ecp": true
+      },
+      "eye_r": {
+       "triangles": 168,
+       "size": [
+        0.084,
+        0.084,
+        0.084
+       ],
+       "ecp": true
+      },
+      "gum_lower": {
+       "triangles": 12,
+       "size": [
+        0.013,
+        0.7,
+        1.66
+       ],
+       "ecp": true
+      },
+      "gum_upper": {
+       "triangles": 12,
+       "size": [
+        0.013,
+        0.7,
+        1.66
+       ],
+       "ecp": true
+      },
+      "teeth_lower": {
+       "triangles": 114,
+       "size": [
+        0.125,
+        0.696,
+        1.709
+       ],
+       "ecp": true
+      },
+      "teeth_upper": {
+       "triangles": 108,
+       "size": [
+        0.133,
+        0.671,
+        1.664
+       ],
+       "ecp": true
+      },
+      "throat": {
+       "triangles": 76,
+       "size": [
+        0.004,
+        0.34,
+        0.34
+       ],
+       "ecp": true
+      },
+      "tongue": {
+       "triangles": 152,
+       "size": [
+        0.03,
+        0.36,
+        0.66
+       ],
+       "ecp": true
+      }
+     },
+     "textures": {},
+     "clips": {
+      "ambush": {
+       "length": 0.8667,
+       "bindings": 30,
+       "events": 1,
+       "ecp_length": 0.8667
+      },
+      "death": {
+       "length": 2.0,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 2.0
+      },
+      "idle": {
+       "length": 1.3333,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 1.3333
+      },
+      "lunge": {
+       "length": 2.8,
+       "bindings": 30,
+       "events": 1,
+       "ecp_length": 2.8
+      },
+      "run": {
+       "length": 0.4,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 0.4
+      },
+      "sleep": {
+       "length": 1.0,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 1.0
+      },
+      "stagger": {
+       "length": 0.5,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 0.5
+      },
+      "walk": {
+       "length": 0.5333,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 0.5333
+      }
+     },
+     "kits": {
+      "crypt_mimic": {
+       "transforms": 19,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       8,
+       8
+      ],
+      "Material": [
+       4,
+       4
+      ],
+      "AnimationClip": [
+       8,
+       8
+      ],
+      "MeshRenderer": [
+       7,
+       7
+      ],
+      "SkinnedMeshRenderer": [
+       1,
+       1
+      ],
+      "AnimatorController": [
+       1,
+       1
+      ],
+      "Avatar": [
+       1,
+       1
+      ]
+     },
+     "problems": []
+    },
+    "linux": {
+     "bytes": 204661,
+     "sha256": "a6224e7e3c58fde0db1cd573546d5e30a99c297c206886bf2a68af60d262b005",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "eye_l": {
+       "triangles": 168,
+       "size": [
+        0.084,
+        0.084,
+        0.084
+       ],
+       "ecp": true
+      },
+      "eye_r": {
+       "triangles": 168,
+       "size": [
+        0.084,
+        0.084,
+        0.084
+       ],
+       "ecp": true
+      },
+      "gum_lower": {
+       "triangles": 12,
+       "size": [
+        0.013,
+        0.7,
+        1.66
+       ],
+       "ecp": true
+      },
+      "gum_upper": {
+       "triangles": 12,
+       "size": [
+        0.013,
+        0.7,
+        1.66
+       ],
+       "ecp": true
+      },
+      "teeth_lower": {
+       "triangles": 114,
+       "size": [
+        0.125,
+        0.696,
+        1.709
+       ],
+       "ecp": true
+      },
+      "teeth_upper": {
+       "triangles": 108,
+       "size": [
+        0.133,
+        0.671,
+        1.664
+       ],
+       "ecp": true
+      },
+      "throat": {
+       "triangles": 76,
+       "size": [
+        0.004,
+        0.34,
+        0.34
+       ],
+       "ecp": true
+      },
+      "tongue": {
+       "triangles": 152,
+       "size": [
+        0.03,
+        0.36,
+        0.66
+       ],
+       "ecp": true
+      }
+     },
+     "textures": {},
+     "clips": {
+      "ambush": {
+       "length": 0.8667,
+       "bindings": 30,
+       "events": 1,
+       "ecp_length": 0.8667
+      },
+      "death": {
+       "length": 2.0,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 2.0
+      },
+      "idle": {
+       "length": 1.3333,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 1.3333
+      },
+      "lunge": {
+       "length": 2.8,
+       "bindings": 30,
+       "events": 1,
+       "ecp_length": 2.8
+      },
+      "run": {
+       "length": 0.4,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 0.4
+      },
+      "sleep": {
+       "length": 1.0,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 1.0
+      },
+      "stagger": {
+       "length": 0.5,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 0.5
+      },
+      "walk": {
+       "length": 0.5333,
+       "bindings": 30,
+       "events": 0,
+       "ecp_length": 0.5333
+      }
+     },
+     "kits": {
+      "crypt_mimic": {
+       "transforms": 19,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       8,
+       8
+      ],
+      "Material": [
+       4,
+       4
+      ],
+      "AnimationClip": [
+       8,
+       8
+      ],
+      "MeshRenderer": [
+       7,
+       7
+      ],
+      "SkinnedMeshRenderer": [
+       1,
+       1
+      ],
+      "AnimatorController": [
+       1,
+       1
+      ],
+      "Avatar": [
+       1,
+       1
+      ]
+     },
+     "problems": []
+    }
+   },
+   "unity_report": [
+    "mimic: 8 clips from its own rig, root motion check passed",
+    "platform windows built: 120443 bytes",
+    "platform linux built: 204661 bytes"
+   ]
+  },
+  "ecr_slinger": {
+   "sources": [
+    "blender/run.py on assets/ecr_slingshot, ecr_sling_band, ecr_sling_pouch, ecr_slinger_satchel",
+    "ECP bundle export: kit tree, ecr_sling_shot (as authored)"
+   ],
+   "platforms": {
+    "windows": {
+     "bytes": 954855,
+     "sha256": "a2dd5b5cda389e7b874b95468ccafc212becb5d95f62c0363d29b2e71c4b660f",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecr_sling_band": {
+       "triangles": 28,
+       "size": [
+        0.007,
+        0.009,
+        1.0
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecr_sling_pouch": {
+       "triangles": 424,
+       "size": [
+        0.016,
+        0.038,
+        0.064
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecr_slinger_satchel": {
+       "triangles": 808,
+       "size": [
+        0.09,
+        0.156,
+        0.163
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecr_slingshot": {
+       "triangles": 3420,
+       "size": [
+        0.043,
+        0.132,
+        0.3
+       ],
+       "blender": true,
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecr_sling_band_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecr_sling_pouch_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecr_sling_pouch_normal": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecr_slinger_satchel_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_slinger_satchel_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_slingshot_albedo": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecr_slingshot_normal": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      }
+     },
+     "clips": {
+      "ecr_sling_shot": {
+       "length": 2.0,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 2.0,
+       "neutral_rekey": null,
+       "max_value_difference": 0.0,
+       "ecp_length": 2.0
+      }
+     },
+     "kits": {
+      "ecr_slinger_kit": {
+       "transforms": 20,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       4,
+       4
+      ],
+      "Texture2D": [
+       7,
+       7
+      ],
+      "Material": [
+       4,
+       4
+      ],
+      "AnimationClip": [
+       1,
+       1
+      ],
+      "MeshRenderer": [
+       5,
+       5
+      ]
+     },
+     "problems": []
+    },
+    "linux": {
+     "bytes": 1086988,
+     "sha256": "33d7c4da4267b46846e38c3203d191330e0586d00e49087325a0757535662a49",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecr_sling_band": {
+       "triangles": 28,
+       "size": [
+        0.007,
+        0.009,
+        1.0
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecr_sling_pouch": {
+       "triangles": 424,
+       "size": [
+        0.016,
+        0.038,
+        0.064
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecr_slinger_satchel": {
+       "triangles": 808,
+       "size": [
+        0.09,
+        0.156,
+        0.163
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecr_slingshot": {
+       "triangles": 3420,
+       "size": [
+        0.043,
+        0.132,
+        0.3
+       ],
+       "blender": true,
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecr_sling_band_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecr_sling_pouch_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecr_sling_pouch_normal": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecr_slinger_satchel_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_slinger_satchel_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_slingshot_albedo": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      },
+      "ecr_slingshot_normal": {
+       "size": [
+        512,
+        512
+       ],
+       "format": "25",
+       "ecp_size": [
+        512,
+        512
+       ]
+      }
+     },
+     "clips": {
+      "ecr_sling_shot": {
+       "length": 2.0,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 2.0,
+       "neutral_rekey": null,
+       "max_value_difference": 0.0,
+       "ecp_length": 2.0
+      }
+     },
+     "kits": {
+      "ecr_slinger_kit": {
+       "transforms": 20,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       4,
+       4
+      ],
+      "Texture2D": [
+       7,
+       7
+      ],
+      "Material": [
+       4,
+       4
+      ],
+      "AnimationClip": [
+       1,
+       1
+      ],
+      "MeshRenderer": [
+       5,
+       5
+      ]
+     },
+     "problems": []
+    }
+   },
+   "unity_report": [
+    "kit ecr_slinger_kit: 20 transforms, 5 renderers",
+    "clip ecr_sling_shot: 102 curves, length 2.000s, human True, 1 events",
+    "platform windows built: 954855 bytes",
+    "platform linux built: 1086988 bytes"
+   ]
+  },
+  "ecp_crossbowman": {
+   "sources": [
+    "blender/run.py on assets/ecp_xbow_*",
+    "ECP bundle export: kit trees, four authored clips (Q3 re-key on aim and fire)"
+   ],
+   "platforms": {
+    "windows": {
+     "bytes": 384299,
+     "sha256": "ffc639495de3a7bb389358884b3c03fd9825dbf57341b90b2122481e0f97a3cc",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_xbow_bolt": {
+       "triangles": 236,
+       "size": [
+        0.026,
+        0.028,
+        0.572
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_xbow_crossbow": {
+       "triangles": 1432,
+       "size": [
+        0.115,
+        0.72,
+        0.825
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_xbow_quiver": {
+       "triangles": 1742,
+       "size": [
+        0.091,
+        0.128,
+        0.332
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_xbow_string": {
+       "triangles": 20,
+       "size": [
+        0.005,
+        0.005,
+        1.0
+       ],
+       "blender": true,
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_xbow_bolt_albedo": {
+       "size": [
+        32,
+        32
+       ],
+       "format": "25",
+       "ecp_size": [
+        32,
+        32
+       ]
+      },
+      "ecp_xbow_bolt_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_xbow_crossbow_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_xbow_crossbow_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_xbow_quiver_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_xbow_quiver_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_xbow_string_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      }
+     },
+     "clips": {
+      "ecp_xbow_aim": {
+       "length": 4.4072,
+       "bindings": 102,
+       "events": 0,
+       "record_length": 4.4072,
+       "neutral_rekey": {
+        "start_keys": 41,
+        "end_keys": 5,
+        "flat_muscles": 61
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 4.4072
+      },
+      "ecp_xbow_fire": {
+       "length": 5.3891,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 5.3891,
+       "neutral_rekey": {
+        "start_keys": 53,
+        "end_keys": 17,
+        "flat_muscles": 49
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 5.3891
+      },
+      "ecp_xbow_player_reload": {
+       "length": 3.7154,
+       "bindings": 102,
+       "events": 0,
+       "record_length": 3.7154,
+       "neutral_rekey": null,
+       "max_value_difference": 0.0,
+       "ecp_length": 3.7154
+      },
+      "ecp_xbow_player_reload_done": {
+       "length": 0.1,
+       "bindings": 102,
+       "events": 0,
+       "record_length": 0.1,
+       "neutral_rekey": null,
+       "max_value_difference": 0.0,
+       "ecp_length": 0.1
+      }
+     },
+     "kits": {
+      "ecp_xbow_bolt": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_crossbow": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_item_loaded": {
+       "transforms": 9,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_item_rig": {
+       "transforms": 13,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_item_unloaded": {
+       "transforms": 7,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_kit": {
+       "transforms": 38,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_string": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       4,
+       4
+      ],
+      "Texture2D": [
+       7,
+       7
+      ],
+      "Material": [
+       4,
+       4
+      ],
+      "AnimationClip": [
+       4,
+       7
+      ],
+      "Sprite": [
+       2,
+       2
+      ],
+      "MeshRenderer": [
+       25,
+       25
+      ]
+     },
+     "problems": []
+    },
+    "linux": {
+     "bytes": 521856,
+     "sha256": "4c33915cdb28ca094d1f1156edf92f21d3986636f4d2473b75c4fe95c25ae8bc",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_xbow_bolt": {
+       "triangles": 236,
+       "size": [
+        0.026,
+        0.028,
+        0.572
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_xbow_crossbow": {
+       "triangles": 1432,
+       "size": [
+        0.115,
+        0.72,
+        0.825
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_xbow_quiver": {
+       "triangles": 1742,
+       "size": [
+        0.091,
+        0.128,
+        0.332
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_xbow_string": {
+       "triangles": 20,
+       "size": [
+        0.005,
+        0.005,
+        1.0
+       ],
+       "blender": true,
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_xbow_bolt_albedo": {
+       "size": [
+        32,
+        32
+       ],
+       "format": "25",
+       "ecp_size": [
+        32,
+        32
+       ]
+      },
+      "ecp_xbow_bolt_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_xbow_crossbow_albedo": {
+       "size": [
+        64,
+        64
+       ],
+       "format": "25",
+       "ecp_size": [
+        64,
+        64
+       ]
+      },
+      "ecp_xbow_crossbow_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      },
+      "ecp_xbow_quiver_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_xbow_quiver_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_xbow_string_albedo": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "25",
+       "ecp_size": [
+        128,
+        128
+       ]
+      }
+     },
+     "clips": {
+      "ecp_xbow_aim": {
+       "length": 4.4072,
+       "bindings": 102,
+       "events": 0,
+       "record_length": 4.4072,
+       "neutral_rekey": {
+        "start_keys": 41,
+        "end_keys": 5,
+        "flat_muscles": 61
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 4.4072
+      },
+      "ecp_xbow_fire": {
+       "length": 5.3891,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 5.3891,
+       "neutral_rekey": {
+        "start_keys": 53,
+        "end_keys": 17,
+        "flat_muscles": 49
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 5.3891
+      },
+      "ecp_xbow_player_reload": {
+       "length": 3.7154,
+       "bindings": 102,
+       "events": 0,
+       "record_length": 3.7154,
+       "neutral_rekey": null,
+       "max_value_difference": 0.0,
+       "ecp_length": 3.7154
+      },
+      "ecp_xbow_player_reload_done": {
+       "length": 0.1,
+       "bindings": 102,
+       "events": 0,
+       "record_length": 0.1,
+       "neutral_rekey": null,
+       "max_value_difference": 0.0,
+       "ecp_length": 0.1
+      }
+     },
+     "kits": {
+      "ecp_xbow_bolt": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_crossbow": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_item_loaded": {
+       "transforms": 9,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_item_rig": {
+       "transforms": 13,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_item_unloaded": {
+       "transforms": 7,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_kit": {
+       "transforms": 38,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_xbow_string": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       4,
+       4
+      ],
+      "Texture2D": [
+       7,
+       7
+      ],
+      "Material": [
+       4,
+       4
+      ],
+      "AnimationClip": [
+       4,
+       7
+      ],
+      "Sprite": [
+       2,
+       2
+      ],
+      "MeshRenderer": [
+       25,
+       25
+      ]
+     },
+     "problems": []
+    }
+   },
+   "unity_report": [
+    "kit ecp_xbow_item_loaded: 9 transforms, 4 renderers",
+    "kit ecp_xbow_item_rig: 13 transforms, 4 renderers",
+    "kit ecp_xbow_item_unloaded: 7 transforms, 3 renderers",
+    "kit ecp_xbow_kit: 38 transforms, 11 renderers",
+    "clip ecp_xbow_aim: 102 curves, length 4.407s, human True, 0 events",
+    "clip ecp_xbow_fire: 102 curves, length 5.389s, human True, 1 events",
+    "clip ecp_xbow_player_reload: 102 curves, length 3.715s, human True, 0 events",
+    "clip ecp_xbow_player_reload_done: 102 curves, length 0.100s, human True, 0 events",
+    "platform windows built: 384299 bytes",
+    "platform linux built: 521856 bytes"
+   ]
+  },
+  "ecp_headsman": {
+   "sources": [
+    "blender/run.py on assets/ecp_bone_greataxe",
+    "assets/ecp_headsman/icons.py",
+    "unity/Assets/Editor/Headsman/{HeadsmanAxe,HeadsmanPieces}.cs",
+    "ECP bundle export: kit trees, seven authored clips (Q3 re-key on the six attacks)"
+   ],
+   "platforms": {
+    "windows": {
+     "bytes": 1126713,
+     "sha256": "f076af6d25612374dc84b0f64e1455c24f7f4d9769efa3b2381180202f26f063",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_bone_greataxe": {
+       "triangles": 2916,
+       "size": [
+        0.283,
+        0.807,
+        1.5
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_greataxe_axehead": {
+       "triangles": 2028,
+       "size": [
+        0.32,
+        0.805,
+        0.915
+       ],
+       "ecp": true
+      },
+      "piece_00_vertebra_00": {
+       "triangles": 120,
+       "size": [
+        0.069,
+        0.08,
+        0.114
+       ],
+       "ecp": true
+      },
+      "piece_01_vertebra_02": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.098,
+        0.101
+       ],
+       "ecp": true
+      },
+      "piece_02_vertebra_04": {
+       "triangles": 88,
+       "size": [
+        0.069,
+        0.073,
+        0.088
+       ],
+       "ecp": true
+      },
+      "piece_03_vertebra_05": {
+       "triangles": 44,
+       "size": [
+        0.048,
+        0.051,
+        0.088
+       ],
+       "ecp": true
+      },
+      "piece_04_vertebra_06": {
+       "triangles": 44,
+       "size": [
+        0.056,
+        0.068,
+        0.069
+       ],
+       "ecp": true
+      },
+      "piece_05_vertebra_07": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.103,
+        0.104
+       ],
+       "ecp": true
+      },
+      "piece_06_vertebra_09": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.105,
+        0.106
+       ],
+       "ecp": true
+      },
+      "piece_07_vertebra_10": {
+       "triangles": 152,
+       "size": [
+        0.043,
+        0.118,
+        1.175
+       ],
+       "ecp": true
+      },
+      "piece_08_vertebra_11": {
+       "triangles": 88,
+       "size": [
+        0.069,
+        0.079,
+        0.088
+       ],
+       "ecp": true
+      },
+      "piece_09_vertebra_13": {
+       "triangles": 88,
+       "size": [
+        0.069,
+        0.078,
+        0.088
+       ],
+       "ecp": true
+      },
+      "piece_10_vertebra_15": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.108,
+        0.111
+       ],
+       "ecp": true
+      },
+      "piece_11_vertebra_16": {
+       "triangles": 64,
+       "size": [
+        0.062,
+        0.088,
+        0.108
+       ],
+       "ecp": true
+      },
+      "piece_12_vertebra_17": {
+       "triangles": 24,
+       "size": [
+        0.04,
+        0.044,
+        0.109
+       ],
+       "ecp": true
+      },
+      "piece_13_blade_0": {
+       "triangles": 67,
+       "size": [
+        0.031,
+        0.121,
+        0.307
+       ],
+       "ecp": true
+      },
+      "piece_14_blade_1": {
+       "triangles": 172,
+       "size": [
+        0.026,
+        0.254,
+        0.255
+       ],
+       "ecp": true
+      },
+      "piece_15_vertebra_18": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.11,
+        0.117
+       ],
+       "ecp": true
+      },
+      "piece_16_vertebra_20": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.111,
+        0.122
+       ],
+       "ecp": true
+      },
+      "piece_17_vertebra_21": {
+       "triangles": 44,
+       "size": [
+        0.071,
+        0.08,
+        0.101
+       ],
+       "ecp": true
+      },
+      "piece_18_blade_2": {
+       "triangles": 458,
+       "size": [
+        0.082,
+        0.304,
+        0.372
+       ],
+       "ecp": true
+      },
+      "piece_19_back_1": {
+       "triangles": 235,
+       "size": [
+        0.183,
+        0.265,
+        0.271
+       ],
+       "ecp": true
+      },
+      "piece_20_back_0": {
+       "triangles": 377,
+       "size": [
+        0.164,
+        0.226,
+        0.283
+       ],
+       "ecp": true
+      },
+      "piece_21_blade_3": {
+       "triangles": 282,
+       "size": [
+        0.035,
+        0.237,
+        0.358
+       ],
+       "ecp": true
+      },
+      "piece_22_blade_4": {
+       "triangles": 41,
+       "size": [
+        0.041,
+        0.223,
+        0.34
+       ],
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_bone_greataxe_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_greataxe_axehead_icon": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "4",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_greataxe_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      }
+     },
+     "clips": {
+      "ecp_headsman_hurl": {
+       "length": 5.1,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 5.1,
+       "neutral_rekey": {
+        "start_keys": 83,
+        "end_keys": 68,
+        "flat_muscles": 19
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 5.1
+      },
+      "ecp_headsman_rear": {
+       "length": 1.9,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 1.9,
+       "neutral_rekey": {
+        "start_keys": 69,
+        "end_keys": 60,
+        "flat_muscles": 33
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 1.9
+      },
+      "ecp_headsman_scrape": {
+       "length": 1.85,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 1.85,
+       "neutral_rekey": {
+        "start_keys": 57,
+        "end_keys": 42,
+        "flat_muscles": 45
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 1.85
+      },
+      "ecp_headsman_slam": {
+       "length": 2.75,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 2.75,
+       "neutral_rekey": {
+        "start_keys": 60,
+        "end_keys": 52,
+        "flat_muscles": 42
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 2.75
+      },
+      "ecp_headsman_slot_idle": {
+       "length": 1.0,
+       "bindings": 0,
+       "events": 0
+      },
+      "ecp_headsman_slot_run": {
+       "length": 1.0,
+       "bindings": 0,
+       "events": 0
+      },
+      "ecp_headsman_slot_walk": {
+       "length": 1.0,
+       "bindings": 0,
+       "events": 0
+      },
+      "ecp_headsman_spin": {
+       "length": 3.6,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 3.6,
+       "neutral_rekey": {
+        "start_keys": 60,
+        "end_keys": 41,
+        "flat_muscles": 42
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 3.6
+      },
+      "ecp_headsman_spinthrow": {
+       "length": 5.2,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 5.2,
+       "neutral_rekey": {
+        "start_keys": 84,
+        "end_keys": 65,
+        "flat_muscles": 18
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 5.2
+      },
+      "ecp_headsman_stagger": {
+       "length": 1.0,
+       "bindings": 0,
+       "events": 0,
+       "record_length": 1.0,
+       "neutral_rekey": null,
+       "max_value_difference": 0.0,
+       "ecp_length": 1.0
+      }
+     },
+     "kits": {
+      "ecp_greataxe_axehead": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_greataxe_held": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_headsman_kit": {
+       "transforms": 26,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       25,
+       25
+      ],
+      "Texture2D": [
+       3,
+       3
+      ],
+      "Material": [
+       1,
+       1
+      ],
+      "AnimationClip": [
+       10,
+       10
+      ],
+      "Sprite": [
+       2,
+       2
+      ],
+      "MeshRenderer": [
+       25,
+       25
+      ],
+      "AnimatorController": [
+       1,
+       1
+      ]
+     },
+     "problems": []
+    },
+    "linux": {
+     "bytes": 1196072,
+     "sha256": "d880f6692f596695883e5a1ebe9c2f468dbb1ef0344a12a133935ab292e632a4",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecp_bone_greataxe": {
+       "triangles": 2916,
+       "size": [
+        0.283,
+        0.807,
+        1.5
+       ],
+       "blender": true,
+       "ecp": true
+      },
+      "ecp_greataxe_axehead": {
+       "triangles": 2028,
+       "size": [
+        0.32,
+        0.805,
+        0.915
+       ],
+       "ecp": true
+      },
+      "piece_00_vertebra_00": {
+       "triangles": 120,
+       "size": [
+        0.069,
+        0.08,
+        0.114
+       ],
+       "ecp": true
+      },
+      "piece_01_vertebra_02": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.098,
+        0.101
+       ],
+       "ecp": true
+      },
+      "piece_02_vertebra_04": {
+       "triangles": 88,
+       "size": [
+        0.069,
+        0.073,
+        0.088
+       ],
+       "ecp": true
+      },
+      "piece_03_vertebra_05": {
+       "triangles": 44,
+       "size": [
+        0.048,
+        0.051,
+        0.088
+       ],
+       "ecp": true
+      },
+      "piece_04_vertebra_06": {
+       "triangles": 44,
+       "size": [
+        0.056,
+        0.068,
+        0.069
+       ],
+       "ecp": true
+      },
+      "piece_05_vertebra_07": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.103,
+        0.104
+       ],
+       "ecp": true
+      },
+      "piece_06_vertebra_09": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.105,
+        0.106
+       ],
+       "ecp": true
+      },
+      "piece_07_vertebra_10": {
+       "triangles": 152,
+       "size": [
+        0.043,
+        0.118,
+        1.175
+       ],
+       "ecp": true
+      },
+      "piece_08_vertebra_11": {
+       "triangles": 88,
+       "size": [
+        0.069,
+        0.079,
+        0.088
+       ],
+       "ecp": true
+      },
+      "piece_09_vertebra_13": {
+       "triangles": 88,
+       "size": [
+        0.069,
+        0.078,
+        0.088
+       ],
+       "ecp": true
+      },
+      "piece_10_vertebra_15": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.108,
+        0.111
+       ],
+       "ecp": true
+      },
+      "piece_11_vertebra_16": {
+       "triangles": 64,
+       "size": [
+        0.062,
+        0.088,
+        0.108
+       ],
+       "ecp": true
+      },
+      "piece_12_vertebra_17": {
+       "triangles": 24,
+       "size": [
+        0.04,
+        0.044,
+        0.109
+       ],
+       "ecp": true
+      },
+      "piece_13_blade_0": {
+       "triangles": 67,
+       "size": [
+        0.031,
+        0.121,
+        0.307
+       ],
+       "ecp": true
+      },
+      "piece_14_blade_1": {
+       "triangles": 172,
+       "size": [
+        0.026,
+        0.254,
+        0.255
+       ],
+       "ecp": true
+      },
+      "piece_15_vertebra_18": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.11,
+        0.117
+       ],
+       "ecp": true
+      },
+      "piece_16_vertebra_20": {
+       "triangles": 88,
+       "size": [
+        0.088,
+        0.111,
+        0.122
+       ],
+       "ecp": true
+      },
+      "piece_17_vertebra_21": {
+       "triangles": 44,
+       "size": [
+        0.071,
+        0.08,
+        0.101
+       ],
+       "ecp": true
+      },
+      "piece_18_blade_2": {
+       "triangles": 458,
+       "size": [
+        0.082,
+        0.304,
+        0.372
+       ],
+       "ecp": true
+      },
+      "piece_19_back_1": {
+       "triangles": 235,
+       "size": [
+        0.183,
+        0.265,
+        0.271
+       ],
+       "ecp": true
+      },
+      "piece_20_back_0": {
+       "triangles": 377,
+       "size": [
+        0.164,
+        0.226,
+        0.283
+       ],
+       "ecp": true
+      },
+      "piece_21_blade_3": {
+       "triangles": 282,
+       "size": [
+        0.035,
+        0.237,
+        0.358
+       ],
+       "ecp": true
+      },
+      "piece_22_blade_4": {
+       "triangles": 41,
+       "size": [
+        0.041,
+        0.223,
+        0.34
+       ],
+       "ecp": true
+      }
+     },
+     "textures": {
+      "ecp_bone_greataxe_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_greataxe_axehead_icon": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "4",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecp_greataxe_icon": {
+       "size": [
+        128,
+        128
+       ],
+       "format": "4",
+       "ecp_size": [
+        128,
+        128
+       ]
+      }
+     },
+     "clips": {
+      "ecp_headsman_hurl": {
+       "length": 5.1,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 5.1,
+       "neutral_rekey": {
+        "start_keys": 83,
+        "end_keys": 68,
+        "flat_muscles": 19
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 5.1
+      },
+      "ecp_headsman_rear": {
+       "length": 1.9,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 1.9,
+       "neutral_rekey": {
+        "start_keys": 69,
+        "end_keys": 60,
+        "flat_muscles": 33
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 1.9
+      },
+      "ecp_headsman_scrape": {
+       "length": 1.85,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 1.85,
+       "neutral_rekey": {
+        "start_keys": 57,
+        "end_keys": 42,
+        "flat_muscles": 45
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 1.85
+      },
+      "ecp_headsman_slam": {
+       "length": 2.75,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 2.75,
+       "neutral_rekey": {
+        "start_keys": 60,
+        "end_keys": 52,
+        "flat_muscles": 42
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 2.75
+      },
+      "ecp_headsman_slot_idle": {
+       "length": 1.0,
+       "bindings": 0,
+       "events": 0
+      },
+      "ecp_headsman_slot_run": {
+       "length": 1.0,
+       "bindings": 0,
+       "events": 0
+      },
+      "ecp_headsman_slot_walk": {
+       "length": 1.0,
+       "bindings": 0,
+       "events": 0
+      },
+      "ecp_headsman_spin": {
+       "length": 3.6,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 3.6,
+       "neutral_rekey": {
+        "start_keys": 60,
+        "end_keys": 41,
+        "flat_muscles": 42
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 3.6
+      },
+      "ecp_headsman_spinthrow": {
+       "length": 5.2,
+       "bindings": 102,
+       "events": 1,
+       "record_length": 5.2,
+       "neutral_rekey": {
+        "start_keys": 84,
+        "end_keys": 65,
+        "flat_muscles": 18
+       },
+       "max_value_difference": 0.0,
+       "ecp_length": 5.2
+      },
+      "ecp_headsman_stagger": {
+       "length": 1.0,
+       "bindings": 0,
+       "events": 0,
+       "record_length": 1.0,
+       "neutral_rekey": null,
+       "max_value_difference": 0.0,
+       "ecp_length": 1.0
+      }
+     },
+     "kits": {
+      "ecp_greataxe_axehead": {
+       "transforms": 2,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_greataxe_held": {
+       "transforms": 3,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecp_headsman_kit": {
+       "transforms": 26,
+       "ecp_max_trs_difference": 0.0
+      }
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       25,
+       25
+      ],
+      "Texture2D": [
+       3,
+       3
+      ],
+      "Material": [
+       1,
+       1
+      ],
+      "AnimationClip": [
+       10,
+       10
+      ],
+      "Sprite": [
+       2,
+       2
+      ],
+      "MeshRenderer": [
+       25,
+       25
+      ],
+      "AnimatorController": [
+       1,
+       1
+      ]
+     },
+     "problems": []
+    }
+   },
+   "unity_report": [
+    "greataxe: 23 pieces",
+    "kit ecp_greataxe_axehead: 2 transforms, 1 renderers",
+    "kit ecp_greataxe_held: 3 transforms, 1 renderers",
+    "kit ecp_headsman_kit: 26 transforms, 23 renderers",
+    "clip ecp_headsman_hurl: 102 curves, length 5.100s, human True, 1 events",
+    "clip ecp_headsman_rear: 102 curves, length 1.900s, human True, 1 events",
+    "clip ecp_headsman_scrape: 102 curves, length 1.850s, human True, 1 events",
+    "clip ecp_headsman_slam: 102 curves, length 2.750s, human True, 1 events",
+    "clip ecp_headsman_spin: 102 curves, length 3.600s, human True, 1 events",
+    "clip ecp_headsman_spinthrow: 102 curves, length 5.200s, human True, 1 events",
+    "clip ecp_headsman_stagger: 0 curves, length 1.000s, human False, 0 events",
+    "animator Assets/Bundles/ecp_headsman/_built/ecp_headsman_animator.controller: 19 parameters, 8 states, Movement on slots ecp_headsman_slot_idle, ecp_headsman_slot_walk, ecp_headsman_slot_run",
+    "platform windows built: 1126713 bytes",
+    "platform linux built: 1196072 bytes"
+   ]
+  },
+  "ecr_rimegiant": {
+   "sources": [
+    "blender/run.py on assets/ecr_rime_*",
+    "runtime Troll numeric measurements in assets/bestiary/records/rimegiant-fit.json",
+    "unity/Assets/Editor/RimeGiant/RimeKit.Flatten, BestiaryRime numerical local TRS adapter"
+   ],
+   "platforms": {
+    "windows": {
+     "bytes": 2107927,
+     "sha256": "dbd9923681c79c378db74abeca4ac1723df6f323fb50ca08b9f4612611dd2168",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecr_rime_boulder": {
+       "triangles": 110,
+       "size": [
+        1.106,
+        1.214,
+        1.359
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust": {
+       "triangles": 866,
+       "size": [
+        2.338,
+        3.499,
+        6.051
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_1": {
+       "triangles": 542,
+       "size": [
+        2.831,
+        3.494,
+        3.624
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_2": {
+       "triangles": 264,
+       "size": [
+        1.335,
+        1.59,
+        1.718
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_3": {
+       "triangles": 208,
+       "size": [
+        0.947,
+        1.055,
+        1.332
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_4": {
+       "triangles": 204,
+       "size": [
+        0.966,
+        1.023,
+        1.178
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_5": {
+       "triangles": 152,
+       "size": [
+        1.97,
+        2.062,
+        4.419
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_6": {
+       "triangles": 144,
+       "size": [
+        1.432,
+        2.335,
+        3.633
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_0": {
+       "triangles": 176,
+       "size": [
+        1.227,
+        1.799,
+        2.143
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_1": {
+       "triangles": 188,
+       "size": [
+        1.271,
+        2.041,
+        2.734
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_2": {
+       "triangles": 170,
+       "size": [
+        1.199,
+        1.537,
+        1.576
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_3": {
+       "triangles": 194,
+       "size": [
+        1.081,
+        1.423,
+        1.538
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_4": {
+       "triangles": 172,
+       "size": [
+        0.77,
+        0.825,
+        1.418
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_5": {
+       "triangles": 184,
+       "size": [
+        0.875,
+        0.954,
+        1.276
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_6": {
+       "triangles": 180,
+       "size": [
+        1.117,
+        1.199,
+        1.294
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_7": {
+       "triangles": 162,
+       "size": [
+        1.143,
+        1.186,
+        1.204
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      }
+     },
+     "textures": {
+      "ecr_rime_boulder_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_boulder_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_1_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_1_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_2_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_2_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_3_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_3_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_4_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_4_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_5_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_5_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_6_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_6_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_0_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_0_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_1_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_1_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_2_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_2_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_3_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_3_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_4_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_4_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_5_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_5_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_6_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_6_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_7_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_7_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      }
+     },
+     "clips": {},
+     "kits": {
+      "ecr_rime_boulder": {
+       "transforms": 1,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecr_rime_kit": {
+       "transforms": 25
+      }
+     },
+     "fit": {
+      "sha256": "0e35623cf0303ba796f75a9bea8452946b17bf0d72747d07b137448f7813b6b8",
+      "mounts": 15,
+      "max_local_trs_difference": 3.7e-07
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       16,
+       16
+      ],
+      "Texture2D": [
+       32,
+       32
+      ],
+      "Material": [
+       16,
+       16
+      ],
+      "MeshRenderer": [
+       16,
+       16
+      ]
+     },
+     "problems": []
+    },
+    "linux": {
+     "bytes": 2245345,
+     "sha256": "de3bb6e858e8c51ad5e2400c1930fe909cc6c495841afefac0c20b0c79fec105",
+     "externals": [
+      "Resources/unity_builtin_extra"
+     ],
+     "forbidden_clips_found": [],
+     "meshes": {
+      "ecr_rime_boulder": {
+       "triangles": 110,
+       "size": [
+        1.106,
+        1.214,
+        1.359
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust": {
+       "triangles": 866,
+       "size": [
+        2.338,
+        3.499,
+        6.051
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_1": {
+       "triangles": 542,
+       "size": [
+        2.831,
+        3.494,
+        3.624
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_2": {
+       "triangles": 264,
+       "size": [
+        1.335,
+        1.59,
+        1.718
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_3": {
+       "triangles": 208,
+       "size": [
+        0.947,
+        1.055,
+        1.332
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_4": {
+       "triangles": 204,
+       "size": [
+        0.966,
+        1.023,
+        1.178
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_5": {
+       "triangles": 152,
+       "size": [
+        1.97,
+        2.062,
+        4.419
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_crust_6": {
+       "triangles": 144,
+       "size": [
+        1.432,
+        2.335,
+        3.633
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_0": {
+       "triangles": 176,
+       "size": [
+        1.227,
+        1.799,
+        2.143
+       ],
+       "blender": true,
+       "ecp": false,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_1": {
+       "triangles": 188,
+       "size": [
+        1.271,
+        2.041,
+        2.734
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_2": {
+       "triangles": 170,
+       "size": [
+        1.199,
+        1.537,
+        1.576
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_3": {
+       "triangles": 194,
+       "size": [
+        1.081,
+        1.423,
+        1.538
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_4": {
+       "triangles": 172,
+       "size": [
+        0.77,
+        0.825,
+        1.418
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_5": {
+       "triangles": 184,
+       "size": [
+        0.875,
+        0.954,
+        1.276
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_6": {
+       "triangles": 180,
+       "size": [
+        1.117,
+        1.199,
+        1.294
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      },
+      "ecr_rime_plate_7": {
+       "triangles": 162,
+       "size": [
+        1.143,
+        1.186,
+        1.204
+       ],
+       "blender": true,
+       "ecp": true,
+       "ecp_comparison": "informational: armor rebuilt against the recorded live-game fit, Blender is authoritative"
+      }
+     },
+     "textures": {
+      "ecr_rime_boulder_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_boulder_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_1_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_1_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_2_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_2_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_3_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_3_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_4_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_4_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_5_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_5_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_6_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_6_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_crust_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_0_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_0_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_1_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_1_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_2_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_2_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_3_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_3_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_4_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_4_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_5_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_5_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_6_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_6_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_7_albedo": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      },
+      "ecr_rime_plate_7_normal": {
+       "size": [
+        256,
+        256
+       ],
+       "format": "25",
+       "ecp_size": [
+        256,
+        256
+       ]
+      }
+     },
+     "clips": {},
+     "kits": {
+      "ecr_rime_boulder": {
+       "transforms": 1,
+       "ecp_max_trs_difference": 0.0
+      },
+      "ecr_rime_kit": {
+       "transforms": 25
+      }
+     },
+     "fit": {
+      "sha256": "0e35623cf0303ba796f75a9bea8452946b17bf0d72747d07b137448f7813b6b8",
+      "mounts": 15,
+      "max_local_trs_difference": 3.7e-07
+     },
+     "counts_built_vs_ecp": {
+      "Mesh": [
+       16,
+       16
+      ],
+      "Texture2D": [
+       32,
+       32
+      ],
+      "Material": [
+       16,
+       16
+      ],
+      "MeshRenderer": [
+       16,
+       16
+      ]
+     },
+     "problems": []
+    }
+   },
+   "unity_report": [
+    "platform windows built: 2107927 bytes",
+    "platform linux built: 2245345 bytes"
+   ]
+  }
+ }
+}

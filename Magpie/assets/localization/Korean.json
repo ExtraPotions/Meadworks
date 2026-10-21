@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "strings": {
+    "loot_multiplier": "전리품 배율",
+    "module_pickup": "Magpie 줍기",
+    "module_merge": "Magpie 바닥 더미",
+    "module_float": "Magpie 떠다니는 아이템",
+    "module_loot": "Magpie 전리품 배율",
+    "step_aside_pickup": "Magpie 줍기가 꺼졌습니다: {0}이(가) 설치되어 있습니다.",
+    "step_aside_merge": "Magpie 바닥 더미가 꺼졌습니다: {0}이(가) 설치되어 있습니다.",
+    "step_aside_float": "Magpie 떠다니는 아이템이 꺼졌습니다: {0}이(가) 설치되어 있습니다.",
+    "step_aside_loot": "Magpie 전리품 배율이 꺼졌습니다: {0}이(가) 설치되어 있습니다.",
+    "import_done": "Magpie 설정 {0}개를 가져왔습니다. 원본 파일은 유지됩니다.",
+    "import_sync_incomplete": "Magpie 가져오기를 로컬에 저장했지만 동기화가 완료되지 않았습니다. 동기화를 확인하고 이 미리보기를 다시 적용하지 마세요."
+  }
+}

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Keel logic (settings table, ship tuning values, Sailing rules, ship catalog, pen rules, step-aside and import plans, text keys). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Keel.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Keel</RootNamespace>
+  </PropertyGroup>
+</Project>

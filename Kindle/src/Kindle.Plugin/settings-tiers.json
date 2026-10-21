@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "product": "Kindle",
+  "default": "Advanced",
+  "settings": {
+    "Recipe List/Search": "Essential",
+    "Recipe List/Search Key": "Essential",
+    "Recipe List/Favorites": "Essential",
+    "Batch Crafting/Enabled": "Essential",
+    "Recipe Tracker/Enabled": "Essential",
+    "Salvage/Enabled": "Essential",
+    "Virtual Workbench/Virtual Workbench": "Essential",
+    "Virtual Workbench/Virtual Workbench Key": "Essential",
+    "Crafting Stations/Use Distance Multiplier": "Essential",
+    "Salvage/Skip Items With Mod Data": "FileOnly",
+    "Salvage/Mod Data Prefixes": "FileOnly",
+    "Salvage/Managed YAML Content": "FileOnly",
+    "Import/Preview OpenKeep": "FileOnly",
+    "Import/Apply OpenKeep": "FileOnly",
+    "Import/Binding Overrides": "FileOnly",
+    "Import/Imported Sources": "FileOnly"
+  }
+}

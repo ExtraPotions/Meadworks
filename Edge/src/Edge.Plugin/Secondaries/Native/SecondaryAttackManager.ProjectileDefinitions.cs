@@ -1,0 +1,334 @@
+// Edge - ExtraPotions Meadworks. SPDX-License-Identifier: GPL-3.0-only
+// Portions from SecondaryAttacks 1.2.17 (sighsorry1029), GPL-3.0, at 4375a2b17297052a773c5b143b0cae21dc655ed8:
+// SecondaryAttackManager.ProjectileDefinitions.cs (native definition types and compilation; game algorithms retained). Source notices retained in THIRD_PARTY_NOTICES.
+// Changed by expDARE, 2026: Edge namespace, portable config/canonical catalog and diagnostics boundaries;
+// portable rotation values converted at the native boundary. No ServerSync or source UI/config ownership.
+// Copyright (C) 2026 expDARE (ExtraPotions Meadworks) for the changes.
+using System;
+using UnityEngine;
+
+namespace ExtraPotions.Edge.Runtime.Secondaries.Native;
+using ExtraPotions.Edge.Secondaries;
+using ExtraPotions.Edge.Secondaries.Adopted;
+
+internal static partial class SecondaryAttackManager
+{
+    internal static bool TryCreateCustomPayloadDefinition(
+        string prefabName,
+        ItemDrop.ItemData.SharedData sharedData,
+        Attack primaryAttack,
+        NormalizedWeaponConfig weaponConfig,
+        out SecondaryAttackDefinition? definition)
+    {
+        definition = null;
+        NormalizedProjectileSecondaryConfig projectileConfig = weaponConfig.Secondary?.Projectile ?? new NormalizedProjectileSecondaryConfig();
+        if (!TryParsePreset(projectileConfig.Preset, out SecondaryAttackPreset preset))
+        {
+            RuleDiagnostics.Warning($"Skipping {prefabName}: unknown projectile preset '{projectileConfig.Preset}'.");
+            return false;
+        }
+
+        bool usesAmmo = !string.IsNullOrWhiteSpace(sharedData.m_ammoType);
+        if (!ProjectileRuntimeSystem.TryValidateConfiguredPayload(primaryAttack, preset, usesAmmo, out string compatibilityReason))
+        {
+            RuleDiagnostics.Warning($"Skipping {prefabName}: {compatibilityReason}");
+            return false;
+        }
+
+        int projectileCount = preset == SecondaryAttackPreset.Burst
+            ? Mathf.Clamp(projectileConfig.Count, 1, ProjectileRuntimeSystem.MaxBurstShotCount)
+            : Mathf.Max(1, projectileConfig.Count);
+        if (preset == SecondaryAttackPreset.Burst && projectileConfig.Count > ProjectileRuntimeSystem.MaxBurstShotCount)
+        {
+            SecondaryAttackWarningLog.WarnOnce(
+                $"burst_count_clamped:{prefabName}:{projectileConfig.Count}",
+                $"Clamping {prefabName} Burst count from {projectileConfig.Count} to {ProjectileRuntimeSystem.MaxBurstShotCount}.");
+        }
+        int ammoConsumption = ResolveAmmoConsumption(projectileConfig.AmmoConsumption, usesAmmo, preset);
+        string resolvedAttackAnimation = GetNormalizedAttackAnimation(weaponConfig);
+        bool hasCustomAttackAnimation = !string.IsNullOrWhiteSpace(resolvedAttackAnimation);
+        string attackAnimation = hasCustomAttackAnimation
+            ? resolvedAttackAnimation.Trim()
+            : primaryAttack.m_attackAnimation.Trim();
+        bool isBombPreset = IsBombProjectilePreset(preset);
+        float resourceMultiplier = isBombPreset ? 1f : Mathf.Max(0f, GetNormalizedResourceMultiplier(weaponConfig));
+        float durabilityFactor = isBombPreset ? 1f : Mathf.Max(0f, projectileConfig.DurabilityFactor);
+        float spreadAngle = isBombPreset ? 0f : Mathf.Max(0f, projectileConfig.SpreadAngle);
+        float rewardFactor = ResolveProjectileRewardFactor(preset, projectileCount);
+        float volleyArcAngleMin = Mathf.Clamp(projectileConfig.VolleyArcAngleMin, 1f, 89f);
+        float volleyArcAngleMax = Mathf.Clamp(projectileConfig.VolleyArcAngleMax, 1f, 89f);
+        if (volleyArcAngleMax < volleyArcAngleMin)
+        {
+            (volleyArcAngleMin, volleyArcAngleMax) = (volleyArcAngleMax, volleyArcAngleMin);
+        }
+        float interval = projectileConfig.Interval;
+        if (preset != SecondaryAttackPreset.Barrage &&
+            preset != SecondaryAttackPreset.Volley &&
+            preset != SecondaryAttackPreset.Meteor &&
+            preset != SecondaryAttackPreset.Spiral &&
+            interval <= 0f)
+        {
+            interval = 0.12f;
+        }
+
+        definition = new SecondaryAttackDefinition
+        {
+            PrefabName = prefabName,
+            AppliesSecondaryOverride = true,
+            Behavior = new ProjectileSecondaryBehavior
+            {
+                Preset = preset,
+                Cooldown = isBombPreset ? 0f : Mathf.Max(0f, projectileConfig.Cooldown),
+                CooldownReductionFactor = isBombPreset ? 0f : Mathf.Clamp01(projectileConfig.CooldownReductionFactor),
+                DamageFactor = Mathf.Max(0f, projectileConfig.DamageFactor),
+                SkillRaiseFactor = rewardFactor,
+                AdrenalineFactor = rewardFactor,
+                ProjectileSpeedFactor = Mathf.Max(0.01f, projectileConfig.ProjectileSpeedFactor),
+                ProjectileScaleFactor = Mathf.Max(0.01f, projectileConfig.ProjectileScaleFactor),
+                DurabilityFactor = durabilityFactor,
+                ProjectileCount = projectileCount,
+                SpreadAngle = spreadAngle,
+                AmmoConsumption = Mathf.Max(0, ammoConsumption),
+                VolleyRadius = Mathf.Max(0f, projectileConfig.VolleyRadius),
+                VolleyArcAngleMin = volleyArcAngleMin,
+                VolleyArcAngleMax = volleyArcAngleMax,
+                VolleyMaxRange = Mathf.Max(1f, projectileConfig.VolleyMaxRange),
+                Interval = preset is SecondaryAttackPreset.Barrage or SecondaryAttackPreset.Volley or SecondaryAttackPreset.Meteor or SecondaryAttackPreset.Spiral ? Mathf.Max(0f, interval) : Mathf.Max(0.01f, interval),
+                HoldRepeatInterval = Mathf.Max(0.01f, projectileConfig.HoldRepeatInterval),
+                BarrageSpacing = Mathf.Max(0f, projectileConfig.BarrageSpacing),
+                MeteorRadius = Mathf.Max(0f, projectileConfig.MeteorRadius),
+                PierceDamageDecay = Mathf.Clamp01(projectileConfig.PierceDamageDecay),
+                SplitAngle = Mathf.Max(0f, projectileConfig.SplitAngle),
+                RicochetBounces = Mathf.Max(0, projectileConfig.RicochetBounces),
+                RicochetDecay = Mathf.Clamp01(projectileConfig.RicochetDecay),
+                RicochetRoughness = Mathf.Clamp01(projectileConfig.RicochetRoughness),
+                SpiralRadius = Mathf.Max(0f, projectileConfig.SpiralRadius),
+                SpiralTurns = Mathf.Max(0f, projectileConfig.SpiralTurns),
+                SentinelDetectionRange = Mathf.Max(1f, projectileConfig.SentinelDetectionRange),
+                SentinelHoverDistance = Mathf.Max(0.5f, projectileConfig.SentinelHoverDistance),
+                SentinelHoverHeight = Mathf.Max(0.5f, projectileConfig.SentinelHoverHeight),
+                SentinelHoverElevationAngle = Mathf.Clamp(projectileConfig.SentinelHoverElevationAngle, 0f, 90f),
+                SentinelOrbitRadius = Mathf.Max(0f, projectileConfig.SentinelOrbitRadius),
+                SentinelOrbitSpeed = Mathf.Max(0f, projectileConfig.SentinelOrbitSpeed),
+                SentinelLifetime = Mathf.Max(0.5f, projectileConfig.SentinelLifetime),
+                SentinelAttackDelay = Mathf.Max(0f, projectileConfig.SentinelAttackDelay),
+                MeteorSpawnHeight = Mathf.Max(1f, projectileConfig.MeteorSpawnHeight),
+                MaxCharges = Mathf.Max(1, projectileConfig.MaxCharges),
+                DetonateAnimation = projectileConfig.DetonateAnimation.Trim(),
+                AoeRadiusFactor = Mathf.Max(0.01f, projectileConfig.AoeRadiusFactor)
+            },
+            AttackAnimation = attackAnimation,
+            HasCustomAttackAnimation = hasCustomAttackAnimation,
+            ResourceMultiplier = resourceMultiplier,
+            OutputMultiplier = Mathf.Max(0f, GetNormalizedOutputMultiplier(weaponConfig)),
+            DurabilityFactor = durabilityFactor
+        };
+        ApplyProjectileDefinitionFeatures(definition, prefabName, weaponConfig);
+        ApplyAttackResourceScaling(definition, primaryAttack, resourceMultiplier);
+        return true;
+    }
+
+    private static bool IsBombProjectilePreset(SecondaryAttackPreset preset)
+    {
+        return preset is SecondaryAttackPreset.StickyDetonator or SecondaryAttackPreset.OverchargedBomb;
+    }
+
+    private static float ResolveProjectileRewardFactor(SecondaryAttackPreset preset, int projectileCount)
+    {
+        return preset switch
+        {
+            SecondaryAttackPreset.StickyDetonator or SecondaryAttackPreset.OverchargedBomb => 0f,
+            SecondaryAttackPreset.Piercing => 1f,
+            _ => 1f / Mathf.Max(1, projectileCount)
+        };
+    }
+
+    internal static bool TryCreateSecondaryOverrideDefinition(
+        string prefabName,
+        string sourcePrefabName,
+        Attack primaryAttack,
+        Attack sourceSecondaryAttack,
+        NormalizedWeaponConfig weaponConfig,
+        out SecondaryAttackDefinition? definition)
+    {
+        string resolvedAttackAnimation = GetNormalizedAttackAnimation(weaponConfig);
+        bool hasCustomAttackAnimation = !string.IsNullOrWhiteSpace(resolvedAttackAnimation);
+        string attackAnimation = hasCustomAttackAnimation
+            ? resolvedAttackAnimation.Trim()
+            : sourceSecondaryAttack.m_attackAnimation.Trim();
+
+        definition = new SecondaryAttackDefinition
+        {
+            PrefabName = prefabName,
+            AppliesSecondaryOverride = true,
+            Behavior = new CopiedSecondaryBehavior
+            {
+                SourcePrefabName = sourcePrefabName
+            },
+            AttackAnimation = attackAnimation,
+            HasCustomAttackAnimation = hasCustomAttackAnimation,
+            ResourceMultiplier = Mathf.Max(0f, GetSelectedMeleeResourceMultiplier(weaponConfig)),
+            OutputMultiplier = Mathf.Max(0f, GetNormalizedOutputMultiplier(weaponConfig)),
+            DurabilityFactor = Mathf.Max(0f, GetSelectedMeleeDurabilityFactor(weaponConfig))
+        };
+        ApplyProjectileDefinitionFeatures(definition, prefabName, weaponConfig);
+        ApplyAttackResourceScaling(definition, primaryAttack, GetSelectedMeleeResourceMultiplier(weaponConfig));
+        return true;
+    }
+
+    internal static bool TryCreateAftershockDefinition(
+        SecondaryAttackDefinitionBuildContext buildContext,
+        string prefabName,
+        ItemDrop.ItemData.SharedData sharedData,
+        Attack primaryAttack,
+        NormalizedWeaponConfig weaponConfig,
+        out SecondaryAttackDefinition? definition)
+    {
+        definition = null;
+        string sourcePrefabName = string.IsNullOrWhiteSpace(weaponConfig.Secondary?.CopyFrom)
+            ? prefabName
+            : weaponConfig.Secondary!.CopyFrom.Trim();
+        if (!TryResolveAftershockSourceAttack(buildContext.ObjectDb, sourcePrefabName, out Attack? sourceAttack, out string reason))
+        {
+            RuleDiagnostics.Warning($"Skipping {prefabName}: {reason}");
+            if (weaponConfig.SneakAmbush?.Enabled == true ||
+                weaponConfig.CleavingThrust?.Enabled == true ||
+                weaponConfig.LaunchSlam?.Enabled == true ||
+                weaponConfig.KnockbackChain?.Enabled == true ||
+                weaponConfig.RiftTrail?.Enabled == true ||
+                weaponConfig.FractureLine?.Enabled == true ||
+                weaponConfig.HarvestSweep?.Enabled == true ||
+                weaponConfig.SpinningSweep?.Enabled == true)
+            {
+                definition = CreateEffectOnlyDefinition(prefabName, weaponConfig);
+                return true;
+            }
+
+            return false;
+        }
+
+        string resolvedAttackAnimation = GetNormalizedAttackAnimation(weaponConfig);
+        bool hasCustomAttackAnimation = !string.IsNullOrWhiteSpace(resolvedAttackAnimation);
+        string attackAnimation = hasCustomAttackAnimation
+            ? resolvedAttackAnimation.Trim()
+            : sourceAttack!.m_attackAnimation.Trim();
+
+        definition = new SecondaryAttackDefinition
+        {
+            PrefabName = prefabName,
+            AppliesSecondaryOverride = true,
+            Behavior = new AftershockSecondaryBehavior
+            {
+                SourcePrefabName = sourcePrefabName
+            },
+            AttackAnimation = attackAnimation,
+            HasCustomAttackAnimation = hasCustomAttackAnimation,
+            ResourceMultiplier = Mathf.Max(0f, GetSelectedMeleeResourceMultiplier(weaponConfig)),
+            OutputMultiplier = Mathf.Max(0f, GetNormalizedOutputMultiplier(weaponConfig)),
+            DurabilityFactor = Mathf.Max(0f, GetSelectedMeleeDurabilityFactor(weaponConfig))
+        };
+        ApplyProjectileDefinitionFeatures(definition, prefabName, weaponConfig);
+        ApplyAttackResourceScaling(definition, primaryAttack, GetSelectedMeleeResourceMultiplier(weaponConfig));
+        return true;
+    }
+
+    internal static bool TryCreateFractureLineDefinition(
+        SecondaryAttackDefinitionBuildContext buildContext,
+        string prefabName,
+        Attack primaryAttack,
+        NormalizedWeaponConfig weaponConfig,
+        out SecondaryAttackDefinition? definition)
+    {
+        definition = null;
+        string sourcePrefabName = string.IsNullOrWhiteSpace(weaponConfig.Secondary?.CopyFrom)
+            ? prefabName
+            : weaponConfig.Secondary!.CopyFrom.Trim();
+        if (!TryResolveFractureLineSourceAttack(buildContext.ObjectDb, sourcePrefabName, out Attack? sourceAttack, out string reason))
+        {
+            RuleDiagnostics.Warning($"Skipping {prefabName}: {reason}");
+            if (weaponConfig.SneakAmbush?.Enabled == true ||
+                weaponConfig.CleavingThrust?.Enabled == true ||
+                weaponConfig.LaunchSlam?.Enabled == true ||
+                weaponConfig.KnockbackChain?.Enabled == true ||
+                weaponConfig.RiftTrail?.Enabled == true ||
+                weaponConfig.HarvestSweep?.Enabled == true ||
+                weaponConfig.SpinningSweep?.Enabled == true)
+            {
+                definition = CreateEffectOnlyDefinition(prefabName, weaponConfig);
+                return true;
+            }
+
+            return false;
+        }
+
+        string resolvedAttackAnimation = GetNormalizedAttackAnimation(weaponConfig);
+        bool hasCustomAttackAnimation = !string.IsNullOrWhiteSpace(resolvedAttackAnimation);
+        string attackAnimation = hasCustomAttackAnimation
+            ? resolvedAttackAnimation.Trim()
+            : sourceAttack!.m_attackAnimation.Trim();
+
+        definition = new SecondaryAttackDefinition
+        {
+            PrefabName = prefabName,
+            AppliesSecondaryOverride = true,
+            Behavior = new FractureLineSecondaryBehavior
+            {
+                SourcePrefabName = sourcePrefabName
+            },
+            AttackAnimation = attackAnimation,
+            HasCustomAttackAnimation = hasCustomAttackAnimation,
+            ResourceMultiplier = Mathf.Max(0f, GetSelectedMeleeResourceMultiplier(weaponConfig)),
+            OutputMultiplier = Mathf.Max(0f, GetNormalizedOutputMultiplier(weaponConfig)),
+            DurabilityFactor = Mathf.Max(0f, GetSelectedMeleeDurabilityFactor(weaponConfig))
+        };
+        ApplyProjectileDefinitionFeatures(definition, prefabName, weaponConfig);
+        ApplyAttackResourceScaling(definition, primaryAttack, GetSelectedMeleeResourceMultiplier(weaponConfig));
+        return true;
+    }
+
+    private static MeleeOnProjectileHitDefinition? CreateMeleeOnProjectileHitDefinition(string prefabName, NormalizedMeleeOnProjectileHitConfig? config)
+    {
+        if (config == null || !config.Enabled || string.IsNullOrWhiteSpace(config.Preset))
+        {
+            return null;
+        }
+
+        string presetName = config.Preset.Trim();
+        MeleeSpecialPreset preset;
+        if (presetName.Equals("spearRain", StringComparison.OrdinalIgnoreCase))
+        {
+            preset = MeleeSpecialPreset.SpearRain;
+        }
+        else if (presetName.Equals("impactBurst", StringComparison.OrdinalIgnoreCase))
+        {
+            preset = MeleeSpecialPreset.ImpactBurst;
+        }
+        else
+        {
+            RuleDiagnostics.Warning($"Skipping {prefabName} onProjectileHit: unknown preset '{config.Preset}'.");
+            return null;
+        }
+
+        return new MeleeOnProjectileHitDefinition
+        {
+            Preset = preset,
+            PresetCooldown = CreatePresetCooldown(
+                config.Cooldown,
+                config.CooldownReductionFactor),
+            DurabilityFactor = Mathf.Max(0f, config.DurabilityFactor),
+            ProjectileSpinAxis = config.ProjectileSpinAxis,
+            ProjectileVisualRotationOffset = new Vector3(config.ProjectileVisualRotationOffset.X, config.ProjectileVisualRotationOffset.Y, config.ProjectileVisualRotationOffset.Z),
+            Vfx = config.Vfx,
+            Count = Mathf.Max(1, config.Count),
+            SpawnHeight = Mathf.Max(0.1f, config.SpawnHeight),
+            SpawnRadius = Mathf.Max(0f, config.SpawnRadius),
+            FlightTime = Mathf.Max(0.1f, config.FlightTime),
+            DamageFactor = Mathf.Max(0f, config.DamageFactor),
+            PushFactor = Mathf.Max(0f, config.PushFactor),
+            Radius = Mathf.Max(0.1f, config.Radius),
+            IncludeDirectTarget = config.IncludeDirectTarget,
+            IncludeDestructibles = config.IncludeDestructibles,
+            TriggerOnCharactersOnly = config.TriggerOnCharactersOnly
+        };
+    }
+}

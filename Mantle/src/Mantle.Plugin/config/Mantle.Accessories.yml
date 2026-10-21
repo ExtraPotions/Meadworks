@@ -1,0 +1,38 @@
+# Mantle.Accessories.yml - the ring and belt registry.
+#
+# The Ring and Belt slots of the inventory (section 2. Slots: Ring Slots, Belt Slot) take only the items named here, and the
+# items lying in them give their bonus together: two identical rings give double. Mantle's rings and belts are never worn: the bonus
+# follows the item's cell, and a death, a logout or a world change takes it away with the cell. The one exception is a game utility item
+# tagged for the belt slot (the Megingjord): the game wears it from the belt cell, with its look and status effect.
+#
+# One entry per item prefab. Every key is optional; a key left out keeps the built-in value.
+#   slot:     ring or belt. Needed to tag an item that is not one of Mantle's own (the game's or another mod's).
+#   enabled:  false makes the item an ordinary item again (a Mantle item of that name cannot then be crafted).
+#   station / level / cost: how Mantle's own items are crafted (a station prefab name, its level 1 to 10, prefab:amount pairs).
+#   max_health, max_stamina, max_eitr, carry:   flat bonuses, 0 to 1000.
+#   stamina_regen, move_speed, attack_stamina:  percent of the base value, -100 to 100 (a negative attack_stamina makes
+#                                               attacks cost less stamina).
+#
+# Items Mantle makes are built when the game starts, so a restart is needed to add one; tagging an existing item, changing a stat
+# or a recipe and enabling or disabling an item apply at once. The file is synced from the server, which decides what the slots
+# take and give, reloaded a few seconds after it is saved and can be edited in game (Configuration Manager, "Edit YAML").
+# Extra files named Mantle.Accessories<anything>.yml are read as well.
+#
+# A tagged ring, or a tagged belt that is not a game utility item, gives only the stats written here, not the effects of the item's own
+# prefab. A tagged game utility belt gives its own effects while it lies in the belt cell, and the stats here only while it is not worn. For example:
+#   # Mantle's own items (ids and built-in values; copy a line below `accessories:` and change a number to override it):
+#   Mantle_BoneBand       ring  workbench 1   BoneFragments:6, LeatherScraps:2        max_stamina 5
+#   Mantle_CopperRing     ring  forge 1       Copper:3, Amber:1                       max_health 10
+#   Mantle_IronRing       ring  forge 2       Iron:3, Bloodbag:2                      stamina_regen 10
+#   Mantle_SilverRing     ring  forge 3       Silver:3, FreezeGland:2                 move_speed 5
+#   Mantle_BlackMetalRing ring  forge 4       BlackMetal:3, Needle:3                  attack_stamina -10
+#   Mantle_EitrRing       ring  galdr table 1 Eitr:3, Silver:2                        max_eitr 15
+#   Mantle_LeatherBelt    belt  workbench 1   DeerHide:4, LeatherScraps:4             carry 25
+#   Mantle_TrollHideBelt  belt  workbench 2   TrollHide:3, Bronze:1                   carry 40
+#   Mantle_LoxBelt        belt  workbench 3   LoxPelt:3, BlackMetal:2                 carry 60, max_stamina 5
+# The game's Megingjord is tagged into the belt slot by default (BeltStrength: { slot: belt, carry: 150 }): it fits the belt slot
+# only, never a utility slot, while the belt slot is on. In the belt cell it is worn as the game wears it (the belt shows on the character, its
+# status effect and HUD icon run) and that effect carries the +150, so the carry value above counts only while it is not worn (an attack in
+# progress); change the +150 itself in the game's item, not here. `BeltStrength: { enabled: false }` makes it an ordinary utility item again.
+#   SomeModBelt: { slot: belt, carry: 100 }   # a game utility item tagged for the belt slot is worn by the game while it lies there; its own effects count, this carry only while it is not worn
+accessories:

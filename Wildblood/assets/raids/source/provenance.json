@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "asset": "mw_raid_chest_model",
+  "soleAuthor": "expDARE",
+  "copyright": "2026 ExtraPotions",
+  "status": "corrected source after rendered-art CHANGES; revised Unity build/render and native fit pending",
+  "binaryInputs": [],
+  "licenses": {
+    "art_recipe_output_svg_documentation": "CC-BY-NC-SA-4.0",
+    "generator_validator_editor": "GPL-3.0-or-later"
+  },
+  "references": [
+    {
+      "purpose": "behavior interoperability only; names, lid rotation, root boxes and socket contract",
+      "repository": "geraldjglasgow/ValheimMods",
+      "commit": "f331465b3ed2551c89decc42ba81565a7b689543",
+      "artworkCopied": false
+    },
+    {
+      "purpose": "existing workshop workflow and minimal Unity module dependency set only",
+      "repository": "local Bestiary",
+      "commit": "a8ea29008f23dcebfd3afe93c157c6bf6e8d7be1",
+      "artworkCopied": false
+    }
+  ],
+  "contract": {
+    "meshCount": 3,
+    "nodeCount": 5,
+    "rootBoxCount": 3,
+    "triangles": 892,
+    "lidHingeMeters": [
+      0,
+      0.86,
+      -0.59
+    ],
+    "lidDegrees": [
+      0,
+      -100
+    ],
+    "socket": "model/lid/horn/horn_mouth",
+    "texturePixels": [
+      256,
+      256
+    ],
+    "gameComponents": false
+  },
+  "sourceSha256": {
+    ".gitignore": "6cf68f361ed9af9c89f8304b81604d87347c3d38348e90f1e5bef55ea8fa99a5",
+    "chest_source.py": "5ebed0111315c8b9381573349d19ea6627f0becc10d7d2cc4a35e60abc511443",
+    "validate_source.py": "2a6182d46cec4782b78a1eaf093add26a18e60b5ed5a712afdb1757b64240eb3",
+    "raid-chest.svg": "60ff49ecda8aa6ef124d5431cef5d9f2b28c3a46f0978f11180273cef96aaf47",
+    "README.md": "e55b3ca6ba5f4eb0de885ac389a766e03af67de2d0da8cb5330da5986e7cf8a2",
+    "NOTICE.md": "55d307a312fbd24b288af190ea5c92531c3977b120fc736bdd525bb369dd5cec",
+    "licenses/CC-BY-NC-SA-4.0.txt": "616cfe2a42f376776d08de3c361320e0e10d27388495d331d586540d05a59f8e",
+    "licenses/GPL-3.0.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "unity/Assets/Editor/BuildRaidChest.cs": "3c69745cb2f2a5493cd8a6af3ca794fab988a091a33f50e23d0e91077647dac7",
+    "unity/Packages/manifest.json": "732715aeb2158f044d49e7965068c846101bce737101b2080935b1e7ef37e473"
+  },
+  "generatedSource": {
+    "path": "build/source/raid-chest.meshes.json",
+    "sha256": "187a3b88a915e2b2359302adb34dfba1b91516eedee24130a7cb31b6361e2ee9"
+  },
+  "queuedBuild": {
+    "unity": "6000.0.75f1",
+    "entry": "MeadWorks.RaidChest.BuildRaidChest.Build",
+    "platforms": [
+      "windows",
+      "linux"
+    ],
+    "memoryBudgetGiB": 8,
+    "timeoutMinutes": 20
+  },
+  "sourceValidation": {
+    "testsPassed": 7,
+    "lastRunSeconds": 0.142,
+    "singleProcess": true,
+    "memoryBudgetMiB": 256,
+    "peakRssMeasured": false
+  },
+  "artCorrection": {
+    "body": "four open rim rails; wood floor",
+    "lidEndBandExteriorClearanceMeters": 0.012,
+    "validationMinimumClearanceMeters": 0.008,
+    "interiorTriangleRayProbes": 9
+  }
+}

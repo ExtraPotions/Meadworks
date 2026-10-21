@@ -1,0 +1,145 @@
+{
+  "sourceSha256": "8B9191B724DDB6173F0CB639C01675AACE59C31339BF6DC2AEE0BB20B6703743",
+  "files": [
+    {
+      "file": "mw_bestiary_items.windows",
+      "sha256": "D2E3C27DF6EA5A9E8B179AECA55CB72518E0315BF3CF531AB618F2FE910CA34A"
+    },
+    {
+      "file": "mw_bestiary_items.linux",
+      "sha256": "C375FD46BC41B528B8F0A3EED969F6B414C7C794B363108E2580732CFE16515B"
+    },
+    {
+      "file": "icons/bestiary_dagger_icon.png",
+      "sha256": "F3349A9D9BA8605B5D2856BF5207061B1260964133F3F3E3E9754F948A2CBF93"
+    },
+    {
+      "file": "icons/bestiary_sword_icon.png",
+      "sha256": "B8D9ACFC811525FF37DFCF50337504F1C8B85B58D4E58F12149A1534236DB7DE"
+    },
+    {
+      "file": "icons/bestiary_axe_icon.png",
+      "sha256": "65F8993748D314E70D44F5349E56A9846962FEBDFD91940274048C1ABC98ECE9"
+    },
+    {
+      "file": "icons/bestiary_mace_icon.png",
+      "sha256": "ED14A927F5F85BE2651FE73D32496C0798E9CE5C73959DFB35CDE43816D496FF"
+    },
+    {
+      "file": "icons/bestiary_spear_icon.png",
+      "sha256": "1E0AAE729D70E57206EC408EF490EC550E9F5D0A241617B274EE63444014745A"
+    },
+    {
+      "file": "icons/bestiary_atgeir_icon.png",
+      "sha256": "938CA592A1FC044A923C68593C9064B581E1F8724EB2A93D21D62F157C3CF784"
+    },
+    {
+      "file": "icons/bestiary_bow_icon.png",
+      "sha256": "597716CE8A49EE4DE558EB3B2E3C3566958B94EBCAB05B09D7BC285A90822344"
+    },
+    {
+      "file": "icons/bestiary_crossbow_icon.png",
+      "sha256": "351F11182A34776EFC13C86FA58454F70C6BB41E8CCFBBE4633EB8F40D63EBAE"
+    },
+    {
+      "file": "icons/bestiary_executioner_icon.png",
+      "sha256": "38B05BE282ED670AD07C7073B5B08EFC38E42C77C10435C6D8C79173B211C98D"
+    },
+    {
+      "file": "icons/bestiary_spine_icon.png",
+      "sha256": "0B507B8AF3354BBB0D10472F82E1AB00CAB3667AFFD20FF81976957EAC8D7646"
+    },
+    {
+      "file": "icons/bestiary_arrow_icon.png",
+      "sha256": "168527F461EFAC917A4BCA0EE8AAA6D778F25B0268E7769CC0610BC888286D8A"
+    },
+    {
+      "file": "icons/bestiary_bolt_icon.png",
+      "sha256": "4492B8C5D5A3E0DB4ED0B7FB5544E9D1898166B98720FCF97DDC597D498876C5"
+    },
+    {
+      "file": "icons/bestiary_axehead_icon.png",
+      "sha256": "789E1965F4BF91089F21CDD55270DA6518C5ABA3C7BCEF908145EA697BA4364E"
+    },
+    {
+      "file": "icons/bestiary_beak_icon.png",
+      "sha256": "B3EA3892FAFC432C8F64CA8E49C929E8BDD64E06FDA7A09FE44ED5AEBBA83661"
+    },
+    {
+      "file": "icons/bestiary_meat_raw_icon.png",
+      "sha256": "84C082BA2FA8306D11BE7400F3E9E81AB0806876CA7CB2F40622AF9879D92623"
+    },
+    {
+      "file": "icons/bestiary_meat_cooked_icon.png",
+      "sha256": "498E0162A3657CC618EF4908DEF78E7C4C83FAEBFFD2FFC181FBBA9FFDB881C2"
+    },
+    {
+      "file": "icons/bestiary_shield_icon.png",
+      "sha256": "5168864857E0D36F05B9595BC022DDEAE6726539A7FFC43A99C294BDD78D9C9D"
+    },
+    {
+      "file": "source/bestiary/check_export_contract.py",
+      "sha256": "FAA9B9796106D1C644235BD4BE9F7C2A0DE4DEB72C0E3DD9246E6F4FB04764F1"
+    },
+    {
+      "file": "source/bestiary/check_source.py",
+      "sha256": "9A678BD798E58EA3932A7CAD668CBFD8A1DF7255CD8B04A82DB6E571D7501B12"
+    },
+    {
+      "file": "source/bestiary/EXPORT-CONTRACT-CHECKS.json",
+      "sha256": "F7755A94CC1C950712285B6F1161C9A4D7BF9DAEDB0115EB7CA341753B3BED61"
+    },
+    {
+      "file": "source/bestiary/generate.py",
+      "sha256": "96BBD4142F2B7342305EEBDAF3F23ECEB636DAAF4B682A7888BA42F81F77D602"
+    },
+    {
+      "file": "source/bestiary/geometry.py",
+      "sha256": "6D6A37FBD0ABF9013309F61AA35FDD4D986BEE1A127FD302C5EEBAC48F356AED"
+    },
+    {
+      "file": "source/bestiary/models.json",
+      "sha256": "8B9191B724DDB6173F0CB639C01675AACE59C31339BF6DC2AEE0BB20B6703743"
+    },
+    {
+      "file": "source/bestiary/preview_source.py",
+      "sha256": "CF0D6CB70732C4977C47AA2339F7FDE15FC19BD47DAC35FBF695E56D24E4EF18"
+    },
+    {
+      "file": "source/bestiary/SOURCE-CHECKS.json",
+      "sha256": "B1B2D740B962B1B30F0E34B421DDF0FDDC6CAB323068640E59897C6F680D81A3"
+    },
+    {
+      "file": "source/BuildCustomItems.cs",
+      "sha256": "BB4BC3A82B38FA3930440EDE02B6797906831EFB4D98D25712F06D0AA3F42837"
+    },
+    {
+      "file": "source/OriginalItemArt.cs",
+      "sha256": "3F33CA68E6F084105521AE0FF2572B4601B1A85ED16208F5598DC3CB2B00C1F4"
+    },
+    {
+      "file": "source/README.md",
+      "sha256": "0DE3AB4668FFF32919A87B5919D2575F68FD49305575FF48FB3318E02AA4247A"
+    },
+    {
+      "file": "source/Rebuild-OriginalArt.ps1",
+      "sha256": "CD41B87CCE6647D979FCC7B570457B4E324395BA141979623B66032ADFD97052"
+    },
+    {
+      "file": "source/SOURCE-REBUILD.md",
+      "sha256": "B18BD02878D7CE8D2C31A963D1E72FE62147EF7208843B4E4BFD9FDD96684D0E"
+    },
+    {
+      "file": "source/textures/materials-atlas.png",
+      "sha256": "83F3B012447DA4F44C64943AB26D632E530480D5DEF958FD41D56792937A10C1"
+    },
+    {
+      "file": "source/textures/provenance.json",
+      "sha256": "4B5454F1FC5A5ECA9615213DB391F79DF0362BB8F0C84755D1C7E8617AA0E01B"
+    },
+    {
+      "file": "source/source-kit.json",
+      "sha256": "4BA1AFAA58719275515CAEF9F149F5EA5481F9CEA29A6476C296D16DC3345279"
+    }
+  ]
+}

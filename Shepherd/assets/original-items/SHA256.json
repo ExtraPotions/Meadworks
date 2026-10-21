@@ -1,0 +1,85 @@
+{
+  "sourceSha256": "C1A761254F66D42814C1ECB4FAC52555D2FF09755784E1F66FBD160F4D462D75",
+  "files": [
+    {
+      "file": "mw_shepherd_items.windows",
+      "sha256": "DE59F1B19AFF4CE0D9ED1A9978DE4C6E5509B4C7E94FAC0FEFA5CBFF50A395D8"
+    },
+    {
+      "file": "mw_shepherd_items.linux",
+      "sha256": "7972F982C992AFCB5CF7163D602B116D4164855A0AD7BF2A57CC346763BB45B3"
+    },
+    {
+      "file": "icons/shepherd_feed_barrel_icon.png",
+      "sha256": "7396DD00CE265CFB86A690F57E91A5E3A8B90CE2BE4A47D5323D147033C69ACC"
+    },
+    {
+      "file": "icons/shepherd_trough_plank_icon.png",
+      "sha256": "CDEA17F8BD0000C6ED42509EE723F70D65C0232D95F77AEF7508E70E0D9B4042"
+    },
+    {
+      "file": "icons/shepherd_trough_stone_icon.png",
+      "sha256": "982F910341A090B666B0466B887422CB05A6E2885D5CB3BA7711A8774F95BD5D"
+    },
+    {
+      "file": "source/shepherd/check_models.py",
+      "sha256": "B41848BF4EC5B084076FCA52CC73A1B18BDA0C2E48AABF5078270C214574B5C6"
+    },
+    {
+      "file": "source/shepherd/generate.py",
+      "sha256": "1EE93031EE489520D41C98E57F666C7CB3FC3A62817820B8D84578F07B4A608E"
+    },
+    {
+      "file": "source/shepherd/geometry.py",
+      "sha256": "311CDD5C565B0099380507D31E68988C24156A477C9F12E742B081E7A05FF2F5"
+    },
+    {
+      "file": "source/shepherd/models.json",
+      "sha256": "C1A761254F66D42814C1ECB4FAC52555D2FF09755784E1F66FBD160F4D462D75"
+    },
+    {
+      "file": "source/shepherd/preview_source.py",
+      "sha256": "DE59B5CB152B7BAA53699E8CE9FF2B3F489DA37F20FA2B09F7F60145BDECF98C"
+    },
+    {
+      "file": "source/shepherd/README.md",
+      "sha256": "A67B261D44E4288641898EB053B73A23CB6FF32F098F3C4FB83343D5A3C46DF8"
+    },
+    {
+      "file": "source/shepherd/SOURCE-CHECKS.json",
+      "sha256": "C03146399656964A88350273FA354DF5FD526735128B2D06D6F0CA7340D28759"
+    },
+    {
+      "file": "source/BuildCustomItems.cs",
+      "sha256": "BB4BC3A82B38FA3930440EDE02B6797906831EFB4D98D25712F06D0AA3F42837"
+    },
+    {
+      "file": "source/OriginalItemArt.cs",
+      "sha256": "3F33CA68E6F084105521AE0FF2572B4601B1A85ED16208F5598DC3CB2B00C1F4"
+    },
+    {
+      "file": "source/README.md",
+      "sha256": "0DE3AB4668FFF32919A87B5919D2575F68FD49305575FF48FB3318E02AA4247A"
+    },
+    {
+      "file": "source/Rebuild-OriginalArt.ps1",
+      "sha256": "CD41B87CCE6647D979FCC7B570457B4E324395BA141979623B66032ADFD97052"
+    },
+    {
+      "file": "source/SOURCE-REBUILD.md",
+      "sha256": "B18BD02878D7CE8D2C31A963D1E72FE62147EF7208843B4E4BFD9FDD96684D0E"
+    },
+    {
+      "file": "source/textures/materials-atlas.png",
+      "sha256": "83F3B012447DA4F44C64943AB26D632E530480D5DEF958FD41D56792937A10C1"
+    },
+    {
+      "file": "source/textures/provenance.json",
+      "sha256": "4B5454F1FC5A5ECA9615213DB391F79DF0362BB8F0C84755D1C7E8617AA0E01B"
+    },
+    {
+      "file": "source/source-kit.json",
+      "sha256": "CE41C7E7AFFD58EF2D1BEEC768BE598CCBD4C11CE6C3AE9F25209FAAC75A2271"
+    }
+  ]
+}
