@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.30 (2026-10-22)
+
+- Crucible 0.3.30; Crucible.UI stays at 0.3.21.
+- Setting help now resolves the owner of MeadWorks settings bound through embedded sync libraries. Mantle's Trinket Preset help fills in the three preset names instead of showing `{0}`, `{1}` and `{2}`. This text lookup leaves edit permissions, synchronization and saved values unchanged.
+
 ## 0.3.29 (2026-10-21)
 
 - Crucible 0.3.29, including Crucible.UI 0.3.21.

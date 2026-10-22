@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.15 (2026-10-22)
+
+- Requires Crucible 0.3.30 / Crucible.UI 0.3.21.
+- 0.1.15.
+- The weather filter rebuilds its disabled-environment list when that setting or the season changes. A settings read that saw the empty default no longer leaves the environment list unfiltered.
+
 ## 0.1.14 (2026-10-22)
 
 - Requires Crucible 0.3.29 / Crucible.UI 0.3.21.

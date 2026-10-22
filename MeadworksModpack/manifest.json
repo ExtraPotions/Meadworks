@@ -1,11 +1,11 @@
 {
   "name": "Meadworks",
-  "version_number": "0.1.12",
+  "version_number": "0.1.13",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/MeadworksModpack",
   "description": "Meadworks suite: Crucible and all 26 Meadworks products in one install. Contains no code of its own. Required on all peers.",
   "dependencies": [
-    "expDARE-Crucible-0.3.29",
-    "expDARE-Almanac-0.1.18",
+    "expDARE-Crucible-0.3.30",
+    "expDARE-Almanac-0.1.19",
     "expDARE-Beacon-0.1.14",
     "expDARE-Bestiary-0.1.17",
     "expDARE-Burrow-0.3.25",
@@ -22,7 +22,7 @@
     "expDARE-Mantle-0.1.26",
     "expDARE-Saga-0.1.16",
     "expDARE-Shepherd-0.1.17",
-    "expDARE-Tempest-0.1.14",
+    "expDARE-Tempest-0.1.15",
     "expDARE-Thing-0.1.12",
     "expDARE-Threshold-0.3.10",
     "expDARE-Timber-0.2.1",

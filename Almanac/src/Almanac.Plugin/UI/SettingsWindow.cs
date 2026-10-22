@@ -123,7 +123,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
             TickFeatureReturn();
             if(!IsOpen)return;
             string currentLanguage=CrucibleUiPlugin.Language;
-            if(!string.Equals(presentationLanguage,currentLanguage,StringComparison.Ordinal)){presentationLanguage=currentLanguage;RefreshLocalizedChrome();dirty=true;}
+            if(!string.Equals(presentationLanguage,currentLanguage,StringComparison.Ordinal)){presentationLanguage=currentLanguage;RefreshLocalizedChrome();RefreshChoiceDialogTitle();dirty=true;}
             SyncPreferences();
             TickActions();
             TickWorldEdits();

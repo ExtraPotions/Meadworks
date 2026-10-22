@@ -16,6 +16,10 @@ namespace ExtraPotions.Almanac.Runtime.UI
                 text(Presentation.Heading(entry.Attributes, entry.Entry.Definition.Section)),
                 SettingNotes.WithoutSyncSuffix(entry.Attributes.Description ?? entry.Entry.Description.Description));
 
+        // Choice-list heading: the row's localized setting name. Other mods keep the raw display name.
+        internal static string ChoiceDialogTitle(NativeEntry entry, string language, Func<string,string> text)
+            => Resolve(entry, language, text).Label;
+
         internal static string SectionTitle(string fallback, IEnumerable<string> labels)
         {
             string? selected = null;

@@ -1,6 +1,7 @@
 // Copyright (C) 2026 expDARE. SPDX-License-Identifier: GPL-3.0-or-later
 using System;
 using System.Collections.Concurrent;
+using System.IO;
 using BepInEx.Configuration;
 
 namespace ExtraPotions.Meadworks.Crucible
@@ -22,7 +23,7 @@ namespace ExtraPotions.Meadworks.Crucible
         ConfigPresentationText? Resolve(ConfigEntryBase entry, string language);
     }
 
-    /// <summary>Optional ConfigDescription tag for the exact managed owner and setting type. Resolve live display text without changing settings.</summary>
+    /// <summary>Optional ConfigDescription tag for the exact config owner and setting type. Resolve live display text without changing settings.</summary>
     public sealed class ConfigPresentation<T> : IConfigPresentation
     {
         readonly string productId;
@@ -50,7 +51,7 @@ namespace ExtraPotions.Meadworks.Crucible
 
     public static partial class MeadworksConfig
     {
-        /// <summary>Resolves an exact registered entry's display text; missing, ambiguous or failing providers retain raw fallbacks. Never changes owner, scope or values.</summary>
+        /// <summary>Resolves an exact config entry's display text; missing, ambiguous or failing providers retain raw fallbacks. Never changes owner, scope or values.</summary>
         public static ConfigPresentationText Presentation(ConfigEntryBase entry, string language, string label, string section, string help)
         {
             var fallback = new ConfigPresentationText(label, section, help);
@@ -64,8 +65,8 @@ namespace ExtraPotions.Meadworks.Crucible
                     provider = candidate;
                 }
             if (provider == null) return Conventional(entry, language, fallback);
-            if (!provider.Supports(entry) || !TryGetMetadata(entry, out var metadata)
-                || !string.Equals(provider.ProductId, metadata.ProductId, StringComparison.Ordinal)) return fallback;
+            if (!provider.Supports(entry) || !TryPresentationOwner(entry, out var owner)
+                || !string.Equals(provider.ProductId, owner, StringComparison.Ordinal)) return fallback;
             try
             {
                 var given = provider.Resolve(entry, language ?? "English");
@@ -76,13 +77,22 @@ namespace ExtraPotions.Meadworks.Crucible
         }
         static string Prefer(string value, string fallback) => string.IsNullOrWhiteSpace(value) ? fallback : value;
 
+        static bool TryPresentationOwner(ConfigEntryBase entry, out string owner)
+        {
+            if (TryGetMetadata(entry, out var metadata)) { owner = metadata.ProductId; return true; }
+            // Embedded sync libraries bind outside Crucible. Their config GUID identifies text ownership only.
+            owner = Path.GetFileNameWithoutExtension(entry.ConfigFile.ConfigFilePath) ?? "";
+            const string prefix = "com.meadworks.";
+            return owner.StartsWith(prefix, StringComparison.Ordinal) && owner.Length > prefix.Length;
+        }
+
         /// <summary>
         /// Without a provider tag: the owning plugin's registered translations under <see cref="SettingTextKeys"/>
         /// (cfg_section__key_name/_help, cfg_section_heading). A missing language uses the English entry, then the raw text.
         /// </summary>
         static ConfigPresentationText Conventional(ConfigEntryBase entry, string language, ConfigPresentationText fallback)
         {
-            if (!TryGetMetadata(entry, out var metadata) || !SettingTranslations.TryGet(metadata.ProductId, out var translations)) return fallback;
+            if (!TryPresentationOwner(entry, out var owner) || !SettingTranslations.TryGet(owner, out var translations)) return fallback;
             var section = entry.Definition.Section; var key = entry.Definition.Key; language = language ?? MeadworksLanguages.English;
             string Lookup(string? textKey, string raw)
             {

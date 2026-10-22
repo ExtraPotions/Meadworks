@@ -9,9 +9,12 @@
 // AppendEnvironment) is replaced by the Disabled Environments list; the hooks act only while Tempest's Filter module is
 // active (not while NoFogBruh is installed) and never remove the environment Tempest itself is applying.
 // Seasonal aliases share their base switch; optional server weights multiply copied list entries after Solstice's rules.
+// The cached filter is rebuilt when the effective disabled-environment list or the season and its weights differ.
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks). This file as a whole: SPDX-License-Identifier: GPL-3.0-or-later
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using ExtraPotions.Tempest.Config;
 using ExtraPotions.Tempest.Integration;
 using ExtraPotions.Tempest.Weather;
 using HarmonyLib;
@@ -22,6 +25,8 @@ namespace ExtraPotions.Tempest.Runtime
     public static class TempestFilter
     {
         static WeatherFilter? cached;
+        static TempestConfig? cachedSettings;
+        static string? cachedKey;
 
         /// <summary>The filter now, or null while the Filter module is off (NoFogBruh installed, product off).</summary>
         public static WeatherFilter? Current
@@ -30,14 +35,34 @@ namespace ExtraPotions.Tempest.Runtime
             {
                 var settings = Plugin.Settings;
                 if (settings == null || !TempestModules.Active(TempestModule.Filter)) return null;
-                return cached ??= settings.Filter();
+                var key = CacheKey(settings);
+                if (cached == null || !ReferenceEquals(cachedSettings, settings) || cachedKey != key)
+                {
+                    cached = settings.Filter();
+                    cachedSettings = settings;
+                    cachedKey = key;
+                }
+                return cached;
             }
         }
 
-        /// <summary>Called when any setting changed: the next read rebuilds the filter.</summary>
-        public static void Invalidate() => cached = null;
+        // The disabled-environment list and seasonal weights are copied when the filter is built. A settings callback can
+        // observe the safe default, so the next read rebuilds when those effective values or the season differ.
+        static string CacheKey(TempestConfig settings)
+        {
+            var disabled = settings.Get(TempestSettings.Filter.OtherDisabled) ?? "";
+            return disabled.Length.ToString(CultureInfo.InvariantCulture) + "|" + disabled + "|" + TempestSeasons.FilterStamp(settings);
+        }
 
-        public static void Shutdown() => cached = null;
+        /// <summary>Drops the cached filter so the next read builds it again.</summary>
+        public static void Invalidate()
+        {
+            cached = null;
+            cachedSettings = null;
+            cachedKey = null;
+        }
+
+        public static void Shutdown() => Invalidate();
 
         public static bool Allows(string? environment)
         {

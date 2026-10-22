@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.19 (2026-10-22)
+
+- Requires Crucible 0.3.30 / Crucible.UI 0.3.21.
+- 0.1.19. The choice list for an enum or preset setting uses the same translated setting name as its row, and that title follows a language change while the list stays open. A mod without translated setting metadata keeps the raw name.
+
 ## 0.1.18 (2026-10-22)
 
 - Requires Crucible 0.3.29 / Crucible.UI 0.3.21.

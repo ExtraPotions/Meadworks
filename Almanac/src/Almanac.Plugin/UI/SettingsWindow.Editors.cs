@@ -20,6 +20,8 @@ namespace ExtraPotions.Almanac.Runtime.UI
     public sealed partial class SettingsWindow
     {
         static readonly CultureInfo Inv=CultureInfo.InvariantCulture;
+        NativeEntry? choiceEntry;
+        KitAlmanacDialog? choiceDialog;
         static string Chord(NativeEntry native)
         {
             if(native.Entry.BoxedValue is KeyboardShortcut shortcut)return shortcut.MainKey==KeyCode.None?"":shortcut.MainKey+":"+string.Join(",",shortcut.Modifiers.OrderBy(key=>(int)key));
@@ -54,13 +56,55 @@ namespace ExtraPotions.Almanac.Runtime.UI
             Func<string,string> label=null;
             if(!flags&&native.Attributes.ObjToStr is Delegate show)
                 label=option=>{try{return (string)show.DynamicInvoke(TomlTypeConverter.ConvertToValue(option,native.Entry.SettingType))??option;}catch{return option;}};
-            KitAlmanacChoice.Open(window!,native.Entry.Definition.Key,options,selected,flags,values=>
+            // The heading is the same localized setting name as the row, and follows a language change while this list stays open.
+            string title=ChoiceDialogTitle(native);
+            KitAlmanacChoice.Open(window!,title,options,selected,flags,values=>
             {
                 string zero=options.FirstOrDefault(option=>Enum.Parse(native.Entry.SettingType,option).Equals(Enum.ToObject(native.Entry.SettingType,0)))??"0";
                 string text=flags?values.Count>0?string.Join(", ",values):zero:values[0];
                 WriteValue(native,TomlTypeConverter.ConvertToValue(text,native.Entry.SettingType));
             },label);
+            BindChoiceDialog(native,title);
             FollowDependency(native);
+        }
+        string ChoiceDialogTitle(NativeEntry native)
+        {
+            string language=presentationLanguage.Length>0?presentationLanguage:CrucibleUiPlugin.Language;
+            return EntryPresentation.ChoiceDialogTitle(native,language,text);
+        }
+        void BindChoiceDialog(NativeEntry native,string title)
+        {
+            var dialog=KitAlmanacDialog.Active;
+            if(dialog==null||dialog.Parent!=window||dialog.Panel==null)return;
+            var heading=dialog.Panel.Find("Title");
+            var shown=heading!=null?heading.GetComponent<TMPro.TMP_Text>():null;
+            if(shown==null||shown.text!=title)return;
+            if(!ReferenceEquals(choiceDialog,dialog))
+            {
+                if(choiceDialog!=null)choiceDialog.Closed-=ClearChoiceDialog;
+                choiceDialog=dialog;
+                dialog.Closed+=ClearChoiceDialog;
+            }
+            choiceEntry=native;
+        }
+        void ClearChoiceDialog()
+        {
+            if(choiceDialog!=null)choiceDialog.Closed-=ClearChoiceDialog;
+            choiceDialog=null;
+            choiceEntry=null;
+        }
+        void RefreshChoiceDialogTitle()
+        {
+            var entry=choiceEntry;
+            var dialog=choiceDialog;
+            if(entry==null||dialog==null)return;
+            var panel=dialog.Panel;
+            if(panel==null){ClearChoiceDialog();return;}
+            var heading=panel.Find("Title");
+            var label=heading!=null?heading.GetComponent<TMPro.TMP_Text>():null;
+            if(label==null)return;
+            string title=ChoiceDialogTitle(entry);
+            if(label.text!=title)label.text=title;
         }
         void ListEditor(NativeEntry native)
         {

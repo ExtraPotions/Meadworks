@@ -1,5 +1,6 @@
 // Tempest - ExtraPotions Meadworks. Copyright (C) 2026 expDARE (ExtraPotions Meadworks). SPDX-License-Identifier: GPL-3.0-or-later
 using System;
+using System.Globalization;
 using ExtraPotions.Tempest.Config;
 using ExtraPotions.Tempest.Weather;
 using CruciblePlugin = ExtraPotions.Meadworks.Crucible.Plugin;
@@ -33,6 +34,15 @@ namespace ExtraPotions.Tempest.Runtime
             var season = Reader.Reading;
             return season.Available && season.Effects
                 ? new SeasonalWeights(settings.Get(TempestSettings.SeasonalWeather.Weights[season.Season])) : null;
+        }
+
+        // Season index and that season's weight text. "off" when seasonal effects are not in use.
+        internal static string FilterStamp(TempestConfig settings)
+        {
+            var season = Reader.Reading;
+            var weights = TempestSettings.SeasonalWeather.Weights;
+            if (!season.Available || !season.Effects || (uint)season.Season >= (uint)weights.Count) return "off";
+            return season.Season.ToString(CultureInfo.InvariantCulture) + ":" + settings.Get(weights[season.Season]);
         }
 
         public static string? EventEnvironment(string? name, Func<string, bool> exists)

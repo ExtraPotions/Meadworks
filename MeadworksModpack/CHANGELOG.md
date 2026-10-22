@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.13 (2026-10-22)
+
+- Dependency pins: Crucible 0.3.30, Almanac 0.1.19 and Tempest 0.1.15 (release 8.3); the other 24 packages are unchanged.
+- Installer: an update removes files in a MeadWorks plugin folder (`BepInEx/plugins/expDARE-<Name>`) that the package does not include, and removes folders left empty. That clears leftovers such as `LOCAL-PREVIEW.json`, `mm_v2_manifest.json`, old notice files and license files an r2modman Thunderstore install left in the folder. Removed files stay in the pre-install backup, and the install receipt and backup note list them. Server YAML (`.yml` and `.yaml`) that this installer did not ship stays, and a file from an earlier installer run stays when its contents were edited. `BepInEx/config`, saves, other mods and any `expDARE-*` folder this setup does not install are left alone. `--install <profiles folder> <profile name> --report-stale` lists those files and does not delete them.
+
 ## 0.1.12 (2026-10-22)
 
 - Dependency pins: Barter 0.1.2, Solstice 0.1.3, Tempest 0.1.14, Almanac 0.1.18 and Wildblood 0.5.6 (release 8.2); the other 22 packages are unchanged.
