@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.18 (2026-10-22)
+
+- Version 0.1.18.
+- Requires Crucible 0.3.28 / Crucible.UI 0.3.20.
+- Each Slag Charred side plate sits another 0.06 m outward (0.79 m from the chest) so the idle forearm clears it. The front plate is unchanged, and the plates still do not overlap from the front.
+- The Fuling Spearman copy equips the game's spear (GoblinSpear, then SpearFlint, then SpearWood) and does not wear a stand-in spear. The shared Fuling prefab and its shield roll are unchanged.
+
 ## 0.1.17 (2026-10-21)
 
 - Version 0.1.17.

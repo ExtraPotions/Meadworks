@@ -12,6 +12,8 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
     {
         public static void Dress(GameObject creature, string name)
         {
+            // This copy equips the game's spear. No stand-in on the spearman.
+            if (name == KitCreatures.Javelineer) return;
             GameObject source = null;
             var chosen = StandInProps.Choose(name, MeadworksHeadless.AllowsUi, prefab =>
             {
@@ -35,11 +37,11 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
                 var chest = Chest(creature);
                 int count = StandInProps.Copies(name);
                 for (int i = 0; i < count; i++)
-                    Hang(creature.transform, chest, source, StandInProps.PlateMeters, StandInProps.PlateGrip(i, chest == creature.transform), true, false);
+                    Hang(creature.transform, chest, source, StandInProps.PlateMeters, StandInProps.PlateGrip(i, chest == creature.transform), true);
                 return;
             }
             var hand = Hand(creature, out var onBody);
-            Hang(creature.transform, hand, source, StandInProps.Meters(name), StandInProps.HoldGrip(name, onBody), false, name == KitCreatures.Javelineer && !onBody);
+            Hang(creature.transform, hand, source, StandInProps.Meters(name), StandInProps.HoldGrip(name, onBody), false);
         }
 
         private static Transform Hand(GameObject creature, out bool onBody)
@@ -85,7 +87,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
             return db != null ? db.GetItemPrefab(prefab) : null;
         }
 
-        private static void Hang(Transform body, Transform parent, GameObject source, float meters, StandInProps.Grip grip, bool faceOut, bool alongShaft)
+        private static void Hang(Transform body, Transform parent, GameObject source, float meters, StandInProps.Grip grip, bool faceOut)
         {
             var prop = UnityEngine.Object.Instantiate(Visual(source), parent, false);
             prop.name = "mw_prop";
@@ -105,7 +107,6 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
             var local = PropFit.Scale(PropFit.WorldScale(meters, unit), new PropFit.Axes(bone.x, bone.y, bone.z));
             t.localScale = new Vector3(local.X, local.Y, local.Z);
             if (faceOut) FacePlate(body, t, min, max, Outward(grip));
-            if (alongShaft) AimSpear(body, t, min, max);
             var world = body.TransformVector(new Vector3(grip.Right, grip.Up, grip.Forward));
             var placed = PropFit.IntoBone(
                 new PropFit.Axes(world.x, world.y, world.z),
@@ -143,60 +144,6 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
             // The positive thin side of the buckler is the grip. A half turn about the creature's up swaps the dome outward and leaves the plate upright.
             if (PropFit.FacesNegative(front))
                 prop.rotation = Quaternion.AngleAxis(180f, body.up) * prop.rotation;
-        }
-
-        // Width picks the head. The idle pose puts GoblinSpear's wide end on the ground, so world height is the wrong end.
-        private static void AimSpear(Transform body, Transform prop, Vector3 min, Vector3 max)
-        {
-            var size = max - min;
-            var scale = prop.localScale;
-            float sx = Mathf.Abs(size.x * scale.x);
-            float sy = Mathf.Abs(size.y * scale.y);
-            float sz = Mathf.Abs(size.z * scale.z);
-            int axis = sx >= sy && sx >= sz ? 0 : sy >= sz ? 1 : 2;
-            float axisMin = axis == 0 ? min.x : axis == 1 ? min.y : min.z;
-            float axisMax = axis == 0 ? max.x : axis == 1 ? max.y : max.z;
-            var mid = (min + max) * 0.5f;
-            EndSpreads(prop, axis, axisMin, axisMax, mid, out float spreadMin, out float spreadMax);
-            bool headAtMax = PropFit.HeadAtMax(spreadMin, spreadMax);
-            var aim = PropFit.SpearAim(StandInProps.SpearTiltDegrees);
-            var headLocal = axis == 0 ? Vector3.right : axis == 1 ? Vector3.up : Vector3.forward;
-            if (!headAtMax) headLocal = -headLocal;
-            var headWorld = prop.TransformDirection(headLocal);
-            var aimWorld = body.TransformDirection(new Vector3(aim.X, aim.Y, aim.Z));
-            if (headWorld.sqrMagnitude > 1e-8f && aimWorld.sqrMagnitude > 1e-8f)
-                prop.rotation = Quaternion.FromToRotation(headWorld, aimWorld) * prop.rotation;
-            // A head at max Z means the butt is min Z.
-            float delta = PropFit.ShaftSlide(axisMin, axisMax, headAtMax, StandInProps.SpearFromButt);
-            if (Mathf.Abs(delta) < 1e-6f) return;
-            var shift = axis == 0 ? Vector3.right : axis == 1 ? Vector3.up : Vector3.forward;
-            shift *= delta;
-            for (int i = 0; i < prop.childCount; i++)
-                prop.GetChild(i).localPosition += shift;
-        }
-
-        private static void EndSpreads(Transform prop, int axis, float axisMin, float axisMax, Vector3 mid, out float spreadMin, out float spreadMax)
-        {
-            var along = new List<float>();
-            var off = new List<float>();
-            void Take(Transform meshTransform, Mesh mesh)
-            {
-                if (mesh == null || !mesh.isReadable) return;
-                var verts = mesh.vertices;
-                for (int i = 0; i < verts.Length; i++)
-                {
-                    var local = prop.InverseTransformPoint(meshTransform.TransformPoint(verts[i]));
-                    along.Add(axis == 0 ? local.x : axis == 1 ? local.y : local.z);
-                    off.Add(PropFit.OffShaft(local.x - mid.x, local.y - mid.y, local.z - mid.z, axis));
-                }
-            }
-            var filters = prop.GetComponentsInChildren<MeshFilter>(true);
-            for (int i = 0; i < filters.Length; i++)
-                if (filters[i].sharedMesh != null) Take(filters[i].transform, filters[i].sharedMesh);
-            var skins = prop.GetComponentsInChildren<SkinnedMeshRenderer>(true);
-            for (int i = 0; i < skins.Length; i++)
-                if (skins[i].sharedMesh != null) Take(skins[i].transform, skins[i].sharedMesh);
-            PropFit.EndSpreads(along, off, axisMin, axisMax, out spreadMin, out spreadMax, out _, out _);
         }
 
         private static GameObject Visual(GameObject source)

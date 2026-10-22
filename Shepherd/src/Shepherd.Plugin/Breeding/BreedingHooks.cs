@@ -3,6 +3,7 @@
 // and Breeding/Parents.cs.
 // Copyright (C) 2026 Gerald Glasgow. GPL-3.0-or-later.
 // Pin: ad278ecf323901c3645eb1f9f6fac6833a0f8cb1
+// ECR breeding pin: 0471a49e972e4453a453e365cb90b5fd20d0f4ea; native star writes require Wildblood permission.
 // Changed by expDARE, 2026: one Procreate prefix/postfix/finalizer for pace, birth plan and twins; decisions in the
 // portable Shepherd.Breeding core (BreedingPace, BirthPlanner, ClaimSlot, Carry, SireCapture, TwinRules); Shepherd
 // pen-scoped count lifetime, temporary capacity and moving-ship pause; lineage keys and egg record with optional Wildblood trait transport; twins due after Twin Delay; external inheritance yields its level/trait/egg writers while lineage continues; Mutation Chance passed to the trait provider; seasonal breed rate composed after pace.
@@ -69,6 +70,7 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             public bool Twins;
             public BirthPlan? Plan;
             public bool OwnInheritance;
+            public bool Stars;
             public bool ExternalStar;
             public bool RestoreRanges;
             public float PartnerRange;
@@ -180,6 +182,7 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
                 BreedingStore.ReadPendingSire(store), parent.m_minOffspringLevel, level, EnvMan.instance != null ? EnvMan.instance.GetDay() : 0,
                 BreederName(parent.transform.position), ShepherdSettings.RecordLineage.Value, "");
             bool stars = WildbloodOffspringStars.Allow();
+            call.Stars = stars;
             BirthPlan plan = BirthPlanner.Plan(input, call.OwnInheritance ? NativeBreeding.Inheritance(stars)
                 : new InheritanceSettings(InheritanceMode.Vanilla, 0, 10, 0, 0), Dice);
             var traits = WildbloodTraitsCapability.Current;
@@ -217,7 +220,7 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             zdo.Set(BreedingKeys.Births, zdo.GetInt(BreedingKeys.Births, 0) + 1);
             GameObject? born = claimed;
             claimed = null;
-            if (born != null) Stamp(born, call.Plan, call.WasTwin, call.OwnInheritance && NativeBreeding.InheritanceActive);
+            if (born != null) OffspringStamp.Apply(born, call.Plan, call.WasTwin, call.OwnInheritance && NativeBreeding.InheritanceActive, call.Stars);
             if (call.WasTwin)
             {
                 BreedingStore.SetIsTwin(store, false);
@@ -231,40 +234,6 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             if (born != null) HerdCallout.Send(parent, call.OwnInheritance ? call.Plan.Inheritance.StrongOffspring : EcrOffspringStar.Added(parent, call.ExternalStar), call.Twins);
             NativeBreeding.Verbose("birth: " + global::Utils.GetPrefabName(parent.gameObject) + " level " + call.Plan.Level
                 + (call.Twins ? ", twin due" : ""));
-        }
-
-        /// <summary>Writes the plan on the claimed newborn: level (after the game's own SetLevel/SetQuality) and lineage or egg record.</summary>
-        private static void Stamp(GameObject born, BirthPlan plan, bool twin, bool inheritance)
-        {
-            Character character = born.GetComponent<Character>();
-            if (character != null)
-            {
-                ZNetView view = character.m_nview;
-                if (!Owned(view)) return;
-                if (inheritance) character.SetLevel(plan.Level);
-                var store = new ZdoKeyStore(view.GetZDO());
-                if (plan.Lineage != null)
-                {
-                    store.Set(InstanceKey, plan.Lineage.Token);
-                    BreedingStore.WriteLineage(store, plan.Lineage);
-                }
-                if (inheritance)
-                {
-                    BreedingStore.SetTraits(store, plan.Egg.Traits);
-                    WildbloodTraitsCapability.Current.Apply(character, plan.Egg.Traits);
-                }
-                if (twin) BreedingStore.SetIsTwin(store, true);
-                return;
-            }
-            ItemDrop egg = born.GetComponent<ItemDrop>();
-            if (egg == null || !Owned(egg.m_nview)) return;
-            if (inheritance) egg.SetQuality(plan.EggQuality);
-            var traits = WildbloodTraitsCapability.Current;
-            if (plan.Lineage != null || inheritance && (traits.Available || plan.Egg.Traits.Length != 0))
-            {
-                egg.m_itemData.m_customData[BreedingKeys.Egg] = inheritance ? traits.EncodeEgg(plan.Egg) : EggCodec.Encode(plan.Egg);
-                egg.Save();
-            }
         }
 
         /// <summary>

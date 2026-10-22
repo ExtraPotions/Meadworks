@@ -1,6 +1,8 @@
 # Shepherd
 
-Version 0.1.17. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.18. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+
+The ECR breeding refresh and its adoption boundaries are recorded in [docs/ecr-breeding-refresh.md](docs/ecr-breeding-refresh.md).
 
 Animal keeping as part of your base: feed troughs, a Husbandry skill, and breeding with sires, star inheritance, twins, herd limits and lineage.
 

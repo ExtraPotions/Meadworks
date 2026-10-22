@@ -117,8 +117,40 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
                 }
             }
             if (creature.Prefab == KitCreatures.BogHook) copy.AddComponent<BogHook>();
-            else if (creature.Prefab == KitCreatures.Javelineer) copy.AddComponent<JavelinOnce>();
+            else if (creature.Prefab == KitCreatures.Javelineer)
+            {
+                copy.AddComponent<JavelinOnce>();
+                SpearOnly(scene, copy);
+            }
             else if (creature.Prefab == KitCreatures.SlagCharred) copy.AddComponent<KitPlates>();
+        }
+
+        // New array on this copy. The Goblin prefab keeps its own weapon list. Shield, armor, and default items stay as copied.
+        private static void SpearOnly(ZNetScene scene, GameObject copy)
+        {
+            var humanoid = copy.GetComponent<Humanoid>();
+            if (humanoid == null)
+            {
+                Log.Warn("Bestiary " + KitCreatures.Javelineer + " has no humanoid; no spear was assigned.");
+                return;
+            }
+            var names = SpearPool.For(name => Item(scene, name) != null);
+            GameObject? spear = names.Length == 0 ? null : Item(scene, names[0]);
+            if (spear == null)
+            {
+                humanoid.m_randomWeapon = Array.Empty<GameObject>();
+                Log.Warn("Bestiary " + KitCreatures.Javelineer + " spear prefab is missing; it keeps no random weapon. The fight still runs.");
+                return;
+            }
+            humanoid.m_randomWeapon = new[] { spear };
+        }
+
+        private static GameObject? Item(ZNetScene scene, string name)
+        {
+            var found = scene.GetPrefab(name);
+            if (found != null) return found;
+            var db = ObjectDB.instance;
+            return db != null ? db.GetItemPrefab(name) : null;
         }
     }
 }

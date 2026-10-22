@@ -1,13 +1,14 @@
 // Shepherd - ExtraPotions Meadworks animal husbandry.
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks).
 //
-// Adapted from EliteCreaturesReborn 3.20.0 and GrindstoneSkills 0.14.1, Copyright (C) 2026 Gerald Glasgow,
+// Adapted from EliteCreaturesReborn 3.30.0 and GrindstoneSkills 0.14.1, Copyright (C) 2026 Gerald Glasgow,
 // GPL-3.0-or-later (ValheimMods monorepo at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1:
 // EliteCreaturesReborn/EliteCreaturesReborn/Breeding/Inheritance.cs Inheritance.Offspring (star part),
 // EliteCreaturesReborn/EliteCreaturesReborn/Breeding/KeeperBonus.cs KeeperBonus.Apply (cap one above the stronger
 // parent), GrindstoneSkills/GrindstoneSkills/Husbandry/Breeding/OffspringStar.cs OffspringStar.Begin (Max Offspring
 // Level, the minimum offspring level floor)). Full notice in THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt.
 //
+// ECR breeding pin: 0471a49e972e4453a453e365cb90b5fd20d0f4ea; tame-star permission comes only from Wildblood.
 // Changed by expDARE, 2026: namespace Shepherd.Breeding; Unity-free; levels instead of stars (level = stars + 1);
 // mutation picking removed (Wildblood owns traits); three server modes (Vanilla, BestParentUniform, ParentMean with
 // round half up, design 10.3 and user decision Q3); the keeper star and BreedingUpgrades' flat birth star applied once

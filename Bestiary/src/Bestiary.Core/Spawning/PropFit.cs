@@ -1,7 +1,6 @@
 // Bestiary - ExtraPotions Meadworks creatures and bone arsenal.
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks). SPDX-License-Identifier: GPL-3.0-or-later
 using System;
-using System.Collections.Generic;
 
 namespace ExtraPotions.Bestiary.Spawning
 {
@@ -74,81 +73,6 @@ namespace ExtraPotions.Bestiary.Spawning
         }
 
         public static bool FacesNegative(Axes front) => front.X < 0f || front.Y < 0f || front.Z < 0f;
-
-        /// <summary>Outer share of the shaft counted as an end when comparing width.</summary>
-        public const float EndBand = 0.15f;
-
-        /// <summary>Distance off a shaft axis. <paramref name="x"/>, <paramref name="y"/> and <paramref name="z"/> are already relative to the shaft center.</summary>
-        public static float OffShaft(float x, float y, float z, int axis)
-        {
-            if (axis == 0) x = 0f;
-            else if (axis == 1) y = 0f;
-            else z = 0f;
-            return (float)Math.Sqrt(x * x + y * y + z * z);
-        }
-
-        /// <summary>
-        /// Widest offset in the outer <see cref="EndBand"/> of <paramref name="min"/>..<paramref name="max"/>.
-        /// A vertex past both cuts counts for both ends.
-        /// </summary>
-        public static void EndSpreads(IReadOnlyList<float> along, IReadOnlyList<float> offShaft, float min, float max,
-            out float spreadMin, out float spreadMax, out int countMin, out int countMax)
-        {
-            spreadMin = 0f;
-            spreadMax = 0f;
-            countMin = 0;
-            countMax = 0;
-            float span = max - min;
-            if (span < MinAxis || along == null || offShaft == null) return;
-            int n = along.Count < offShaft.Count ? along.Count : offShaft.Count;
-            float minCut = min + span * EndBand;
-            float maxCut = max - span * EndBand;
-            for (int i = 0; i < n; i++)
-            {
-                float off = Math.Abs(offShaft[i]);
-                if (along[i] < minCut)
-                {
-                    countMin++;
-                    if (off > spreadMin) spreadMin = off;
-                }
-                if (along[i] > maxCut)
-                {
-                    countMax++;
-                    if (off > spreadMax) spreadMax = off;
-                }
-            }
-        }
-
-        /// <summary>The head is the wider end. Equal width keeps the min end.</summary>
-        public static bool HeadAtMax(float spreadMin, float spreadMax) => spreadMax > spreadMin;
-
-        /// <summary>Butt height above the ground. The tail hangs below the hand by the sine of the world pitch.</summary>
-        public static float ButtHeight(float handHeight, float elevationDegrees, float fromButt, float length)
-        {
-            double rad = elevationDegrees * (Math.PI / 180.0);
-            return handHeight - (float)Math.Sin(rad) * fromButt * length;
-        }
-
-        /// <summary>Creature axes, right then up then forward. <paramref name="tiltDegrees"/> is up from forward.</summary>
-        public static Axes SpearAim(float tiltDegrees)
-        {
-            double rad = tiltDegrees * (Math.PI / 180.0);
-            return new Axes(0f, (float)Math.Sin(rad), (float)Math.Cos(rad));
-        }
-
-        /// <summary>
-        /// Local shift along one axis so the origin sits <paramref name="fromButt"/> of the span out from the butt.
-        /// <paramref name="buttIsMin"/> is the narrow end. The head is the other end.
-        /// </summary>
-        public static float ShaftSlide(float min, float max, bool buttIsMin, float fromButt)
-        {
-            float span = max - min;
-            if (span < MinAxis) return 0f;
-            float hold = fromButt;
-            if (hold < 0.05f) hold = 0.05f;
-            if (hold > 0.49f) hold = 0.49f;
-            return buttIsMin ? -hold * span - min : hold * span - max;
-        }
 
         public const string StripJoint = "Joint";
         public const string StripBody = "Rigidbody";

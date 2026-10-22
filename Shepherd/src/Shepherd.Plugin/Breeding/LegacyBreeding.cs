@@ -1,8 +1,11 @@
 // Copyright (C) 2026 expDARE. SPDX-License-Identifier: GPL-3.0-or-later
 // Consumes the existing adopted EcrImport reader and Wildblood EggDecode; source keys remain untouched.
+// Adapted from EliteCreaturesReborn 3.30.0 Breeding/EggData.cs.
+// Copyright (C) 2026 Gerald Glasgow. GPL-3.0-or-later.
+// Pin: 0471a49e972e4453a453e365cb90b5fd20d0f4ea
+// Changed by expDARE, 2026: migrate optional egg traits once while preserving native quality and legacy data.
 using System.Globalization;
 using ExtraPotions.Shepherd.Breeding;
-using ExtraPotions.Shepherd.Runtime.Adopted.Husbandry;
 using ExtraPotions.Shepherd.Runtime.Integration;
 
 namespace ExtraPotions.Shepherd.Runtime.Breeding
@@ -41,9 +44,8 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             var zdo = view.GetZDO();
             string carried = WildbloodTraitsCapability.Current.DecodeLegacyEgg(EggText(legacy.Stars, legacy.Mask, legacy.Biome));
             if (!Allowed(view) || egg.m_nview != view || item.m_nview != view || !ReferenceEquals(view.GetZDO(), zdo)) return;
-            item.SetQuality(System.Math.Min(legacy.Level, HusbandryBreedingSettings.MaxOffspringLevel.Value));
             if (carried.Length != 0) data.m_customData[BreedingKeys.Egg] = EggCodec.Encode(new EggRecord("", "", "", "", 0, 0, "", carried));
-            else if (legacy.Mask != 0) NativeBreeding.Verbose("legacy ECR egg level imported; trait mask omitted because no usable provider decoded it");
+            else if (legacy.Mask != 0) NativeBreeding.Verbose("legacy ECR egg metadata imported; trait mask omitted because no usable provider decoded it");
             data.m_customData[EggImported] = "1";
             item.Save();
         }

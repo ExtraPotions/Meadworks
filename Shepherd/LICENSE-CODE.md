@@ -10,6 +10,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 The complete, unmodified license text is included in `licenses/GPL-3.0.txt`. Official source: https://www.gnu.org/licenses/gpl-3.0.txt
 
-Shepherd contains logic adapted from the ValheimMods monorepo (GrindstoneSkills 0.14.1 and EliteCreaturesReborn 3.20.0, GPL-3.0-or-later, Copyright (C) 2026 Gerald Glasgow). The retained notice is in `THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt`; scope and pinned provenance are in `LICENSE_SCOPE.md` and `SOURCE_NOTICE.md`. This grant does not replace or modify that notice.
+Shepherd contains logic adapted from the ValheimMods monorepo (GrindstoneSkills 0.14.1 and EliteCreaturesReborn breeding through 3.30.0, GPL-3.0-or-later, Copyright (C) 2026 Gerald Glasgow). The retained notice is in `THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt`; scope and pinned provenance are in `LICENSE_SCOPE.md` and `SOURCE_NOTICE.md`. This grant does not replace or modify that notice.
 
 Crucible, Jotunn, BepInEx and game assemblies retain their own licenses and are not bundled or relicensed by Shepherd.

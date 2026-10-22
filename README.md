@@ -8,11 +8,11 @@ Crucible is the shared library every product requires. The Meadworks modpack dep
 | Mod | Version | Description |
 | --- | --- | --- |
 | [Crucible](meadworks-crucible/) | 0.3.30 | Meadworks shared library: product registration, server authority, the shared interface kit, localization and logging. Adds no gameplay. Required on all peers. |
-| [Meadworks](MeadworksModpack/) | 0.1.13 | Meadworks suite: Crucible and all 26 Meadworks products in one install. Contains no code of its own. Required on all peers. |
+| [Meadworks](MeadworksModpack/) | 0.1.14 | Meadworks suite: Crucible and all 26 Meadworks products in one install. Contains no code of its own. Required on all peers. |
 | [Almanac](Almanac/) | 0.1.19 | Meadworks settings book: one in-game window for every installed mod's settings, showing which ones the server locks and why, with settings imports. Client-optional. |
 | [Barter](Barter/) | 0.1.2 | ExtraPotions Meadworks trader overhaul: per-trader buy and sell lists, custom currencies, a trader purse that moves prices, and a sell list. Required on all peers. |
 | [Beacon](Beacon/) | 0.1.14 | Meadworks saved servers: join without the password prompt, passwords in protected storage, saved servers in Join Game favorites, optional auto-join and reconnect (a server can turn reconnect off), AutoConnector import. Client-optional. |
-| [Bestiary](Bestiary/) | 0.1.17 | Meadworks creatures and bone arsenal: Crypt Mimic, Greydwarf Slinger, Rime Giant, Kraken, the arsenal skeletons, the Skeleton Crossbowman and the Crypt Executioner. Required on all peers. |
+| [Bestiary](Bestiary/) | 0.1.18 | Meadworks creatures and bone arsenal: Crypt Mimic, Greydwarf Slinger, Rime Giant, Kraken, the arsenal skeletons, the Skeleton Crossbowman and the Crypt Executioner. Required on all peers. |
 | [Burrow](Burrow/) | 0.3.25 | Meadworks storage: craft and build from nearby chests, chest previews, bigger chests, sorting, quick stack, restocking, routing and multi-user chests. Required on all peers. |
 | [Cairn](Cairn/) | 0.1.17 | Meadworks exploration: exploration radius, Exploration skill, per-effect fog controls, time/weather/compass HUD, map marker choices and tidy pins. Imports Pathfinder, NoFogBruh, BetterFog and TimeWeatherHud settings. Client-optional. |
 | [Delve](Delve/) | 0.1.13 | Meadworks world regeneration: dungeon sizes, chest refills, dungeon resources, the Queen and camp creatures come back on timers, never near players or their buildings. Server-only. |
@@ -26,7 +26,7 @@ Crucible is the shared library every product requires. The Meadworks modpack dep
 | [Magpie](Magpie/) | 0.1.13 | Meadworks loot handling: magnet pickup, ground-stack merging, floating drops and a server-controlled loot multiplier cheat. Required on all peers. |
 | [Mantle](Mantle/) | 0.1.26 | Meadworks inventory and equipment: configurable grid, gear, ring and belt slots, backpacks, key ring, tacklebox and a Swap loadout button. Required on all peers (same version). |
 | [Saga](Saga/) | 0.1.16 | Meadworks progression: boss kills turn the Forsaken powers into permanent passives, Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks, and one skill book shows every skill. Required on all peers. |
-| [Shepherd](Shepherd/) | 0.1.17 | Meadworks animal husbandry: feed troughs, the Husbandry skill, breeding with sires, star inheritance, twins, herd limits and lineage. Required on all peers. |
+| [Shepherd](Shepherd/) | 0.1.18 | Meadworks animal husbandry: feed troughs, the Husbandry skill, breeding with sires, star inheritance, twins, herd limits and lineage. Required on all peers. |
 | [Solstice](Solstice/) | 0.1.3 | Meadworks seasons: spring, summer, fall and winter by the world calendar, with seasonal growth, bees, food, stamina, fire, sap, rest and wind effects, and local winter snow and season colors. Cooperates with Tempest weather. Required on all peers. |
 | [Tempest](Tempest/) | 0.1.15 | Meadworks weather: rare blizzards and severe thunderstorms with a five-minute warning, the same for every player, plus a server weather filter. Required on all peers. |
 | [Thing](Thing/) | 0.1.12 | Meadworks server administration: moderation, messages, world tools and in-game server config editing, checked against the server's admin list. Required on all peers. |

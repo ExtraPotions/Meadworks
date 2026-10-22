@@ -1,8 +1,8 @@
 // Shepherd - ExtraPotions Meadworks animal husbandry.
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks).
 //
-// Adapted from EliteCreaturesReborn 3.20.0, Copyright (C) 2026 Gerald Glasgow, GPL-3.0-or-later (ValheimMods monorepo
-// at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1: EliteCreaturesReborn/EliteCreaturesReborn/Breeding/Parents.cs
+// Adapted from EliteCreaturesReborn 3.30.0, Copyright (C) 2026 Gerald Glasgow, GPL-3.0-or-later (ValheimMods monorepo
+// at 0471a49e972e4453a453e365cb90b5fd20d0f4ea: EliteCreaturesReborn/EliteCreaturesReborn/Breeding/Parents.cs
 // Parents.FindPartner and Parents.IsPartner). Full notice in THIRD_PARTY_NOTICES/ValheimMods-GPL-3.0-or-later.txt.
 //
 // Changed by expDARE, 2026: namespace Shepherd.Breeding; Unity-free: the plugin gathers the loaded candidates and passes

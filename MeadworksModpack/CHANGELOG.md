@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.14 (2026-10-22)
+
+- Dependency pins: Bestiary 0.1.18 and Shepherd 0.1.18 (release 8.4); the other 25 packages are unchanged.
+- Installer 0.1.14: the Backups tab also finds recoverable MeadWorks configuration backups beside the profiles and opens selected profile-before ZIP archives. It identifies each origin and restores only MeadWorks content from these additional sources, preserving other mods and saves and backing up the current profile first. Mixed backups cannot be deleted in Setup.
+- Installer: backup titles fit beside their action buttons, keyboard confirmation defaults to the safe action, Escape dismisses optional notices and returns focus, and repainting unchanged status facts no longer repeats screen-reader events. New recovery text supports all seven suite languages.
+
 ## 0.1.13 (2026-10-22)
 
 - Dependency pins: Crucible 0.3.30, Almanac 0.1.19 and Tempest 0.1.15 (release 8.3); the other 24 packages are unchanged.

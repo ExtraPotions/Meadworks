@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.18 (2026-10-22)
+
+- Version 0.1.18.
+- Requires Crucible 0.3.28 / Crucible.UI 0.3.20.
+- Preserve the game's newborn level and egg quality when Wildblood declines star inheritance. Wildblood remains the owner of creature stars and mutations.
+- Import legacy EliteCreaturesReborn egg metadata without lowering saved egg quality to Shepherd's offspring cap.
+- Review the six adopted breeding files against EliteCreaturesReborn 3.30.0 and refresh their GPL provenance. No new star or mutation settings.
+
 ## 0.1.17 (2026-10-21)
 
 - Thunderstore republish of the release 8 build; no code changes.

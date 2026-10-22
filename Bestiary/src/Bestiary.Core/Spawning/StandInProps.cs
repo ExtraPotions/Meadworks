@@ -9,38 +9,33 @@ namespace ExtraPotions.Bestiary.Spawning
     {
         private static readonly string[] None = Array.Empty<string>();
         private static readonly string[] Hook = { "PickaxeAntler", "AxeFlint", "FishingRod" };
-        private static readonly string[] Javelin = { "GoblinSpear", "SpearFlint", "SpearWood" };
         private static readonly string[] Plate = { "ShieldBronzeBuckler", "ShieldIronBuckler", "ArmorIronChest" };
         private static readonly string[] Lantern = { "Lantern_DN", "Lantern", "piece_dvergr_lantern" };
 
         public static string[] Names(string creature)
         {
             if (creature == KitCreatures.BogHook) return Hook;
-            if (creature == KitCreatures.Javelineer) return Javelin;
             if (creature == KitCreatures.SlagCharred) return Plate;
             if (creature == KitCreatures.MarrowLantern) return Lantern;
             return None;
         }
 
-        /// <summary>Props parented on the body. The Slag Charred wears three plates. The others wear one.</summary>
-        public static int Copies(string creature) => creature == KitCreatures.SlagCharred ? 3 : 1;
+        /// <summary>Props parented on the body. The Slag Charred wears three plates. The Spearman wears none. The others wear one.</summary>
+        public static int Copies(string creature)
+        {
+            if (creature == KitCreatures.SlagCharred) return 3;
+            if (creature == KitCreatures.Javelineer) return 0;
+            return 1;
+        }
 
         public const float HookMeters = 1.2f;
-        public const float SpearMeters = 2.2f;
         public const float LanternMeters = 0.5f;
         public const float PlateMeters = 0.45f;
-
-        /// <summary>Hand, as a fraction of the spear from the narrow butt. The wide end is the head.</summary>
-        public const float SpearFromButt = 0.12f;
-
-        /// <summary>Degrees the head tilts up from the creature's forward axis.</summary>
-        public const float SpearTiltDegrees = 22f;
 
         /// <summary>Longest axis, in meters, once the bone scale is divided out.</summary>
         public static float Meters(string creature)
         {
             if (creature == KitCreatures.BogHook) return HookMeters;
-            if (creature == KitCreatures.Javelineer) return SpearMeters;
             if (creature == KitCreatures.MarrowLantern) return LanternMeters;
             if (creature == KitCreatures.SlagCharred) return PlateMeters;
             return 1f;
@@ -69,11 +64,11 @@ namespace ExtraPotions.Bestiary.Spawning
             return new Grip(0f, 0f, 0f);
         }
 
-        /// <summary>Front, then left, then right, in meters out from the chest bone. Sides sit further out and slightly forward of the shoulder guards. The front plate stays on the chest. <paramref name="onBody"/> lifts them when the rig has no chest bone.</summary>
+        /// <summary>Front, then left, then right, in meters out from the chest bone. Sides sit 0.79 m out and 0.12 m forward so the idle forearm clears the plate. The front plate stays on the chest. <paramref name="onBody"/> lifts them when the rig has no chest bone.</summary>
         public static Grip PlateGrip(int index, bool onBody)
         {
-            var grip = index == 1 ? new Grip(-0.73f, 0.29f, 0.12f)
-                : index == 2 ? new Grip(0.73f, 0.29f, 0.12f)
+            var grip = index == 1 ? new Grip(-0.79f, 0.29f, 0.12f)
+                : index == 2 ? new Grip(0.79f, 0.29f, 0.12f)
                 : new Grip(0f, 0.31f, 0.30f);
             return onBody ? new Grip(grip.Right, grip.Up + 1.55f, grip.Forward) : grip;
         }

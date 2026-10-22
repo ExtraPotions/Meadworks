@@ -1,6 +1,6 @@
 # Bestiary
 
-Version 0.1.17. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.18. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 New creatures with fights of their own, the bone arsenal you craft from them, and a creature workshop for server owners.
 
