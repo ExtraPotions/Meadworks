@@ -186,4 +186,97 @@ namespace ExtraPotions.Saga.Powers
         public static bool BlocksGame(bool open, int claimedFrame, int frame) =>
             open || (claimedFrame >= 0 && claimedFrame == frame);
     }
+
+    /// <summary>One rectangle in the wheel, top-left origin, y growing downward.</summary>
+    public readonly struct WheelBox
+    {
+        public WheelBox(double x, double y, double width, double height)
+        {
+            X = x;
+            Y = y;
+            Width = width < 0d ? 0d : width;
+            Height = height < 0d ? 0d : height;
+        }
+
+        public double X { get; }
+        public double Y { get; }
+        public double Width { get; }
+        public double Height { get; }
+        public double CenterX => X + Width * 0.5d;
+        public double CenterY => Y + Height * 0.5d;
+
+        public bool Hits(WheelBox other, double gap)
+        {
+            if (gap < 0d) gap = 0d;
+            return X < other.X + other.Width + gap && other.X < X + Width + gap
+                && Y < other.Y + other.Height + gap && other.Y < Y + Height + gap;
+        }
+    }
+
+    /// <summary>
+    /// Forsaken power cards on a ring around the center hint. The oldest attunement is index 0, at the top, then
+    /// clockwise. The square that used to back the ring is not part of this layout.
+    /// </summary>
+    public static class PowerWheelLayout
+    {
+        public const double CardWidth = 156d;
+        public const double CardHeight = 52d;
+        public const double CenterWidth = 240d;
+        public const double CenterHeight = 72d;
+        public const double Gap = 12d;
+
+        public static void Arrange(int count, out WheelBox panel, WheelBox[] cards, out WheelBox center)
+        {
+            panel = default;
+            center = default;
+            if (cards == null) throw new ArgumentNullException(nameof(cards));
+            if (count < 0 || count > cards.Length) throw new ArgumentOutOfRangeException(nameof(count));
+            double radius = 0d;
+            if (count > 0)
+            {
+                double low = 0d;
+                double high = Math.Max(CardWidth, CardHeight) + CenterWidth + Gap;
+                for (int step = 0; step < 24; step++)
+                {
+                    double mid = (low + high) * 0.5d;
+                    if (Clear(count, mid)) high = mid;
+                    else low = mid;
+                }
+                radius = high;
+            }
+            double reach = radius + Math.Max(CardWidth, CardHeight) * 0.5d + Gap;
+            double side = Math.Max(reach * 2d, CenterWidth + Gap * 2d);
+            side = Math.Max(side, CenterHeight + Gap * 2d);
+            panel = new WheelBox(0d, 0d, side, side);
+            center = new WheelBox((side - CenterWidth) * 0.5d, (side - CenterHeight) * 0.5d, CenterWidth, CenterHeight);
+            for (int i = 0; i < count; i++)
+            {
+                double angle = count == 0 ? 0d : (Math.PI * 2d) * i / count;
+                double x = panel.CenterX + Math.Sin(angle) * radius - CardWidth * 0.5d;
+                double y = panel.CenterY - Math.Cos(angle) * radius - CardHeight * 0.5d;
+                cards[i] = new WheelBox(x, y, CardWidth, CardHeight);
+            }
+        }
+
+        static bool Clear(int count, double radius)
+        {
+            var placed = new WheelBox[count];
+            double reach = radius + Math.Max(CardWidth, CardHeight) * 0.5d + Gap;
+            double side = Math.Max(reach * 2d, Math.Max(CenterWidth, CenterHeight) + Gap * 2d);
+            var middle = new WheelBox((side - CenterWidth) * 0.5d, (side - CenterHeight) * 0.5d, CenterWidth, CenterHeight);
+            for (int i = 0; i < count; i++)
+            {
+                double angle = (Math.PI * 2d) * i / count;
+                double x = side * 0.5d + Math.Sin(angle) * radius - CardWidth * 0.5d;
+                double y = side * 0.5d - Math.Cos(angle) * radius - CardHeight * 0.5d;
+                var card = new WheelBox(x, y, CardWidth, CardHeight);
+                if (card.Hits(middle, Gap)) return false;
+                for (int earlier = 0; earlier < i; earlier++)
+                    if (card.Hits(placed[earlier], Gap)) return false;
+                if (card.X < 0d || card.Y < 0d || card.X + card.Width > side || card.Y + card.Height > side) return false;
+                placed[i] = card;
+            }
+            return true;
+        }
+    }
 }

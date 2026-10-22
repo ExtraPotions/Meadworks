@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.17 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- README: the Thing grants line names the World tools grant and the Spawn grant.
+
 ## 0.1.16 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

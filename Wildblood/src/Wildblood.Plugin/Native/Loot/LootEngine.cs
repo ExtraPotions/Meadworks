@@ -52,6 +52,7 @@ namespace ExtraPotions.Wildblood.Adopted.Loot
 
         public static void Rework(CharacterDrop drop, EliteController controller, List<KeyValuePair<GameObject, int>> result)
         {
+            if (ExtraPotions.Wildblood.Runtime.NativeCreatureRules.Find(controller.Creature)?.Worthless == true) return;
             LootRules loot = RuleState.Active.Loot;
             if (loot.Mode == LootMode.Vanilla)
             {

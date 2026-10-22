@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.7 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- README: the Seasons description now gives Night Length's limits and requirements, Fuel Burn's range and what Torch Heat does.
+
 ## 0.5.6 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

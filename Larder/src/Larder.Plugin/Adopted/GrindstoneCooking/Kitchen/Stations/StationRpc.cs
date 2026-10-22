@@ -73,10 +73,10 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         /// <summary>A level that came over the network, trusted like every skill level but never negative, NaN or infinite.</summary>
         private static float Sane(float value) => float.IsNaN(value) || float.IsInfinity(value) || value < 0f ? 0f : value;
 
-        internal static void ApplyAdd(CookingStation station, long sender, string prefab, bool cheated, float level, Action<bool> settle)
+        internal static void ApplyAdd(CookingStation station, long sender, string prefab, bool cheated, float level, Action<int, bool> settle)
         {
             int slot = station.IsItemAllowed(prefab) ? station.GetFreeSlot() : -1;
-            if (slot < 0) { settle(false); return; }
+            if (slot < 0) { settle(slot, false); return; }
             pendingStation = station;
             pendingLevel = Sane(level);
             try { station.RPC_AddItem(sender, prefab, cheated); }
@@ -86,8 +86,11 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                 // Native effects can throw after SetSlot. The stored slot, not normal return, determines payment.
                 station.GetSlot(slot, out string placed, out _, out _, out _);
                 bool accepted = placed == prefab;
-                if (accepted) StationSlots.Write(station.m_nview.GetZDO(), slot, Sane(level));
-                settle(accepted);
+                try
+                {
+                    if (accepted) StationSlots.Write(station.m_nview.GetZDO(), slot, Sane(level));
+                }
+                finally { settle(slot, accepted); }
             }
         }
 

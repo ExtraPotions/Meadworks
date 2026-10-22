@@ -142,6 +142,7 @@ namespace ExtraPotions.Wildblood.Adopted.Rules {
                 var prepared = sections.Select(section => Tuple.Create(section, section.Prepare(snapshot))).ToArray();
                 foreach (var warning in parsed.Warnings) log.Warning("Wildblood rules: " + warning);
                 NativeRuleProjection.Apply(parsed.Rules, RootPlugin.Settings);
+                ExtraPotions.Wildblood.Runtime.NativeCreatureRules.Project(parsed.Rules);
                 foreach (var row in prepared) row.Item1.Commit(row.Item2);
                 RuleState.Adopt(parsed.Rules); applied = snapshot; errorSignature = "";
             } catch (Exception error) { attemptedLocal = ""; Report(error.GetType().Name + ": " + error.Message); }

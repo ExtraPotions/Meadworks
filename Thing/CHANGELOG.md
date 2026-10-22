@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.11 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- Inventory delete reserves the selected item's full identity, saves removal with a character receipt before confirming success, and recovers lost replies with the same token. Changed durability or custom data cancels the deletion without touching a replacement stack.
+- The inventory take confirmation, in all seven languages, says the reserved stack goes into an empty inventory slot and does not merge with a stack you already have. It stays at your feet as a protected pickup only when no empty slot is free.
+- Inventory take and delete use version 3.0 of the inventory owner request, so the server and the player whose inventory is opened both need Thing 0.1.11 for them.
+
 ## 0.1.10 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

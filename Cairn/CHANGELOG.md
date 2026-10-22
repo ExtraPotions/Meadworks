@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.17 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- README: the forecast description says seasonal names come from Solstice, and that without Solstice (or with its seasons off) the line uses the game's own weather.
+
 ## 0.1.16 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

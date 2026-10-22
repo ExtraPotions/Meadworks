@@ -82,6 +82,37 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             return null;
         }
 
+        /// <summary>Screen rectangles of the game's own visible notice and unlock cards, so other MeadWorks HUD can stay off them.</summary>
+        internal static void AppendShownRects(List<Rect> into)
+        {
+            if (into == null) return;
+            for (int i = 0; i < surfaces.Count; i++)
+            {
+                RectTransform frame = surfaces[i].Frame;
+                if (frame != null && frame.gameObject.activeInHierarchy && KitHudLayout.ScreenRect(frame, out Rect framed))
+                    into.Add(framed);
+            }
+            if (host == null) return;
+            List<GameObject> unlocks = Native.Unlocks(host);
+            if (unlocks == null) return;
+            for (int i = 0; i < unlocks.Count; i++)
+            {
+                GameObject root = unlocks[i];
+                if (root == null || !root.activeInHierarchy || FrameFor(root) != null) continue;
+                var box = root.transform.Find("UnlockMessage/bkg") as RectTransform;
+                if (box == null) box = root.transform.Find("UnlockMessage") as RectTransform;
+                if (box != null && KitHudLayout.ScreenRect(box, out Rect rect)) into.Add(rect);
+            }
+        }
+
+        static RectTransform FrameFor(GameObject root)
+        {
+            for (int i = 0; i < surfaces.Count; i++)
+                if (surfaces[i].NativeRoot == root && surfaces[i].Frame != null && surfaces[i].Frame.gameObject.activeInHierarchy)
+                    return surfaces[i].Frame;
+            return null;
+        }
+
         static bool Has(GameObject root)
         {
             for (int i = 0; i < surfaces.Count; i++) if (surfaces[i].NativeRoot == root) return true;

@@ -29,6 +29,7 @@ namespace ExtraPotions.Wildblood.Adopted.Adapters
             if (registration == null) throw new ArgumentNullException(nameof(registration));
             registration.AddCapability(Id, Version, Provider);
             registration.AddCapability<Func<object,string>>("meadworks.creatures.trait_labels", Version, TraitLabels);
+            BreedingReadiness.Register(registration);
         }
         private static ZDO? Data(object target) => target is ZDO zdo ? zdo
             : target is Character creature && creature != null && creature.m_nview != null && creature.m_nview.IsValid() ? creature.m_nview.GetZDO()

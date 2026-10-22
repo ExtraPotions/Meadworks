@@ -64,6 +64,7 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             public IDisposable? PenScope;
             public int OriginalMax;
             public bool Birth;
+            public bool DeferBirth;
             public bool WasTwin;
             public bool Twins;
             public BirthPlan? Plan;
@@ -96,7 +97,7 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
                 // Strict Herd Limit (S08): a due birth waits for room; nothing is armed and the call is skipped.
                 if (NativeBreeding.Run("herd limit", static p => HerdHooks.Holds(p), parent)) return false;
                 __state = NativeBreeding.Run("breeding call", static p => Begin(p), parent, (Call?)null);
-                return true;
+                return __state?.DeferBirth != true;
             }
 
             [HarmonyPostfix]
@@ -162,6 +163,11 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             ApplySeason(parent, call);
             if (!NativeBreeding.Active || !parent.IsPregnant() || !parent.IsDue() || parent.m_offspring == null)
                 return call;
+            if (!WildbloodBreedingReadiness.Ready())
+            {
+                call.DeferBirth = true;
+                return call;
+            }
             ZDO zdo = parent.m_nview.GetZDO();
             var store = new ZdoKeyStore(zdo);
             LegacyBreeding.Sire(parent);

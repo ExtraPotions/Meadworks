@@ -65,6 +65,7 @@ namespace ExtraPotions.Wildblood.Adopted.Rules
         /// <summary>Whether this boss may roll this aspect: its own list if it has one, and Summoner only with summons.</summary>
         public bool InRotation(string bossPrefab, Aspect aspect)
         {
+            if (ExtraPotions.Wildblood.Runtime.NativeCreatureRules.Find(bossPrefab)?.Excludes(aspect.ToString()) == true) return false;
             Bosses.TryGetValue(bossPrefab, out BossAspectRule? rule);
             if (aspect == Aspect.Summoner && (rule == null || rule.Summons.Count == 0))
             {

@@ -29,6 +29,7 @@ Run from the repository root. Each product's plugin project also builds its Core
 dotnet build meadworks-crucible/src/Crucible.Plugin/Crucible.Plugin.csproj -c Release
 dotnet build meadworks-crucible/src/Crucible.UI/Crucible.UI.csproj -c Release
 dotnet build Almanac/src/Almanac.Plugin/Almanac.Plugin.csproj -c Release
+dotnet build Barter/src/Barter.Plugin/Barter.Plugin.csproj -c Release
 dotnet build Beacon/src/Beacon.Plugin/Beacon.Plugin.csproj -c Release
 dotnet build Bestiary/src/Bestiary.Plugin/Bestiary.Plugin.csproj -c Release
 dotnet build Burrow/src/Burrow.Plugin/Burrow.Plugin.csproj -c Release
@@ -45,6 +46,7 @@ dotnet build Magpie/src/Magpie.Plugin/Magpie.Plugin.csproj -c Release
 dotnet build Mantle/src/Mantle.Plugin/Mantle.Plugin.csproj -c Release
 dotnet build Saga/src/Saga.Plugin/Saga.Plugin.csproj -c Release
 dotnet build Shepherd/src/Shepherd.Plugin/Shepherd.Plugin.csproj -c Release
+dotnet build Solstice/src/Solstice.Plugin/Solstice.Plugin.csproj -c Release
 dotnet build Tempest/src/Tempest.Plugin/Tempest.Plugin.csproj -c Release
 dotnet build Thing/src/Thing.Plugin/Thing.Plugin.csproj -c Release
 dotnet build Threshold/src/Threshold.Plugin/Threshold.Plugin.csproj -c Release

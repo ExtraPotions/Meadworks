@@ -32,6 +32,7 @@ namespace ExtraPotions.Wildblood.Adopted.Mutations
         private float _lastAlpha = float.NaN;
         private float _applied = float.NaN; // the phase the renderers last showed; NaN until first applied
         private Character? _character;
+        private EliteController? _controller;
         private bool[] _originalEnabled = System.Array.Empty<bool>();
         private MaterialPropertyBlock[] _originalBlocks = System.Array.Empty<MaterialPropertyBlock>();
 
@@ -93,6 +94,7 @@ namespace ExtraPotions.Wildblood.Adopted.Mutations
                 _renderers[i].GetPropertyBlock(_originalBlocks[i]);
             }
             EliteController controller = GetComponent<EliteController>();
+            _controller = controller;
             if (controller != null)
             {
                 _reveal = Scaling.Enhance.Magnitude(controller.Rules, controller.Traits, Mutation.Cloaked,
@@ -107,6 +109,13 @@ namespace ExtraPotions.Wildblood.Adopted.Mutations
 
         private void Step()
         {
+            EliteController? controller = _controller;
+            if (controller != null)
+            {
+                _reveal = Scaling.Enhance.Magnitude(controller.Rules, controller.Traits, Mutation.Cloaked, Fields.RevealDistance);
+                _margin = controller.Rules.PowerOf(Mutation.Cloaked, Fields.FadeMargin);
+                _fadeTime = controller.Rules.PowerOf(Mutation.Cloaked, Fields.FadeTime);
+            }
             Player local = Player.m_localPlayer;
             if (local == null)
             {

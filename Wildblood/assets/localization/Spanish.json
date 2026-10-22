@@ -305,7 +305,7 @@
     "cfg_4_traits__tamed_keep_traits_name": "Domesticados conservan rasgos",
     "cfg_4_traits__tamed_keep_traits_help": "Domesticar conserva los rasgos de una criatura (se aplican las variantes domesticadas). Desactivado: mientras una criatura está domesticada, sus mutaciones y modificadores no actúan; siguen guardados y sus estrellas se mantienen. Las crías nacidas con esto desactivado no heredan ninguna mutación.",
     "cfg_4_traits__tamed_stars_name": "Estrellas de domesticados",
-    "cfg_4_traits__tamed_stars_help": "Activado: un nacimiento nuevo puede heredar estrellas, y Shepherd sigue esto cuando está instalado. Desactivado: un recién nacido conserva el nivel de su progenitor, como en el juego, y no se añade ninguna estrella extra. Domesticar nunca quita estrellas, salud ni mutaciones. Una criatura que una versión anterior dejó en el nivel del juego recupera sus estrellas guardadas la próxima vez que carga. El servidor lo fija.",
+    "cfg_4_traits__tamed_stars_help": "Activado: un nacimiento nuevo puede heredar estrellas, y Shepherd sigue esto cuando está instalado. Con Estrellas activadas y el Modo de estrellas en Wildblood, una criatura domesticada con una tirada de estrellas guardada, que quedó en el nivel del juego, recupera esas estrellas al momento si está cargada, o la próxima vez que carga. Su salud se queda en la misma parte de la barra de salud (una barra llena sigue llena, y una barra vacía sigue vacía). Su tamaño y su color coinciden con las estrellas. La recuperación no cambia sus mutaciones. Desactivado: un recién nacido conserva el nivel de su progenitor, como en el juego, y no se añade ninguna estrella extra. Desactivarlo no quita las estrellas que un domesticado ya tiene, incluidas las que acaba de recuperar. Domesticar nunca quita estrellas, salud ni mutaciones. Los jefes, las crías nuevas sin nivel de reserva guardado ni marca de restauración, y las criaturas sin tirada de estrellas guardada se quedan como están. Las crías con estrellas reservadas también pueden recuperarlas. Sin marca de restauración, la criatura domesticada debe seguir en su nivel de reserva guardado. El servidor lo fija.",
     "cfg_4_traits__players_may_inspect_name": "Los jugadores pueden inspeccionar",
     "cfg_4_traits__players_may_inspect_help": "Regla del anfitrión: cualquier jugador puede usar wildblood inspect, que muestra las estrellas, los rasgos y los valores resultantes de la criatura en la mira. Solo lee, así que no es un truco. Desactivado: solo administradores.",
     "cfg_5_bosses_heading": "5 - Jefes",
@@ -339,9 +339,9 @@
     "cfg_6_loot__defer_to_dropnspawn_name": "Ceder ante DropNSpawn",
     "cfg_6_loot__defer_to_dropnspawn_help": "El botín se aparta mientras DropNSpawn esté instalado.",
     "cfg_6_loot__seasonal_meat_name": "Carne estacional",
-    "cfg_6_loot__seasonal_meat_help": "Anfitrión o servidor: mientras las estaciones de Solstice están activas, la carne y las pieles de las criaturas usan la tasa publicada de esa estación. Primavera y verano sueltan menos, otoño e invierno sueltan más, entre un cuarto y tres veces la cantidad habitual. Un objeto sigue siendo un objeto. Los trofeos, plumas, colmillos, escamas y monedas siguen igual. Desactivada, sin Solstice, o con las estaciones apagadas, el botín sigue como hoy. La siguiente muerte usa la tasa actual.",
+    "cfg_6_loot__seasonal_meat_help": "Anfitrión o servidor: mientras las estaciones de Solstice están activas, la carne y las pieles de las criaturas usan la tasa publicada de esa estación. Primavera y verano sueltan menos, otoño e invierno sueltan más, entre un cuarto y tres veces la cantidad habitual. Por debajo de uno, las fracciones se deciden al azar; puede que no caiga un objeto individual. Los trofeos, plumas, colmillos, escamas y monedas siguen igual. Desactivada, sin Solstice, o con las estaciones apagadas, el botín sigue como hoy. La siguiente muerte usa la tasa actual.",
     "cfg_6_loot__seasonal_wood_name": "Madera estacional",
-    "cfg_6_loot__seasonal_wood_help": "Anfitrión o servidor: mientras las estaciones de Solstice están activas, la madera de los árboles talados usa la tasa publicada de esa estación. Primavera y verano sueltan menos, otoño e invierno sueltan más, entre un cuarto y tres veces la cantidad habitual. Una pieza sigue siendo una pieza. Desactivada, sin Solstice, o con las estaciones apagadas, la madera sigue como hoy. El siguiente árbol usa la tasa actual.",
+    "cfg_6_loot__seasonal_wood_help": "Anfitrión o servidor: mientras las estaciones de Solstice están activas, la madera de los árboles talados usa la tasa publicada de esa estación. Primavera y verano sueltan menos, otoño e invierno sueltan más, entre un cuarto y tres veces la cantidad habitual. Por debajo de uno, las fracciones se deciden al azar; puede que no caiga un objeto individual. Desactivada, sin Solstice, o con las estaciones apagadas, la madera sigue como hoy. El siguiente árbol usa la tasa actual.",
     "cfg_7_luck_heading": "7 - Suerte",
     "cfg_7_luck__persist_counters_name": "Guardar contadores",
     "cfg_7_luck__persist_counters_help": "Los contadores de mala suerte se guardan con el personaje, por mundo.",
@@ -458,6 +458,15 @@
     "cfg_12_cheats__lucky_kills_name": "Muertes afortunadas",
     "cfg_12_cheats__lucky_kills_help": "Truco. Cada fila protegida contra la mala suerte cae en cada muerte; los contadores no cambian.",
     "cfg_12_cheats__creature_commands_name": "Comandos de criaturas",
-    "cfg_12_cheats__creature_commands_help": "Truco. Activa los comandos de administrador wildblood spawn, purge y karma."
+    "cfg_12_cheats__creature_commands_help": "Truco. Activa los comandos de administrador wildblood spawn, purge y karma.",
+    "raid_request_command": "start <monedas> [nivel 0-7] [ID de solicitud] o stop: cofre a menos de 5 metros",
+    "raid_request_player": "Usa este comando con un jugador conectado junto a un cofre.",
+    "raid_request_chest": "No hay ningún cofre disponible a menos de 5 metros.",
+    "raid_request_unavailable": "Ahora no se puede enviar la solicitud de incursión. Inténtalo cuando el servidor esté listo.",
+    "raid_request_sent": "Solicitud de incursión {0} enviada al servidor.",
+    "raid_request_started": "Incursión aceptada. Solicitud {0}.",
+    "raid_request_stopped": "Incursión detenida. Solicitud {0}.",
+    "raid_request_refused": "Se rechazó la solicitud de incursión {0}. Revisa el acceso al cofre, las monedas, el tiempo de espera y los registros de recuperación del servidor. Cierra el cofre y espera a que su inventario se sincronice antes de reintentar con el mismo ID.",
+    "raid_request_timeout": "Sin respuesta a la solicitud de incursión {0}. Se desconoce el resultado. Para iniciar una incursión, reinténtalo con el mismo ID para evitar pagar dos veces."
   }
 }

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Solstice logic (season calendar, effect, stat and environment tables, weather yield, season capability reading, settings table, step-aside, text keys). No game, Unity, BepInEx or Crucible reference. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Solstice.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Solstice</RootNamespace>
+  </PropertyGroup>
+</Project>

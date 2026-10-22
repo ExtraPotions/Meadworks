@@ -31,11 +31,18 @@ namespace ExtraPotions.Saga.Config
             this.choices = choices ?? throw new ArgumentNullException(nameof(choices));
             foreach (var preset in new[] { SagaPreset.Vanilla, SagaPreset.MeadWorksDefault, SagaPreset.Relaxed })
             {
-                if (!choices.TryGetValue(preset, out var values) || values.Count != members.Length || members.Any(m => !values.ContainsKey(m)))
+                if (!choices.TryGetValue(preset, out var values))
                     throw new ArgumentException(selector.Id + " " + preset + " does not cover its members.");
+                foreach (var key in values.Keys)
+                    if (!members.Contains(key)) throw new ArgumentException(key.Id + " is not a member of " + selector.Id + ".");
                 foreach (var member in members)
                 {
-                    var value = values[member];
+                    // Relaxed power switches are omitted on purpose: choosing that preset must not rewrite them.
+                    if (!values.TryGetValue(member, out var value))
+                    {
+                        if (preset == SagaPreset.Relaxed && SagaPresets.KeepsCurrentValue(preset, member)) continue;
+                        throw new ArgumentException(selector.Id + " " + preset + " does not cover its members.");
+                    }
                     if (value == null || !member.ValueType.IsInstanceOfType(value) || !Equals(member.NormalizeBoxed(value), value))
                         throw new ArgumentException(member.Id + " " + preset + " is outside its range or type.");
                     if (preset == SagaPreset.MeadWorksDefault && !Equals(value, member.DefaultValue))
@@ -119,6 +126,21 @@ namespace ExtraPotions.Saga.Config
 
         public static bool CanWrite(SagaPresetGroup group, bool remoteClient) =>
             group != null && (!remoteClient || group.Selector.Scope == SettingScope.Local);
+
+        private static HashSet<SagaSetting> preservedSwitches;
+
+        /// <summary>Relaxed power switches are not part of that bundle. Other groups still write their own toggles.</summary>
+        public static bool KeepsCurrentValue(SagaPreset preset, SagaSetting setting)
+        {
+            if (preset != SagaPreset.Relaxed || setting == null) return false;
+            if (preservedSwitches == null)
+            {
+                preservedSwitches = new HashSet<SagaSetting>();
+                foreach (var feature in PowerCatalog.Features)
+                    if (feature.Kind == FeatureKind.Toggle) preservedSwitches.Add(SagaSettings.PowerFeature(feature));
+            }
+            return preservedSwitches.Contains(setting);
+        }
 
         public static Resistance RaiseResistance(Resistance value)
         {
@@ -235,7 +257,7 @@ namespace ExtraPotions.Saga.Config
                         values[setting] = preset == SagaPreset.Vanilla ? Resistance.Normal : RaiseResistance((Resistance)setting.DefaultValue);
                         break;
                     case FeatureKind.Toggle:
-                        values[setting] = preset == SagaPreset.Vanilla ? false : setting.DefaultValue;
+                        if (preset == SagaPreset.Vanilla) values[setting] = false;
                         break;
                     default:
                         var range = PowerCatalog.Range(feature.Kind) ?? throw new InvalidOperationException(setting.Id);

@@ -2,7 +2,7 @@
 
 The shared library every Meadworks mod needs. It adds no gameplay on its own.
 
-Version 0.3.26, with Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.27, with Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -13,7 +13,7 @@ Version 0.3.26, with Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG
 - Achievement guard: quality-of-life actions never mix marked and clean items in one stack. Products whose cheats create items say on their own page whether those items are marked. An optional past-stat resync copies stats the game counted while achievements were not tracked, never for characters that used cheats.
 - A shared experience multiplier for Meadworks custom skills (not the game's own skills).
 - The `meadworks` console command lists installed Meadworks products, their versions and the session's authority state.
-- Notices: MeadWorks top-left and center messages stack in a Timber or Brown panel. The newest card is on top, repeats collapse into one card with a count, and a notice with an item icon shows that icon. Cards that do not fit wait, and their timers wait with them. The stack stays off the compass, the status-effect row and the hotbar, and it hides while a player window is open. Unlock and biome banners, the game's own messages, and other mods' UI are left alone. Local settings, section Notices: Stacked Notices (on by default), Position, Duration and Maximum Visible. A mod that registers its own notice provider replaces this stack.
+- Notices: MeadWorks top-left and center messages stack in a Timber or Brown panel. The newest card is on top. The same notice again becomes one card: item amounts add, and a notice with no amount shows how many times it repeated. A notice with an item icon shows that icon. Cards past Maximum Visible, and cards that do not fit, wait, and their timers wait with them. The stack stays off the compass, the status-effect row and the hotbar. It hides while the inventory, the map, the pause menu, or a MeadWorks window is open, and the timers wait then too. Unlock and biome banners stay on the game's banners. Other mods' UI is left alone. Stacked Notices off uses the game's own message for those top-left and center notices. Local settings, section Notices: Stacked Notices (on by default), Position (TopLeft by default; also TopRight, BottomLeft or BottomRight), Duration (4 seconds, from 1 to 30; the next notice uses it) and Maximum Visible (5, from 1 to 8). The other notice settings apply at once. A mod that registers its own notice provider replaces this stack.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ Version 0.3.26, with Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG
 - Accepted own-value edits through the shared settings menus save by default, even when a configuration file has automatic saving disabled. Only the edited value is saved against the existing disk configuration; unrelated keys and personal preferences remain intact. Remote server overlays are kept separate from local saved values, and server-owned edits retain their authority and synchronization rules. Saving failures are reported.
 - Crucible's settings live in `BepInEx/config/com.meadworks.crucible.cfg`; the interface kit's look settings live in `BepInEx/config/com.meadworks.crucible.ui.cfg`. Edit them in game with Almanac or any ConfigurationManager.
 - Server-synced settings (such as the skill experience multiplier) use the server's values in multiplayer and show as read-only to non-admin players.
-- Notice stack settings are local to this player. The server does not override them. Changes apply without a restart.
+- Notice stack settings are local to this player. The server does not override them. They apply without a restart. Duration applies to the next notice. Position, Stacked Notices and Maximum Visible apply at once.
 - Crucible has no cheats of its own. It provides the shared gate that every product's cheats go through: in single player you decide; in multiplayer cheats stay locked unless the server allows them.
 
 ## Multiplayer

@@ -39,7 +39,9 @@ namespace ExtraPotions.Wildblood.Adopted.Mutations
 
         /// <summary>True when the creature can be prey at all: not a player, not a boss, not large, not a Cloning decoy.</summary>
         public static bool IsPrey(Character creature) =>
-            !creature.IsPlayer() && !creature.IsBoss() && !BodySize.IsLarge(creature) && !CloneStore.IsDecoy(creature);
+            !creature.IsPlayer() && !ExtraPotions.Wildblood.Runtime.NativeCreatureRules.IsBoss(creature)
+            && ExtraPotions.Wildblood.Runtime.NativeCreatureRules.Find(creature)?.NeverDevoured != true
+            && !BodySize.IsLarge(creature) && !CloneStore.IsDecoy(creature);
 
         /// <summary>
         /// True when it is prey and within reach: its current health at most `max prey health` percent of the devourer's

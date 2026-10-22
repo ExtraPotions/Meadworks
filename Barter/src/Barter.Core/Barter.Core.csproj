@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Unity-free Barter logic (trade list model, file names, parsing, validation, pricing math, trader purse, currency resolution, availability rules, settings table). References only netstandard: no game, Unity, BepInEx, Crucible or YAML library. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Barter.Core</AssemblyName>
+    <RootNamespace>ExtraPotions.Barter</RootNamespace>
+  </PropertyGroup>
+</Project>

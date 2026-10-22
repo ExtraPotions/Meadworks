@@ -26,6 +26,7 @@ namespace ExtraPotions.Wildblood.Adopted.Traits
 
         /// <summary>What a kind never carries, by prefab name; 0 for most.</summary>
         public static int OfKind(string prefab) =>
-            (KindBars.TryGetValue(prefab, out int bars) ? bars : 0) | DeathBrood.BarsOf(prefab);
+            (KindBars.TryGetValue(prefab, out int bars) ? bars : 0) | DeathBrood.BarsOf(prefab)
+            | ExtraPotions.Wildblood.Runtime.NativeCreatureRules.Barred(prefab);
     }
 }

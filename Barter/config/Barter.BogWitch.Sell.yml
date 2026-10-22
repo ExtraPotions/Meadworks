@@ -1,0 +1,25 @@
+# Bog Witch, sell list: swamp ingredients, per lot.
+#
+# Written once by Barter when no list file exists. Edit freely; delete a file to stop using it (it is not written again
+# while any Barter list file exists). Prices are in the trader's currency before the trader's purse moves them (see the
+# Trader Purse settings). Items the game gives a value (trophies, gems, valuables) already sell to every trader at that value
+# through the Common Valuables setting, so this list names materials only.
+
+- prefab: Ooze
+  stack: 5
+  price: 20
+- prefab: Guck
+  stack: 5
+  price: 25
+- prefab: Bloodbag
+  stack: 5
+  price: 15
+- prefab: Entrails
+  stack: 5
+  price: 15
+- prefab: Root
+  stack: 5
+  price: 20
+- prefab: Thistle
+  stack: 5
+  price: 15

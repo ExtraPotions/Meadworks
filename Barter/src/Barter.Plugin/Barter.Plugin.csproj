@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Barter</AssemblyName>
+    <RootNamespace>ExtraPotions.Barter.Runtime</RootNamespace>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+  <!-- BepInEx, Jotunn, Harmony, Unity and game references, shared with Crucible. -->
+  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
+    <PackageReference Include="YamlDotNet" Version="13.7.1"/>
+    <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
+    <Reference Include="assembly_utils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_utils.dll" Private="false"/>
+    <Reference Include="assembly_guiutils" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_guiutils.dll" Private="false"/>
+    <Reference Include="gui_framework" HintPath="$(ValheimManagedDir)/gui_framework.dll" Private="false"/>
+    <Reference Include="Splatform" HintPath="$(ValheimManagedDir)/Splatform.dll" Private="false"/>
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
+    <ProjectReference Include="../Barter.Core/Barter.Core.csproj"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false"/>
+    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.UI/Crucible.UI.csproj" Private="false"/>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../../config/Barter.*.yml" LogicalName="Barter.config.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Barter.localization.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="../../assets/settings-tiers.json" LogicalName="Barter.settings-tiers.json"/>
+  </ItemGroup>
+</Project>

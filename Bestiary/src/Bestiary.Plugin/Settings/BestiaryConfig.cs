@@ -88,6 +88,16 @@ namespace ExtraPotions.Bestiary.Runtime.Settings
             else if (ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.Slinger + ".Share"))
                 || ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.Slinger + ".Nests"))
                 || ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.Slinger + ".Biomes"))) family = BestiarySettings.Slinger;
+            else if (ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.BogHook + ".Share"))
+                || ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.BogHook + ".Biomes"))) family = BestiarySettings.BogHook;
+            else if (ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.Javelineer + ".Share"))
+                || ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.Javelineer + ".Biomes"))) family = BestiarySettings.Javelineer;
+            else if (ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.SlagCharred + ".Regions"))
+                || ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.SlagCharred + ".Chance"))
+                || ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.SlagCharred + ".Interval"))
+                || ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.SlagCharred + ".Biomes"))) family = BestiarySettings.SlagCharred;
+            else if (ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.MarrowLantern + ".Places"))
+                || ReferenceEquals(spec, BestiarySettings.Find(BestiarySettings.MarrowLantern + ".Chance"))) family = BestiarySettings.MarrowLantern;
             if (family == null) return Array.Empty<object>();
             string parent = family + ".Enabled";
             return new object[] { new ConfigDependency(() => Flag(BestiarySettings.General + ".Enabled") && Flag(parent),

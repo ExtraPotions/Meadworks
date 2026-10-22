@@ -1,6 +1,6 @@
 # Hex
 
-Version 0.1.16. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.17. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 A cheat toolkit for Valheim that the server controls: personal powers, spawning, skills, map tools, ESP and presets.
 
@@ -16,7 +16,7 @@ A cheat toolkit for Valheim that the server controls: personal powers, spawning,
 - Item and creature catalogs with search and filters for spawning (off by default, needs the server's grant).
 - Skill editor, map reveal and reset, world seed display, and boss and trader location overlays.
 - Debug mode shortcuts (Z, B, K, L, Ctrl + middle-click map teleport, Shift + C time and field of view), ESP labels for nearby players, creatures, items, resources, pickables and dungeons.
-- Debug page Radius (m), from 5 to 1000, applies to Kill enemies (K), Remove drops (L) and Tame. Stop event ends the current event and does not use the radius. Kill and Tame skip players and tames. Tame affects wild creatures in that radius. When Thing is installed, a per-player grant can allow routed kill, drops, tame, stop event and spawn when the only refusal is that the player is not an admin. Any other block still refuses. If Thing is not installed, those actions stay admin-only as before.
+- Debug page Radius (m), from 5 to 1000, applies to Kill enemies (K), Remove drops (L) and Tame. Stop event ends the current event and does not use the radius. Kill and Tame skip players and tames. Tame affects wild creatures in that radius. When Thing is installed, its World tools grant can allow kill, remove drops, tame and stop event, and its Spawn grant can allow spawn, when the only refusal is that the player is not an admin. Any other block still refuses. If Thing is not installed, those actions stay admin-only as before.
 - Spawn protection overlay: on the Debug page or with `hex protection`, show base protection and structural cover in green and gaps in red on loaded terrain within 50 meters. Requires Debug Tools and Information permission. It starts off each session, has an optional unassigned hotkey and is excluded from saved presets. Red does not guarantee spawning.
 - Quick actions: heal, Rested and boss powers for yourself.
 - Saved presets, a panic key that resets every power, and optional hotkeys for each cheat and action.
@@ -26,7 +26,7 @@ A cheat toolkit for Valheim that the server controls: personal powers, spawning,
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
 
 ## Installation
 

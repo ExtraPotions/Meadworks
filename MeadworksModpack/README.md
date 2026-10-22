@@ -4,7 +4,7 @@ Dependency-only modpack for the Meadworks Valheim suite by expDARE. Installing i
 
 ## Features
 
-Included (25), by category:
+Included (27), by category:
 
 **Library**
 
@@ -15,6 +15,7 @@ Included (25), by category:
 - **Burrow** (storage): craft and build from nearby chests, chest previews, bigger chests, sorting, quick stack, restocking, routing and multi-user chests. Required on all peers.
 - **Mantle** (inventory and equipment): configurable grid, gear, ring and belt slots, backpacks, key ring, tacklebox and a Swap loadout button. Required on all peers (same version).
 - **Magpie** (loot handling): magnet pickup, ground-stack merging, floating drops and a server-controlled loot multiplier cheat. Required on all peers.
+- **Barter** (traders): per-trader buy and sell lists, custom currencies, a trader purse that moves prices, and a sell list beside the trader's window. Required on all peers.
 
 **Hearth**
 
@@ -31,7 +32,7 @@ Included (25), by category:
 **Fang**
 
 - **Wildblood** (wild creatures): difficulty and stars that grow with the world, mutations and modifiers, boss aspects, loot rules and bad-luck protection. Required on all peers.
-- **Bestiary** (creatures and bone arsenal): Crypt Mimic, Greydwarf Slinger, Rime Giant, Kraken, the arsenal skeletons, the Skeleton Crossbowman and the Crypt Executioner. Required on all peers.
+- **Bestiary** (creatures and bone arsenal): Crypt Mimic, Greydwarf Slinger, Rime Giant, Kraken, the arsenal skeletons, the Skeleton Crossbowman, the Crypt Executioner, and the Draugr Hook, Fuling Spearman, Slag Charred and Marrow Lantern. Required on all peers.
 - **Inscribe** (gear inscriptions): item rarity, runes and enhancement tiers from +1 to +20 with scrolls; guaranteed upgrades as a server-controlled cheat. Required on all peers.
 - **Edge** (combat): weapon-family secondary attacks, quickstep, slope-aware swings, swim equipment recovery and Dodge Cancel (off by default). Required on all peers.
 - **Saga** (progression): boss kills turn the Forsaken powers into permanent passives, Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks, and one skill book shows every skill. Required on all peers.
@@ -49,6 +50,7 @@ Included (25), by category:
 - **Thing** (server administration): moderation, messages, world tools and in-game server config editing, checked against the server's admin list. Required on all peers.
 - **Delve** (world regeneration): dungeon sizes, chest refills, dungeon resources, the Queen and camp creatures come back on timers, never near players or their buildings. Server-only.
 - **Beacon** (saved servers): join without the password prompt, passwords in protected storage, saved servers in Join Game favorites, optional auto-join and reconnect (a server can turn reconnect off), AutoConnector import. Client-optional.
+- **Solstice** (seasons): spring, summer, fall and winter by the world calendar, with seasonal growth, bees, food, stamina, fire, sap, rest and wind, summer overheating, and local winter snow and season colors. Required on all peers.
 
 **Mischief**
 

@@ -27,7 +27,7 @@ namespace ExtraPotions.Wildblood.Integration
     /// <summary>
     /// Optional reader for <c>meadworks.seasons.facts</c> 1.0. Wildblood does not reference Solstice.
     /// <c>meat</c> and <c>wood</c> apply only when the line is intact and <c>effects=1</c>.
-    /// A published 0 becomes one quarter, so a season cannot erase a drop.
+    /// A published 0 becomes one quarter; fractional reductions are rolled once by the drop's owner.
     /// </summary>
     public static class SeasonDrops
     {
@@ -58,27 +58,34 @@ namespace ExtraPotions.Wildblood.Integration
 
         public static float ClampDrop(float rate) => rate < MinRate ? MinRate : rate > MaxRate ? MaxRate : rate;
 
-        /// <summary>Ceil the stack. A positive stack stays at least 1 and does not grow past 100 unless it was already larger.</summary>
-        public static int ScaleAmount(int amount, float rate)
+        /// <summary>Below one, round the fractional remainder using a sample in [0, 1). Increases retain ceiling and the stack cap.</summary>
+        public static int ScaleAmount(int amount, float rate, double sample)
         {
             if (amount <= 0 || rate == 1f) return amount;
-            double scaled = Math.Ceiling(amount * (double)rate - 1e-9d);
-            if (scaled < 1d) return 1;
+            double product = amount * (double)rate;
+            double scaled;
+            if (rate < 1f)
+            {
+                double whole = Math.Floor(product);
+                scaled = whole + (sample < product - whole ? 1d : 0d);
+            }
+            else scaled = Math.Ceiling(product - 1e-9d);
+            if (scaled < 0d) return 0;
             int next = scaled >= int.MaxValue ? int.MaxValue : (int)scaled;
             int cap = Math.Max(StackCap, amount);
             return next > cap ? cap : next;
         }
 
-        public static void ScaleRange(int min, int max, float rate, out int scaledMin, out int scaledMax)
+        public static void ScaleRange(int min, int max, float rate, double sample, out int scaledMin, out int scaledMax)
         {
             if (rate == 1f) { scaledMin = min; scaledMax = max; return; }
-            scaledMin = ScaleAmount(min, rate);
-            scaledMax = ScaleAmount(Math.Max(min, max), rate);
+            scaledMin = ScaleAmount(min, rate, sample);
+            scaledMax = ScaleAmount(Math.Max(min, max), rate, sample);
             if (scaledMax < scaledMin) scaledMax = scaledMin;
         }
 
-        public static int Stack(string? name, int amount, float rate, bool enabled) =>
-            enabled && IsMeatOrHide(name) ? ScaleAmount(amount, rate) : amount;
+        public static int Stack(string? name, int amount, float rate, bool enabled, double sample) =>
+            enabled && IsMeatOrHide(name) ? ScaleAmount(amount, rate, sample) : amount;
 
         public static bool IsMeatOrHide(string? name)
         {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10 (2026-10-21)
+
+- Barter 0.1.0 and Solstice 0.1.0 join the suite: trader lists and purses, and four seasons by the world calendar.
+- Dependency pins refreshed to the October 21 eighth release: Crucible 0.3.27 (Crucible.UI 0.3.20), Bestiary 0.1.16, Burrow 0.3.25, Cairn 0.1.17, Delve 0.1.12, Ember 0.5.7, Hex 0.1.17, Larder 0.2.13, Mantle 0.1.24, Saga 0.1.15, Shepherd 0.1.16, Thing 0.1.11, Wildblood 0.5.5 and Wildroot 0.1.20; the other 11 pins are unchanged.
+- Installer: What's new for the 16 new versions; the installer and the profile updater take 27 packages.
+
 ## 0.1.9 (2026-10-21)
 
 - Dependency pins: Wildroot 0.1.19; the other 24 pins are unchanged from 0.1.8.

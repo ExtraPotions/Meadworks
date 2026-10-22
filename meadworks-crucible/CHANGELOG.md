@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.27 (2026-10-21)
+
+- Includes Crucible.UI 0.3.20.
+- The MeadWorks notice stack sits below the game's unlock and notice cards. A notice wraps to two lines and the card grows with the text. "..." is used only when a third line would be needed.
+- Notice cards measure the wrapped text in the game font. Chinese, Korean, and any other script get a second line when the message needs it, instead of a one-line card that cuts the rest off. A notice still stops at two lines, and "..." is used only when a third line would be needed.
+
 ## 0.3.26 (2026-10-21)
 
 - Includes Crucible.UI 0.3.19.

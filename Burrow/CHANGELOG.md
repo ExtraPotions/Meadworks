@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.25 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- Shared Materials fails a reservation as soon as every nearby source is ready and short. A chest that is still loading, held, in use, remote, or briefly missing keeps the ten-second wait, and nothing is taken.
+
 ## 0.3.24 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

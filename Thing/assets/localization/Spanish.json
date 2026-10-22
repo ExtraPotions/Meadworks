@@ -319,7 +319,7 @@
     "ui_inventory_empty": "Este jugador no lleva nada que esta vista pueda mostrar.",
     "ui_inventory_take": "Tomar",
     "ui_inventory_delete": "Eliminar",
-    "ui_inventory_take_body": "¿Tomar {0} ({1}) de este jugador? El servidor reserva esa pila y crea un objeto protegido a tus pies antes de retirarla del jugador. Recógelo en un espacio vacío del inventario.",
+    "ui_inventory_take_body": "¿Tomar {0} ({1}) de este jugador? El servidor reserva esa pila antes de retirarla del jugador. La pila entera va a un espacio vacío de tu inventario y no se mezcla con una pila que ya tengas. Si no hay un espacio vacío, se queda a tus pies como un objeto protegido.",
     "ui_inventory_delete_body": "¿Eliminar {0} ({1}) de este jugador? El servidor te pedirá confirmarlo una vez más antes de destruirlo.",
     "ui_inventory_delete_again": "¿Eliminar {0} ({1}) de forma permanente? Esto no se puede deshacer.",
     "ui_inventory_stored": "El montón está en tu inventario.",

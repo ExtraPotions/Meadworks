@@ -21,7 +21,7 @@ namespace ExtraPotions.Saga.Runtime {
         static readonly string[] worldKeys={"defeated_eikthyr","defeated_gdking","defeated_bonemass","defeated_dragon","defeated_goblinking","defeated_queen","defeated_fader","defeated_frozenking_p3"};
         static readonly Dictionary<Boss,SagaPowerEffect> templates=new Dictionary<Boss,SagaPowerEffect>();
         static Player? current;static float next;static readonly HashSet<ZDOID> credited=new HashSet<ZDOID>();
-        static KitHudPanel? hud;static string hudLayout="";
+        static KitHudPanel? hud;static string hudLayout="";static bool foldNativeName;
         static UITooltip? nativeTooltip;static bool ownsNativeTooltip;static string oldTopic="",oldText="",appliedTopic="",appliedText="";
         static readonly List<HudRow> hudRows=new List<HudRow>();
         sealed class HudRow {public Boss Boss;public GameObject Root=null!;public TMP_Text Title=null!;public TMP_Text? Details;public Image Icon=null!;public bool IconOnly;}
@@ -79,7 +79,7 @@ namespace ExtraPotions.Saga.Runtime {
         }
         public static void Tick(){BossKillCredit.Poll();PowerWheelRuntime.Poll();if(Time.unscaledTime<next)return;next=Time.unscaledTime+.5f;var player=Player.m_localPlayer;
             if(current!=player){Remove(current);current=player;credited.Clear();DestroyHud();}
-            if(player==null||!NativeSaga.Active("powers")||player.IsDead()){Remove(player);hud?.Update(false,false,1,1);RestoreNativeTooltip();return;}
+            if(player==null||!NativeSaga.Active("powers")||player.IsDead()){Remove(player);hud?.Update(false,false,1,1);NativeNameVisible(true);RestoreNativeTooltip();return;}
             Seed(player);var state=Attuned(player);Save(player,state);
             foreach(Boss boss in Enum.GetValues(typeof(Boss))){var hash=("SagaPower_"+boss).GetStableHashCode();if(!state.Attuned.Contains(boss)){player.GetSEMan().RemoveStatusEffect(hash);continue;}
                 if(!templates.TryGetValue(boss,out var template)){template=ScriptableObject.CreateInstance<SagaPowerEffect>();template.name="SagaPower_"+boss;template.Boss=boss;template.m_name=PowerCatalog.DisplayName(boss);template.m_ttl=0;template.m_startMessage="";template.m_stopMessage="";templates.Add(boss,template);}
@@ -91,29 +91,66 @@ namespace ExtraPotions.Saga.Runtime {
         }
         static void Remove(Player? player){if(player==null)return;foreach(Boss boss in Enum.GetValues(typeof(Boss)))player.GetSEMan().RemoveStatusEffect(("SagaPower_"+boss).GetStableHashCode());}
         static void Place(RectTransform rect,Vector2 at,Vector2 size){rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(at.x,-at.y);rect.sizeDelta=size;}
-        static void DestroyHud(){hud?.Dispose();hud=null;hudRows.Clear();hudLayout="";}
+        static void DestroyHud(){hud?.Dispose();hud=null;hudRows.Clear();hudLayout="";NativeNameVisible(true);}
         static void RestoreNativeTooltip(){if(nativeTooltip!=null){if(ownsNativeTooltip)UnityEngine.Object.Destroy(nativeTooltip);else if(nativeTooltip.m_topic==appliedTopic&&nativeTooltip.m_text==appliedText)nativeTooltip.Set(oldTopic,oldText);}nativeTooltip=null;ownsNativeTooltip=false;oldTopic=oldText=appliedTopic=appliedText="";}
         static void NativeTooltip(Hud gameHud,Player player,Boss boss){if(gameHud.m_gpIcon==null)return;var control=gameHud.m_gpIcon.gameObject;if(nativeTooltip==null||nativeTooltip.gameObject!=control){RestoreNativeTooltip();nativeTooltip=control.GetComponent<UITooltip>();ownsNativeTooltip=nativeTooltip==null;if(nativeTooltip==null)nativeTooltip=KitTooltip.Attach(control);if(nativeTooltip==null)return;oldTopic=nativeTooltip.m_topic;oldText=nativeTooltip.m_text;}appliedTopic=BossLabel(boss);appliedText=Tooltip(player,boss)+(player.m_guardianPowerCooldown>0?"\n"+RechargeText(player):"");nativeTooltip.Set(appliedTopic,appliedText);}
         [HarmonyPatch(typeof(Player),nameof(Player.GetGuardianPowerHUD))]static class GuardianHud {
             static bool Prefix(Player __instance,ref StatusEffect se,ref float cooldown){if(__instance!=Player.m_localPlayer||!NativeSaga.Active("powers"))return true;var state=Attuned(__instance);cooldown=__instance.m_guardianPowerCooldown;se=state.Attuned.Count==0?null!:__instance.GetSEMan().GetStatusEffect(PowerHash(state.Attuned.Last()))??PowerSource(state.Attuned.Last())!;return false;}
         }
         [HarmonyPatch(typeof(Hud),nameof(Hud.UpdateGuardianPower))]static class GuardianLabel {
-            static void Postfix(Hud __instance,Player player){if(!Plugin.AllowsUi||player==null||player!=Player.m_localPlayer||!NativeSaga.Active("powers")||player.IsDead()){RestoreNativeTooltip();return;}var state=Attuned(player);if(state.Attuned.Count==0){RestoreNativeTooltip();return;}var newest=state.Attuned.Last();if(__instance.m_gpName!=null)__instance.m_gpName.text=BossLabel(newest);if(__instance.m_gpCooldown!=null)__instance.m_gpCooldown.text=player.m_guardianPowerCooldown>0?PowerRecharge.TimeLeft(player.m_guardianPowerCooldown):MasteryText(player,newest);NativeTooltip(__instance,player,newest);}
+            static void Postfix(Hud __instance,Player player){if(!Plugin.AllowsUi||player==null||player!=Player.m_localPlayer||!NativeSaga.Active("powers")||player.IsDead()){NativeNameVisible(true);RestoreNativeTooltip();return;}var state=Attuned(player);if(state.Attuned.Count==0){NativeNameVisible(true);RestoreNativeTooltip();return;}var newest=state.Attuned.Last();if(__instance.m_gpName!=null){__instance.m_gpName.text=BossLabel(newest);__instance.m_gpName.enabled=!foldNativeName;}if(__instance.m_gpCooldown!=null)__instance.m_gpCooldown.text=player.m_guardianPowerCooldown>0?PowerRecharge.TimeLeft(player.m_guardianPowerCooldown):MasteryText(player,newest);NativeTooltip(__instance,player,newest);}
         }
         static void Draw(Player player,Attunement state){
-            if(!Plugin.AllowsUi||Hud.instance==null)return;var settings=Plugin.Settings!;var mode=settings.Get(SagaSettings.Powers.DisplayMode);var spacing=settings.Get(SagaSettings.Powers.DisplaySpacing);var full=settings.Get(SagaSettings.Powers.FullPowerDisplays);var shown=state.Attuned.Reverse().Skip(1).Take(mode==PowerDisplayMode.NewestOnly?0:7).ToArray();if(shown.Length==0){DestroyHud();return;}
-            var layout=mode+":"+full+":"+spacing+":"+string.Join(",",shown);
-            if(hud?.Root==null||hudLayout!=layout){DestroyHud();hudLayout=layout;int fullCount=mode==PowerDisplayMode.Stacked?shown.Length:mode==PowerDisplayMode.Mixed?Math.Min(Math.Max(0,full-1),shown.Length):0;int compactCount=mode==PowerDisplayMode.Compact?shown.Length:0;int iconCount=shown.Length-fullCount-compactCount;float height=16+fullCount*(64+spacing)+compactCount*(28+spacing)+(iconCount>0?36:0);float width=fullCount>0||compactCount>0?245:Math.Max(44,16+iconCount*(32+spacing));
-                hud=KitHudPanel.Create(Hud.instance.transform,"Saga_power_hud",new Vector2(width,height),new Vector2(12,205), global::ExtraPotions.Saga.Runtime.Plugin.Guid, "Saga_power_hud");if(hud==null)return;float y=8;int iconIndex=0;
-                for(int n=0;n<shown.Length;n++){bool fullRow=n<fullCount,compact=mode==PowerDisplayMode.Compact,iconOnly=!fullRow&&!compact;float rowHeight=fullRow?64:iconOnly?32:28;float x=iconOnly?8+iconIndex++*(32+spacing):8;var root=new GameObject("Saga_power_"+shown[n],typeof(RectTransform));root.transform.SetParent(hud.Content,false);Place((RectTransform)root.transform,new Vector2(x,y),new Vector2(iconOnly?32:229,rowHeight));
-                    var iconObject=new GameObject("icon",typeof(RectTransform),typeof(Image));iconObject.transform.SetParent(root.transform,false);var image=iconObject.GetComponent<Image>();image.preserveAspect=true;Place((RectTransform)iconObject.transform,Vector2.zero,new Vector2(fullRow?48:24,fullRow?48:24));hud.SetInteractive(image,true);
-                    var title=KitCanvas.Text(root.transform,"name","",iconOnly?9:fullRow?16:13,Color.white,TextAlignmentOptions.Left,false);Place(title.rectTransform,new Vector2(iconOnly?0:fullRow?56:32,iconOnly?16:2),new Vector2(iconOnly?32:173,24));KitCanvas.Fit(title);TMP_Text? details=null;if(fullRow){details=KitCanvas.Text(root.transform,"effects","",11,Color.white,TextAlignmentOptions.Left,true);Place(details.rectTransform,new Vector2(56,26),new Vector2(173,34));}
-                    hudRows.Add(new HudRow{Boss=shown[n],Root=root,Icon=image,Title=title,Details=details,IconOnly=iconOnly});if(!iconOnly)y+=rowHeight+spacing;
-                }
+            if(!Plugin.AllowsUi||Hud.instance==null)return;var settings=Plugin.Settings!;var mode=settings.Get(SagaSettings.Powers.DisplayMode);var spacing=settings.Get(SagaSettings.Powers.DisplaySpacing);var full=settings.Get(SagaSettings.Powers.FullPowerDisplays);
+            var shown=state.Attuned.Reverse().Skip(1).Take(mode==PowerDisplayMode.NewestOnly?0:7).ToList();
+            bool nameInPlate=mode==PowerDisplayMode.Compact&&shown.Count>0&&state.Attuned.Count>0;
+            if(nameInPlate)shown.Add(state.Attuned[state.Attuned.Count-1]);
+            if(shown.Count==0){DestroyHud();NativeNameVisible(true);return;}
+            var layout=mode+":"+full+":"+spacing+":"+string.Join(",",shown)+":"+string.Join("|",shown.Select(BossLabel))+":"+(nameInPlate?"1":"0");
+            if(hud?.Root==null||hudLayout!=layout){
+                DestroyHud();hudLayout=layout;
+                if(nameInPlate)BuildCompact(player,shown,spacing);else BuildRows(shown,mode,spacing,full);
+                if(hud==null)return;
             }
-            if(hud.Root.parent is RectTransform parent&&Hud.instance.m_gpRoot?.transform is RectTransform nativeRoot){var corners=new Vector3[4];nativeRoot.GetWorldCorners(corners);var at=parent.InverseTransformPoint(corners[1]);hud.SetPosition(new Vector2(at.x-parent.rect.xMin,parent.rect.yMax-at.y-hud.Root.rect.height-spacing));}
-            hud.Update(shown.Length>0,Cursor.visible,1,.85f);foreach(var row in hudRows){bool recharging=player.m_guardianPowerCooldown>0;var mastery=MasteryText(player,row.Boss);var shownValue=recharging?PowerRecharge.TimeLeft(player.m_guardianPowerCooldown):mastery;row.Title.text=row.IconOnly?shownValue:BossLabel(row.Boss)+"  "+shownValue;row.Icon.color=recharging?new Color(.45f,.45f,.45f,1):Color.white;row.Icon.sprite=templates.TryGetValue(row.Boss,out var template)?template.m_icon:null;if(row.Details!=null)row.Details.text=string.Join(", ",Effects(player,row.Boss).Select(EffectText));KitTooltip.Set(row.Root,BossLabel(row.Boss),Tooltip(player,row.Boss)+(recharging?"\n"+RechargeText(player):""));}
+            NativeNameVisible(!nameInPlate);
+            PlaceHud(spacing,!nameInPlate);
+            hud.Update(true,Cursor.visible,1,.85f);
+            foreach(var row in hudRows){bool recharging=player.m_guardianPowerCooldown>0;var mastery=MasteryText(player,row.Boss);var shownValue=recharging?PowerRecharge.TimeLeft(player.m_guardianPowerCooldown):mastery;string line=row.IconOnly?shownValue:BossLabel(row.Boss)+"  "+shownValue;
+                if(!row.IconOnly&&nameInPlate){float width=row.Title.rectTransform.rect.width;if(width<1f)width=PowerStatusLayout.TextWidth;line=PowerStatusLayout.Fit(line,width).Text;}
+                row.Title.text=line;row.Icon.color=recharging?new Color(.45f,.45f,.45f,1):Color.white;row.Icon.sprite=templates.TryGetValue(row.Boss,out var template)?template.m_icon:null;if(row.Details!=null)row.Details.text=string.Join(", ",Effects(player,row.Boss).Select(EffectText));KitTooltip.Set(row.Root,BossLabel(row.Boss),Tooltip(player,row.Boss)+(recharging?"\n"+RechargeText(player):""));}
         }
+        static void BuildCompact(Player player,List<Boss> shown,float spacing){
+            var labels=new string[shown.Count];
+            for(int i=0;i<shown.Count;i++){bool recharging=player.m_guardianPowerCooldown>0;string value=recharging?PowerRecharge.TimeLeft(player.m_guardianPowerCooldown):MasteryText(player,shown[i]);labels[i]=BossLabel(shown[i])+"  "+value;}
+            var plate=PowerStatusLayout.Layout(labels,spacing);
+            hud=KitHudPanel.Create(Hud.instance.transform,"Saga_power_hud",new Vector2(PowerStatusLayout.PlateWidth,plate.PlateHeight),new Vector2(12,205),global::ExtraPotions.Saga.Runtime.Plugin.Guid,"Saga_power_hud");
+            if(hud==null)return;
+            for(int n=0;n<shown.Count;n++){var row=plate.Rows[n];var root=new GameObject("Saga_power_"+shown[n],typeof(RectTransform));root.transform.SetParent(hud.Content,false);Place((RectTransform)root.transform,new Vector2(row.X,row.Y),new Vector2(row.Width,row.Height));
+                var iconObject=new GameObject("icon",typeof(RectTransform),typeof(Image));iconObject.transform.SetParent(root.transform,false);var image=iconObject.GetComponent<Image>();image.preserveAspect=true;Place((RectTransform)iconObject.transform,new Vector2(row.IconX-row.X,row.IconY-row.Y),new Vector2(row.IconSize,row.IconSize));hud.SetInteractive(image,true);
+                var title=KitCanvas.Text(root.transform,"name",row.Shown,13,Color.white,row.Lines>1?TextAlignmentOptions.TopLeft:TextAlignmentOptions.Left,true);title.overflowMode=TextOverflowModes.Truncate;title.maxVisibleLines=PowerStatusLayout.MaxLines;Place(title.rectTransform,new Vector2(row.TextX-row.X,row.TextY-row.Y),new Vector2(row.TextWidth,row.TextHeight));
+                hudRows.Add(new HudRow{Boss=shown[n],Root=root,Icon=image,Title=title,IconOnly=false});}
+        }
+        static void BuildRows(List<Boss> shown,PowerDisplayMode mode,float spacing,int full){
+            int fullCount=mode==PowerDisplayMode.Stacked?shown.Count:mode==PowerDisplayMode.Mixed?Math.Min(Math.Max(0,full-1),shown.Count):0;int compactCount=mode==PowerDisplayMode.Compact?shown.Count:0;int iconCount=shown.Count-fullCount-compactCount;float height=16+fullCount*(64+spacing)+compactCount*(28+spacing)+(iconCount>0?36:0);float width=fullCount>0||compactCount>0?245:Math.Max(44,16+iconCount*(32+spacing));
+            hud=KitHudPanel.Create(Hud.instance.transform,"Saga_power_hud",new Vector2(width,height),new Vector2(12,205),global::ExtraPotions.Saga.Runtime.Plugin.Guid,"Saga_power_hud");if(hud==null)return;float y=8;int iconIndex=0;
+            for(int n=0;n<shown.Count;n++){bool fullRow=n<fullCount,compact=mode==PowerDisplayMode.Compact,iconOnly=!fullRow&&!compact;float rowHeight=fullRow?64:iconOnly?32:28;float x=iconOnly?8+iconIndex++*(32+spacing):8;var root=new GameObject("Saga_power_"+shown[n],typeof(RectTransform));root.transform.SetParent(hud.Content,false);Place((RectTransform)root.transform,new Vector2(x,y),new Vector2(iconOnly?32:229,rowHeight));
+                var iconObject=new GameObject("icon",typeof(RectTransform),typeof(Image));iconObject.transform.SetParent(root.transform,false);var image=iconObject.GetComponent<Image>();image.preserveAspect=true;Place((RectTransform)iconObject.transform,Vector2.zero,new Vector2(fullRow?48:24,fullRow?48:24));hud.SetInteractive(image,true);
+                var title=KitCanvas.Text(root.transform,"name","",iconOnly?9:fullRow?16:13,Color.white,TextAlignmentOptions.Left,false);Place(title.rectTransform,new Vector2(iconOnly?0:fullRow?56:32,iconOnly?16:2),new Vector2(iconOnly?32:173,24));KitCanvas.Fit(title);TMP_Text? details=null;if(fullRow){details=KitCanvas.Text(root.transform,"effects","",11,Color.white,TextAlignmentOptions.Left,true);Place(details.rectTransform,new Vector2(56,26),new Vector2(173,34));}
+                hudRows.Add(new HudRow{Boss=shown[n],Root=root,Icon=image,Title=title,Details=details,IconOnly=iconOnly});if(!iconOnly)y+=rowHeight+spacing;}
+        }
+        static void PlaceHud(float spacing,bool clearLabels){
+            if(hud?.Root==null||!(hud.Root.parent is RectTransform parent))return;
+            var nativeRoot=Hud.instance!=null&&Hud.instance.m_gpRoot!=null?Hud.instance.m_gpRoot.transform as RectTransform:null;
+            if(!ScreenTop(parent,nativeRoot,out float x,out float down))return;
+            if(clearLabels&&Hud.instance!=null){down=Highest(parent,Hud.instance.m_gpName!=null?Hud.instance.m_gpName.rectTransform:null,down);down=Highest(parent,Hud.instance.m_gpCooldown!=null?Hud.instance.m_gpCooldown.rectTransform:null,down);down=Highest(parent,Hud.instance.m_gpIcon!=null?Hud.instance.m_gpIcon.rectTransform:null,down);}
+            float height=hud.Root.rect.height;if(height<1f)height=hud.Root.sizeDelta.y;
+            hud.SetPosition(new Vector2(x,down-height-spacing));
+        }
+        static float Highest(RectTransform parent,RectTransform? target,float down)=>ScreenTop(parent,target,out _,out float next)&&next<down?next:down;
+        static bool ScreenTop(RectTransform parent,RectTransform? target,out float x,out float down){
+            x=0f;down=0f;if(parent==null||target==null||!target.gameObject.activeInHierarchy)return false;var corners=new Vector3[4];target.GetWorldCorners(corners);var at=parent.InverseTransformPoint(corners[1]);x=at.x-parent.rect.xMin;down=parent.rect.yMax-at.y;return true;
+        }
+        static void NativeNameVisible(bool visible){foldNativeName=!visible;var name=Hud.instance!=null?Hud.instance.m_gpName:null;if(name!=null)name.enabled=visible;}
         internal static bool KnownBossPrefab(string prefab,out string boss){boss="";if(string.IsNullOrEmpty(prefab))return false;foreach(var pair in bosses)if(pair.Value==prefab){boss=pair.Key;return true;}return false;}
         internal static bool KnownBossHash(int hash,out string boss){boss="";foreach(var pair in bosses)if(pair.Value.GetStableHashCode()==hash){boss=pair.Key;return true;}return false;}
         internal static bool IsKnownBoss(string boss)=>!string.IsNullOrEmpty(boss)&&bosses.ContainsKey(boss);

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Bootstrap;
 using ExtraPotions.Wildblood.Adopted.Raids;
@@ -15,8 +16,8 @@ using UnityEngine;
 using CruciblePlugin=ExtraPotions.Meadworks.Crucible.Plugin;
 
 namespace ExtraPotions.Wildblood.Runtime {
-    // One local authority owns admission and its journals; remote-owned chests are deliberately unavailable.
-    internal static class NativeRaidAdmission {
+    // The server alone owns admission, the chest debit and both durable journals.
+    internal static partial class NativeRaidAdmission {
         internal const string RootKey="wildblood.raid.event-root",HashKey="wildblood.raid.plan-hash";
         static readonly Dictionary<Container,Owner> owners=new Dictionary<Container,Owner>();
         static readonly HashSet<Container> loaded=new HashSet<Container>();
@@ -56,13 +57,12 @@ namespace ExtraPotions.Wildblood.Runtime {
         internal static void Release(Container chest){if(owners.TryGetValue(chest,out var owner)){owner.Dispose();owners.Remove(chest);}loaded.Remove(chest);refused.Remove(chest);}
         internal static bool CanRun(RaidRunner runner)=>Authority&&!refused.Contains(runner.GetComponent<Container>())&&owners.TryGetValue(runner.GetComponent<Container>(),out var owner)&&owner.VerifiedRoot==runner.Zdo?.GetString(RootKey);
 
-        internal static string? Start(Container chest,Player asker,int stake,string requestId,int tier=-1){
+        internal static string? Start(Container chest,Player asker,int stake,string requestId,int tier=-1,uint revision=0,string? itemsHash=null){
             if(!Authority||!Enabled||!Plugin.NativeRulesReady)return "Raid admission requires the active Wildblood host.";
-            if(!asker||asker!=Player.m_localPlayer||asker.IsDead()||!Valid(chest))return "An available host player and authority-owned chest are required.";
-            if((asker.transform.position-chest.transform.position).sqrMagnitude>25f)return "Stand within 5 meters of the chest.";
-            if(chest.IsInUse()||chest.m_checkGuardStone&&!PrivateArea.CheckAccess(chest.transform.position,0f,false)
-                ||!chest.CheckAccess(asker.GetPlayerID()))return "The chest is in use or access is denied.";
+            if(!Eligible(chest,asker))return "The chest is in use or access is denied.";
             if(stake<1||stake>RaidStakePlan.MaxStake||!Canonical(requestId))return "Invalid stake or request ID.";
+            if(tier < -1 || tier > RaidTable.MaxTier)return "Invalid raid tier.";
+            if(!Acquire(chest,asker,revision,itemsHash))return "The chest requires its current owner's recovery or inventory replication before admission.";
             var view=chest.GetComponent<ZNetView>();var zdo=view.GetZDO();
             string token=zdo.GetString(NativeRaidChest.TokenKey);
             if(string.IsNullOrEmpty(token)){token=Guid.NewGuid().ToString("N");string fresh=token;NativeRaidChest.WriteKeys(chest,z=>z.Set(NativeRaidChest.TokenKey,fresh));}
@@ -98,18 +98,19 @@ namespace ExtraPotions.Wildblood.Runtime {
         }
         static bool Canonical(string value)=>value!=null&&value.Length==32&&value.Any(c=>c!='0')&&value.All(c=>c>='0'&&c<='9'||c>='a'&&c<='f');
         internal static void Tick(){
-            if(command==null)command=new Terminal.ConsoleCommand("wildblood_raid","start <coins> [tier 0-7] [request-id] or stop: host-owned chest within 5 meters",args=>{
-                var player=Player.m_localPlayer;if(!Authority||!player){args.Context.AddString("Only the active local host can use this command.");return;}
-                var chest=UnityEngine.Object.FindObjectsByType<Container>(FindObjectsSortMode.None).Where(c=>Valid(c)&&(c.transform.position-player.transform.position).sqrMagnitude<=25f).OrderBy(c=>(c.transform.position-player.transform.position).sqrMagnitude).FirstOrDefault();
-                if(!chest){args.Context.AddString("No authority-owned chest within 5 meters.");return;}
-                if(args.Length==2&&args[1]=="stop"){if(chest.GetComponent<RaidRunner>() is RaidRunner runner&&runner.State.Running){runner.End(RaidEnd.Stopped);Reconcile(chest);args.Context.AddString("Raid stopped.");}else args.Context.AddString("No raid is running at this chest.");return;}
+            if(command==null)command=new Terminal.ConsoleCommand("wildblood_raid",WildbloodText.Text("raid_request_command"),args=>{
+                var player=Player.m_localPlayer;if(!player){args.Context.AddString(WildbloodText.Text("raid_request_player"));return;}
+                var chest=UnityEngine.Object.FindObjectsByType<Container>(FindObjectsSortMode.None).Where(c=>Available(c)&&(c.transform.position-player.transform.position).sqrMagnitude<=25f).OrderBy(c=>(c.transform.position-player.transform.position).sqrMagnitude).FirstOrDefault();
+                if(!chest){args.Context.AddString(WildbloodText.Text("raid_request_chest"));return;}
+                if(args.Length==2&&args[1]=="stop"){Submit(chest,player,true,0,Guid.NewGuid().ToString("N"),-1,args.Context.AddString);return;}
                 switch(RaidStartArgs.Parse(args.Args,out var start,out string badTier)){
                     case RaidStartParse.Usage:args.Context.AddString(WildbloodText.Text("raid_usage"));return;
                     case RaidStartParse.BadTier:args.Context.AddString(WildbloodText.Format("raid_tier_invalid",badTier));return;
                 }
-                string request=start.RequestId??Guid.NewGuid().ToString("N");args.Context.AddString(Start(chest,player,start.Coins,request,start.Tier)??("Raid admitted. Request "+request));
+                string request=start.RequestId??Guid.NewGuid().ToString("N");Submit(chest,player,false,start.Coins,request,start.Tier,args.Context.AddString);
             });
-            if(SourcePresent){CloseOwners();return;}
+            if(SourcePresent){CloseOwners();CloseRequests();return;}
+            RequestTick();
             RaidNet.EnsureRegistered();
             if(!Authority){CloseOwners();if(Enabled)RaidHere.PingDue(Time.time);return;}
             if(generation!=CruciblePlugin.Session.Generation){CloseOwners();refused.Clear();generation=CruciblePlugin.Session.Generation;}
@@ -125,6 +126,7 @@ namespace ExtraPotions.Wildblood.Runtime {
         }
         static void CloseOwners(){foreach(var owner in owners.Values)owner.Dispose();owners.Clear();}
         internal static bool Shutdown(){
+            CloseRequests();
             bool release=true;
             foreach(var entry in owners.ToArray())try{
                 if(Authority&&Valid(entry.Key)){var runner=entry.Key.GetComponent<RaidRunner>();if(runner&&runner.State.Running)runner.End(RaidEnd.Stopped);entry.Value.Recover();}
@@ -197,7 +199,20 @@ namespace ExtraPotions.Wildblood.Runtime {
         static class ReplicatedChest {static void Postfix(Container __instance)=>Attach(__instance);}
         [HarmonyPatch(typeof(ZNetScene),nameof(ZNetScene.Destroy),new[]{typeof(GameObject)})]
         static class DestroyedChest {static bool Prefix(GameObject go){var chest=go?go.GetComponent<Container>():null;if(!chest||!owners.TryGetValue(chest,out var owner))return true;if(!Authority||!Valid(chest))return true;try{if(NativeRaidChest.Held(chest.GetInventory()))return false;var runner=chest.GetComponent<RaidRunner>();if(runner&&runner.State.Running)runner.End(RaidEnd.Robbed);owner.Recover();Release(chest);return true;}catch(Exception e){Plugin.NativeLogger?.LogError("Raid chest destruction held: "+e.GetType().Name);return false;}}}
-        [HarmonyPatch(typeof(ZNetView),nameof(ZNetView.ClaimOwnership))]
-        static class RunningOwnership {static bool Prefix(ZNetView __instance)=>!__instance||!__instance.IsValid()||!__instance.GetComponent<Container>()||string.IsNullOrEmpty(__instance.GetZDO().GetString(NativeRaidChest.TokenKey))||!RaidState.IsRunning(__instance.GetZDO());}
+        [HarmonyPatch]
+        static class RunningOwnership {
+            static IEnumerable<MethodBase> TargetMethods(){
+                yield return typeof(ZNetView).GetMethod(nameof(ZNetView.ClaimOwnership));
+                foreach(string name in new[]{"RPC_RequestOpen","RPC_RequestStack","RPC_RequestTakeAll"}){
+                    var method=typeof(Container).GetMethod(name,BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic);
+                    if(method!=null)yield return method;
+                }
+            }
+            static bool Prefix(object __instance){
+                var view=__instance is ZNetView value?value:(__instance as Container)?.GetComponent<ZNetView>();
+                return !view||!view.IsValid()||!view.GetComponent<Container>()||string.IsNullOrEmpty(view.GetZDO().GetString(NativeRaidChest.TokenKey))
+                    ||!RaidState.IsRunning(view.GetZDO())&&!view.GetZDO().GetBool(NativeRaidChest.HoldKey);
+            }
+        }
     }
 }

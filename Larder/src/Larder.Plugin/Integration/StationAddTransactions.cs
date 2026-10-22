@@ -14,6 +14,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         const string EscrowKey = "larder.stationEscrow.v1", SequenceKey = "larder.stationSequence.v1";
         const string ParkedKey = "larder.stationEscrow.parked.v1", HoldKey = "larder.stationHold.v1";
         const string ReceiptsKey = "larder_add_receipts_v1";
+        const string AttemptKey = "larder_add_attempt_v1";
         const int ManyLimit = 256;
         static Harmony transport;
         static float nextPoll;
@@ -45,6 +46,27 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                 var p = new ZPackage(value);
                 return new Escrow { World = p.ReadLong(), Character = p.ReadLong(), Sequence = p.ReadLong(),
                     Station = p.ReadZDOID(), Item = p.ReadString(), Level = p.ReadSingle(), Rejected = p.ReadBool() };
+            }
+        }
+
+        sealed class Attempt
+        {
+            internal long Character, Sequence;
+            internal bool Rejected;
+
+            internal string Save()
+            {
+                var p = new ZPackage();
+                p.Write(Character); p.Write(Sequence); p.Write(Rejected);
+                return p.GetBase64();
+            }
+
+            internal static Attempt Load(string value)
+            {
+                var p = new ZPackage(value);
+                var result = new Attempt { Character = p.ReadLong(), Sequence = p.ReadLong(), Rejected = p.ReadBool() };
+                if (result.Character == 0 || result.Sequence <= 0) throw new FormatException("Invalid station-add attempt.");
+                return result;
             }
         }
 
@@ -167,13 +189,15 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             var station = Find(escrow.Station);
             if (station == null) return;
             if (!TryDecision(station, escrow, out var decision)) return;
-            if (decision == StationAddDecision.Accepted || decision == StationAddDecision.Stale)
+            if (decision == StationAddDecision.Accepted)
             {
                 // A receipt already stored at load survived a world save. One written this session has not.
                 if (created.Contains(escrow.Sequence) || awaitingProof.Contains(escrow.Sequence)) RememberHold(player, escrow);
                 else CommitProven(player, escrow);
                 return;
             }
+            // A newer sequence cannot prove whether this character backup's ingredient was ever placed.
+            if (decision == StationAddDecision.Stale) return;
             if (decision == StationAddDecision.Rejected) { escrow.Rejected = true; FinishReject(player, escrow); return; }
             if (!created.Contains(escrow.Sequence)) awaitingProof.Add(escrow.Sequence);
             RegisterOn(station);
@@ -271,12 +295,12 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                 if (hold.World != world || hold.Character != character || !holdsAtLoad.Contains(hold.Sequence)) continue;
                 var station = Find(hold.Station);
                 if (station == null || !TryDecision(station, hold, out var decision)) continue;
-                if (decision == StationAddDecision.Accepted || decision == StationAddDecision.Stale)
+                if (decision == StationAddDecision.Accepted)
                 {
                     holds.RemoveAt(i);
                     changed = true;
                 }
-                else if (TryGive(player, hold, () =>
+                else if (decision != StationAddDecision.Stale && TryGive(player, hold, () =>
                 {
                     holds.RemoveAt(i);
                     if (holds.Count == 0) player.m_customData.Remove(HoldKey);
@@ -358,6 +382,13 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                 if (zdo == null) return false;
                 string raw = zdo.GetString(ReceiptsKey);
                 decision = StationAddReceipts.Parse(raw).Check(escrow.Character, escrow.Sequence);
+                string attemptRaw = zdo.GetString(AttemptKey);
+                if (string.IsNullOrEmpty(attemptRaw)) return true;
+                var attempt = Attempt.Load(attemptRaw);
+                if (attempt.Character != escrow.Character || attempt.Sequence != escrow.Sequence) return true;
+                if (decision == StationAddDecision.Accepted || decision == StationAddDecision.Rejected) return true;
+                if (!attempt.Rejected) return false;
+                decision = StationAddDecision.Rejected;
                 return true;
             }
             catch (Exception error)
@@ -420,7 +451,28 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                 Reply(view, sender, world, character, sequence, decision == StationAddDecision.Accepted);
                 return;
             }
-            // Prepare both outcomes before mutating the station. No fallible ledger serialization follows placement.
+            string attemptRaw = zdo.GetString(AttemptKey);
+            if (!string.IsNullOrEmpty(attemptRaw))
+            {
+                var previous = Attempt.Load(attemptRaw);
+                var priorDecision = receipts.Check(previous.Character, previous.Sequence);
+                if (priorDecision != StationAddDecision.Accepted && priorDecision != StationAddDecision.Rejected)
+                {
+                    if (!previous.Rejected) return;
+                    if (priorDecision == StationAddDecision.New)
+                    {
+                        zdo.Set(ReceiptsKey, receipts.Record(previous.Character, previous.Sequence, false));
+                        receipts = StationAddReceipts.Parse(zdo.GetString(ReceiptsKey));
+                    }
+                    zdo.Set(AttemptKey, "");
+                    if (previous.Character == character && previous.Sequence == sequence)
+                    {
+                        Reply(view, sender, world, character, sequence, false);
+                        return;
+                    }
+                }
+            }
+
             string accepted = receipts.Record(character, sequence, true);
             string rejected = StationAddReceipts.Parse(zdo.GetString(ReceiptsKey)).Record(character, sequence, false);
             if (!NativeCooking.Active)
@@ -429,10 +481,29 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                 Reply(view, sender, world, character, sequence, false);
                 return;
             }
-            StationRpc.ApplyAdd(station, sender, prefab, cheated, level, placed =>
+            // Write ahead of the native slot: an interrupted attempt must never be replayed or refunded as New.
+            var attempt = new Attempt { Character = character, Sequence = sequence };
+            zdo.Set(AttemptKey, attempt.Save());
+            StationRpc.ApplyAdd(station, sender, prefab, cheated, level, (slot, placed) =>
             {
                 if (!view.IsValid() || !view.IsOwner()) return;
-                zdo.Set(ReceiptsKey, placed ? accepted : rejected);
+                string outcome = placed ? accepted : rejected;
+                try { zdo.Set(ReceiptsKey, outcome); }
+                catch
+                {
+                    if (zdo.GetString(ReceiptsKey) == outcome) return;
+                    if (placed)
+                    {
+                        station.GetSlot(slot, out string current, out _, out _, out _);
+                        if (current != prefab) throw;
+                        station.SetSlot(slot, "", 0f, 0, false);
+                    }
+                    // Only a completed rollback proves rejection. A failed rollback leaves the attempt unresolved.
+                    attempt.Rejected = true;
+                    zdo.Set(AttemptKey, attempt.Save());
+                    throw;
+                }
+                zdo.Set(AttemptKey, "");
                 Reply(view, sender, world, character, sequence, placed);
             });
         }

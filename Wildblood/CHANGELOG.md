@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.5 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- Wildblood publishes the optional `meadworks.creatures.rules` v1 contract. Creature defaults from Bestiary follow the host's synchronized rules, including live Cloaked reveal distances, mutation and aspect exclusions, body size, devouring protection and loot classification. Explicit creature YAML values retain precedence. Clients keep their saved local preferences.
+- Due births wait for Wildblood's server rules before star or mutation inheritance, including births managed by Shepherd. Their pregnancies remain due until the rules arrive.
+- Wildblood publishes the optional `meadworks.wildblood.breeding_ready` v1 capability. Shepherd reads it to hold a due birth until the server's rules have arrived.
+- Raid start and stop requests from a connected player can run on a dedicated server through the host's existing stake journal. The server validates the player, chest access, distance, stake and request before admission.
+- On a dedicated server, a raid request can load a bounded area around a distant base while it waits. No coins are taken until the player, chest, terrain and nearby objects are ready, and a refusal because loading timed out takes no payment. While a raid runs or holds its chest, requests to open, stack into or take all from that chest are refused, and so is a claim of its ownership.
+- Parked offspring, hatched eggs and grown creatures can regain stored stars when Tamed Stars is turned on. A saved parked level must match the current level unless an unfinished restore is marked; fresh births and existing legitimate stars are preserved.
+- Seasonal Wood scales only wood entries after a tree's drop list is rolled. Resin, seeds and other entries in mixed tree tables keep their original rolls and amounts.
+- Seasonal meat, hide and wood rates below one can now reduce a single drop to zero. The creature or tree owner rolls each fractional remainder once, so a rate of one half keeps half of single drops on average. Season increases keep their existing rounding and stack caps; trophies and other creature drops are unchanged.
+- Tamed Stars on: a tamed creature that an older build left at the game's level, and that still has a stored star roll, gets those stars back. Health stays the same fraction of its bar (a full bar stays full), and its size and color match the stars. A loaded creature changes with the setting. One that is not loaded changes the next time it loads. The creature's owner writes the level and health, and other players see them. Turning Tamed Stars off does not remove stars a tame already has, including stars just restored. Taming still does not remove stars, health, or mutations. A creature with no stored star roll stays as it is. Mutations are not rewritten. One log line names how many creatures were restored together.
+- The Tamed Stars setting help matches that restore in all seven languages. Health stays the same share of the health bar. A full bar stays full, and an empty bar stays empty. Size and color match the stars. Bosses, fresh births without parking metadata, and creatures with no stored star roll stay as they are. The restore still needs Stars Enabled and Star Mode Wildblood.
+
 ## 0.5.4 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

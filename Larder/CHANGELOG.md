@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.13 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- Cooking additions write a recovery marker before touching a station slot. Receipt failures roll back that slot; interrupted or uncertain placements retain their ingredient claim without resending or refunding it. Cooking-level write failures still settle the placement receipt.
+- A newer cooking receipt no longer discards an older ingredient claim from a restored character. Claims without their own acceptance proof remain recoverable.
+- README: the Fermenter Timer line says the timer shows only while a fermenter is still fermenting.
+
 ## 0.2.12 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

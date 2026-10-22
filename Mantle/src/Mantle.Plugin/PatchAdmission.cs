@@ -13,7 +13,7 @@ namespace Mantle
         private static readonly string[] Namespaces =
         {
             "Mantle.Layout", "Mantle.Worn", "Mantle.Backpacks", "Mantle.Slots",
-            "Mantle.Consume", "Mantle.Ring", "Mantle.Tackle", "Mantle.Accessories", "Mantle.Panels", "Mantle.Elite",
+            "Mantle.Consume", "Mantle.Ring", "Mantle.Tackle", "Mantle.Accessories", "Mantle.Panels", "Mantle.Elite", "Mantle.Trinkets",
         };
 
         public static bool Allows(string fullName)

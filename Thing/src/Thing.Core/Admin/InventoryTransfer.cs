@@ -15,9 +15,10 @@ namespace ExtraPotions.Thing.Admin
     /// <summary>The selected native prefab and slot. Runtime escrow also checks the complete owner-serialized item image before removal.</summary>
     public readonly struct ItemSlot
     {
-        public ItemSlot(string prefab, int stack, int quality, int x, int y, long crafter, int variant)
+        public ItemSlot(string prefab, int stack, int quality, int x, int y, long crafter, int variant, float durability = -1, string imageDigest = "")
         {
             Prefab = prefab ?? ""; Stack = stack; Quality = quality; X = x; Y = y; Crafter = crafter; Variant = variant;
+            Durability = durability; ImageDigest = imageDigest ?? "";
         }
 
         public string Prefab { get; }
@@ -27,28 +28,51 @@ namespace ExtraPotions.Thing.Admin
         public int Y { get; }
         public long Crafter { get; }
         public int Variant { get; }
+        public float Durability { get; }
+        public string ImageDigest { get; }
+        public bool HasIdentity => Durability >= 0 && !float.IsInfinity(Durability) && ValidDigest(ImageDigest);
 
         public string Text => string.Join("\t", Prefab, Stack.ToString(CultureInfo.InvariantCulture), Quality.ToString(CultureInfo.InvariantCulture),
-            X.ToString(CultureInfo.InvariantCulture), Y.ToString(CultureInfo.InvariantCulture), Crafter.ToString(CultureInfo.InvariantCulture), Variant.ToString(CultureInfo.InvariantCulture));
+            X.ToString(CultureInfo.InvariantCulture), Y.ToString(CultureInfo.InvariantCulture), Crafter.ToString(CultureInfo.InvariantCulture), Variant.ToString(CultureInfo.InvariantCulture))
+            + (string.IsNullOrEmpty(ImageDigest) ? "" : "\t" + Durability.ToString("R", CultureInfo.InvariantCulture) + "\t" + ImageDigest);
 
         public static bool TryParse(string text, out ItemSlot slot)
         {
             slot = default;
             var parts = (text ?? "").Split('\t');
-            if (parts.Length != 7 || !ValidPrefab(parts[0])) return false;
+            if (parts.Length != 7 && parts.Length != 9 || !ValidPrefab(parts[0])) return false;
             if (!int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out var stack) || stack < 1 || stack > 9999) return false;
             if (!int.TryParse(parts[2], NumberStyles.None, CultureInfo.InvariantCulture, out var quality) || quality < 1 || quality > 100) return false;
             if (!int.TryParse(parts[3], NumberStyles.None, CultureInfo.InvariantCulture, out var x) || x < 0 || x > 32) return false;
             if (!int.TryParse(parts[4], NumberStyles.None, CultureInfo.InvariantCulture, out var y) || y < 0 || y > 32) return false;
             if (!long.TryParse(parts[5], NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var crafter)) return false;
             if (!int.TryParse(parts[6], NumberStyles.None, CultureInfo.InvariantCulture, out var variant) || variant < 0 || variant > 100) return false;
-            slot = new ItemSlot(parts[0], stack, quality, x, y, crafter, variant);
+            var durability = -1f;
+            var digest = "";
+            if (parts.Length == 9)
+            {
+                if (!float.TryParse(parts[7], NumberStyles.Float, CultureInfo.InvariantCulture, out durability)
+                    || float.IsNaN(durability) || float.IsInfinity(durability) || durability < 0 || !ValidDigest(parts[8])) return false;
+                digest = parts[8];
+            }
+            slot = new ItemSlot(parts[0], stack, quality, x, y, crafter, variant, durability, digest);
             return true;
         }
 
         public static bool ValidPrefab(string prefab) => !string.IsNullOrWhiteSpace(prefab) && prefab.Length <= 128 && prefab.IndexOfAny(new[] { '\t', '\r', '\n', '|', ' ' }) < 0;
 
-        public bool Same(ItemSlot other) => Prefab == other.Prefab && Stack == other.Stack && Quality == other.Quality && X == other.X && Y == other.Y && Crafter == other.Crafter && Variant == other.Variant;
+        static bool ValidDigest(string value) => value != null && value.Length == 64 && value.All(c => c >= '0' && c <= '9' || c >= 'a' && c <= 'f');
+
+        bool SameFields(ItemSlot other) => Prefab == other.Prefab && Stack == other.Stack && Quality == other.Quality && X == other.X && Y == other.Y && Crafter == other.Crafter && Variant == other.Variant;
+
+        public bool Same(ItemSlot other) => SameFields(other)
+            && Durability == other.Durability && ImageDigest == other.ImageDigest;
+
+        public bool Matches(ItemSlot item) => SameFields(item)
+            && (!HasIdentity || Durability == item.Durability && ImageDigest == item.ImageDigest);
+
+        // Native serialization rounds durability; verify received bytes without reserializing the loaded item.
+        public bool MatchesPayload(ItemSlot decoded, string digest) => SameFields(decoded) && (!HasIdentity || ImageDigest == digest);
     }
 
     public sealed class ItemMove

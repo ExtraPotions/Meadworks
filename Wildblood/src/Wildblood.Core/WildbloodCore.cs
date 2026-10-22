@@ -6,7 +6,7 @@ namespace ExtraPotions.Wildblood
     {
         public const string PluginGuid = "com.meadworks.wildblood";
         public const string ProductName = "Wildblood";
-        public const string ProductVersion = "0.5.4";
+        public const string ProductVersion = "0.5.5";
         public const string Family = "Fang";
 
         /// <summary>Localization namespace (design section 13): tokens <c>$meadworks_wildblood_&lt;key&gt;</c>.</summary>

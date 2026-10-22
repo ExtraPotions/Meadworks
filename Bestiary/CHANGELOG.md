@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.16 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- Requires Wildblood 0.5.5: the Marrow Lantern's Reveal uses its creature rules, which Wildblood 0.5.4 ignores.
+- Four new creatures: Draugr Hook, Fuling Spearman, Slag Charred and Marrow Lantern spawn on the Draugr, Fuling, Charred warrior and Deep North skeleton. No new materials, recipes, boss bar or world defeat key.
+- They wear a game hook, spear, buckler and lantern found by prefab name as stand-in props. If that prefab is missing, the prop is left off and the fight still runs. Dedicated servers register the creatures and run the fights without props, materials or textures.
+- Draugr Hook, Fuling Spearman and Marrow Lantern hold their hook, spear and lantern at about 1.2 m, 2.2 m and 0.5 m on the right hand. The Fuling Spearman holds the spear like a javelin: the wide head points forward and up, and the grip is a quarter of the way from the butt. Slag Charred plates sit on the upper chest at about 0.45 m each, with the buckler dome facing out, and they do not cover each other from the front.
+- One Ashlands region gets one Slag Charred. The server records the claim before the creature spawns, so two zones rolling together cannot both spawn. A full Delve regenerate clears that claim and a Rime Giant's mountain claim. Marrow Lanterns have no claim.
+- Fire on a hit breaks a Slag Charred plate, a partial plate is kept, and a broken plate is no longer shown. The hook's cooldown is kept. The hook and the spear hit harder with stars, the same way the body's own attacks do.
+- A hook pull is accepted only from the owner of a living Draugr Hook in range, and the drag stops at the Pull setting.
+- Marrow Lantern Reveal is the distance at which that skeleton's own cloak drops when Wildblood gives it Cloaked. It does not reveal creatures around it. A Reveal of 0 is sent to Wildblood as cloaked_reveal 0.
+- A Marrow Lantern rolled from a location with an enemy level override still starts at level 1. Wildblood can still replace that level.
+- The lantern compendium no longer says a cloaked creature is revealed just because Wildblood is installed. French, Russian and Chinese use Valheim's Drake names.
+- Elite Creatures Pack still makes the whole product step aside, including these creatures.
+
 ## 0.1.15 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

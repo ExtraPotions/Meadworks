@@ -1,6 +1,6 @@
 # Wildroot
 
-Version 0.1.19. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.20. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Gardening for Valheim: plant in grids, harvest in bulk, replant automatically and plant more of the world's flora.
 
@@ -15,8 +15,9 @@ Gardening for Valheim: plant in grids, harvest in bulk, replant automatically an
 - Farming skill: the game's own Farming skill grows from planting and picking crops, scaled by `Farming.ExperienceMultiplier`, by how rich the crop is (`Farming.TierScaling`) and a first-pick bonus for each kind of crop (`Farming.DiscoveryMultiplier`). Its skill page lists your perks; death costs Farming levels like any other skill.
 - Farming perks, from the level of whoever planted or picked: plants grow up to 40% faster and need up to 40% less room, rain speeds planted crops up by 50% while it falls, picking gives the bonus crop up to 50% of the time (the game's own 25%) and gives a seed back up to 30% of the time.
 - High Farming levels: from level 75 your crops grow in the Ashlands without a shield; from level 100 Meadows crops also grow in the Mountain and Deep North.
-- Restrictions / AshlandsCrops (host or server, on by default): carrots, onions, turnips, oats, poteitr, kale and their seed crops can grow in the Ashlands, as in the game. They still need a shield there until the planter's Farming level reaches HeatToleranceLevel. Barley and flax stay Plains-only. Magecap and Jotun puffs stay Mistlands-only. The Timberwood sapling keeps the game's biomes and does not grow in the Ashlands. Ashlands plants keep the game's own rules. Turning AshlandsCrops off restores the earlier farmland-only masks, including for crops already planted. Saves are unchanged.
+- Restrictions / AshlandsCrops (host or server, on by default): carrots, onions, turnips, oats, poteitr, kale and their seed crops can grow in the Ashlands, as in the game, while Restrictions / EnforceBiomesVanilla is on (it is on by default). They still need a shield there until the planter's Farming level reaches HeatToleranceLevel. Barley and flax stay Plains-only. Magecap and Jotun puffs stay Mistlands-only. The Timberwood sapling keeps the game's biomes and does not grow in the Ashlands. Ashlands plants keep the game's own rules. Turning AshlandsCrops off removes the Ashlands from those crops, including crops already planted. Turnips and turnip seeds still grow in the swamp and the Mistlands. Saves are unchanged.
 - Grid placement checks nearby plants for grow space, so a dense grid does not ignore plants already standing there. Extra crop and sapling spacing stay on SpacingPreset and the extra-spacing settings.
+- With Burrow, a shared-material grid keeps planting a cell that is not ready yet, and it tries a cell again when the chest confirms the materials were not taken. That retry runs up to four more times, after a short wait. Time spent queued behind other cells does not use up the ready-wait. A cell that stays unready is skipped after 15 seconds, or longer on a slow connection, and never after more than 45. You can keep using the cultivator while those cells finish in the background. Escape, the pause menu, putting the cultivator away, or losing permission stops the tries. A payment that has not been answered yet keeps its first request, so a late reply cannot charge that cell again.
 - Rows and auto replant: planting one crop at a time (a 1 x 1 grid, or grid planting off) plants a row of three from Farming level 25 and five from level 50; hold the alternate place key to plant one.
 - Auto replant: from level 50 a picked crop is planted again in the same spot, paid from your inventory (`Farming.RowPlanting` and `Farming.AutoReplant` are your own switches). A larger grid is your own choice and stays as it is.
 - Seed crafting: at a workbench, one carrot, turnip, onion, kale or poteitr makes two of its seeds. The recipe shows once you have held the crop (`SeedCrafting.Enabled`).
@@ -27,7 +28,7 @@ Gardening for Valheim: plant in grids, harvest in bulk, replant automatically an
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
 
 ## Installation
 

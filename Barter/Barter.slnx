@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Barter.Core/Barter.Core.csproj" />
+    <Project Path="src/Barter.Plugin/Barter.Plugin.csproj" />
+  </Folder>
+</Solution>

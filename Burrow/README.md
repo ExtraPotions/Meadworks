@@ -1,6 +1,6 @@
 # Burrow
 
-Version 0.3.24. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.25. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Craft and build from nearby chests, preview chest contents, bigger chests, sorting, quick stacking and shared chests.
 
@@ -34,7 +34,7 @@ Craft and build from nearby chests, preview chest contents, bigger chests, sorti
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
 
 ## Installation
 

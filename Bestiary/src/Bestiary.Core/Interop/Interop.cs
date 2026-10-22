@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ExtraPotions.Bestiary.Config;
+using ExtraPotions.Bestiary.Spawning;
 
 namespace ExtraPotions.Bestiary.Interop
 {
@@ -16,7 +17,7 @@ namespace ExtraPotions.Bestiary.Interop
     /// <item><see cref="Disguise"/> v1 (Bestiary provides): <c>Func&lt;object zdo, bool&gt;</c> IsDisguised.</item>
     /// <item><see cref="ItemClasses"/> v1 (Inscribe provides): <c>Tuple&lt;Func&lt;string cls, string prefab, bool&gt; ClaimItems,
     /// Func&lt;string prefab, int level, bool&gt; SetItemLevel, Func&lt;string json, bool&gt; SetCreatureLoot&gt;</c>.</item>
-    /// <item><see cref="BestiaryWorld"/> v1 (Bestiary provides, Delve consumes): <c>Func&lt;int&gt;</c> ResetMountainClaims, the claims cleared.</item>
+    /// <item><see cref="BestiaryWorld"/> v1 (Bestiary provides, Delve consumes): <c>Func&lt;int&gt;</c> ResetMountainClaims, the Rime Giant and Slag Charred region claims cleared. Marrow Lanterns have no claim.</item>
     /// </list>
     /// Inscribe publishes ItemClasses in this shape; the CreatureRules shape is Bestiary's proposal until Wildblood publishes one.
     /// </summary>
@@ -69,19 +70,26 @@ namespace ExtraPotions.Bestiary.Interop
             new CreatureDefaults("ECP_RimeGiant", body: "large", cloakedReveal: 15, neverTraits: new[] { "Gilded", "Relentless" }, neverDevoured: true),
             new CreatureDefaults("ECP_Headsman", miniBoss: true),
             new CreatureDefaults("ECP_HeadsmanSkeleton", worthless: true),
+            new CreatureDefaults(KitCreatures.BogHook),
+            new CreatureDefaults(KitCreatures.Javelineer),
+            new CreatureDefaults(KitCreatures.SlagCharred),
+            new CreatureDefaults(KitCreatures.MarrowLantern, cloakedReveal: 12),
         };
 
         public static CreatureDefaults? Find(string prefab) => All.FirstOrDefault(d => d.Prefab == prefab);
 
-        /// <summary>Compact JSON with only the fields that are set, in a fixed order.</summary>
-        public static string Json(CreatureDefaults d)
+        /// <summary>Compact JSON in a fixed field order. Unset optional fields are left out. Lantern Reveal 0 is written: omitting cloaked_reveal clears the rule.</summary>
+        public static string Json(CreatureDefaults d, int marrowReveal = 12)
         {
+            var reveal = d.Prefab == KitCreatures.MarrowLantern ? marrowReveal : d.CloakedReveal;
             var b = new StringBuilder("{\"prefab\":").Append(Quote(d.Prefab));
             if (d.Boss) b.Append(",\"boss\":true");
             if (d.MiniBoss) b.Append(",\"mini_boss\":true");
             if (d.Worthless) b.Append(",\"worthless\":true");
             if (d.Body != null) b.Append(",\"body\":").Append(Quote(d.Body));
-            if (d.CloakedReveal > 0) b.Append(",\"cloaked_reveal\":").Append(d.CloakedReveal);
+            // 0 on any other prefab means the field was never set. Writing it would replace Wildblood's ordinary distance.
+            if (reveal > 0 || d.Prefab == KitCreatures.MarrowLantern && reveal == 0)
+                b.Append(",\"cloaked_reveal\":").Append(reveal);
             if (d.NeverTraits.Count > 0) b.Append(",\"never_traits\":[").Append(string.Join(",", d.NeverTraits.Select(Quote))).Append(']');
             if (d.NeverDevoured) b.Append(",\"never_devoured\":true");
             if (d.ExcludedAspects.Count > 0) b.Append(",\"excluded_aspects\":[").Append(string.Join(",", d.ExcludedAspects.Select(Quote))).Append(']');
@@ -114,10 +122,10 @@ namespace ExtraPotions.Bestiary.Interop
     /// <summary>Sends the tables to a resolved provider; a missing provider is <see cref="InteropOutcome.Absent"/>, a throwing one never escapes.</summary>
     public static class InteropCalls
     {
-        public static InteropOutcome RegisterDefaults(Func<string, string, bool>? register)
+        public static InteropOutcome RegisterDefaults(Func<string, string, bool>? register, int marrowReveal = 12)
         {
             if (register == null) return InteropOutcome.Absent;
-            return Send(WildbloodDefaults.All.Select(d => (Func<bool>)(() => register(d.Prefab, WildbloodDefaults.Json(d)))));
+            return Send(WildbloodDefaults.All.Select(d => (Func<bool>)(() => register(d.Prefab, WildbloodDefaults.Json(d, marrowReveal)))));
         }
 
         public static InteropOutcome RegisterInscribe(Tuple<Func<string, string, bool>, Func<string, int, bool>, Func<string, bool>>? classes,

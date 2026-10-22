@@ -305,7 +305,7 @@
     "cfg_4_traits__tamed_keep_traits_name": "Les apprivoisés gardent leurs traits",
     "cfg_4_traits__tamed_keep_traits_help": "L'apprivoisement conserve les traits d'une créature (les variantes apprivoisées s'appliquent). Désactivé : tant qu'une créature est apprivoisée, ses mutations et modificateurs n'agissent pas ; ils restent enregistrés, et ses étoiles restent. Les petits nés pendant que c'est désactivé n'héritent d'aucune mutation.",
     "cfg_4_traits__tamed_stars_name": "Étoiles des apprivoisés",
-    "cfg_4_traits__tamed_stars_help": "Activé : une nouvelle naissance peut hériter des étoiles, et Shepherd suit ce réglage lorsqu'il est installé. Désactivé : un nouveau-né garde le niveau de son parent, comme dans le jeu, et aucune étoile en plus n'est ajoutée. L'apprivoisement ne retire jamais les étoiles, la vie ni les mutations. Une créature qu'une version plus ancienne a laissée au niveau du jeu retrouve ses étoiles enregistrées au prochain chargement. Le serveur le fixe.",
+    "cfg_4_traits__tamed_stars_help": "Activé : une nouvelle naissance peut hériter des étoiles, et Shepherd suit ce réglage lorsqu'il est installé. Quand « Étoiles activées » est actif et que le « Mode d'étoiles » est Wildblood, une créature apprivoisée qui a des étoiles enregistrées et qui est restée au niveau du jeu retrouve ces étoiles tout de suite si elle est chargée, ou au prochain chargement. Sa vie reste la même part de la barre de vie (une barre pleine reste pleine, et une barre vide reste vide). Sa taille et sa couleur suivent les étoiles. La restauration ne change pas ses mutations. Désactivé : un nouveau-né garde le niveau de son parent, comme dans le jeu, et aucune étoile en plus n'est ajoutée. Le désactiver ne retire pas les étoiles qu'un apprivoisé a déjà, y compris celles qu'il vient de retrouver. L'apprivoisement ne retire jamais les étoiles, la vie ni les mutations. Les boss, les nouveau-nés sans niveau de réserve enregistré ni marque de restauration, et les créatures sans étoiles enregistrées restent tels quels. Les créatures nées avec des étoiles mises en réserve peuvent aussi les retrouver. Sans marque de restauration, une créature apprivoisée doit encore être à son niveau de réserve enregistré. Le serveur le fixe.",
     "cfg_4_traits__players_may_inspect_name": "Les joueurs peuvent inspecter",
     "cfg_4_traits__players_may_inspect_help": "Règle de l'hôte : tout joueur peut lancer wildblood inspect, qui affiche les étoiles, les traits et les valeurs obtenues de la créature visée. Il ne fait que lire, ce n'est donc pas une triche. Désactivé : administrateurs uniquement.",
     "cfg_5_bosses_heading": "5 - Boss",
@@ -339,9 +339,9 @@
     "cfg_6_loot__defer_to_dropnspawn_name": "Céder la place à DropNSpawn",
     "cfg_6_loot__defer_to_dropnspawn_help": "Le butin se retire tant que DropNSpawn est installé.",
     "cfg_6_loot__seasonal_meat_name": "Viande saisonnière",
-    "cfg_6_loot__seasonal_meat_help": "Hôte ou serveur : tant que les saisons de Solstice sont actives, la viande et les peaux des créatures suivent le taux publié de la saison. Le printemps et l'été en donnent moins, l'automne et l'hiver en donnent plus, entre un quart et trois fois la quantité habituelle. Un objet reste un objet. Les trophées, plumes, crocs, écailles et pièces restent inchangés. Désactivé, sans Solstice, ou saisons désactivées : les butins restent ceux d'aujourd'hui. La prochaine mise à mort utilise le taux actuel.",
+    "cfg_6_loot__seasonal_meat_help": "Hôte ou serveur : tant que les saisons de Solstice sont actives, la viande et les peaux des créatures suivent le taux publié de la saison. Le printemps et l'été en donnent moins, l'automne et l'hiver en donnent plus, entre un quart et trois fois la quantité habituelle. En dessous de un, les fractions sont tirées au sort ; un objet seul peut ne pas tomber. Les trophées, plumes, crocs, écailles et pièces restent inchangés. Désactivé, sans Solstice, ou saisons désactivées : les butins restent ceux d'aujourd'hui. La prochaine mise à mort utilise le taux actuel.",
     "cfg_6_loot__seasonal_wood_name": "Bois saisonnier",
-    "cfg_6_loot__seasonal_wood_help": "Hôte ou serveur : tant que les saisons de Solstice sont actives, le bois des arbres abattus suit le taux publié de la saison. Le printemps et l'été en donnent moins, l'automne et l'hiver en donnent plus, entre un quart et trois fois la quantité habituelle. Une pièce reste une pièce. Désactivé, sans Solstice, ou saisons désactivées : le bois reste celui d'aujourd'hui. Le prochain arbre utilise le taux actuel.",
+    "cfg_6_loot__seasonal_wood_help": "Hôte ou serveur : tant que les saisons de Solstice sont actives, le bois des arbres abattus suit le taux publié de la saison. Le printemps et l'été en donnent moins, l'automne et l'hiver en donnent plus, entre un quart et trois fois la quantité habituelle. En dessous de un, les fractions sont tirées au sort ; un objet seul peut ne pas tomber. Désactivé, sans Solstice, ou saisons désactivées : le bois reste celui d'aujourd'hui. Le prochain arbre utilise le taux actuel.",
     "cfg_7_luck_heading": "7 - Chance",
     "cfg_7_luck__persist_counters_name": "Conserver les compteurs",
     "cfg_7_luck__persist_counters_help": "Les compteurs de malchance sont enregistrés avec le personnage, par monde.",
@@ -458,6 +458,15 @@
     "cfg_12_cheats__lucky_kills_name": "Coups chanceux",
     "cfg_12_cheats__lucky_kills_help": "Triche. Chaque ligne protégée contre la malchance tombe à chaque mise à mort ; les compteurs ne changent pas.",
     "cfg_12_cheats__creature_commands_name": "Commandes de créatures",
-    "cfg_12_cheats__creature_commands_help": "Triche. Active les commandes d'administration wildblood spawn, purge et karma."
+    "cfg_12_cheats__creature_commands_help": "Triche. Active les commandes d'administration wildblood spawn, purge et karma.",
+    "raid_request_command": "start <pièces> [palier 0-7] [identifiant] ou stop : coffre à moins de 5 mètres",
+    "raid_request_player": "Utilisez cette commande avec un joueur connecté près d’un coffre.",
+    "raid_request_chest": "Aucun coffre disponible à moins de 5 mètres.",
+    "raid_request_unavailable": "La demande de raid ne peut pas être envoyée pour le moment. Réessayez quand le serveur sera prêt.",
+    "raid_request_sent": "Demande de raid {0} envoyée au serveur.",
+    "raid_request_started": "Raid accepté. Demande {0}.",
+    "raid_request_stopped": "Raid arrêté. Demande {0}.",
+    "raid_request_refused": "La demande de raid {0} a été refusée. Vérifiez l’accès au coffre, les pièces, le délai et les journaux de récupération du serveur. Fermez le coffre et attendez la synchronisation de son inventaire avant de réessayer avec le même identifiant.",
+    "raid_request_timeout": "Aucune réponse à la demande de raid {0}. Son résultat est inconnu. Pour une demande de lancement, réessayez avec le même identifiant pour éviter de payer deux fois."
   }
 }

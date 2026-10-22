@@ -47,15 +47,13 @@ namespace Burrow.Resources {
         static ResourceReservationResult Wait(double deadline)=>new ResourceReservationResult(Time.realtimeSinceStartupAsDouble<deadline?AsyncReservationState.Pending:AsyncReservationState.Failed,null);
         sealed class RequestWait {
             internal double Started=-1,Deadline;
-            internal bool SawUnready;
             internal readonly HashSet<Container> Awaiting=new HashSet<Container>();
             internal string LastReason="";
             internal void Start(){if(Started<0){Started=Time.realtimeSinceStartupAsDouble;Deadline=Started+10;}}
-            internal void Observe(Container chest,bool unready){if(unready){SawUnready=true;Awaiting.Add(chest);}else Awaiting.Remove(chest);}
+            internal void Observe(Container chest,bool unready){if(unready)Awaiting.Add(chest);else Awaiting.Remove(chest);}
         }
         sealed class SourceReadiness {internal int Eligible,Remote,Unloaded,Held,InUse;}
         ResourceReservationResult Defer(RequestWait wait,string reason,int sources=0,SourceReadiness readiness=null){
-            wait.SawUnready=true;
             var result=Wait(wait.Deadline);
             Diagnose(wait,result.State==AsyncReservationState.Pending?reason:reason+"_deadline",sources,readiness);
             return result;
@@ -143,7 +141,8 @@ namespace Burrow.Resources {
                 float range=radius.Value;
                 bool awaitingOwner=includeChests.Value&&!float.IsNaN(range)&&!float.IsInfinity(range)&&range>=0&&range<=50&&ContainerReadiness.AskNearby(range,ContainerUse.Reach);
                 var readiness=Readiness(wait);
-                if(awaitingOwner||wait.SawUnready)return Defer(wait,"sources_unready",sources.Count,readiness);
+                // Wait only while something is still unready. A ready shortage fails on this pass.
+                if(awaitingOwner||readiness.Remote>0||readiness.Unloaded>0||readiness.Held>0||readiness.InUse>0||wait.Awaiting.Count>0)return Defer(wait,"sources_unready",sources.Count,readiness);
                 Diagnose(wait,"insufficient_stock",sources.Count,readiness);
                 return new ResourceReservationResult(AsyncReservationState.Failed,null);
             }

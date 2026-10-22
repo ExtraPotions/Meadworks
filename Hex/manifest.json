@@ -1,11 +1,11 @@
 {
   "name": "Hex",
-  "version_number": "0.1.16",
+  "version_number": "0.1.17",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Hex",
   "description": "Meadworks cheat toolkit: personal powers, item and creature spawning, skills, map tools, ESP and presets, with server-controlled permissions. Client-optional.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.26"
+    "expDARE-Crucible-0.3.27"
   ]
 }

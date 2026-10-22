@@ -22,7 +22,9 @@ namespace ExtraPotions.Bestiary.Config
         public const string General = "1 - General", Mimic = "2 - Crypt Mimic", Slinger = "3 - Greydwarf Slinger",
             RimeGiant = "4 - Rime Giant", Kraken = "5 - Kraken", Crossbowman = "6 - Skeleton Crossbowman",
             BoneCrossbow = "7 - Bone Crossbow", Arsenal = "8 - Skeleton Arsenal", Executioner = "25 - Crypt Executioner",
-            Greataxe = "26 - Executioner Greataxe", Ballista = "28 - Bone Ballista", Workshop = "30 - Workshop";
+            Greataxe = "26 - Executioner Greataxe", Ballista = "28 - Bone Ballista", Workshop = "30 - Workshop",
+            BogHook = "41 - Bog Hook", Javelineer = "42 - Fuling Javelineer", SlagCharred = "43 - Slag Charred",
+            MarrowLantern = "44 - Marrow Lantern";
 
         private const SettingScope L = SettingScope.Local, SA = SettingScope.ServerAuthoritative;
 
@@ -154,6 +156,35 @@ namespace ExtraPotions.Bestiary.Config
             S(Workshop, "Hot Reload", true, "Workshop files reload when saved; creatures already loaded keep what they have completed."),
             S(Workshop, "Texture Sync", true, "The server sends its workshop textures to clients, which keep them in a cache by content hash."),
             S(Workshop, "Texture Cache Limit", 256, "Megabytes of synced workshop textures this client keeps.", 16, 4096, L),
+
+            S(BogHook, "Enabled", true, "Draugr Hooks on the Swamp surface: a Draugr that throws a hook, pulls, then closes in. Health and drops stay the Draugr's. Off: no new ones; ones already in the world stay."),
+            S(BogHook, "Share", 8f, "Percent of wild Draugr in the biomes below that come as Draugr Hooks. Draugr Elites, creature spawners and draugr piles stay Draugr.", 0, 100),
+            S(BogHook, "Biomes", BiomeMask.Swamp, "Where wild Draugr can come as Draugr Hooks. Several biomes are separated by commas."),
+            S(BogHook, "Hook Damage", 18f, "Pierce of the hook, before stars. The Draugr's own sword stays its melee.", 0, 500),
+            S(BogHook, "Range", 14f, "Meters at which it can throw the hook.", 4, 40),
+            S(BogHook, "Pull", 6f, "Meters the hook drags the target closer, and it stops if the ground is in the way.", 0, 20),
+            S(BogHook, "Interval", 8f, "Seconds before it can throw the hook again.", 1, 60),
+
+            S(Javelineer, "Enabled", true, "Fuling Spearmen on the Plains: an ordinary Fuling that throws one spear, then uses the Fuling's own melee. Health and drops stay the Fuling's. Not a Fuling berserker, not a Fuling shaman, and not a village spawner. Off: no new ones; ones already in the world stay."),
+            S(Javelineer, "Share", 8f, "Percent of wild Fuling in the biomes below that come as Fuling Spearmen. Berserkers, shamans and village spawners stay as they are.", 0, 100),
+            S(Javelineer, "Biomes", BiomeMask.Plains, "Where wild Fuling can come as Fuling Spearmen. Several biomes are separated by commas."),
+            S(Javelineer, "Javelin Damage", 22f, "Pierce of the one spear, before stars. After that throw it uses the Fuling's own melee.", 0, 500),
+            S(Javelineer, "Throw Range", 16f, "Meters at which it throws that spear, once.", 4, 40),
+
+            S(SlagCharred, "Enabled", true, "Slag Charred in the Ashlands: a Charred warrior wearing three plates. Fire breaks a plate. Physical blows still land while plates remain, so it can be killed with no fire. At most one per Ashlands region, ever, and never within 1000 m of another. No boss bar. Killing it does not set a world key. Off: no new ones; ones already in the world stay."),
+            S(SlagCharred, "Regions", 40f, "Percent of Ashlands regions that hold one, fixed by the world seed. A region needs at least 40 edge cells (about 150 m across), the same size rule as a Rime Giant's mountain. Once its Charred has come, the region never gets another until Delve clears the claim.", 0, 100),
+            S(SlagCharred, "Chance", 10f, "Percent per zone roll, while someone is in an Ashlands region whose Charred has not come yet.", 0, 100),
+            S(SlagCharred, "Interval", 3600f, "Seconds between a zone's rolls.", 60, 86400),
+            S(SlagCharred, "Biomes", BiomeMask.AshLands, "The biomes whose regions can hold one. Several are separated by commas."),
+            S(SlagCharred, "Health", 700f, "Its health before stars (a Charred warrior: 600, an Asksvin: 800).", 1, 100000),
+            S(SlagCharred, "Plates", 3, "Plates it wears. Fire breaks them one at a time.", 0, 3),
+            S(SlagCharred, "Armored Damage", 40f, "Percent of a physical hit that gets through with every plate on. Each plate lost lets an equal part more through. With none left, the whole hit lands.", 1, 100),
+            S(SlagCharred, "Fire Per Plate", 40f, "Fire on a hit that breaks one plate. With no fire, physical damage still gets through, so the Charred can be killed anyway.", 1, 1000),
+
+            S(MarrowLantern, "Enabled", true, "Marrow Lanterns in the Deep North: a Deep North skeleton carrying a lantern. Some Deep North skeleton spawners can roll one, and those spawners still roll the ordinary skeleton. It is not a wild spawn, not a ShadowPerson, and not part of the bone arsenal. It drops one freeze gland (a Drake drops one) and coins. Off: no new ones; ones already in the world stay."),
+            S(MarrowLantern, "Places", 25f, "Percent of Deep North skeleton spawners that can roll a Marrow Lantern, fixed by the world seed and the spawner's place.", 0, 100),
+            S(MarrowLantern, "Chance", 40f, "Percent of spawns at those spawners that are Marrow Lanterns. The rest stay Deep North skeletons.", 0, 100),
+            S(MarrowLantern, "Reveal", 12, "Meters at which this skeleton's own cloak drops, when Wildblood gives it Cloaked (a Rime Giant's reveal is 15). It does not reveal creatures around it. Wildblood owns stars. Bestiary spawns it at level 1. If Wildblood is absent, it stays level 1 and has no cloak.", 0, 60),
         };
 
         private static SettingSpec ArsenalRow(string title, string weapon) =>

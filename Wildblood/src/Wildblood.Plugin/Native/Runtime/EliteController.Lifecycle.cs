@@ -1,11 +1,16 @@
 // Copyright (C) 2026 expDARE. SPDX-License-Identifier: GPL-3.0-or-later
 // Meadworks-original: live module/session gates around adopted ECR state and exact owned component instances
 // (module flags 1/2/4/8 and 16 = Tamed Keep Traits off for a tamed creature).
+// Tamed Stars on publishes a parked tame's stored roll from here; the trait blob is not rewritten.
 using System.Collections.Generic;
+using ExtraPotions.Wildblood.Adopted.Rules;
+using ExtraPotions.Wildblood.Adopted.Scaling;
 using ExtraPotions.Wildblood.Adopted.Traits;
+using ExtraPotions.Wildblood.Adopted.Visuals;
 using ExtraPotions.Wildblood.AdoptedCm;
 using ExtraPotions.Wildblood.Integration;
 using ExtraPotions.Wildblood.Runtime;
+using ExtraPotions.Wildblood.Stars;
 using UnityEngine;
 using CruciblePlugin = ExtraPotions.Meadworks.Crucible.Plugin;
 
@@ -28,6 +33,8 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
         private readonly HashSet<MonoBehaviour> _suspendedBehaviours = new HashSet<MonoBehaviour>();
         private readonly List<GameObject> _ownedVisuals = new List<GameObject>();
         private readonly HashSet<GameObject> _suspendedVisuals = new HashSet<GameObject>();
+        private bool _restoringStars;
+        private int _creatureRuleBars;
 
         private int CurrentFlags => (WildbloodModules.Active(WildbloodModule.Stars) ? 1 : 0)
             | (WildbloodModules.Active(WildbloodModule.Traits) ? 2 : 0)
@@ -84,8 +91,9 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
         {
             // Load produced the canonical identity. Only this in-memory copy is filtered; never write it back.
             CreatureTraits stored = _traits;
+            _creatureRuleBars = NativeCreatureRules.Barred(PrefabName);
             bool withheld = (_activeFlags & 16) != 0;
-            _traits = new CreatureTraits(stored.Stars, (_activeFlags & 2) != 0 && !withheld ? stored.Mask : 0)
+            _traits = new CreatureTraits(stored.Stars, (_activeFlags & 2) != 0 && !withheld ? stored.Mask & ~_creatureRuleBars : 0)
             {
                 Aspect = (_activeFlags & 4) != 0 && !withheld ? stored.Aspect : Aspect.None,
                 ExtraAspects = (_activeFlags & 4) != 0 && !withheld ? stored.ExtraAspects : 0,
@@ -98,13 +106,20 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
             if (_character == null || _nview == null || !_nview.IsValid()) return;
             // Producer/consumer gates close immediately; the bounded poll only waits for readiness/resume.
             if (_ready && !RuntimeAvailable) SuspendRuntime();
-            if ((_lifecycleWait -= Time.deltaTime) > 0f) return;
+            // The frame the setting turns on, and the next, every loaded tame is checked together.
+            bool due = StarRestoreBatch.Due(Time.frameCount);
+            if ((_lifecycleWait -= Time.deltaTime) > 0f && !due) return;
             _lifecycleWait = 0.25f;
             if (_sessionGeneration != CruciblePlugin.Session.Generation)
             {
                 SuspendRuntime();
                 enabled = false; // an old world's actor never adopts a new session's authority
                 return;
+            }
+            if (_ready && _creatureRuleBars != NativeCreatureRules.Barred(PrefabName))
+            {
+                SuspendRuntime();
+                _pending = true;
             }
             int flags = CurrentFlags;
             if (!NativeModifierRules.Ready || (flags & (_isBoss ? 14 : 43)) == 0)
@@ -117,11 +132,89 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
             if (_ready && flags == _activeFlags)
             {
                 RefreshSwiftMovement(); // modifiers can arrive or change after Apply, on the owner or by ZDO sync
+                FollowStoredStars();
                 return;
             }
             SuspendRuntime();
             _activeFlags = flags;
             _pending = true; // PollResolve uses the existing source roll-once/read path
+        }
+
+        /// <summary>
+        /// Owner writes the stored star level and the same fraction of health. Everyone else copies the level
+        /// once it arrives and refreshes size and color. The trait blob is not saved, so mutations stay stored.
+        /// </summary>
+        private void FollowStoredStars()
+        {
+            if (_restoringStars || !StarRestoreBatch.SettingOn || !_ready || _character == null || !_character.IsTamed() || _isBoss)
+                return;
+            if (!StarsActive || !RuleState.Active.CreatureStars) return;
+            ZDO zdo = _nview.GetZDO();
+            if (zdo == null || !TraitStore.IsResolved(zdo) || KeepsNativeLevel) return;
+            int raw = TraitKeys.Int(zdo, TraitKeys.Source);
+            bool birth = System.Enum.IsDefined(typeof(SpawnSource), raw) && TamedStars.KeepsBirthLevel((SpawnSource)raw);
+            ParkedStarRestore decision = TamedStars.ParkedRestore(
+                tamedStarsOn: true, creatureStarsOn: true, tamed: true, boss: false, keepsNativeLevel: false, birth: birth,
+                resolved: true, currentLevel: _character.GetLevel(), storedStars: TraitKeys.Int(zdo, TraitKeys.Stars),
+                parkedGameLevel: zdo.GetInt(TameGameLevel.Key, 0), parkedMark: TameGameLevel.Marked(zdo));
+            if (!decision.Apply) return;
+            if (!_nview.IsOwner())
+            {
+                int synced = zdo.GetInt(ZDOVars.s_level, 1);
+                // SetLevel writes the ZDO. A client only copies the level the owner already published.
+                if (synced != decision.Level || synced == _character.GetLevel()) return;
+                _character.m_level = synced;
+                ShowStoredStars(zdo);
+                return;
+            }
+            _restoringStars = true;
+            try
+            {
+                float fraction = TamedStars.HealthFraction(_character.GetHealth(), _character.GetMaxHealth());
+                if (_character.GetLevel() != decision.Level) _character.SetLevel(decision.Level);
+                ShowStoredStars(zdo);
+                StatApplier.ApplyHealth(_character, Rules, Traits, freshlyResolved: false);
+                if (fraction >= 1f)
+                {
+                    // A full bar stays full with no stored health, so a later maximum change does not leave it part-hurt.
+                    // m_lastHealth has to match that reading, or a later hit equal to the old value is skipped.
+                    if (zdo.GetFloat(ZDOVars.s_health, -1f) >= 0f) zdo.RemoveFloat(ZDOVars.s_health);
+                    _character.m_lastHealth = _character.GetMaxHealth();
+                }
+                else _character.SetHealth(_character.GetMaxHealth() * fraction);
+                TameGameLevel.Clear(zdo);
+                StarRestoreBatch.Count();
+            }
+            finally
+            {
+                _restoringStars = false;
+            }
+        }
+
+        /// <summary>Size, color, swing, and movement for the level now on the ZDO. Does not install or remove mutation behaviours.</summary>
+        private void ShowStoredStars(ZDO zdo)
+        {
+            Traits = TraitStore.Load(zdo);
+            ProjectTraits();
+            Rules = ResolveRules(TraitStore.GetBiome(zdo));
+            bool held = CreatureModifierManager.SuspendReapingRuntime(_character, health: false, scale: true);
+            ReapingScaleReady = false;
+            try
+            {
+                RestoreScale();
+                Vector3 before = _character.transform.localScale;
+                StatApplier.ApplySize(_character, Rules, Traits);
+                RememberScale(before);
+                StarLook.Apply(_character, Traits.Stars);
+            }
+            finally
+            {
+                ReapingScaleReady = true;
+                if (held) CreatureModifierManager.ResumeReapingRuntime(_character, health: false, scale: true);
+            }
+            SwingSpeedFactor = StatMath.SwingSpeedMultiplier(Rules, Traits);
+            SwingRegistry.Track(this);
+            RefreshMovement(_devourBonus);
         }
 
         private void CaptureMovement()

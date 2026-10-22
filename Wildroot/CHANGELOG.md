@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.20 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- README: AshlandsCrops needs Restrictions / EnforceBiomesVanilla on, and the Burrow shared-material grid retry is described.
+
 ## 0.1.19 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

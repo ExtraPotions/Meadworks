@@ -1,0 +1,25 @@
+# Hildir, sell list: hides, feathers and the like, per lot.
+#
+# Written once by Barter when no list file exists. Edit freely; delete a file to stop using it (it is not written again
+# while any Barter list file exists). Prices are in the trader's currency before the trader's purse moves them (see the
+# Trader Purse settings). Items the game gives a value (trophies, gems, valuables) already sell to every trader at that value
+# through the Common Valuables setting, so this list names materials only.
+
+- prefab: LeatherScraps
+  stack: 10
+  price: 14
+- prefab: DeerHide
+  stack: 5
+  price: 14
+- prefab: TrollHide
+  stack: 1
+  price: 24
+- prefab: WolfPelt
+  stack: 1
+  price: 30
+- prefab: Chitin
+  stack: 10
+  price: 40
+- prefab: Feathers
+  stack: 10
+  price: 14

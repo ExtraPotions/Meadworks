@@ -15,13 +15,12 @@ using UnityEngine.UI;
 namespace ExtraPotions.Saga.Runtime
 {
     /// <summary>
-    /// Hold the wheel key or gamepad button to pick one attuned power. Cards are Crucible rounded rectangles tinted with
-    /// kit color roles, so Timber and Brown restyle them with the rest of the menu. The accent ring marks only the aimed power.
+    /// Hold the wheel key or gamepad button to pick one attuned power. Cards are Crucible rounded rectangles on a ring,
+    /// oldest at the top then clockwise, with the hint in the middle. Timber and Brown restyle the cards. The accent ring
+    /// marks only the aimed power. The square plate behind the ring stays hidden.
     /// </summary>
     public static class PowerWheelRuntime
     {
-        const float CardWidth = 156f;
-        const float CardHeight = 52f;
         static readonly PowerWheelSession session = new PowerWheelSession();
         static readonly List<Wedge> wedges = new List<Wedge>();
         static KitHudPanel hud;
@@ -210,6 +209,7 @@ namespace ExtraPotions.Saga.Runtime
             if (hud == null) return;
             Center();
             hud.Update(true, false, 1f, 0.94f);
+            HideBacking();
             var text = KitAppearance.Color(KitColorRole.Text);
             var muted = KitAppearance.Color(KitColorRole.Muted);
             var shade = KitAppearance.Color(KitColorRole.Shade);
@@ -261,20 +261,21 @@ namespace ExtraPotions.Saga.Runtime
         {
             DestroyUi();
             layout = next;
-            float radius = Mathf.Max(96f, bosses.Length * 26f);
-            float panel = (radius + CardWidth * 0.5f + 28f) * 2f;
-            hud = KitHudPanel.Create(Hud.instance.transform, "Saga_power_wheel", new Vector2(panel, panel), Vector2.zero, Plugin.Guid, "Saga_power_wheel");
+            var slots = new WheelBox[bosses.Length];
+            PowerWheelLayout.Arrange(bosses.Length, out var panel, slots, out var center);
+            float side = (float)panel.Width;
+            hud = KitHudPanel.Create(Hud.instance.transform, "Saga_power_wheel", new Vector2(side, side), Vector2.zero, Plugin.Guid, "Saga_power_wheel");
             if (hud == null) return;
             for (int i = 0; i < bosses.Length; i++)
             {
-                float angle = i * Mathf.PI * 2f / bosses.Length;
-                float x = panel * 0.5f + Mathf.Sin(angle) * radius - CardWidth * 0.5f;
-                float y = panel * 0.5f - Mathf.Cos(angle) * radius - CardHeight * 0.5f;
+                var slot = slots[i];
+                float cardW = (float)slot.Width;
+                float cardH = (float)slot.Height;
                 var root = new GameObject("Saga_wheel_" + bosses[i], typeof(RectTransform));
                 root.transform.SetParent(hud.Content, false);
-                Place((RectTransform)root.transform, new Vector2(x, y), new Vector2(CardWidth, CardHeight));
-                var ring = Round(root.transform, "ring", new Vector2(-4f, -4f), new Vector2(CardWidth + 8f, CardHeight + 8f));
-                var fill = Round(root.transform, "fill", Vector2.zero, new Vector2(CardWidth, CardHeight));
+                Place((RectTransform)root.transform, new Vector2((float)slot.X, (float)slot.Y), new Vector2(cardW, cardH));
+                var ring = Round(root.transform, "ring", new Vector2(-4f, -4f), new Vector2(cardW + 8f, cardH + 8f));
+                var fill = Round(root.transform, "fill", Vector2.zero, new Vector2(cardW, cardH));
                 var icon = NativePowers.WheelIcon(bosses[i]);
                 float textX = 8f;
                 if (icon != null)
@@ -289,16 +290,24 @@ namespace ExtraPotions.Saga.Runtime
                     textX = 46f;
                 }
                 var label = KitCanvas.Text(root.transform, "name", "", 15, Color.white, TextAlignmentOptions.MidlineLeft, true);
-                Place(label.rectTransform, new Vector2(textX, 6f), new Vector2(CardWidth - textX - 8f, 40f));
+                Place(label.rectTransform, new Vector2(textX, 6f), new Vector2(cardW - textX - 8f, 40f));
                 label.overflowMode = TextOverflowModes.Ellipsis;
                 wedges.Add(new Wedge { Boss = bosses[i], Ring = ring, Fill = fill, Label = label, Activatable = NativePowers.WheelCanActivate(bosses[i]) });
             }
             centerName = KitCanvas.Text(hud.Content, "choice", "", 22, Color.white, TextAlignmentOptions.Center, true);
             if (KitCanvas.Heading != null) centerName.font = KitCanvas.Heading;
-            Place(centerName.rectTransform, new Vector2(panel * 0.5f - 120f, panel * 0.5f - 30f), new Vector2(240f, 28f));
+            Place(centerName.rectTransform, new Vector2((float)center.X, (float)center.Y), new Vector2((float)center.Width, 28f));
             centerHint = KitCanvas.Text(hud.Content, "hint", "", 14, Color.white, TextAlignmentOptions.Center, true);
-            Place(centerHint.rectTransform, new Vector2(panel * 0.5f - 120f, panel * 0.5f + 2f), new Vector2(240f, 40f));
+            Place(centerHint.rectTransform, new Vector2((float)center.X, (float)center.Y + 30f), new Vector2((float)center.Width, (float)center.Height - 30f));
+            HideBacking();
             Center();
+        }
+
+        static void HideBacking()
+        {
+            if (hud?.Root == null) return;
+            var back = KitPanel.Background(hud.Root);
+            if (back != null) back.enabled = false;
         }
 
         static Image Round(Transform parent, string name, Vector2 at, Vector2 size)

@@ -1,0 +1,22 @@
+# Haldor, buy list: what Haldor sells to you in addition to his own stock, which Barter keeps.
+#
+# A few raw materials, some gated by the bosses you have defeated. The prices are Barter's own modest scale; items the game
+# gives a value are priced at that value by Common Valuables instead.
+
+- prefab: Flint
+  stack: 10
+  price: 20
+- prefab: Resin
+  stack: 10
+  price: 20
+- prefab: LeatherScraps
+  stack: 10
+  price: 40
+- prefab: Coal
+  stack: 10
+  price: 40
+  requiredGlobalKey: defeated_eikthyr
+- prefab: Feathers
+  stack: 10
+  price: 50
+  requiredGlobalKey: defeated_eikthyr

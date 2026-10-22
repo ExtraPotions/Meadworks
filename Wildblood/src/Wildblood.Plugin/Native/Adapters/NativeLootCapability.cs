@@ -50,9 +50,10 @@ namespace ExtraPotions.Wildblood.Adopted.Adapters
             var traits = controller.Traits;
             // Use the persisted native level, not GenerateDropList's temporary level hold.
             int stars = Math.Max(1, zdo.GetInt(ZDOVars.s_level, 1)) - 1;
-            bool worthless = traits.PhantomCopy || traits.Decoy
+            var defaults = NativeCreatureRules.Find(creature);
+            bool worthless = defaults?.Worthless == true || traits.PhantomCopy || traits.Decoy
                 || traits.HasAspect(Aspect.Tethered) && TetherPair.Standing(TraitKeys.Id(zdo, TraitKeys.TetherPartner));
-            return Tuple.Create(stars, traits.Any, creature.IsBoss(), worthless, Math.Max(0, traits.Tier));
+            return Tuple.Create(stars, traits.Any || defaults?.MiniBoss == true, NativeCreatureRules.IsBoss(creature), worthless, Math.Max(0, traits.Tier));
         }
     }
 }

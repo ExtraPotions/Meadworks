@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.16 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- Due births wait for Wildblood's server rules before the offspring is created or inherits stars and mutations. The pregnancy and its saved parent/twin data remain available to retry after the rules arrive. Breeding without Wildblood is unchanged.
+
 ## 0.1.15 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

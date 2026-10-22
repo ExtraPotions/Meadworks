@@ -61,6 +61,11 @@ namespace ExtraPotions.Wildblood.Adopted.Rules
         public readonly Dictionary<string, CreatureMutationRule> CreatureMutations =
             new Dictionary<string, CreatureMutationRule>(StringComparer.OrdinalIgnoreCase);
 
+        public readonly Dictionary<string, ExtraPotions.Wildblood.Integration.CreatureRule> CreatureDefaults =
+            new Dictionary<string, ExtraPotions.Wildblood.Integration.CreatureRule>(StringComparer.Ordinal);
+        private readonly Dictionary<(BiomeRules, string), BiomeRules> _creatureDefaults =
+            new Dictionary<(BiomeRules, string), BiomeRules>();
+
         public readonly Dictionary<string, BiomeRules> Biomes =
             new Dictionary<string, BiomeRules>(StringComparer.OrdinalIgnoreCase);
 
@@ -96,6 +101,18 @@ namespace ExtraPotions.Wildblood.Adopted.Rules
         public BiomeRules For(Heightmap.Biome biome, string prefab)
         {
             BiomeRules rules = For(biome);
+            if (CreatureDefaults.TryGetValue(prefab, out var defaults) && defaults.CloakedReveal.HasValue)
+            {
+                if (!_creatureDefaults.TryGetValue((rules, prefab), out var over))
+                {
+                    over = rules.Clone();
+                    if (!over.MutationPower.TryGetValue(Mutation.Cloaked, out var power))
+                        over.MutationPower[Mutation.Cloaked] = power = new Dictionary<string, float>();
+                    power[Fields.RevealDistance] = defaults.CloakedReveal.Value;
+                    _creatureDefaults[(rules, prefab)] = over;
+                }
+                rules = over;
+            }
             return CreatureMutations.TryGetValue(prefab, out CreatureMutationRule own) ? own.Over(rules) : rules;
         }
 

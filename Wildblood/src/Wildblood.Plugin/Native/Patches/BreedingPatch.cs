@@ -13,11 +13,17 @@ namespace ExtraPotions.Wildblood.Adopted.Patches
     [HarmonyPatch(typeof(Procreation), "Procreate")]
     public static class BirthPatch
     {
-        private static void Prefix(Procreation __instance, out Lineage.Call? __state)
+        private static bool Prefix(Procreation __instance, out Lineage.Call? __state)
         {
+            __state = null;
+            if (ShepherdBreedingOwnership.FallbackOwnsBirth && !BreedingReadiness.Ready()
+                && __instance.m_nview != null && __instance.m_nview.IsValid() && __instance.m_nview.IsOwner()
+                && __instance.m_tameable != null && __instance.m_tameable.IsTamed()
+                && __instance.IsPregnant() && __instance.IsDue()) return false;
             Lineage.Call? call = null;
             SafeCall.Run("Procreation minimum trait carry", () => call = Hold(__instance));
             __state = call;
+            return true;
         }
 
         private static Lineage.Call? Hold(Procreation __instance)

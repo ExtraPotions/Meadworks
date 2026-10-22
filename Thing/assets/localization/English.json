@@ -319,7 +319,7 @@
     "ui_inventory_empty": "This player is not carrying anything this view can list.",
     "ui_inventory_take": "Take",
     "ui_inventory_delete": "Delete",
-    "ui_inventory_take_body": "Take {0} ({1}) from this player? The server reserves that stack and creates a protected pickup at your feet before removing it from the player. Pick it up into an empty inventory slot.",
+    "ui_inventory_take_body": "Take {0} ({1}) from this player? The server reserves that stack before removing it from the player. The whole stack goes into an empty slot in your inventory and does not merge with a stack you already have. If no empty slot is free, it stays at your feet as a protected pickup.",
     "ui_inventory_delete_body": "Delete {0} ({1}) from this player? The server will ask you to confirm once more before it is destroyed.",
     "ui_inventory_delete_again": "Delete {0} ({1}) permanently? This cannot be undone.",
     "ui_inventory_stored": "The stack is in your inventory.",

@@ -5,6 +5,7 @@ using ExtraPotions.Wildblood.Config;
 using ExtraPotions.Wildblood.Integration;
 using HarmonyLib;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace ExtraPotions.Wildblood.Runtime
 {
@@ -25,11 +26,12 @@ namespace ExtraPotions.Wildblood.Runtime
             var character = __instance.m_character;
             var view = character != null ? character.m_nview : null;
             if (view == null || !view.IsValid() || !view.IsOwner()) return;
-            for (int i = 0; i < __result.Count; i++)
+            for (int i = __result.Count - 1; i >= 0; i--)
             {
                 var pair = __result[i];
-                if (pair.Key == null) continue;
-                int scaled = SeasonDrops.Stack(pair.Key.name, pair.Value, rate, true);
+                if (pair.Key == null || !SeasonDrops.IsMeatOrHide(pair.Key.name)) continue;
+                int scaled = SeasonDrops.Stack(pair.Key.name, pair.Value, rate, true, rate < 1f ? Random.value : 0d);
+                if (scaled == 0 && pair.Value > 0) { __result.RemoveAt(i); continue; }
                 if (scaled != pair.Value) __result[i] = new KeyValuePair<GameObject, int>(pair.Key, scaled);
             }
         }
@@ -42,8 +44,7 @@ namespace ExtraPotions.Wildblood.Runtime
     }
 
     /// <summary>
-    /// Wood from a felled tree. The cloned table shares the drop list, so only the roll counts change, and the
-    /// original table is put back when the call ends.
+    /// A disposable table identifies the owner's tree drop call without changing its rolls or shared prefab data.
     /// </summary>
     [HarmonyPatch(typeof(TreeLog), nameof(TreeLog.Destroy))]
     public static class SeasonWoodLogPatch
@@ -56,7 +57,7 @@ namespace ExtraPotions.Wildblood.Runtime
 
         static void Finalizer(ref DropTable ___m_dropWhenDestroyed, DropTable __state)
         {
-            if (__state != null) ___m_dropWhenDestroyed = __state;
+            SeasonWood.Release(ref ___m_dropWhenDestroyed, __state);
         }
     }
 
@@ -74,12 +75,22 @@ namespace ExtraPotions.Wildblood.Runtime
 
         static void Finalizer(ref DropTable ___m_dropWhenDestroyed, DropTable __state)
         {
-            if (__state != null) ___m_dropWhenDestroyed = __state;
+            SeasonWood.Release(ref ___m_dropWhenDestroyed, __state);
         }
+    }
+
+    [HarmonyPatch(typeof(DropTable), nameof(DropTable.GetDropList), new System.Type[0])]
+    public static class SeasonWoodListPatch
+    {
+        [HarmonyPostfix]
+        [HarmonyPriority(Priority.Last - 2)]
+        static void Postfix(DropTable __instance, List<GameObject> __result) => SeasonWood.ScaleList(__instance, __result);
     }
 
     static class SeasonWood
     {
+        static readonly Dictionary<DropTable, float> active = new Dictionary<DropTable, float>();
+
         internal static void Scale(ref DropTable table, ref DropTable original)
         {
             if (table == null || table.m_drops == null) return;
@@ -87,11 +98,33 @@ namespace ExtraPotions.Wildblood.Runtime
             if (rate == 1f || !HasWood(table)) return;
             var copy = table.Clone();
             if (copy == null) return;
-            SeasonDrops.ScaleRange(copy.m_dropMin, copy.m_dropMax, rate, out var min, out var max);
-            copy.m_dropMin = min;
-            copy.m_dropMax = max;
             original = table;
             table = copy;
+            active.Add(copy, rate);
+        }
+
+        internal static void Release(ref DropTable table, DropTable original)
+        {
+            if (original == null) return;
+            active.Remove(table);
+            table = original;
+        }
+
+        internal static void ScaleList(DropTable table, List<GameObject> list)
+        {
+            if (list == null || !active.TryGetValue(table, out float rate)) return;
+            var counts = new Dictionary<GameObject, int>();
+            foreach (var item in list)
+                if (item != null && SeasonDrops.IsWood(item.name))
+                    counts[item] = counts.TryGetValue(item, out int count) ? count + 1 : 1;
+            foreach (var pair in counts)
+            {
+                int scaled = SeasonDrops.ScaleAmount(pair.Value, rate, rate < 1f ? Random.value : 0d);
+                int remove = pair.Value - scaled;
+                for (int i = list.Count - 1; i >= 0 && remove > 0; i--)
+                    if (list[i] == pair.Key) { list.RemoveAt(i); remove--; }
+                for (int i = pair.Value; i < scaled; i++) list.Add(pair.Key);
+            }
         }
 
         static bool HasWood(DropTable table)

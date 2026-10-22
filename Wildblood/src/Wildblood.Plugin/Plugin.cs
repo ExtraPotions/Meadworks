@@ -38,6 +38,7 @@ namespace ExtraPotions.Wildblood.Runtime
         private Harmony? luckHarmony;
         private IDisposable? luckCapability;
         private Adopted.Rules.NativeRuleAuthority? nativeRules;
+        private NativeCreatureRules? creatureRules;
         private Adopted.Config.NativeConfiguration? nativeConfiguration;
         private IDisposable? modifierRules;
         private IDisposable? karmaRules;
@@ -81,6 +82,7 @@ namespace ExtraPotions.Wildblood.Runtime
                     ExtraPotions.Meadworks.Contracts.FeatureOwnerContract.ContractVersion, () => Running);
                 AllowsUi = MeadworksHeadless.AllowsUi;
                 Settings = WildbloodConfig.Bind(Config, log);
+                creatureRules = new NativeCreatureRules(Config, registration, () => nativeRules?.Invalidate());
                 WildbloodSeasons.Initialize(Config);
                 WildbloodText.Initialize(Info.Metadata, Logger);
                 NativeRaidChestPrefab.Initialize();
@@ -126,7 +128,7 @@ namespace ExtraPotions.Wildblood.Runtime
                     if (type.Namespace == "ExtraPotions.Wildblood.Adopted.Raids" && NativeRaidAdmission.SourcePresent) continue;
                     bool inventoryOwner = Integration.HookActivation.NativeTheft.Contains(type.Namespace + "." + type.Name)
                         || type.DeclaringType == typeof(NativeRaidChest)
-                        || type.DeclaringType == typeof(NativeRaidAdmission) && type.Name == "RunningOwnership";
+                        || type.DeclaringType == typeof(NativeRaidAdmission) && (type.Name == "RunningOwnership" || type.Name == "RaidSceneOwnership");
                     bool luckOwner = type == typeof(LuckDeathGate) || type == typeof(LuckDeathScope);
                     (luckOwner ? luckHarmony : inventoryOwner ? theftHarmony : harmony).CreateClassProcessor(type).Patch();
                 }
@@ -147,6 +149,7 @@ namespace ExtraPotions.Wildblood.Runtime
             if (!Ready) return;
             AdoptedLibs.PatchGuard.Guard.Run("Wildblood season facts", WildbloodSeasons.Tick);
             WildbloodText.Tick();
+            creatureRules?.Tick();
             nativeRules?.Tick();
             if (started && log != null)
             {
@@ -167,10 +170,18 @@ namespace ExtraPotions.Wildblood.Runtime
             else PlayerScalingRuntime.Restore();
         }
 
+        private void LateUpdate()
+        {
+            if (!Ready) return;
+            AdoptedLibs.PatchGuard.Guard.Run("Wildblood star restore", Adopted.Runtime.StarRestoreBatch.EndFrame);
+        }
+
         private void OnDestroy() => Shutdown();
 
         private void Shutdown()
         {
+            try { Adopted.Runtime.StarRestoreBatch.FlushNow(); }
+            catch (Exception error) { log?.Warning("Wildblood star restore: " + error.GetType().Name); }
             NativeRaidChestPrefab.Shutdown();
             try { AdoptedCm.NativePressurePersistence.Save(); }
             catch (Exception error) { log?.Warning("Wildblood pressure settlement: " + error.GetType().Name); }
@@ -213,6 +224,7 @@ namespace ExtraPotions.Wildblood.Runtime
             modifierRules?.Dispose(); modifierRules = null;
             AdoptedCm.CreatureKarmaManager.ResetRuntimeState();
             AdoptedCm.CreatureManagerSpawnLifecycle.ResetRuntimeState();
+            creatureRules?.Dispose(); creatureRules = null;
             nativeRules?.Dispose();
             nativeRules = null;
             nativeConfiguration?.Dispose();

@@ -305,7 +305,7 @@
     "cfg_4_traits__tamed_keep_traits_name": "Gezähmte behalten Merkmale",
     "cfg_4_traits__tamed_keep_traits_help": "Zähmen erhält die Merkmale einer Kreatur (es gelten die gezähmten Varianten). Aus: Solange eine Kreatur gezähmt ist, wirken ihre Mutationen und Modifikatoren nicht; sie bleiben gespeichert, und ihre Sterne bleiben erhalten. Junge, die geboren werden, während dies aus ist, erben keine Mutation.",
     "cfg_4_traits__tamed_stars_name": "Gezähmte Sterne",
-    "cfg_4_traits__tamed_stars_help": "Ein: Eine neue Geburt kann Sterne erben, und Shepherd folgt dem, wenn es installiert ist. Aus: Ein Neugeborenes behält die Stufe seines Elternteils, wie im Spiel, und es kommt kein zusätzlicher Stern dazu. Zähmen nimmt niemals Sterne, Gesundheit oder Mutationen weg. Eine Kreatur, die ein älterer Stand auf der Spielstufe gelassen hat, erhält ihre gespeicherten Sterne beim nächsten Laden zurück. Der Server legt das fest.",
+    "cfg_4_traits__tamed_stars_help": "Ein: Eine neue Geburt kann Sterne erben, und Shepherd folgt dem, wenn es installiert ist. Solange „Sterne aktiviert“ an ist und der Sternmodus Wildblood ist, erhält eine gezähmte Kreatur mit gespeicherten Sternen, die auf der Spielstufe gelassen wurde, diese Sterne sofort zurück, wenn sie geladen ist, oder beim nächsten Laden. Der gefüllte Anteil ihrer Gesundheitsleiste bleibt gleich (eine volle Leiste bleibt voll, und eine leere Leiste bleibt leer). Größe und Farbe passen zu den Sternen. Die Wiederherstellung ändert ihre Mutationen nicht. Aus: Ein Neugeborenes behält die Stufe seines Elternteils, wie im Spiel, und es kommt kein zusätzlicher Stern dazu. Ausschalten nimmt einer gezähmten Kreatur keine Sterne, auch keine gerade zurückgegebenen. Zähmen nimmt niemals Sterne, Gesundheit oder Mutationen weg. Bosse, Neugeborene ohne gespeicherte zurückgestellte Stufe oder Wiederherstellungsmarkierung und Kreaturen ohne gespeicherte Sterne bleiben unverändert. Auch gezüchtete Kreaturen können zurückgestellte Sterne wiedererlangen. Ohne Wiederherstellungsmarkierung muss eine gezähmte Kreatur noch auf ihrer gespeicherten zurückgestellten Stufe sein. Der Server legt das fest.",
     "cfg_4_traits__players_may_inspect_name": "Spieler dürfen untersuchen",
     "cfg_4_traits__players_may_inspect_help": "Host-Regel: Jeder Spieler darf wildblood inspect ausführen, das Sterne, Merkmale und resultierende Werte der Kreatur im Fadenkreuz auflistet. Es liest nur und ist daher kein Cheat. Aus: nur Admins.",
     "cfg_5_bosses_heading": "5 - Bosse",
@@ -339,9 +339,9 @@
     "cfg_6_loot__defer_to_dropnspawn_name": "DropNSpawn den Vortritt lassen",
     "cfg_6_loot__defer_to_dropnspawn_help": "Die Beute tritt zurück, solange DropNSpawn installiert ist.",
     "cfg_6_loot__seasonal_meat_name": "Saisonales Fleisch",
-    "cfg_6_loot__seasonal_meat_help": "Host oder Server: Solange Solstices Jahreszeiten an sind, folgen Fleisch und Häute von Kreaturen der veröffentlichten Rate dieser Jahreszeit. Frühling und Sommer geben weniger, Herbst und Winter mehr, zwischen einem Viertel und dem Dreifachen der üblichen Menge. Ein Gegenstand bleibt ein Gegenstand. Trophäen, Federn, Reißzähne, Schuppen und Münzen bleiben, wie sie sind. Aus, ohne Solstice oder bei deaktivierten Jahreszeiten bleibt die heutige Beute. Der nächste Abschuss nutzt die aktuelle Rate.",
+    "cfg_6_loot__seasonal_meat_help": "Host oder Server: Solange Solstices Jahreszeiten an sind, folgen Fleisch und Häute von Kreaturen der veröffentlichten Rate dieser Jahreszeit. Frühling und Sommer geben weniger, Herbst und Winter mehr, zwischen einem Viertel und dem Dreifachen der üblichen Menge. Unter eins werden Bruchteile ausgewürfelt; ein einzelner Gegenstand kann ausbleiben. Trophäen, Federn, Reißzähne, Schuppen und Münzen bleiben, wie sie sind. Aus, ohne Solstice oder bei deaktivierten Jahreszeiten bleibt die heutige Beute. Der nächste Abschuss nutzt die aktuelle Rate.",
     "cfg_6_loot__seasonal_wood_name": "Saisonales Holz",
-    "cfg_6_loot__seasonal_wood_help": "Host oder Server: Solange Solstices Jahreszeiten an sind, folgt Holz von gefällten Bäumen der veröffentlichten Rate dieser Jahreszeit. Frühling und Sommer geben weniger, Herbst und Winter mehr, zwischen einem Viertel und dem Dreifachen der üblichen Menge. Ein Stück bleibt ein Stück. Aus, ohne Solstice oder bei deaktivierten Jahreszeiten bleibt das heutige Holz. Der nächste Baum nutzt die aktuelle Rate.",
+    "cfg_6_loot__seasonal_wood_help": "Host oder Server: Solange Solstices Jahreszeiten an sind, folgt Holz von gefällten Bäumen der veröffentlichten Rate dieser Jahreszeit. Frühling und Sommer geben weniger, Herbst und Winter mehr, zwischen einem Viertel und dem Dreifachen der üblichen Menge. Unter eins werden Bruchteile ausgewürfelt; ein einzelner Gegenstand kann ausbleiben. Aus, ohne Solstice oder bei deaktivierten Jahreszeiten bleibt das heutige Holz. Der nächste Baum nutzt die aktuelle Rate.",
     "cfg_7_luck_heading": "7 - Glück",
     "cfg_7_luck__persist_counters_name": "Zähler speichern",
     "cfg_7_luck__persist_counters_help": "Pechzähler werden mit dem Charakter gespeichert, pro Welt.",
@@ -458,6 +458,15 @@
     "cfg_12_cheats__lucky_kills_name": "Glückstreffer",
     "cfg_12_cheats__lucky_kills_help": "Cheat. Jede Zeile mit Pechschutz fällt bei jeder Tötung; Zähler bleiben unberührt.",
     "cfg_12_cheats__creature_commands_name": "Kreaturbefehle",
-    "cfg_12_cheats__creature_commands_help": "Cheat. Aktiviert die Admin-Befehle wildblood spawn, purge und karma."
+    "cfg_12_cheats__creature_commands_help": "Cheat. Aktiviert die Admin-Befehle wildblood spawn, purge und karma.",
+    "raid_request_command": "start <Münzen> [Stufe 0-7] [Anfrage-ID] oder stop: Truhe in höchstens 5 Metern Entfernung",
+    "raid_request_player": "Verwende diesen Befehl als verbundener Spieler neben einer Truhe.",
+    "raid_request_chest": "Keine verfügbare Truhe in höchstens 5 Metern Entfernung.",
+    "raid_request_unavailable": "Die Überfallanfrage kann gerade nicht gesendet werden. Versuche es erneut, sobald der Server bereit ist.",
+    "raid_request_sent": "Überfallanfrage {0} an den Server gesendet.",
+    "raid_request_started": "Überfall angenommen. Anfrage {0}.",
+    "raid_request_stopped": "Überfall beendet. Anfrage {0}.",
+    "raid_request_refused": "Überfallanfrage {0} wurde abgelehnt. Prüfe Truhenzugriff, Münzen, Wartezeit und die Wiederherstellungsprotokolle des Servers. Schließe die Truhe und warte auf die Inventarsynchronisierung, bevor du dieselbe Anfrage-ID erneut verwendest.",
+    "raid_request_timeout": "Keine Antwort auf Überfallanfrage {0}. Das Ergebnis ist unbekannt. Verwende beim erneuten Startversuch dieselbe Anfrage-ID, um nicht doppelt zu bezahlen."
   }
 }

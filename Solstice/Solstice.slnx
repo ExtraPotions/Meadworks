@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Solstice.Core/Solstice.Core.csproj" />
+    <Project Path="src/Solstice.Plugin/Solstice.Plugin.csproj" />
+  </Folder>
+</Solution>

@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExtraPotions.Bestiary.Spawning;
 
 namespace ExtraPotions.Bestiary.Catalog
 {
@@ -20,6 +21,9 @@ namespace ExtraPotions.Bestiary.Catalog
         Skeletons,
         ArsenalCrafting,
         Workshop,
+
+        /// <summary>Draugr Hook, Fuling Spearman, Slag Charred and Marrow Lantern, each a copy of a game body.</summary>
+        Kit,
     }
 
     /// <summary>How a creature enters the world (design 1.1 A, section 8 "Spawn swaps", "Spawn entries").</summary>
@@ -42,6 +46,15 @@ namespace ExtraPotions.Bestiary.Catalog
 
         /// <summary>Raised by the Executioner in a fight.</summary>
         Raised,
+
+        /// <summary>A share of one wild game creature. Spawners, piles, raids and elites stay the game's.</summary>
+        WildShare,
+
+        /// <summary>One per biome region, claimed until Delve clears it.</summary>
+        RegionClaim,
+
+        /// <summary>A roll on an existing creature spawner, which still spawns its own creature the rest of the time.</summary>
+        SpawnerRoll,
     }
 
     /// <summary>One <c>CharacterDrop.Drop</c>: item prefab, amount range as passed to the game, chance and scaling.</summary>
@@ -183,6 +196,19 @@ namespace ExtraPotions.Bestiary.Catalog
                 keepBaseDrops: false, scale: 1.25f, healthSetting: "25 - Crypt Executioner.Health"));
             list.Add(new CreatureDefinition("ECP_HeadsmanSkeleton", null, "Skeleton_NoArcher", BestiaryModule.Crypt, SpawnKind.Raised,
                 Array.Empty<DropSpec>(), keepBaseDrops: false, worthless: true));
+            list.Add(new CreatureDefinition(KitCreatures.BogHook, "enemy_mw_boghook", KitCreatures.Draugr, BestiaryModule.Kit, SpawnKind.WildShare,
+                Array.Empty<DropSpec>(), keepBaseDrops: true));
+            list.Add(new CreatureDefinition(KitCreatures.Javelineer, "enemy_mw_fulingjavelineer", KitCreatures.Fuling, BestiaryModule.Kit, SpawnKind.WildShare,
+                Array.Empty<DropSpec>(), keepBaseDrops: true));
+            list.Add(new CreatureDefinition(KitCreatures.SlagCharred, "enemy_mw_slagcharred", KitCreatures.Charred, BestiaryModule.Kit, SpawnKind.RegionClaim,
+                Array.Empty<DropSpec>(), keepBaseDrops: true, healthSetting: "43 - Slag Charred.Health"));
+            list.Add(new CreatureDefinition(KitCreatures.MarrowLantern, "enemy_mw_marrowlantern", KitCreatures.DeepNorthSkeleton, BestiaryModule.Kit, SpawnKind.SpawnerRoll,
+                new[]
+                {
+                    new DropSpec("FreezeGland", 1, 1, levelMultiplier: false, dontScale: true),
+                    new DropSpec("Coins", 8, 20),
+                },
+                keepBaseDrops: false));
             return list.ToArray();
         }
     }

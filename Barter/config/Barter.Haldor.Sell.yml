@@ -1,0 +1,49 @@
+# Haldor, sell list: what Haldor pays for, per lot.
+#
+# Written once by Barter when no list file exists. Edit freely; delete a file to stop using it (it is not written again
+# while any Barter list file exists). Prices are in the trader's currency before the trader's purse moves them (see the
+# Trader Purse settings). Items the game gives a value (trophies, gems, valuables) already sell to every trader at that value
+# through the Common Valuables setting, so this list names materials only.
+
+- prefab: Wood
+  stack: 10
+  price: 8
+- prefab: Stone
+  stack: 10
+  price: 6
+- prefab: Flint
+  stack: 10
+  price: 10
+- prefab: Resin
+  stack: 10
+  price: 10
+- prefab: Coal
+  stack: 10
+  price: 12
+- prefab: LeatherScraps
+  stack: 10
+  price: 12
+- prefab: DeerHide
+  stack: 5
+  price: 12
+- prefab: Feathers
+  stack: 10
+  price: 12
+- prefab: TrollHide
+  stack: 1
+  price: 20
+- prefab: Copper
+  stack: 1
+  price: 10
+- prefab: Tin
+  stack: 1
+  price: 10
+- prefab: Bronze
+  stack: 1
+  price: 18
+- prefab: Iron
+  stack: 1
+  price: 28
+- prefab: Silver
+  stack: 1
+  price: 45

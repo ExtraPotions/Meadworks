@@ -1,11 +1,11 @@
 {
   "name": "Mantle",
-  "version_number": "0.1.23",
+  "version_number": "0.1.24",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Mantle",
   "description": "Meadworks inventory and equipment: configurable grid, gear, ring and belt slots, backpacks, key ring, tacklebox and a Swap loadout button. Required on all peers (same version).",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.26"
+    "expDARE-Crucible-0.3.27"
   ]
 }

@@ -1,0 +1,29 @@
+# Barter trade list: what every trader sells. Barter writes this file once, when no list file exists yet.
+#
+# File names are Barter.<trader>.<Buy|Sell>[.<anything>].yml (also .yaml, .json, .csv). "common" applies to every trader; a
+# trader name is its prefab name without case: Haldor, Hildir, BogWitch. Files in a folder named Barter inside the config
+# folder need no Barter. prefix, so lists written for TradersExtended (haldor.buy.json, hildir.sell.yaml) work when copied there.
+#
+# Buy lists: what the trader sells to you. Sell lists: what the trader pays you for. Every file of the same trader and
+# kind is added together, in file name order. On a server the server's lists are the ones in force for everyone.
+#
+# Fields (all but prefab are optional):
+#   prefab                 the item, case sensitive, for example SwordIron
+#   stack                  items per lot (default 1)
+#   price                  price of one lot (default 1)
+#   quality                Buy: the quality bought. Sell: the quality this price is for (0: any)
+#   currency               an item prefab to pay with instead of the trader's currency
+#   requiredGlobalKey      comma list of world keys that must all be set, for example defeated_gdking
+#   notRequiredGlobalKey   comma list of world keys of which none may be set
+#   requiredPlayerKey      comma list of player keys that must all be set, for example GP_Eikthyr
+#   notRequiredPlayerKey   comma list of player keys of which none may be set
+#
+# Example (remove the # to use it):
+#
+# - prefab: DragonEgg
+#   price: 500
+#   requiredGlobalKey: defeated_dragon
+# - prefab: RawMeat
+#   stack: 10
+#   price: 2
+#   currency: Ruby

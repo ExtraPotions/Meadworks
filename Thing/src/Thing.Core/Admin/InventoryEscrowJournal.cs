@@ -10,7 +10,7 @@ using ExtraPotions.Thing.Moderation;
 
 namespace ExtraPotions.Thing.Admin
 {
-    public enum EscrowState { Prepared, CommitRequested, Committed, Released, Cancelled, ClaimRequested, Claimed }
+    public enum EscrowState { Prepared, CommitRequested, Committed, Released, Cancelled, ClaimRequested, Claimed, DeleteRequested, Deleted, DeleteCancelled }
 
     public sealed class EscrowRecord
     {
@@ -176,13 +176,15 @@ namespace ExtraPotions.Thing.Admin
             }
             catch (FormatException error) { throw new ArgumentException("Invalid escrow payload.", error); }
             if (record.Pickup == null || record.Pickup.Length > 128 || record.Pickup.Any(char.IsControl)) throw new ArgumentException("Invalid escrow pickup id.");
-            if ((int)record.State < (int)EscrowState.Prepared || (int)record.State > (int)EscrowState.Claimed) throw new ArgumentException("Invalid escrow state.");
+            if ((int)record.State < (int)EscrowState.Prepared || (int)record.State > (int)EscrowState.DeleteCancelled) throw new ArgumentException("Invalid escrow state.");
             if (record.SourceCharacter == null || record.SourceCharacter.Length > 32 || record.SourceCharacter.Length != 0
                 && (!long.TryParse(record.SourceCharacter, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var character) || character == 0))
                 throw new ArgumentException("Invalid escrow source character.");
             if (record.ReceiverCharacter == null || record.ReceiverCharacter.Length > 32 || record.ReceiverCharacter.Length != 0
                 && (!long.TryParse(record.ReceiverCharacter, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var receiver) || receiver == 0))
                 throw new ArgumentException("Invalid escrow receiver character.");
+            if (record.State >= EscrowState.DeleteRequested && (!record.Slot.HasIdentity || record.SourceCharacter.Length == 0 || record.Pickup.Length != 0 || record.ReceiverCharacter.Length != 0))
+                throw new ArgumentException("A deletion requires an exact source image and no delivery.");
             if ((record.State == EscrowState.ClaimRequested || record.State == EscrowState.Claimed) && record.ReceiverCharacter.Length == 0)
                 throw new ArgumentException("An escrow claim requires its receiver character.");
         }
@@ -203,6 +205,7 @@ namespace ExtraPotions.Thing.Admin
                 case EscrowState.Committed: return next == EscrowState.Released;
                 case EscrowState.Released: return next == EscrowState.ClaimRequested;
                 case EscrowState.ClaimRequested: return next == EscrowState.Claimed;
+                case EscrowState.DeleteRequested: return next == EscrowState.Deleted || next == EscrowState.DeleteCancelled;
                 default: return false;
             }
         }

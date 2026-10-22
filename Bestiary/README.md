@@ -1,6 +1,6 @@
 # Bestiary
 
-Version 0.1.15. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 New creatures with fights of their own, the bone arsenal you craft from them, and a creature workshop for server owners.
 
@@ -17,12 +17,13 @@ New creatures with fights of their own, the bone arsenal you craft from them, an
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Wildblood 0.5.5 or later
 
 ## Installation
 
 - **Mod manager (recommended):** install Bestiary with r2modman, Gale or the Thunderstore Mod Manager; the dependencies above are installed for you.
-- **Manual:** install BepInExPack Valheim, then Jotunn and Crucible, then copy the `plugins/Bestiary` folder from this package into `BepInEx/plugins/`.
+- **Manual:** install BepInExPack Valheim, then Jotunn, Crucible and Wildblood, then copy the `plugins/Bestiary` folder from this package into `BepInEx/plugins/`.
 - In multiplayer, install Bestiary on the server and on every client (see Multiplayer).
 
 ## Configuration
@@ -43,7 +44,7 @@ New creatures with fights of their own, the bone arsenal you craft from them, an
 
 - Steps aside: when Elite Creatures Pack is installed, Bestiary turns itself off (both would add the same creatures). When CreatureManager is installed and has creature data, Bestiary's workshop turns off and the rest keeps running.
 - Converters: Elite Creatures Pack settings and CreatureManager workshop files (see Configuration).
-- Optional Meadworks integrations: Wildblood supplies stars, mutations and loot rules for Bestiary creatures; Inscribe supplies runes and item levels for the arsenal. Both are optional.
+- Meadworks integrations: Wildblood supplies stars, mutations, loot rules and the Marrow Lantern's Reveal for Bestiary creatures, and mod managers install it with Bestiary. Inscribe supplies runes and item levels for the arsenal and is optional.
 
 ## Notes
 

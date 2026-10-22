@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "product": "Barter",
+  "default": "Advanced",
+  "settings": {
+    "Trader Purse/Enabled": "Essential",
+    "Interface/*": "Essential",
+    "Trader Services/*": "Advanced",
+    "Trade Lists/Managed List Files": "FileOnly",
+    "Trade Lists/Managed Trader Policies": "FileOnly"
+  }
+}

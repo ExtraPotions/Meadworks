@@ -13,7 +13,9 @@ namespace ExtraPotions.Meadworks.Crucible.UI
     /// MeadWorks notice stack. Timber or Brown cards, newest at the top, each fading out on its own timer.
     /// This object is ours: it does not restyle MessageHud or any other mod's UI. While the inventory, map, pause
     /// menu, or a MeadWorks window is open, the cards hide and their timers wait. The stack stays off the compass, the
-    /// status row and the hotbar. When that gap is shorter than the stack, fewer cards show and the rest wait.
+    /// status row, the hotbar and the game's own unlock and notice cards. A card wraps to two lines, measured in the
+    /// game font, and grows to that text; "..." is used only when a third line would be needed. When the gap is
+    /// shorter than the stack, fewer cards show and the rest wait.
     /// </summary>
     public static class KitNoticePanel
     {
@@ -41,14 +43,19 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         static readonly Dictionary<int, Sprite> icons = new Dictionary<int, Sprite>();
         static readonly CardView[] views = new CardView[KitNoticeStack.MaxVisibleLimit];
         static readonly List<Rect> screenBlocks = new List<Rect>(16);
+        static readonly List<Rect> nativeRects = new List<Rect>(8);
         static readonly List<KitRect> blocks = new List<KitRect>(16);
         static RectTransform root;
+        static TMP_Text probe;
+        static float oneLineHeight;
         static HotkeyBar hotbar;
         static bool layoutDirty = true;
         static bool heldLast;
         static int appliedRevision = -1, appliedMax = -1, screenW, screenH, obstacleSignature;
         static int fitCards = KitNoticeStack.MaxVisibleLimit;
         static float fitWidth = CardWidth;
+        static float fitSlot = 10000f;
+        static int nativeSignature;
         static float nextPlace;
         static string languageSeen = "";
 
@@ -97,8 +104,10 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             heldLast = hold;
             int previousCards = fitCards;
             float previousWidth = fitWidth;
-            if (!hold && (layoutDirty || screen || due || opened)) Measure();
-            bool fitChanged = fitCards != previousCards || Math.Abs(fitWidth - previousWidth) > 0.01f;
+            float previousSlot = fitSlot;
+            bool notices = !hold && NativeNoticesMoved();
+            if (!hold && (layoutDirty || screen || due || opened || notices)) Measure();
+            bool fitChanged = fitCards != previousCards || Math.Abs(fitWidth - previousWidth) > 0.01f || Math.Abs(fitSlot - previousSlot) > 0.5f;
             int max = Maximum;
             int space = fitCards;
             bool changed = stack.Tick(Time.unscaledDeltaTime, hold, max, space);
@@ -111,7 +120,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             }
             if (!EnsureRoot()) return;
             if (!root.gameObject.activeSelf) root.gameObject.SetActive(true);
-            if (changed || layoutDirty || stack.Revision != appliedRevision || max != appliedMax || screen || due || opened || fitChanged)
+            if (changed || layoutDirty || stack.Revision != appliedRevision || max != appliedMax || screen || due || opened || fitChanged || notices)
             {
                 appliedRevision = stack.Revision;
                 appliedMax = max;
@@ -130,11 +139,15 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             appliedRevision = -1;
             appliedMax = -1;
             obstacleSignature = 0;
+            nativeSignature = 0;
             languageSeen = "";
             heldLast = false;
             fitCards = KitNoticeStack.MaxVisibleLimit;
             fitWidth = CardWidth;
+            fitSlot = 10000f;
             hotbar = null;
+            if (probe != null) { UnityEngine.Object.Destroy(probe.gameObject); probe = null; }
+            oneLineHeight = 0f;
             if (root != null) UnityEngine.Object.Destroy(root.gameObject);
             root = null;
             for (int i = 0; i < views.Length; i++) views[i] = null;
@@ -233,8 +246,9 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             icon.raycastTarget = false;
             icon.preserveAspect = true;
             Move(icon.rectTransform, new Vector2(8f, -7f), new Vector2(32f, 32f));
-            var body = KitCanvas.Text(card, "Text", "", 16f, KitUnity.Colour(KitPalette.SheetLabel), TextAlignmentOptions.MidlineLeft, false);
+            var body = KitCanvas.Text(card, "Text", "", 16f, KitUnity.Colour(KitPalette.SheetLabel), TextAlignmentOptions.MidlineLeft, true);
             body.overflowMode = TextOverflowModes.Truncate;
+            body.maxVisibleLines = KitNoticeText.MaxLines;
             var count = KitCanvas.Text(card, "Count", "", 16f, KitUnity.Colour(KitPalette.TabLitText), TextAlignmentOptions.MidlineRight, false);
             count.overflowMode = TextOverflowModes.Truncate;
             iconObject.SetActive(false);
@@ -249,16 +263,41 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             {
                 fitCards = cards;
                 fitWidth = CardWidth;
+                fitSlot = 10000f;
                 return;
             }
+            int n = Math.Min(cards, stack.HeldCount);
+            if (n < 1)
+            {
+                fitCards = cards;
+                fitWidth = CardWidth;
+                fitSlot = 10000f;
+                return;
+            }
+            var heights = new float[n];
+            Fill(n, CardWidth, heights, null);
             Collect(blocks);
-            float desired = (cards * CardHeight + (cards - 1) * Gap) * scale;
-            var slot = KitNoticePlacement.Place(Corner, Screen.width, Screen.height, CardWidth * scale, desired, blocks, Margin);
-            fitCards = KitNoticePlacement.CardsThatFit(slot.Height, CardHeight * scale, Gap * scale, cards);
+            var slot = PlaceHeights(scale, CardWidth, heights);
             float width = slot.Width / scale;
             if (float.IsNaN(width) || float.IsInfinity(width) || width > CardWidth) width = CardWidth;
             if (width < 1f) width = 1f;
+            if (width < CardWidth - 0.5f)
+            {
+                Fill(n, width, heights, null);
+                slot = PlaceHeights(scale, width, heights);
+            }
+            var pixels = new float[n];
+            for (int i = 0; i < n; i++) pixels[i] = heights[i] * scale;
+            fitCards = KitNoticePlacement.PrefixThatFits(slot.Height, pixels, Gap * scale);
+            fitSlot = slot.Height / scale;
+            if (float.IsNaN(fitSlot) || fitSlot < 0f) fitSlot = 0f;
             fitWidth = width;
+        }
+
+        static KitRect PlaceHeights(float scale, float width, float[] heights)
+        {
+            float desired = KitNoticePlacement.StackHeight(heights, heights.Length, Gap) * scale;
+            return KitNoticePlacement.Place(Corner, Screen.width, Screen.height, width * scale, desired, blocks, Margin);
         }
 
         static float Scale()
@@ -275,18 +314,28 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             float width = fitWidth;
             if (width > CardWidth) width = CardWidth;
             if (width < 1f) width = 1f;
+            var heights = new float[count];
+            var lines = new string[count];
+            Fill(count, width, heights, lines);
+            int draw = KitNoticePlacement.PrefixThatFits(fitSlot, heights, Gap);
             float y = 0f;
-            var cardSize = new Vector2(width, CardHeight);
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < draw; i++)
             {
                 var view = View(i);
                 if (view == null) return;
                 if (!view.Root.gameObject.activeSelf) view.Root.gameObject.SetActive(true);
                 var pos = new Vector2(0f, -y);
                 if (view.Root.anchoredPosition != pos) view.Root.anchoredPosition = pos;
+                float cardH = heights[i];
+                var cardSize = new Vector2(width, cardH);
                 if (view.Root.sizeDelta != cardSize) view.Root.sizeDelta = cardSize;
-                string body = Line(stack.TitleAt(i), KitNotices.Localize(stack.TextAt(i)));
+                var reading = KitCanvas.Font;
+                if (reading != null && view.Body.font != reading) view.Body.font = reading;
+                string body = lines[i] ?? "";
                 if (view.BodyCache != body) { view.BodyCache = body; view.Body.text = body; }
+                int lineCount = cardH > KitNoticeText.OneLineCard + 0.5f || body.IndexOf('\n') >= 0 ? 2 : 1;
+                var align = lineCount > 1 ? TextAlignmentOptions.TopLeft : TextAlignmentOptions.MidlineLeft;
+                if (view.Body.alignment != align) view.Body.alignment = align;
                 int badge = stack.BadgeAt(i);
                 string badgeText = badge > 1 ? "\u00d7" + badge.ToString(CultureInfo.InvariantCulture) : "";
                 if (view.CountCache != badgeText) { view.CountCache = badgeText; view.Count.text = badgeText; }
@@ -295,22 +344,255 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 if (view.Icon.sprite != icon) view.Icon.sprite = icon;
                 if (view.Icon.gameObject.activeSelf != showIcon) view.Icon.gameObject.SetActive(showIcon);
                 float textX = showIcon ? 46f : 12f;
-                float textW = width - textX - 72f;
-                if (textW < 1f) textW = 1f;
-                Move(view.Body.rectTransform, new Vector2(textX, -7f), new Vector2(textW, 32f));
+                float box = cardH - KitNoticeText.VerticalPad;
+                if (box < 1f) box = KitNoticeText.TextBoxHeight(lineCount);
+                Move(view.Body.rectTransform, new Vector2(textX, -7f), new Vector2(TextWidth(width, showIcon), box));
                 float countX = width - 68f;
                 if (countX < 1f) countX = 1f;
                 Move(view.Count.rectTransform, new Vector2(countX, -7f), new Vector2(56f, 32f));
                 float alpha = stack.OpacityAt(i);
                 if (!Mathf.Approximately(view.Alpha, alpha)) { view.Alpha = alpha; view.Fade.alpha = alpha; }
-                y += CardHeight + Gap;
+                y += cardH + Gap;
             }
-            for (int i = count; i < views.Length; i++)
+            for (int i = draw; i < views.Length; i++)
                 if (views[i] != null && views[i].Root != null && views[i].Root.gameObject.activeSelf) views[i].Root.gameObject.SetActive(false);
-            float height = count == 0 ? 0f : y - Gap;
+            float height = draw == 0 ? 0f : y - Gap;
             var size = new Vector2(width, height);
             if (root.sizeDelta != size) root.sizeDelta = size;
             PlaceRoot();
+        }
+
+        static void Fill(int count, float width, float[] heights, string[] lines)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                string body = Line(stack.TitleHeld(i), KitNotices.Localize(stack.RawHeld(i)));
+                bool icon = stack.IconHeld(i);
+                var laid = Lay(body, TextWidth(width, icon));
+                heights[i] = KitNoticeText.VerticalPad + laid.Box;
+                if (lines != null) lines[i] = laid.Text;
+            }
+        }
+
+        static float TextWidth(float cardWidth, bool icon)
+        {
+            float textX = icon ? 46f : 12f;
+            float room = cardWidth - textX - 72f;
+            return room < 1f ? 1f : room;
+        }
+
+        readonly struct LaidNotice
+        {
+            public LaidNotice(string text, int lines, float box)
+            {
+                Text = text ?? "";
+                Lines = lines < 1 ? 1 : lines;
+                Box = box < 1f ? KitNoticeText.TextBoxHeight(Lines) : box;
+            }
+
+            public string Text { get; }
+            public int Lines { get; }
+            public float Box { get; }
+        }
+
+        /// <summary>Line count from the notice font. With no font yet, every character counts as one em so wide text still wraps.</summary>
+        static LaidNotice Lay(string text, float width)
+        {
+            var fontProbe = Probe();
+            if (fontProbe == null)
+            {
+                var fit = KitNoticeText.Fit(text, width, KitNoticeText.FontSize, FallbackWidth);
+                return new LaidNotice(fit.Text, fit.Lines, KitNoticeText.TextBoxHeight(fit.Lines));
+            }
+            return FitMeasured(fontProbe, text, width);
+        }
+
+        static float FallbackWidth(string text) => string.IsNullOrEmpty(text) ? 0f : text.Length * KitNoticeText.FontSize;
+
+        static TMP_Text Probe()
+        {
+            var font = KitCanvas.Font;
+            if (probe != null)
+            {
+                if (font != null && probe.font != font) { probe.font = font; oneLineHeight = 0f; }
+                probe.fontSize = KitNoticeText.FontSize;
+                return probe;
+            }
+            var parent = KitCanvas.Front as RectTransform;
+            if (parent == null) return null;
+            probe = KitCanvas.Text(parent, "NoticeMeasure", "", KitNoticeText.FontSize, Color.white, TextAlignmentOptions.TopLeft, true);
+            if (probe == null) return null;
+            probe.overflowMode = TextOverflowModes.Overflow;
+            probe.maxVisibleLines = 64;
+            probe.raycastTarget = false;
+            var hide = probe.gameObject.AddComponent<CanvasGroup>();
+            hide.alpha = 0f;
+            hide.blocksRaycasts = false;
+            hide.interactable = false;
+            var rect = probe.rectTransform;
+            rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
+            rect.pivot = new Vector2(0f, 1f);
+            rect.anchoredPosition = new Vector2(-10000f, -10000f);
+            if (font != null) probe.font = font;
+            return probe;
+        }
+
+        static LaidNotice FitMeasured(TMP_Text fontProbe, string text, float width)
+        {
+            int lines = CountLines(fontProbe, text, width);
+            string shown;
+            int shownLines;
+            if (lines > KitNoticeText.MaxLines)
+            {
+                shown = Ellipsize(fontProbe, text, width);
+                shownLines = CountLines(fontProbe, shown, width);
+                if (shownLines > KitNoticeText.MaxLines) shownLines = KitNoticeText.MaxLines;
+            }
+            else if (lines > 1)
+            {
+                string joined = JoinMeasured(fontProbe, lines);
+                shown = joined.IndexOf('\n') >= 0 ? joined : (text ?? "");
+                shownLines = KitNoticeText.MaxLines;
+            }
+            else
+            {
+                shown = text ?? "";
+                shownLines = 1;
+            }
+            float preferred = fontProbe.GetPreferredValues(shown, width, 0f).y;
+            return new LaidNotice(shown, shownLines, BoxHeight(shownLines, preferred));
+        }
+
+        static float BoxHeight(int lines, float preferred)
+        {
+            float formula = KitNoticeText.TextBoxHeight(lines);
+            float cap = KitNoticeText.FontSize * 4f * lines;
+            if (float.IsNaN(preferred) || float.IsInfinity(preferred) || preferred <= formula || preferred > cap)
+                return formula;
+            return preferred;
+        }
+
+        static int CountLines(TMP_Text fontProbe, string text, float width)
+        {
+            if (string.IsNullOrEmpty(text)) return 1;
+            var rect = fontProbe.rectTransform;
+            rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width < 1f ? 1f : width);
+            rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 800f);
+            fontProbe.textWrappingMode = TextWrappingModes.Normal;
+            fontProbe.overflowMode = TextOverflowModes.Overflow;
+            fontProbe.maxVisibleLines = 64;
+            fontProbe.text = text;
+            fontProbe.ForceMeshUpdate(true);
+            var info = fontProbe.textInfo;
+            int count = info == null ? 1 : info.lineCount;
+            while (count > 1 && info.lineInfo[count - 1].characterCount <= 0) count--;
+            if (count < 1) count = 1;
+            float one = OneLine(fontProbe);
+            fontProbe.textWrappingMode = TextWrappingModes.Normal;
+            float all = fontProbe.GetPreferredValues(text, width, 0f).y;
+            if (count == 1 && one > 1f && !float.IsNaN(all) && !float.IsInfinity(all) && all > one * 1.25f)
+            {
+                int fromHeight = Mathf.RoundToInt(all / one);
+                if (fromHeight >= 2 && fromHeight <= 8) count = fromHeight;
+            }
+            fontProbe.textWrappingMode = TextWrappingModes.Normal;
+            fontProbe.text = text;
+            fontProbe.ForceMeshUpdate(true);
+            return count;
+        }
+
+        static float OneLine(TMP_Text fontProbe)
+        {
+            if (oneLineHeight > 1f) return oneLineHeight;
+            fontProbe.textWrappingMode = TextWrappingModes.NoWrap;
+            float latin = fontProbe.GetPreferredValues("Ag").y;
+            float wide = fontProbe.GetPreferredValues("\u6728").y;
+            float height = latin > wide ? latin : wide;
+            if (float.IsNaN(height) || float.IsInfinity(height) || height < 1f) return 0f;
+            oneLineHeight = height;
+            return height;
+        }
+
+        const string Dots = "...";
+
+        static string Ellipsize(TMP_Text fontProbe, string text, float width)
+        {
+            int lo = 0, hi = text.Length, best = 0;
+            while (lo <= hi)
+            {
+                int mid = (lo + hi) / 2;
+                if (CountLines(fontProbe, Candidate(text, mid), width) <= KitNoticeText.MaxLines)
+                {
+                    best = mid;
+                    lo = mid + 1;
+                }
+                else hi = mid - 1;
+            }
+            int atWord = WordBoundary(text, best);
+            if (atWord < best && CountLines(fontProbe, WordAfter(text, atWord), width) <= 1)
+                best = atWord;
+            string chosen = Candidate(text, best);
+            int lines = CountLines(fontProbe, chosen, width);
+            if (lines > KitNoticeText.MaxLines) lines = KitNoticeText.MaxLines;
+            if (lines <= 1) return chosen;
+            return JoinMeasured(fontProbe, lines);
+        }
+
+        static string WordAfter(string text, int boundary)
+        {
+            int i = boundary;
+            while (i < text.Length && char.IsWhiteSpace(text[i])) i++;
+            int start = i;
+            while (i < text.Length && !char.IsWhiteSpace(text[i])) i++;
+            return start >= text.Length ? "" : text.Substring(start, i - start);
+        }
+
+        static int WordBoundary(string text, int count)
+        {
+            if (count <= 0 || count >= text.Length) return count;
+            if (char.IsWhiteSpace(text[count - 1])) return count;
+            for (int i = count - 1; i > 0; i--)
+                if (char.IsWhiteSpace(text[i])) return i;
+            return count;
+        }
+
+        static string Candidate(string text, int count)
+        {
+            if (count <= 0) return Dots;
+            if (count > text.Length) count = text.Length;
+            if (count == text.Length) return text;
+            string prefix = text.Substring(0, count).TrimEnd();
+            return prefix.Length == 0 ? Dots : prefix + Dots;
+        }
+
+        static string JoinMeasured(TMP_Text fontProbe, int lines)
+        {
+            var info = fontProbe.textInfo;
+            string raw = fontProbe.text ?? "";
+            if (info == null || lines <= 1 || raw.Length == 0) return raw;
+            int take = lines < info.lineCount ? lines : info.lineCount;
+            if (take > KitNoticeText.MaxLines) take = KitNoticeText.MaxLines;
+            string first = Slice(info, raw, 0);
+            if (take < 2) return first.Length > 0 ? first : raw;
+            string second = Slice(info, raw, 1);
+            if (second.Length == 0) return first.Length > 0 ? first : raw;
+            if (first.Length == 0) return second;
+            return first + "\n" + second;
+        }
+
+        static string Slice(TMP_TextInfo info, string raw, int lineIndex)
+        {
+            if (info == null || lineIndex < 0 || lineIndex >= info.lineCount) return "";
+            var line = info.lineInfo[lineIndex];
+            if (line.characterCount <= 0) return "";
+            int from = line.firstCharacterIndex;
+            int to = line.lastCharacterIndex;
+            if (from < 0 || to < from || to >= info.characterCount) return "";
+            int start = info.characterInfo[from].index;
+            int end = info.characterInfo[to].index;
+            if (start < 0 || end < start || start >= raw.Length) return "";
+            if (end >= raw.Length) end = raw.Length - 1;
+            return raw.Substring(start, end - start + 1).TrimEnd(' ', '\t', '\r', '\n');
         }
 
         static void Fade()
@@ -388,7 +670,23 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                     if (bar.GetChild(i) is RectTransform slot && slot.gameObject.activeInHierarchy && KitHudLayout.ScreenRect(slot, out var rect))
                         screenBlocks.Add(rect);
             }
+            KitNativeNotices.AppendShownRects(screenBlocks);
             for (int i = 0; i < screenBlocks.Count; i++) into.Add(KitUnity.Rect(screenBlocks[i]));
+        }
+
+        static bool NativeNoticesMoved()
+        {
+            nativeRects.Clear();
+            KitNativeNotices.AppendShownRects(nativeRects);
+            int signature = nativeRects.Count;
+            for (int i = 0; i < nativeRects.Count; i++)
+            {
+                var block = nativeRects[i];
+                signature = unchecked(signature * 31 + block.x.GetHashCode() + block.y.GetHashCode() + block.width.GetHashCode() + block.height.GetHashCode());
+            }
+            if (signature == nativeSignature) return false;
+            nativeSignature = signature;
+            return true;
         }
 
         static string Line(string title, string text)

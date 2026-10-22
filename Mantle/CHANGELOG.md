@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.24 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- Adds server-owned trinket tuning with native game data as its baseline. Tuning is off and the Native preset is selected by default; Conservative optionally awards 5% of the effective adrenaline threshold per credited hostile death, weighted by the target's native multiplier. Custom tables are validated atomically. Native recipes, item identities and saved items remain unchanged.
+- Adds live tuning, seven-language setting descriptions and effective-value reporting. Unsupported peers use native tuning without new admission requirements.
+- Kill credit uses the last hit this peer can see, including when another player owns the creature. Without a visible last hit, only the player who owns the creature can receive the award.
+
 ## 0.1.23 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

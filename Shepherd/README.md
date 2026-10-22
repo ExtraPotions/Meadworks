@@ -1,6 +1,6 @@
 # Shepherd
 
-Version 0.1.15. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Animal keeping as part of your base: feed troughs, a Husbandry skill, and breeding with sires, star inheritance, twins, herd limits and lineage.
 
@@ -14,8 +14,8 @@ Animal keeping as part of your base: feed troughs, a Husbandry skill, and breedi
 - Honey production (native/off by default): Honey Per Day sets a bounded daily rate; Honey Per Player Online replaces it with the actual online player count. Native hive conditions and capacity still apply. Existing extra-honey skill rewards happen separately at harvest.
 - Husbandry skill: levels as you tame, feed, pet and breed animals, and gives faster taming, animals that stay fed longer, calmer animals, more butcher yield and produce, and tougher tamed companions.
 - Follow and stay for supported tames: Use on a tamed boar, lox, hen or other tame that supports commands toggles the game's own follow/stay command. Summons and unsupported tameables stay unchanged.
-- Breeding: the father (sire) is recorded at conception, twins, and lineage records (parents, generation, birth day and breeder). Newborn stars follow Wildblood. When Wildblood is installed and its Tamed Stars is on, stars are inherited from both parents (Star Inheritance), with Better Offspring and Birth Star Chance. Off, or without Wildblood, a newborn keeps its mother's level, as the game does, and those bonuses add nothing. Shepherd's own Tamed Stars setting is ignored. The old key stays in the config file and does not change a birth.
-- Seasonal Breeding (on by default, host or server): while Solstice seasons are on, tame breeding uses that season's rate. Spring is faster, winter is slower, and a rate of zero starts no new pregnancies. A pregnancy already underway still finishes. Off, or without Solstice, breeding stays as it is. Feeding and troughs are unchanged.
+- Breeding: the father (sire) is recorded at conception, twins, and lineage records (parents, generation, birth day and breeder). Newborn stars follow Wildblood. When Wildblood is installed and its `4 - Traits / Tamed Stars` is on, stars are inherited from both parents (`6 - Breeding / Star Inheritance`), with `6 - Breeding / Better Offspring At 100` and `6 - Breeding / Birth Star Chance`. Off, or without Wildblood, a newborn keeps its mother's level, as the game does, and those bonuses add nothing. Shepherd's own `6 - Breeding / Tamed Stars` setting is ignored. The old key stays in the config file and does not change a birth. Wildblood, not Shepherd, gives a tame that an older build left at the game's level its stored stars back when that setting is on. Parked births can regain stored stars too; fresh births without parking metadata keep their assigned level. A due pregnancy waits for Wildblood's server rules before the newborn is created or inherits traits.
+- `6 - Breeding / Seasonal Breeding` (on by default, host or server): while Solstice seasons are on, tame breeding uses that season's rate. Spring is faster, winter is slower. The pace stays between one quarter and three times the usual pace. A rate of zero starts no new pregnancies. A pregnancy already underway still finishes. Off, or without Solstice, or with seasons off, breeding stays as it is. Feeding and troughs are unchanged.
 - Herd limits: an optional strict herd limit delays births while a herd is over its limit. A buildable land pen sets its own herd capacity, and breeding can pause on moving ship pens.
 - Herd book: a shared book listing nearby animals with their lineage, opened from the Meadworks menu (F8 or Esc > Meadworks), the trough header, or a key or gamepad chord (unbound by default), within 50 m. Tames can be renamed.
 - Animal lore lines on hover (compact or full).
@@ -25,7 +25,7 @@ Animal keeping as part of your base: feed troughs, a Husbandry skill, and breedi
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
 
 ## Installation
 

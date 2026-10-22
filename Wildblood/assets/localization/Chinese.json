@@ -305,7 +305,7 @@
     "cfg_4_traits__tamed_keep_traits_name": "驯服后保留特性",
     "cfg_4_traits__tamed_keep_traits_help": "驯服后生物保留其特性（适用驯服变体）。关闭：生物被驯服期间，其变异和词缀不生效；它们仍会保存，星级也保留。关闭期间出生的幼崽不继承变异。",
     "cfg_4_traits__tamed_stars_name": "驯服星级",
-    "cfg_4_traits__tamed_stars_help": "开启：新出生的生物可以继承星级，安装了 Shepherd 时会遵循此项。关闭：新生生物按游戏方式保留亲本的等级，不会额外增加星级。驯服从不移除星级、生命值或变异。旧版本曾留在游戏等级的生物，会在下次加载时取回已保存的星级。由服务器设定。",
+    "cfg_4_traits__tamed_stars_help": "开启：新出生的生物可以继承星级，安装了 Shepherd 时会遵循此项。当启用星级为开启且星级模式为 Wildblood 时，一只留在游戏等级、且存有星级的驯服生物，若已加载会立刻取回这些星级，否则在下次加载时取回。它的生命值保持血条上原来的比例（满血仍是满血，空血仍是空血）。体型和颜色与这些星级一致。这次取回不改变它的变异。关闭：新生生物按游戏方式保留亲本的等级，不会额外增加星级。关闭此项不会移除驯服生物已有的星级，包括刚刚取回的星级。驯服从不移除星级、生命值或变异。首领、没有已保存的暂存等级或恢复标记的新生生物，以及没有已保存星级的生物保持原样。繁殖出生的生物也能恢复暂存的星级。没有恢复标记时，驯服生物必须仍处于已保存的暂存等级。由服务器设定。",
     "cfg_4_traits__players_may_inspect_name": "玩家可查看",
     "cfg_4_traits__players_may_inspect_help": "主机规则：每位玩家都可以运行 wildblood inspect，列出准星下生物的星级、特性和最终数值。它只读取数据，因此不算作弊。关闭：仅限管理员。",
     "cfg_5_bosses_heading": "5 - 首领",
@@ -339,9 +339,9 @@
     "cfg_6_loot__defer_to_dropnspawn_name": "让位于 DropNSpawn",
     "cfg_6_loot__defer_to_dropnspawn_help": "安装了 DropNSpawn 时，掉落功能让位。",
     "cfg_6_loot__seasonal_meat_name": "季节性的肉",
-    "cfg_6_loot__seasonal_meat_help": "由主机或服务器控制：当 Solstice 的季节开启时，生物掉落的肉和皮使用该季节公布的速率。春季和夏季更少，秋季和冬季更多，在平时数量的四分之一到三倍之间。一件物品仍是一件。战利品、羽毛、尖牙、鳞片和硬币保持不变。关闭、没有 Solstice，或季节关闭时，掉落保持现在的样子。下一次击杀使用当前速率。",
+    "cfg_6_loot__seasonal_meat_help": "由主机或服务器控制：当 Solstice 的季节开启时，生物掉落的肉和皮使用该季节公布的速率。春季和夏季更少，秋季和冬季更多，在平时数量的四分之一到三倍之间。倍率低于一时，小数部分随机取整，单件物品可能不会掉落。战利品、羽毛、尖牙、鳞片和硬币保持不变。关闭、没有 Solstice，或季节关闭时，掉落保持现在的样子。下一次击杀使用当前速率。",
     "cfg_6_loot__seasonal_wood_name": "季节性的木材",
-    "cfg_6_loot__seasonal_wood_help": "由主机或服务器控制：当 Solstice 的季节开启时，被砍倒的树掉落的木材使用该季节公布的速率。春季和夏季更少，秋季和冬季更多，在平时数量的四分之一到三倍之间。一块木材仍是一块。关闭、没有 Solstice，或季节关闭时，木材保持现在的样子。下一棵树使用当前速率。",
+    "cfg_6_loot__seasonal_wood_help": "由主机或服务器控制：当 Solstice 的季节开启时，被砍倒的树掉落的木材使用该季节公布的速率。春季和夏季更少，秋季和冬季更多，在平时数量的四分之一到三倍之间。倍率低于一时，小数部分随机取整，单件物品可能不会掉落。关闭、没有 Solstice，或季节关闭时，木材保持现在的样子。下一棵树使用当前速率。",
     "cfg_7_luck_heading": "7 - 运气",
     "cfg_7_luck__persist_counters_name": "保存计数",
     "cfg_7_luck__persist_counters_help": "厄运计数按世界随角色一起保存。",
@@ -458,6 +458,15 @@
     "cfg_12_cheats__lucky_kills_name": "幸运击杀",
     "cfg_12_cheats__lucky_kills_help": "作弊。每次击杀都会掉落所有受厄运保护的掉落行；计数不变。",
     "cfg_12_cheats__creature_commands_name": "生物指令",
-    "cfg_12_cheats__creature_commands_help": "作弊。启用管理员指令 wildblood spawn、purge 和 karma。"
+    "cfg_12_cheats__creature_commands_help": "作弊。启用管理员指令 wildblood spawn、purge 和 karma。",
+    "raid_request_command": "start <金币数> [等级 0-7] [请求ID] 或 stop：箱子须在5米以内",
+    "raid_request_player": "请让已连接的玩家站在箱子旁使用此命令。",
+    "raid_request_chest": "5米以内没有可用的箱子。",
+    "raid_request_unavailable": "目前无法发送袭击请求。请在服务器就绪后重试。",
+    "raid_request_sent": "袭击请求 {0} 已发送至服务器。",
+    "raid_request_started": "袭击已获准。请求 {0}。",
+    "raid_request_stopped": "袭击已停止。请求 {0}。",
+    "raid_request_refused": "袭击请求 {0} 被拒绝。请检查箱子权限、金币、冷却时间和服务器恢复日志。关闭箱子并等待物品栏同步后，使用相同的请求ID重试。",
+    "raid_request_timeout": "袭击请求 {0} 未收到回复，结果未知。若为开始袭击的请求，请使用相同的请求ID重试，以免重复付款。"
   }
 }

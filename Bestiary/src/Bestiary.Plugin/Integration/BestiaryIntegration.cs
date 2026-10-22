@@ -65,7 +65,8 @@ namespace ExtraPotions.Bestiary.Runtime.Integration
             if (ProductYields || registration == null) return;
             var capabilities = CruciblePlugin.Services.Capabilities;
             capabilities.TryResolve<Func<string, string, bool>>(CapabilityIds.CreatureRules, CapabilityIds.Version1, out var rules);
-            Wildblood = InteropCalls.RegisterDefaults(rules);
+            var reveal = BestiarySettings.Find(BestiarySettings.MarrowLantern + ".Reveal");
+            Wildblood = InteropCalls.RegisterDefaults(rules, reveal != null && Plugin.Settings != null ? Plugin.Settings.Get<int>(reveal) : 12);
             capabilities.TryResolve<Tuple<Func<string, string, bool>, Func<string, int, bool>, Func<string, bool>>>(CapabilityIds.ItemClasses, CapabilityIds.Version1, out var classes);
             var settings = Plugin.Settings;
             Inscribe = settings == null ? InteropOutcome.Absent : InteropCalls.RegisterInscribe(classes,
@@ -99,13 +100,13 @@ namespace ExtraPotions.Bestiary.Runtime.Integration
             }
         }
 
-        /// <summary><c>meadworks.bestiary.world</c> v1 (Delve): clears every Rime Giant mountain claim on the server; the number cleared.</summary>
+        /// <summary><c>meadworks.bestiary.world</c> v1 (Delve): clears Rime Giant and Slag Charred region claims on the server; the number cleared.</summary>
         private static int ResetMountainClaims()
         {
             if (ZoneSystem.instance == null || ZNet.instance == null || !ZNet.instance.IsServer()) return 0;
-            var claims = ZoneSystem.instance.GetGlobalKeys().Where(k => k.StartsWith(BestiaryKeys.RimeGiantClaimPrefix, StringComparison.Ordinal)).ToList();
+            var claims = ZoneSystem.instance.GetGlobalKeys().Where(BestiaryKeys.IsRegionClaim).ToList();
             foreach (var key in claims) ZoneSystem.instance.RemoveGlobalKey(key);
-            if (claims.Count > 0) log?.Info("Rime Giant mountain claims reset: " + claims.Count + ".");
+            if (claims.Count > 0) log?.Info("Region claims reset: " + claims.Count + ".");
             return claims.Count;
         }
 

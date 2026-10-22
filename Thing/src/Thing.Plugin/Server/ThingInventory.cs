@@ -28,6 +28,7 @@ namespace ExtraPotions.Thing.Runtime
         static readonly TransferLedger ledger = new TransferLedger();
         static readonly HashSet<string> retiredSource = new HashSet<string>(StringComparer.Ordinal);
         static readonly Dictionary<string, Reservation> reserved = new Dictionary<string, Reservation>(StringComparer.Ordinal);
+        static readonly Dictionary<string, Work> armedDeletes = new Dictionary<string, Work>(StringComparer.Ordinal);
         static readonly Dictionary<string, Work> recovering = new Dictionary<string, Work>(StringComparer.Ordinal);
         static IDisposable operation, owner;
         static InventoryEscrowJournal journal;
@@ -42,7 +43,7 @@ namespace ExtraPotions.Thing.Runtime
             journal = new InventoryEscrowJournal(Path.Combine(ThingPaths.DataFolder, "inventory-escrow"));
             ThingInventoryPickup.Initialize();
             operation = CruciblePlugin.Services.Operations.Register(registration, new OperationDescriptor(OperationId, new System.Version(1, 0)), new Codec(), Apply);
-            owner = CruciblePlugin.Services.PeerCommands.Register(registration, new OperationDescriptor(OwnerId, new System.Version(2, 0)), new Codec(), ApplyOwner);
+            owner = CruciblePlugin.Services.PeerCommands.Register(registration, new OperationDescriptor(OwnerId, new System.Version(3, 0)), new Codec(), ApplyOwner);
             generation = CruciblePlugin.Session.Generation;
         }
 
@@ -53,7 +54,7 @@ namespace ExtraPotions.Thing.Runtime
             if (generation != current)
             {
                 // Pending source removals survive here in the flushed journal; never guess a refund.
-                ledger.Clear(); reserved.Clear(); recovering.Clear(); recoveryWorld = 0;
+                ledger.Clear(); reserved.Clear(); armedDeletes.Clear(); recovering.Clear(); recoveryWorld = 0;
                 generation = current;
             }
             if (ZNet.instance == null || !ZNet.instance.IsServer() || !ThingServer.Active || !CruciblePlugin.Session.AuthorityReady) return;
@@ -86,7 +87,7 @@ namespace ExtraPotions.Thing.Runtime
         internal static void Shutdown()
         {
             operation?.Dispose(); owner?.Dispose(); operation = owner = null;
-            ledger.Clear(); reserved.Clear(); recovering.Clear(); recoveryWorld = 0; generation = -1;
+            ledger.Clear(); reserved.Clear(); armedDeletes.Clear(); recovering.Clear(); recoveryWorld = 0; generation = -1;
             // A sealed native pickup remains sealed across unload; its journal is required to release it.
             ThingInventoryDelivery.Shutdown(); ThingInventoryPickup.Shutdown(); log = null;
         }
@@ -102,7 +103,8 @@ namespace ExtraPotions.Thing.Runtime
             if (request.Count == 2 && request[0] == "release")
             {
                 var armed = ledger.Find(request[1]);
-                if (armed != null && armed.AdminId == adminId) ledger.Fail(request[1]);
+                if (armed != null && armed.AdminId == adminId && armed.Phase == TransferPhase.DeleteArmed)
+                { ledger.Fail(request[1]); armedDeletes.Remove(request[1]); }
                 return Done("released");
             }
             if (request.Count < 2 || request[0] != "view" && request[0] != "take" && request[0] != "delete") return Done("denied");
@@ -122,8 +124,8 @@ namespace ExtraPotions.Thing.Runtime
                     Task = Send(target.Peer.m_uid, "view-" + character + ":" + Guid.NewGuid().ToString("N"), new[] { "snapshot", character }) });
             }
             if (recoveryWorld != net.GetWorldUID()) return Done("busy");
-            if (recoveryBlocked || recovering.Values.Any(w => (w.Record.State == EscrowState.CommitRequested || w.Record.State == EscrowState.Committed || w.Record.State == EscrowState.ClaimRequested) && (w.Target.Id == platform || w.Admin.Id == adminId))) return Done("busy");
-            if (!ItemSlot.TryParse(request.Count > 2 ? request[2] : "", out var slot)) return Done("missing");
+            if (recoveryBlocked || recovering.Values.Any(w => (w.Record.State == EscrowState.CommitRequested || w.Record.State == EscrowState.Committed || w.Record.State == EscrowState.ClaimRequested || w.Record.State == EscrowState.DeleteRequested) && (w.Target.Id == platform || w.Admin.Id == adminId))) return Done("busy");
+            if (!ItemSlot.TryParse(request.Count > 2 ? request[2] : "", out var slot) || !slot.HasIdentity) return Done("missing");
             if (request[0] == "delete" && request.Count == 4)
                 return Confirm(context, admin, target.Actor, target.Peer.m_uid, character, slot, request[3]);
             if (request.Count != 3) return Done("denied");
@@ -131,7 +133,10 @@ namespace ExtraPotions.Thing.Runtime
             if (request[0] == "delete")
             {
                 if (ledger.BeginDelete(adminId, platform, slot, token) == null) return Done("busy");
-                context.MarkDecisionMade(); return Done("armed", token);
+                context.MarkDecisionMade();
+                return Poll(new Work { Kind = "arm-delete", Token = token, Slot = slot, Admin = admin, Target = target.Actor,
+                    TargetUid = target.Peer.m_uid, TargetCharacter = character,
+                    Task = Send(target.Peer.m_uid, token + ":reserve-delete", new[] { "reserve", token, slot.Text, character }) });
             }
             if (!Receiver(adminId, out var adminUid, out var adminCharacter)) return Done("failed");
             if (ledger.BeginTake(adminId, platform, slot, token) == null) return Done("busy");
@@ -147,10 +152,19 @@ namespace ExtraPotions.Thing.Runtime
         static OperationExecution<IReadOnlyList<string>> Confirm(AuthorityContext context, Actor admin, Actor target, long targetUid, string character, ItemSlot slot, string token)
         {
             var move = ledger.Find(token);
-            if (move == null || move.AdminId != admin.Id || move.TargetId != target.Id || !move.Delete || !move.Slot.Same(slot) || !ledger.ConfirmDelete(token)) return Done("failed");
+            if (move == null || move.AdminId != admin.Id || move.TargetId != target.Id || !move.Delete || !move.Slot.Same(slot)) return Done("failed");
+            if (recovering.TryGetValue(token, out var retry) && retry.Kind == "destroy")
+            { context.MarkDecisionMade(); return PollDelete(retry); }
+            if (!armedDeletes.TryGetValue(token, out var work) || work.TargetCharacter != character || !ledger.ConfirmDelete(token)) return Done("failed");
             context.MarkDecisionMade();
-            return Poll(new Work { Kind = "destroy", Token = token, Slot = slot, Admin = admin, Target = target,
-                Task = Send(targetUid, token, new[] { "destroy", token, slot.Text, character }) });
+            work.Kind = "destroy"; work.TargetUid = targetUid;
+            work.Record = new EscrowRecord(ZNet.instance.GetWorldUID(), token, admin.Id, target.Id, slot,
+                work.Payload, "", EscrowState.DeleteRequested, work.SourceCharacter);
+            try { journal.Save(work.Record); }
+            catch { ledger.Fail(token); armedDeletes.Remove(token); return Done("failed"); }
+            armedDeletes.Remove(token); recovering[token] = work;
+            work.Task = Delete(work); work.ResumeAt = Time.unscaledTime + 15;
+            return PollDelete(work);
         }
 
         static OperationExecution<IReadOnlyList<string>> Poll(Work work)
@@ -159,6 +173,7 @@ namespace ExtraPotions.Thing.Runtime
             if (generation != CruciblePlugin.Session.Generation) return Finish(work, "failed", AuditOutcome.Failed, "session changed; escrow retained");
             if (work.Kind == "take" && work.Record != null && work.Record.State >= EscrowState.Released && work.Record.State != EscrowState.Cancelled) return Done("dropped");
             if (work.Kind == "claim") return PollClaim(work);
+            if (work.Kind == "destroy") return PollDelete(work);
             var reply = ReplyOf(work.Task);
             if (work.Kind == "view")
             {
@@ -218,12 +233,16 @@ namespace ExtraPotions.Thing.Runtime
                 work.Task = null; work.ResumeAt = 0;
                 return Finish(work, "busy", AuditOutcome.Failed, "source decision pending; sealed delivery retained " + work.Token);
             }
-            if (work.Kind == "destroy")
+            if (work.Kind == "arm-delete")
             {
-                if (reply != null && reply.Count == 2 && reply[0] == "destroyed" && reply[1] == work.Token && ledger.DeletedFrom(work.Token))
-                    return Finish(work, "deleted", AuditOutcome.Done, Detail(work.Slot, "deleted by character owner"));
-                ledger.Fail(work.Token);
-                return Finish(work, "missing", AuditOutcome.Failed, Detail(work.Slot, "deletion unconfirmed"));
+                if (reply == null || reply.Count != 4 || reply[0] != "reserved" || reply[1] != work.Token
+                    || !long.TryParse(reply[3], NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var source) || source == 0
+                    || !ValidatePayload(reply[2], work.Slot, out _))
+                { ledger.Fail(work.Token); return Done("missing"); }
+                work.Payload = reply[2]; work.SourceCharacter = reply[3]; work.Task = null;
+                foreach (var token in armedDeletes.Keys.Where(t => ledger.Find(t)?.Phase != TransferPhase.DeleteArmed).ToArray()) armedDeletes.Remove(token);
+                armedDeletes[work.Token] = work;
+                return Done("armed", work.Token);
             }
             return Finish(work, "failed", AuditOutcome.Failed, "unhandled");
         }
@@ -245,10 +264,10 @@ namespace ExtraPotions.Thing.Runtime
             if (!Plugin.Ready || context.Session.Generation != generation || (!context.IsLocal && !context.ServerConnectionVerified) || request.Count < 2) return Done("missing");
             if (request[0] == "snapshot" && request.Count == 2 && LocalPlayer(request[1], out var viewer))
                 return OperationExecution<IReadOnlyList<string>>.Success(Snapshot(viewer.GetInventory()));
-            if (request[0] == "forget" && request.Count == 5 && LocalPlayer(request[3], out var finished, true))
+            if ((request[0] == "forget" || request[0] == "forget-delete") && request.Count == 5 && LocalPlayer(request[3], out var finished, true))
             {
                 if (finished.GetPlayerID().ToString(CultureInfo.InvariantCulture) != request[4] || !ValidToken(request[1])) return Done("pending");
-                var expected = ReceiptText(request[1], request[2], request[4]);
+                var expected = (request[0] == "forget-delete" ? "delete:" : "") + ReceiptText(request[1], request[2], request[4]);
                 if (finished.m_customData.TryGetValue(Receipt, out var receipt) && (receipt == expected || receipt == "unchanged:" + expected))
                 {
                     finished.m_customData.Remove(Receipt);
@@ -264,16 +283,15 @@ namespace ExtraPotions.Thing.Runtime
             }
             if (request[0] == "forget-delivery" && request.Count == 5 && LocalPlayer(request[3], out var delivered, true))
                 return Done(ThingInventoryDelivery.Forget(delivered, request[1], request[2], request[4]), request[1]);
-            if ((request[0] == "reserve" || request[0] == "destroy") && request.Count == 4 && LocalPlayer(request[3], out var owner))
+            if (request[0] == "reserve" && request.Count == 4 && LocalPlayer(request[3], out var owner))
             {
                 if (!ItemSlot.TryParse(request[2], out var slot) || !ValidToken(request[1])) return Done("missing");
-                if (request[0] == "reserve")
-                {
-                    var bytes = Reserve(owner, request[1], slot);
-                    return bytes.Length == 0 ? Done("missing") : Done("reserved", request[1], bytes, owner.GetPlayerID().ToString(CultureInfo.InvariantCulture));
-                }
-                return Destroy(owner, request[1], slot) ? Done("destroyed", request[1]) : Done("missing");
+                var bytes = Reserve(owner, request[1], slot);
+                return bytes.Length == 0 ? Done("missing") : Done("reserved", request[1], bytes, owner.GetPlayerID().ToString(CultureInfo.InvariantCulture));
             }
+            if (request[0] == "destroy" && request.Count == 6 && LocalPlayer(request[3], out var deleting, true)
+                && ItemSlot.TryParse(request[2], out var deleteSlot) && deleteSlot.HasIdentity && ValidToken(request[1]))
+                return Destroy(deleting, request[1], deleteSlot, request[4], request[5]);
             if (request[0] == "commit" && request.Count == 6 && LocalPlayer(request[3], out var sourcePlayer, true)
                 && ItemSlot.TryParse(request[2], out var sourceSlot) && ValidToken(request[1]))
                 return CommitOwner(sourcePlayer, request[1], sourceSlot, request[4], request[5]);
@@ -356,18 +374,60 @@ namespace ExtraPotions.Thing.Runtime
         }
 
         static string ReceiptText(string token, string digest, string character) => ZNet.instance.GetWorldUID().ToString(CultureInfo.InvariantCulture) + ":" + character + ":" + token + ":" + digest;
-        static bool Destroy(Player player, string token, ItemSlot slot)
+        static OperationExecution<IReadOnlyList<string>> Destroy(Player player, string token, ItemSlot slot, string digest, string character)
         {
-            var inventory = player.GetInventory(); var item = Find(inventory, slot);
-            if (item == null) return false;
-            if (item.m_equipped) player.UnequipItem(item);
-            inventory.RemoveItem(item);
-            return !inventory.ContainsItem(item);
+            if (retiredSource.Contains(token) || player.GetPlayerID().ToString(CultureInfo.InvariantCulture) != character || slot.ImageDigest != digest) return Done("pending");
+            var owner = new DeleteOwner(player, token, slot, digest);
+            var result = DurableInventoryDelete.Apply(owner, "delete:" + ReceiptText(token, digest, character));
+            if (result == InventoryDeleteResult.Pending) return Done("pending");
+            reserved.Remove(token);
+            return Done(result == InventoryDeleteResult.Deleted ? "destroyed" : "unchanged", token, digest, character);
         }
 
-        static ItemSlot SlotOf(ItemDrop.ItemData item) => new ItemSlot(item.m_dropPrefab?.name ?? "", item.m_stack, item.m_quality,
-            item.m_gridPos.x, item.m_gridPos.y, item.m_crafterID, item.m_variant);
-        static ItemDrop.ItemData Find(Inventory inventory, ItemSlot slot) => inventory?.GetAllItems().FirstOrDefault(item => item?.m_dropPrefab != null && SlotOf(item).Same(slot));
+        sealed class DeleteOwner : IInventoryDeleteOwner
+        {
+            readonly Player player;
+            readonly string token, digest;
+            readonly ItemSlot slot;
+            ItemDrop.ItemData item;
+            string preparedPayload;
+            internal DeleteOwner(Player player, string token, ItemSlot slot, string digest)
+            { this.player = player; this.token = token; this.slot = slot; this.digest = digest; }
+            public string Receipt
+            {
+                get => player.m_customData.TryGetValue(ThingInventory.Receipt, out var receipt) ? receipt : "";
+                set => player.m_customData[ThingInventory.Receipt] = value;
+            }
+            public bool MatchesReservation()
+            {
+                if (preparedPayload != null)
+                    return player.GetInventory().ContainsItem(item) && reserved.TryGetValue(token, out var prepared)
+                        && ReferenceEquals(item, prepared.Item) && Digest(prepared.Payload) == digest && item.m_durability == slot.Durability && WriteItem(item) == preparedPayload;
+                item = Find(player.GetInventory(), slot);
+                return item != null && reserved.TryGetValue(token, out var held) && ReferenceEquals(item, held.Item)
+                    && held.Payload == WriteItem(item) && Digest(held.Payload) == digest;
+            }
+            public void Prepare()
+            {
+                var original = item.Clone();
+                if (item.m_equipped) player.UnequipItem(item);
+                var after = item.Clone(); after.m_equipped = original.m_equipped;
+                if (item.m_durability != original.m_durability || WriteItem(after) != WriteItem(original)) throw new InvalidOperationException("Reserved item changed during unequip.");
+                preparedPayload = WriteItem(item);
+            }
+            public void Remove()
+            {
+                var inventory = player.GetInventory();
+                inventory.GetAllItems().Remove(item);
+                inventory.Changed();
+            }
+            public bool ContainsReservedItem() => player.GetInventory().ContainsItem(item);
+            public bool Save() => SaveCharacter(player);
+        }
+
+        static ItemSlot SlotOf(ItemDrop.ItemData item, bool identity = true) => new ItemSlot(item.m_dropPrefab?.name ?? "", item.m_stack, item.m_quality,
+            item.m_gridPos.x, item.m_gridPos.y, item.m_crafterID, item.m_variant, identity ? item.m_durability : -1, identity ? Digest(WriteItem(item)) : "");
+        static ItemDrop.ItemData Find(Inventory inventory, ItemSlot slot) => inventory?.GetAllItems().FirstOrDefault(item => item?.m_dropPrefab != null && slot.Matches(SlotOf(item, slot.HasIdentity)));
         static string WriteItem(ItemDrop.ItemData item)
         {
             var package = new ZPackage(); package.Write(item.m_dropPrefab.name); item.Save(package);
@@ -391,7 +451,7 @@ namespace ExtraPotions.Thing.Runtime
                 var hash = ItemDrop.ItemData.Load(package, data, global::Version.Item.ChunksNCheats);
                 if (hash != prefab.GetStableHashCode() || package.GetPos() != bytes.Length) return false;
                 data.m_dropPrefab = prefabObject;
-                if (!SlotOf(data).Same(slot) || data.m_stack > data.m_shared.m_maxStackSize || data.m_quality > Math.Max(1, data.m_shared.m_maxQuality)
+                if (!slot.MatchesPayload(SlotOf(data, false), Digest(encoded)) || data.m_stack > data.m_shared.m_maxStackSize || data.m_quality > Math.Max(1, data.m_shared.m_maxQuality)
                     || float.IsNaN(data.m_durability) || float.IsInfinity(data.m_durability) || data.m_durability < 0) return false;
                 if (data.m_customData == null) data.m_customData = new Dictionary<string, string>();
                 // Old releases left this transport-only field on items. It is never propagated to the delivered stack.
@@ -566,10 +626,67 @@ namespace ExtraPotions.Thing.Runtime
             work.Task = null; work.ResumeAt = 0;
             return Done("busy");
         }
-        static Work Recovery(EscrowRecord record) => new Work { Kind = "take", Token = record.Token, Slot = record.Slot, Payload = record.Payload,
+        static Work Recovery(EscrowRecord record) => new Work { Kind = record.State >= EscrowState.DeleteRequested ? "destroy" : "take", Token = record.Token, Slot = record.Slot, Payload = record.Payload,
             SourceCharacter = record.SourceCharacter, Record = record, Admin = new Actor(record.AdminId, record.AdminId), Target = new Actor(record.TargetId, record.TargetId), Step = 1 };
+        static Task<OperationResult<IReadOnlyList<string>>> Delete(Work work) => Send(work.TargetUid, work.Token + ":destroy:" + Guid.NewGuid().ToString("N"),
+            new[] { "destroy", work.Token, work.Slot.Text, work.TargetCharacter, Digest(work.Payload), work.SourceCharacter });
+
+        static OperationExecution<IReadOnlyList<string>> PollDelete(Work work)
+        {
+            if (work.Record.State == EscrowState.Deleted) return Done("deleted");
+            if (work.Record.State == EscrowState.DeleteCancelled) return Done("missing");
+            if (generation != CruciblePlugin.Session.Generation) return Done("busy");
+            if (work.Task != null && !work.Task.IsCompleted) return OperationExecution<IReadOnlyList<string>>.Pending(() => PollDelete(work));
+            if (work.Step == 2) return Done("busy");
+            var reply = ReplyOf(work.Task);
+            work.Task = null; work.ResumeAt = 0;
+            if (Matches(work, reply, "destroyed", work.SourceCharacter))
+            {
+                Persist(work, EscrowState.Deleted);
+                ledger.DeletedFrom(work.Token);
+                return Finish(work, "deleted", AuditOutcome.Done, Detail(work.Slot, "deleted and saved by character owner"));
+            }
+            if (Matches(work, reply, "unchanged", work.SourceCharacter))
+            {
+                Persist(work, EscrowState.DeleteCancelled);
+                ledger.Fail(work.Token);
+                return Finish(work, "missing", AuditOutcome.Failed, Detail(work.Slot, "source unchanged; deletion cancelled"));
+            }
+            // An unknown reply is not evidence of failure: keep the saved request and retry its token.
+            return Done("busy");
+        }
+
+        static void RecoverDelete(Work work)
+        {
+            if (work.Record.State != EscrowState.DeleteRequested)
+            {
+                ForgetSource(work);
+                if (work.SourceForgotten) recovering.Remove(work.Token);
+                return;
+            }
+            if (work.Task != null)
+            {
+                if (work.Step == 2)
+                {
+                    work.Step = 0; work.Task = Delete(work); work.ResumeAt = Time.unscaledTime + 15;
+                    return;
+                }
+                PollDelete(work);
+                if (work.Record.State != EscrowState.DeleteRequested) return;
+            }
+            var target = ThingServer.Online().FirstOrDefault(p => p.Actor.Id == work.Target.Id).Peer;
+            if (target == null || ZDOMan.instance?.GetZDO(target.m_characterID)?.GetLong(ZDOVars.s_playerID).ToString(CultureInfo.InvariantCulture) != work.SourceCharacter) return;
+            work.TargetUid = target.m_uid; work.TargetCharacter = CharacterOf(target);
+            if (work.TargetCharacter.Length == 0) return;
+            // Re-establish the exact reservation after a character/session reload. A saved decision wins over reserve failure.
+            work.Step = 2; work.ResumeAt = Time.unscaledTime + 15;
+            work.Task = Send(work.TargetUid, work.Token + ":reserve-delete:" + Guid.NewGuid().ToString("N"),
+                new[] { "reserve", work.Token, work.Slot.Text, work.TargetCharacter });
+        }
+
         static void Recover(Work work)
         {
+            if (work.Kind == "destroy") { RecoverDelete(work); return; }
             if (work.Record.State == EscrowState.Prepared) work.Record = Cancel(work.Record);
             if (work.Record.State == EscrowState.Cancelled)
             {
@@ -623,7 +740,7 @@ namespace ExtraPotions.Thing.Runtime
             if (Forgotten(work.SourceTask, work.Token)) { work.SourceForgotten = true; work.SourceTask = null; return; }
             var peer = ThingServer.Online().FirstOrDefault(p => p.Actor.Id == work.Target.Id).Peer;
             if (peer != null) work.SourceTask = Send(peer.m_uid, work.Token + ":forget:" + Guid.NewGuid().ToString("N"),
-                new[] { "forget", work.Token, Digest(work.Payload), CharacterOf(peer), work.SourceCharacter });
+                new[] { work.Kind == "destroy" ? "forget-delete" : "forget", work.Token, Digest(work.Payload), CharacterOf(peer), work.SourceCharacter });
         }
         sealed class Reservation { internal ItemDrop.ItemData Item; internal string Payload; }
 

@@ -32,7 +32,7 @@ namespace Mantle
     {
         public const string PluginGuid = "com.meadworks.mantle";
         public const string PluginName = "Mantle";
-        public const string PluginVersion = "0.1.23";
+        public const string PluginVersion = "0.1.24";
         public static Plugin Instance { get; private set; }
         public static ManualLogSource Log { get; private set; }
         public static SyncedConfiguration Synced { get; private set; }
@@ -73,6 +73,8 @@ namespace Mantle
             LockConfiguration = Synced.BindLocking("General", "Lock Configuration", true,
                 "Server administrators control inventory layout and equipment settings.");
             InventoryModule.Initialize(Synced);
+            Mantle.Trinkets.TrinketSettings.Initialize(Synced);
+            Mantle.Trinkets.TrinketRuntime.Initialize();
             Mantle.Elite.EliteSetup.Register();
             Mantle.Accessories.AccessoryInscriptions.Register();
             Mantle.Settings.KeepOnDeathUpgrade.Run(Synced.Config, InventorySettings.KeepOnDeath, Logger);
@@ -128,11 +130,14 @@ namespace Mantle
             return cells.AsReadOnly();
         }
 
-        private void LateUpdate() { Mantle.Panels.InventoryWarmup.Tick(); Mantle.Accessories.AccessoryText.Tick(); Mantle.Accessories.AccessoryWords.Tick(); Mantle.Presentation.WildbloodPlate.Tick(); }
+        private void LateUpdate() { Mantle.Trinkets.TrinketKillCredit.Tick(); Mantle.Trinkets.TrinketRuntime.Tick(); Mantle.Panels.InventoryWarmup.Tick(); Mantle.Accessories.AccessoryText.Tick(); Mantle.Accessories.AccessoryWords.Tick(); Mantle.Presentation.WildbloodPlate.Tick(); }
 
         private void OnDestroy()
         {
             IsReady = false;
+            Mantle.Trinkets.TrinketKillCredit.Dispose();
+            Mantle.Trinkets.TrinketRuntime.Dispose();
+            Mantle.Trinkets.TrinketSettings.Dispose();
             Mantle.Panels.StatusEffectIcons.Restore();
             Mantle.Panels.HudRoom.Reset();
             Mantle.Protection.ProtectedSlots.Reset();

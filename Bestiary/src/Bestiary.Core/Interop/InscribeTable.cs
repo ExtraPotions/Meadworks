@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ExtraPotions.Bestiary.Catalog;
 using ExtraPotions.Bestiary.Config;
+using ExtraPotions.Bestiary.Spawning;
 
 namespace ExtraPotions.Bestiary.Interop
 {
@@ -91,6 +92,10 @@ namespace ExtraPotions.Bestiary.Interop
             foreach (var creature in CreatureCatalog.ArsenalSkeletons)
                 yield return Entry(creature.Prefab, Tier(BlackForest));
             yield return Entry("ECP_SkeletonCrossbowman", Tier(BlackForest));
+            yield return Entry(KitCreatures.BogHook, Tier(3));
+            yield return Entry(KitCreatures.Javelineer, Tier(5));
+            yield return Entry(KitCreatures.SlagCharred, Tier(7));
+            yield return Entry(KitCreatures.MarrowLantern, Tier(8));
         }
 
         private static LootProfile Boss(string prefab, int tier, int runes, string bonus, int chance) =>

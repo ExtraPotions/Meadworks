@@ -319,7 +319,7 @@
     "ui_inventory_empty": "Ce joueur ne porte rien que cette vue puisse afficher.",
     "ui_inventory_take": "Prendre",
     "ui_inventory_delete": "Supprimer",
-    "ui_inventory_take_body": "Prendre {0} ({1}) à ce joueur ? Le serveur réserve cette pile et crée un objet protégé à vos pieds avant de la retirer au joueur. Ramassez-le dans un emplacement vide de votre inventaire.",
+    "ui_inventory_take_body": "Prendre {0} ({1}) à ce joueur ? Le serveur réserve cette pile avant de la retirer au joueur. La pile entière va dans un emplacement vide de votre inventaire et ne se mélange pas à une pile que vous avez déjà. S'il n'y a aucun emplacement vide, elle reste à vos pieds comme un objet protégé.",
     "ui_inventory_delete_body": "Supprimer {0} ({1}) de ce joueur ? Le serveur vous demandera de confirmer une fois de plus avant de le détruire.",
     "ui_inventory_delete_again": "Supprimer {0} ({1}) définitivement ? Cette action ne peut pas être annulée.",
     "ui_inventory_stored": "La pile est dans votre inventaire.",

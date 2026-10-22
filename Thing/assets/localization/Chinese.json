@@ -319,7 +319,7 @@
     "ui_inventory_empty": "这名玩家没有此视图可以列出的物品。",
     "ui_inventory_take": "拿走",
     "ui_inventory_delete": "删除",
-    "ui_inventory_take_body": "从此玩家处取走{0}（{1}）？服务器会先预留该物品堆叠，并在你脚边生成受保护的掉落物，然后才从玩家处移除。请将其拾取到背包的空格中。",
+    "ui_inventory_take_body": "从此玩家处取走{0}（{1}）？服务器会先预留这一叠，再从该玩家处移除。整叠进入你物品栏的一个空格，不会并入你已有的一叠。如果没有空格，它会作为受保护的掉落物留在你脚边。",
     "ui_inventory_delete_body": "删除这名玩家的 {0}（{1}）？服务器会在销毁前再请你确认一次。",
     "ui_inventory_delete_again": "永久删除 {0}（{1}）？此操作无法撤销。",
     "ui_inventory_stored": "这叠物品已在你的物品栏中。",

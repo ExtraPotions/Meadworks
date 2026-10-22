@@ -15,6 +15,11 @@
     "2. Slots/Backpack Items": "FileOnly",
     "2. Slots/Slots Per Group": "FileOnly",
     "3. Key Ring/Key Items": "FileOnly",
-    "6. Tacklebox/Tackle Items": "FileOnly"
+    "6. Tacklebox/Tackle Items": "FileOnly",
+    "7. Trinkets/Trinket Tuning": "Essential",
+    "7. Trinkets/Trinket Preset": "Essential",
+    "7. Trinkets/Custom Trinket Table": "Advanced",
+    "7. Trinkets/Display Effective Values": "Essential",
+    "7. Trinkets/Trinket Details": "Essential"
   }
 }

@@ -35,6 +35,8 @@ namespace ExtraPotions.Wildblood.Adopted.Traits
         /// <summary>True when the creature's body, as its prefab builds it, is large.</summary>
         public static bool IsLarge(Character creature)
         {
+            var declared = ExtraPotions.Wildblood.Runtime.NativeCreatureRules.Find(creature)?.Body;
+            if (declared != null) return declared == "large";
             int hash = PrefabHash(creature);
             if (Verdicts.TryGetValue(hash, out bool large))
             {

@@ -1,6 +1,6 @@
 # Larder
 
-Version 0.2.12. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.13. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Food and mead values, eating, regeneration, stamina costs, kitchen stations and Cooking skill perks.
 
@@ -12,7 +12,7 @@ Food and mead values, eating, regeneration, stamina costs, kitchen stations and 
 - Safe Stamina (off by default): chosen actions (sprint, jump, build, swim, attack, sneak) cost no stamina while no enemy is within 25 meters. Safe Area Ignored Creatures accepts a comma-separated list of prefab or displayed names; empty ignores nothing. Safe Area Encumbered is a separate opt-in for free encumbered walking and regeneration while safe; it is off by default.
 - Kitchen stations: cook times, burning, fermenting and feasts.
 - Cooking skill perks, with the Cooking skill icon on the skill page.
-- Fermenter Timer (off by default): hovering an accessible, sheltered fermenter shows the time left until it is ready while Cooking is on. The setting key and default are unchanged.
+- `6 - Kitchen / Fermenter Timer` (off by default, your own preference): hovering an accessible, sheltered fermenter that is still fermenting shows the time left until it is ready, while Cooking is on. Empty and finished fermenters do not show it.
 - Every setting at its default leaves the game as it is.
 - No dish or item stars. An egg keeps the hen's stars as its item quality. A recipe that needs every ingredient counts that quality. A recipe that accepts only one of its ingredients does not.
 
@@ -20,7 +20,7 @@ Food and mead values, eating, regeneration, stamina costs, kitchen stations and 
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
 
 ## Installation
 

@@ -319,7 +319,7 @@
     "ui_inventory_empty": "Dieser Spieler trägt nichts, das diese Ansicht auflisten kann.",
     "ui_inventory_take": "Nehmen",
     "ui_inventory_delete": "Löschen",
-    "ui_inventory_take_body": "{0} ({1}) von diesem Spieler nehmen? Der Server reserviert den Stapel und erstellt einen geschützten Gegenstand zu deinen Füßen, bevor er ihn beim Spieler entfernt. Hebe ihn in einen leeren Inventarplatz auf.",
+    "ui_inventory_take_body": "{0} ({1}) von diesem Spieler nehmen? Der Server reserviert den Stapel, bevor er ihn beim Spieler entfernt. Der ganze Stapel kommt in einen leeren Inventarplatz und wird nicht mit einem Stapel zusammengelegt, den du schon hast. Ist kein leerer Platz frei, bleibt er als geschützter Gegenstand zu deinen Füßen.",
     "ui_inventory_delete_body": "{0} ({1}) von diesem Spieler löschen? Der Server bittet dich um eine weitere Bestätigung, bevor es zerstört wird.",
     "ui_inventory_delete_again": "{0} ({1}) dauerhaft löschen? Das kann nicht rückgängig gemacht werden.",
     "ui_inventory_stored": "Der Stapel liegt in deinem Inventar.",

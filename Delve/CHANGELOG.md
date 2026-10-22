@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.12 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- A full regenerate (`delve-regen`, or an admin request that names every kind) clears Bestiary region claims on the server. Dry Run All leaves them. Regenerating one kind does not.
+
 ## 0.1.11 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

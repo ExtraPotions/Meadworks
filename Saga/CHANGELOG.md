@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.15 (2026-10-21)
+
+- Requires Crucible 0.3.27 / Crucible.UI 0.3.20.
+- Power Strength Relaxed moves the numbers and resistances and leaves each boss-power switch as it is. Vanilla still turns those switches off.
+- The power wheel draws its cards on a ring around the center hint, oldest at the top then clockwise, without the square wood plate.
+- The guardian status plate grows so each attuned name, including the equipped power, stays inside the wood. The equipped name is not drawn again across the plate edge.
+
 ## 0.1.14 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

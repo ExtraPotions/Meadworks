@@ -21,14 +21,27 @@ namespace ExtraPotions.Wildblood.Adopted.Adapters
                     if (!WildbloodModules.ProductActive(out _) ||
                         ExtraPotions.Wildblood.Runtime.Plugin.Settings?.Get(WildbloodSettings.General.Enabled) != true)
                         return false;
-                    return !CruciblePlugin.Services.Capabilities.TryResolve<Func<bool>>(Capability, Version, out var active)
-                        || active == null || !active();
+                    return FallbackOwnsBirth;
                 }
                 catch (Exception)
                 {
                     // A provider that cannot report ownership is not evidence that its producers stopped.
                     return false;
                 }
+            }
+        }
+
+        // Ownership must be queried before remote settings have synchronized.
+        internal static bool FallbackOwnsBirth
+        {
+            get
+            {
+                try
+                {
+                    return !CruciblePlugin.Services.Capabilities.TryResolve<Func<bool>>(Capability, Version, out var active)
+                        || active == null || !active();
+                }
+                catch (Exception) { return false; }
             }
         }
     }

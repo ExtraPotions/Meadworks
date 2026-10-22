@@ -199,6 +199,17 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         public static int ClampVisible(int value) => value < MinVisible ? MinVisible : value > MaxVisibleLimit ? MaxVisibleLimit : value;
         public static float ClampDuration(float value) => value < MinDuration ? MinDuration : value > MaxDuration ? MaxDuration : value;
 
+        internal int HeldCount => cards.Count;
+        internal string RawHeld(int index) => Held(index).Raw;
+        internal string TitleHeld(int index) => Held(index).Title;
+        internal bool IconHeld(int index) => Held(index).HasIcon;
+
+        Slot Held(int index)
+        {
+            if (index < 0 || index >= cards.Count) throw new ArgumentOutOfRangeException(nameof(index));
+            return cards[index];
+        }
+
         int VisibleLimit(int maxVisible)
         {
             int cap = ClampVisible(maxVisible);
@@ -283,6 +294,39 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             return count > max ? max : count;
         }
 
+        /// <summary>How many leading card heights, separated by <paramref name="gap"/>, fit in <paramref name="slotHeight"/>.</summary>
+        public static int PrefixThatFits(float slotHeight, IList<float> heights, float gap)
+        {
+            if (heights == null || heights.Count == 0) return 0;
+            if (gap < 0f) gap = 0f;
+            float used = 0f;
+            int count = 0;
+            for (int i = 0; i < heights.Count; i++)
+            {
+                float card = heights[i] < 1f ? 1f : heights[i];
+                float next = count == 0 ? card : used + gap + card;
+                if (next > slotHeight + 0.01f) break;
+                used = next;
+                count++;
+            }
+            return count;
+        }
+
+        /// <summary>Height of the first <paramref name="count"/> cards and the gaps between them.</summary>
+        public static float StackHeight(IList<float> heights, int count, float gap)
+        {
+            if (heights == null || count <= 0) return 0f;
+            if (gap < 0f) gap = 0f;
+            int n = count < heights.Count ? count : heights.Count;
+            float height = 0f;
+            for (int i = 0; i < n; i++)
+            {
+                if (i > 0) height += gap;
+                height += heights[i] < 1f ? 1f : heights[i];
+            }
+            return height;
+        }
+
         public static bool Overlaps(KitRect a, KitRect b) => a.XMin < b.XMax && a.XMax > b.XMin && a.YMin < b.YMax && a.YMax > b.YMin;
 
         static void Subtract(List<float> free, float cutA, float cutB)
@@ -326,6 +370,138 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             if (height > gapB - gapA) height = gapB - gapA;
             y = top ? gapB - height : gapA;
             return true;
+        }
+    }
+
+    /// <summary>One notice after it has been wrapped. <see cref="Text"/> uses a newline between the two lines.</summary>
+    public readonly struct KitNoticeLineFit
+    {
+        public KitNoticeLineFit(string text, int lines, bool ellipsis)
+        {
+            Text = text ?? "";
+            Lines = lines < 1 ? 1 : lines;
+            Ellipsis = ellipsis;
+        }
+
+        public string Text { get; }
+        public int Lines { get; }
+        public bool Ellipsis { get; }
+    }
+
+    /// <summary>
+    /// Notice copy laid into at most two lines from a measured string width. Three periods stand in for an ellipsis:
+    /// the game fonts have no ellipsis glyph, and TextMeshPro warns when Ellipsis is used without one.
+    /// </summary>
+    public static class KitNoticeText
+    {
+        public const int MaxLines = 2;
+        public const float FontSize = 16f;
+        public const float OneLineCard = 46f;
+        public const float OneLineBox = 32f;
+        public const float LineBox = 20f;
+        public const float VerticalPad = 14f;
+        const string Dots = "...";
+
+        public static float CardHeight(int lines) => lines <= 1 ? OneLineCard : VerticalPad + Math.Max(1, lines) * LineBox;
+        public static float TextBoxHeight(int lines) => lines <= 1 ? OneLineBox : Math.Max(1, lines) * LineBox;
+
+        /// <summary><paramref name="widthOf"/> is the rendered width of a string at <paramref name="fontSize"/>.</summary>
+        public static KitNoticeLineFit Fit(string text, float width, float fontSize, Func<string, float> widthOf)
+        {
+            if (widthOf == null) throw new ArgumentNullException(nameof(widthOf));
+            if (string.IsNullOrEmpty(text)) return new KitNoticeLineFit("", 1, false);
+            if (width < 1f) width = 1f;
+            if (fontSize < 1f) fontSize = FontSize;
+            if (text.IndexOf('\n') < 0 && Width(text, widthOf, fontSize) <= width) return new KitNoticeLineFit(text, 1, false);
+            var lines = new List<string>(4);
+            string current = "";
+            foreach (string word in Words(text))
+                AppendWord(lines, ref current, word, width, fontSize, widthOf);
+            if (current.Length > 0) lines.Add(current);
+            if (lines.Count == 0) return new KitNoticeLineFit("", 1, false);
+            if (lines.Count <= MaxLines)
+                return new KitNoticeLineFit(string.Join("\n", lines), lines.Count, false);
+            string rest = Rest(text, lines[0]);
+            return new KitNoticeLineFit(lines[0] + "\n" + Ellipsize(rest, width, fontSize, widthOf), MaxLines, true);
+        }
+
+        static float Width(string text, Func<string, float> widthOf, float fontSize)
+        {
+            if (string.IsNullOrEmpty(text)) return 0f;
+            float measured = widthOf(text);
+            if (float.IsNaN(measured) || float.IsInfinity(measured) || measured < 0f)
+                return text.Length * fontSize;
+            return measured;
+        }
+
+        static string Rest(string text, string first)
+        {
+            string trimmed = text.Trim();
+            if (trimmed.StartsWith(first, StringComparison.Ordinal))
+                return trimmed.Substring(first.Length).TrimStart();
+            return trimmed;
+        }
+
+        static string Ellipsize(string text, float width, float fontSize, Func<string, float> widthOf)
+        {
+            if (string.IsNullOrEmpty(text)) return Dots;
+            if (Width(text, widthOf, fontSize) <= width) return text;
+            float room = width - Width(Dots, widthOf, fontSize);
+            if (room < Width("n", widthOf, fontSize)) return Width(Dots, widthOf, fontSize) <= width ? Dots : "";
+            string line = "";
+            foreach (string word in Words(text))
+            {
+                if (Width(word, widthOf, fontSize) > room)
+                {
+                    if (line.Length > 0) break;
+                    int n = 1;
+                    while (n < word.Length && Width(word.Substring(0, n + 1), widthOf, fontSize) <= room) n++;
+                    line = word.Substring(0, n);
+                    break;
+                }
+                string candidate = line.Length == 0 ? word : line + " " + word;
+                if (Width(candidate, widthOf, fontSize) > room) break;
+                line = candidate;
+            }
+            return line + Dots;
+        }
+
+        static void AppendWord(List<string> lines, ref string current, string word, float width, float fontSize, Func<string, float> widthOf)
+        {
+            if (Width(word, widthOf, fontSize) > width)
+            {
+                if (current.Length > 0) { lines.Add(current); current = ""; }
+                int i = 0;
+                while (i < word.Length)
+                {
+                    int n = 1;
+                    while (i + n < word.Length && Width(word.Substring(i, n + 1), widthOf, fontSize) <= width) n++;
+                    string chunk = word.Substring(i, n);
+                    i += n;
+                    if (i < word.Length) lines.Add(chunk);
+                    else current = chunk;
+                }
+                return;
+            }
+            if (current.Length == 0) { current = word; return; }
+            string joined = current + " " + word;
+            if (Width(joined, widthOf, fontSize) <= width) current = joined;
+            else { lines.Add(current); current = word; }
+        }
+
+        static List<string> Words(string text)
+        {
+            var words = new List<string>(8);
+            int i = 0;
+            while (i < text.Length)
+            {
+                while (i < text.Length && (text[i] == ' ' || text[i] == '\n' || text[i] == '\r' || text[i] == '\t')) i++;
+                if (i >= text.Length) break;
+                int start = i;
+                while (i < text.Length && text[i] != ' ' && text[i] != '\n' && text[i] != '\r' && text[i] != '\t') i++;
+                words.Add(text.Substring(start, i - start));
+            }
+            return words;
         }
     }
 }

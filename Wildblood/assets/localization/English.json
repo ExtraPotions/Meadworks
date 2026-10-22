@@ -305,7 +305,7 @@
     "cfg_4_traits__tamed_keep_traits_name": "Tamed Keep Traits",
     "cfg_4_traits__tamed_keep_traits_help": "Taming keeps a creature's traits (tamed variants apply). Off: while a creature is tamed its mutations and modifiers do not act; they stay stored, and its stars stay. Young born while this is off inherit no mutation.",
     "cfg_4_traits__tamed_stars_name": "Tamed Stars",
-    "cfg_4_traits__tamed_stars_help": "On: a new birth may inherit stars, and Shepherd follows this when it is installed. Off: a newborn keeps its parent's level, as the game does, and no bonus star is added. Taming never removes stars, health, or mutations. A creature an older build left at the game's level gets its stored stars back the next time it loads. The server sets this.",
+    "cfg_4_traits__tamed_stars_help": "On: a new birth may inherit stars, and Shepherd follows this when it is installed. While Stars Enabled is on and Star Mode is Wildblood, a tamed creature with a stored star roll that was left at the game's level regains those stars at once if it is loaded, or the next time it loads. Its health stays the same share of the health bar (a full bar stays full, and an empty bar stays empty). Its size and color match the stars. The restore does not change its mutations. Off: a newborn keeps its parent's level, as the game does, and no bonus star is added. Turning this off does not remove stars a tame already has, including stars it just regained. Taming never removes stars, health, or mutations. Bosses, fresh births without a saved parked level or restore mark, and creatures with no stored star roll stay as they are. Parked births can regain stored stars too. Without a restore mark, a tame must still be at its saved parked level. The server sets this.",
     "cfg_4_traits__players_may_inspect_name": "Players May Inspect",
     "cfg_4_traits__players_may_inspect_help": "Host rule: every player may run wildblood inspect, which lists the stars, traits and resulting values of the creature under the crosshair. It only reads, so it is not a cheat. Off: admins only.",
     "cfg_5_bosses_heading": "5 - Bosses",
@@ -339,9 +339,9 @@
     "cfg_6_loot__defer_to_dropnspawn_name": "Defer To DropNSpawn",
     "cfg_6_loot__defer_to_dropnspawn_help": "Loot steps aside while DropNSpawn is installed.",
     "cfg_6_loot__seasonal_meat_name": "Seasonal Meat",
-    "cfg_6_loot__seasonal_meat_help": "Host or server: while Solstice seasons are on, meat and hide from creatures use that season's published rate. Spring and summer drop less, fall and winter drop more, between one quarter and three times the usual amount. One item stays one item. Trophies, feathers, fangs, scales and coins stay as they are. Off, missing Solstice, or seasons turned off keeps today's drops. The next kill uses the current rate.",
+    "cfg_6_loot__seasonal_meat_help": "Host or server: while Solstice seasons are on, meat and hide from creatures use that season's published rate. Spring and summer drop less, fall and winter drop more, between one quarter and three times the usual amount. Below one, fractional amounts are rolled; a single item may not drop. Trophies, feathers, fangs, scales and coins stay as they are. Off, missing Solstice, or seasons turned off keeps today's drops. The next kill uses the current rate.",
     "cfg_6_loot__seasonal_wood_name": "Seasonal Wood",
-    "cfg_6_loot__seasonal_wood_help": "Host or server: while Solstice seasons are on, wood from felled trees uses that season's published rate. Spring and summer drop less, fall and winter drop more, between one quarter and three times the usual amount. One piece stays one piece. Off, missing Solstice, or seasons turned off keeps today's wood. The next tree uses the current rate.",
+    "cfg_6_loot__seasonal_wood_help": "Host or server: while Solstice seasons are on, wood from felled trees uses that season's published rate. Spring and summer drop less, fall and winter drop more, between one quarter and three times the usual amount. Below one, fractional amounts are rolled; a single item may not drop. Off, missing Solstice, or seasons turned off keeps today's wood. The next tree uses the current rate.",
     "cfg_7_luck_heading": "7 - Luck",
     "cfg_7_luck__persist_counters_name": "Persist Counters",
     "cfg_7_luck__persist_counters_help": "Bad-luck counters are saved with the character, per world.",
@@ -458,6 +458,15 @@
     "cfg_12_cheats__lucky_kills_name": "Lucky Kills",
     "cfg_12_cheats__lucky_kills_help": "Cheat. Every bad-luck-protected row drops on each kill; counters are untouched.",
     "cfg_12_cheats__creature_commands_name": "Creature Commands",
-    "cfg_12_cheats__creature_commands_help": "Cheat. Enables the admin commands wildblood spawn, purge and karma."
+    "cfg_12_cheats__creature_commands_help": "Cheat. Enables the admin commands wildblood spawn, purge and karma.",
+    "raid_request_command": "start <coins> [tier 0-7] [request-id] or stop: chest within 5 meters",
+    "raid_request_player": "Use this command from a connected player beside a chest.",
+    "raid_request_chest": "No available chest within 5 meters.",
+    "raid_request_unavailable": "The raid request cannot be sent right now. Try again after the server is ready.",
+    "raid_request_sent": "Raid request {0} sent to the server.",
+    "raid_request_started": "Raid admitted. Request {0}.",
+    "raid_request_stopped": "Raid stopped. Request {0}.",
+    "raid_request_refused": "Raid request {0} was refused. Check chest access, Coins, cooldown and server recovery logs. Close the chest and wait for its inventory to sync before retrying the same request ID.",
+    "raid_request_timeout": "No reply for raid request {0}. Its outcome is unknown. For a start request, retry the same request ID to avoid paying twice."
   }
 }

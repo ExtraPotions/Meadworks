@@ -6,6 +6,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using ExtraPotions.Bestiary.Runtime.Adopted.BundlePrefabs;
 using ExtraPotions.Bestiary.Runtime.Integration;
+using ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit;
 using ExtraPotions.Meadworks.Crucible;
 using HarmonyLib;
 using UnityEngine;
@@ -31,6 +32,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters
             if (BestiaryIntegration.ProductYields) return;
             started = true;
             Core.Log.Bind(logger); Settings.Initialize(file);
+            KitSettings.Initialize(new NativeConfiguration());
             harmony = new Harmony(Plugin.Guid + ".native");
             foreach (var type in typeof(NativeRuntime).Assembly.GetTypes().Where(t => t.Namespace == "ExtraPotions.Bestiary.Runtime.Native" || t.Namespace?.StartsWith("ExtraPotions.Bestiary.Runtime.Native.", StringComparison.Ordinal) == true))
                 if (type.GetCustomAttributes(typeof(HarmonyPatch), true).Length > 0)
@@ -41,17 +43,20 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters
             RimeGiant.RimeGiantPrefabs.Install(harmony); Kraken.KrakenPrefabs.Install(harmony);
             Arsenal.ArsenalPrefabs.Install(harmony); Crossbow.XbowPrefabs.Install(harmony); Headsman.HeadsmanPrefabs.Install(harmony);
             Ballista.BallistaPrefabs.Install(harmony);
+            KitPrefabs.Install(harmony);
             // Runs after every native builder: a catalog name a builder left unregistered (bundle unavailable on this
             // platform, a builder that threw) becomes a plain game-prefab clone, so peers still resolve its ZDOs.
             Prefabs.PrefabClones.Install(harmony, log, () => !BestiaryIntegration.ProductYields);
             Prefabs.OriginalItemVisuals.Install(harmony, log);
             Settings.Changed += RefreshOwned;
+            Settings.Changed += KitSpawns.Refresh;
             Settings.Changed += SharedItemLink.Refresh;
             NetPrefabs.OnSceneAwake(harmony, _ => RefreshOwned());
         }
         internal static void Tick()
         {
             if (!started) return;
+            KitPull.Tick();
             bool now = NativeConfiguration.Active;
             if (active != now) { active = now; Settings.Request(); }
             Settings.Tick(); NativeWords.Tick();

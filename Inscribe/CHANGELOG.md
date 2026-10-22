@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The identification check that runs in a normal game now follows Common, Uncommon, Rare, Epic and Legendary, including the Legendary ground glint. It no longer checks enhancement levels, the +N badge, enhancement scrolls or the Enhance tab, which Inscribe 0.2.0 removed.
+
 ## 0.2.4 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

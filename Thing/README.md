@@ -1,6 +1,6 @@
 # Thing
 
-Version 0.1.10. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.11. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Server administration and moderation from inside the game, checked against the server's own admin list.
 
@@ -10,7 +10,7 @@ Server administration and moderation from inside the game, checked against the s
 - People: see who is online, kick, ban permanently or for a limited time, unban, warn and mute with reasons; edit the permitted list, and the admin list when the server allows it.
 - Freeze: an admin can freeze or unfreeze a connected player for this connection only. The frozen player cannot move or use actions. Menus and chat still work. The flag clears on unfreeze and on disconnect, and it is not saved.
 - Permissions: the host or a listed admin can grant World tools, Spawn, Teleport, Freeze, Inventory and Ward for one platform id, including an id that is offline. Grants are stored on the server for that world. Listed admins keep every right. Everyone else starts with none. The People page edits the grants. A player who holds one of these grants can open the People page. The other pages stay with a listed admin. A grant does not turn on a server switch that is off.
-- Inventory: an admin with the Inventory right can view a connected player's inventory (up to 48 stacks) and Take or Delete one stack. Take removes that stack from the player and puts it in your inventory, or drops it at your feet when your inventory is full. Delete asks a second time and is written to the server log. Custom data, quality, durability, crafter and variant are kept. Closing the window drops a delete that is still waiting for the second confirm.
+- Inventory: an admin with the Inventory right can view a connected player's inventory (up to 48 stacks) and Take or Delete one stack. Take removes that stack from the player and puts it in an empty slot in your inventory as its own stack, or leaves it at your feet when no empty slot is free. It does not merge into a stack you already have. Delete asks a second time and is written to the server log. Custom data, quality, durability, crafter and variant are kept. Closing the window drops a delete that is still waiting for the second confirm.
 - Moderation log and the most recent audit records.
 - Messages: broadcast to everyone (center or top-left), schedule or cancel a shutdown, save the world, and edit the message of the day and recurring announcements.
 - World tools: show the world seed, set or freeze the global time, a session-only ward bypass, terrain reset in a previewed circle, and removal of loose dropped items, each with a confirmation step.
@@ -25,7 +25,7 @@ Server administration and moderation from inside the game, checked against the s
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
 
 ## Installation
 
