@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.6 (2026-10-22)
+
+- Version 0.5.6. Requires Crucible 0.3.29 / Crucible.UI 0.3.21.
+- Ordinary world spawns near an active boss or a living Enforcer keep their timers. The spawn list for that area waits, so a rare creature such as a Troll or a Bjorn does not lose the roll it was due. Event spawns, creature spawners, and spawn areas are unchanged.
+
 ## 0.5.5 (2026-10-21)
 
 - Requires Crucible 0.3.27 / Crucible.UI 0.3.20.

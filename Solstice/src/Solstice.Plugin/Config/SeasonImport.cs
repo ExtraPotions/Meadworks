@@ -16,7 +16,9 @@ namespace ExtraPotions.Solstice.Runtime
     public static class SeasonImport
     {
         const string FileName = "Solstice.seasons.json";
-        const string MarkerName = "com.extrapotions.solstice.seasons-import";
+        /// <summary>Marker file name. Before 0.1.3 it began with the old GUID; <see cref="Plugin"/> carries that marker over at startup.</summary>
+        public const string MarkerName = SolsticeCore.PluginGuid + ".seasons-import";
+        public const string LegacyMarkerName = SolsticeCore.LegacyPluginGuid + ".seasons-import";
 
         public static void Run(SolsticeConfig settings, MeadworksLog log)
         {

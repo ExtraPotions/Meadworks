@@ -28,6 +28,7 @@ internal static class CreatureSpawnBlocker
     {
         internal QueryScope? Previous;
         internal bool EventSpawns;
+        internal bool SkipOriginal;
         internal bool RejectedGroupCandidate;
         internal readonly Dictionary<(Vector2s, bool, bool, bool, int, bool), bool> Results = new();
     }
@@ -47,6 +48,7 @@ internal static class CreatureSpawnBlocker
         QueryScope scope = QueryPool.Count > 0 ? QueryPool.Pop() : new QueryScope();
         scope.Previous = CurrentQuery;
         scope.EventSpawns = eventSpawns;
+        scope.SkipOriginal = false;
         return CurrentQuery = scope;
     }
 
@@ -56,6 +58,7 @@ internal static class CreatureSpawnBlocker
         CurrentQuery = scope.Previous;
         scope.Previous = null;
         scope.EventSpawns = false;
+        scope.SkipOriginal = false;
         scope.RejectedGroupCandidate = false;
         scope.Results.Clear();
         QueryPool.Push(scope);
@@ -95,6 +98,10 @@ internal static class CreatureSpawnBlocker
     {
         return CurrentQuery?.EventSpawns == true || AllowSpawn(prefab, position);
     }
+
+    internal static bool CurrentListSkipsOriginal => CurrentQuery?.SkipOriginal == true;
+
+    internal static bool AreaBlocksOrdinarySpawns(Vector3 position) => ShouldBlock(position);
 
     internal static bool AllowSpawn(GameObject prefab, Vector3 position)
     {
@@ -205,7 +212,19 @@ internal static class CreatureSpawnBlocker
 [HarmonyPatch(typeof(SpawnSystem), "UpdateSpawnList")]
 internal static class CreatureManagerSpawnBlockQueryPatch
 {
-    private static void Prefix(bool eventSpawners, out CreatureSpawnBlocker.QueryScope? __state) => __state = CreatureSpawnBlocker.BeginQuery(eventSpawners);
+    // First, and before DropNSpawn, so Horde sees the skip before it grows shared rows.
+    // A blocked ordinary pass never enters the game method, so its interval timers stay due.
+    [HarmonyPriority(Priority.First)]
+    [HarmonyBefore("sighsorry.DropNSpawn")]
+    private static bool Prefix(SpawnSystem __instance, bool eventSpawners, out CreatureSpawnBlocker.QueryScope? __state)
+    {
+        __state = CreatureSpawnBlocker.BeginQuery(eventSpawners);
+        bool blocked = !eventSpawners && __instance != null && CreatureSpawnBlocker.AreaBlocksOrdinarySpawns(__instance.transform.position);
+        bool skip = SpawnListPass.SkipOriginal(eventSpawners, blocked);
+        if (__state != null) __state.SkipOriginal = skip;
+        return !skip;
+    }
+
     private static Exception? Finalizer(Exception? __exception, CreatureSpawnBlocker.QueryScope? __state)
     {
         CreatureSpawnBlocker.EndQuery(__state);

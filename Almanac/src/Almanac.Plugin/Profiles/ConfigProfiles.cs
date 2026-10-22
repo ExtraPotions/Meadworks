@@ -155,9 +155,10 @@ namespace ExtraPotions.Almanac.Runtime.Profiles
         {ThreadCheck();if(profile==null)throw new ArgumentNullException(nameof(profile));return new ProfilePreview(this,profile,profile.Values.Select(PreviewOne));}
         ProfilePreviewRow PreviewOne(ProfileValue value)
         {
-            var owned=discovery.Index.Files.Where(f=>f.EntriesEditable&&string.Equals(f.Owner?.Guid??(f.Kind==FileKind.CoreConfig?ConfigIndex.CoreGroupKey:""),value.Plugin,StringComparison.Ordinal)).ToArray();
+            // A renamed MeadWorks plugin (com.extrapotions.barter to com.meadworks.barter) matches under either ID and settings file name.
+            var owned=discovery.Index.Files.Where(f=>f.EntriesEditable&&LegacyPluginIds.Same(f.Owner?.Guid??(f.Kind==FileKind.CoreConfig?ConfigIndex.CoreGroupKey:""),value.Plugin)).ToArray();
             if(owned.Length==0)return new ProfilePreviewRow(value,ProfileOutcome.MissingPlugin,"Plugin is not indexed.");
-            var matches=owned.Where(f=>string.Equals(FileKey(f.Path),value.File,StringComparison.OrdinalIgnoreCase))
+            var matches=owned.Where(f=>string.Equals(LegacyPluginIds.CurrentFile(FileKey(f.Path)),LegacyPluginIds.CurrentFile(value.File),StringComparison.OrdinalIgnoreCase))
                 .SelectMany(f=>discovery.Entries(f.Path)).Where(e=>e.Definition.Section==value.Section&&e.Definition.Key==value.Key).ToArray();
             if(matches.Length!=1)return new ProfilePreviewRow(value,ProfileOutcome.UnknownKey,matches.Length==0?"No live matching entry.":"Entry identity is ambiguous.");
             var entry=matches[0];

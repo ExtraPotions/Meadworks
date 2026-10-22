@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.14 (2026-10-22)
+
+- Requires Crucible 0.3.29 / Crucible.UI 0.3.21.
+- 0.1.14. Seasonal weather weights still apply after Solstice's seasonal weather rules now that Solstice's plugin ID is `com.meadworks.solstice` (Solstice 0.1.3). The older ID `com.extrapotions.solstice` is still recognized for one release, so Tempest keeps the same order with Solstice 0.1.2.
+
 ## 0.1.13 (2026-10-21)
 
 - Thunderstore republish of the release 8 build; no code changes.

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.18 (2026-10-22)
+
+- Requires Crucible 0.3.29 / Crucible.UI 0.3.21.
+- 0.1.18. Barter and Solstice now use MeadWorks plugin IDs (`com.meadworks.barter`, `com.meadworks.solstice`), so Almanac lists them under Meadworks with the other products.
+- Saved profiles, pinned mods and the remembered mod that still name the old IDs (`com.extrapotions.barter`, `com.extrapotions.solstice`) or their old settings files apply to Barter and Solstice under either ID. Your profile files are not rewritten.
+- A choice list opened from a setting's value button shows each choice by its translated name when the mod provides one (for example Mantle's Trinket Preset). The saved value stays the same.
+
 ## 0.1.17 (2026-10-21)
 
 - Thunderstore republish of the release 8 build; no code changes.

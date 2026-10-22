@@ -63,6 +63,7 @@ namespace ExtraPotions.Solstice.Runtime
             {
                 if (!CruciblePlugin.IsReady)
                     throw new InvalidOperationException("Required Crucible is not ready");
+                CarryOverLegacyFiles(log!);
                 registration = CruciblePlugin.Services.Register(new ProductMetadata(Guid, Name, new System.Version(Version),
                     new System.Version(0, 1), new System.Version(0, 1), MultiplayerPolicy.RequiredOnAllPeers, Family));
                 Settings = SolsticeConfig.Bind(Config, log);
@@ -77,6 +78,41 @@ namespace ExtraPotions.Solstice.Runtime
             {
                 log.Error("Solstice initialization rejected: " + error.GetType().Name + ": " + error.Message);
                 Shutdown();
+            }
+        }
+
+        /// <summary>
+        /// Solstice's GUID was com.extrapotions.solstice before 0.1.3, so BepInEx named its settings file after it, and the seasons
+        /// import marker shared the prefix. Before the settings bind, copy both to the new names (never over an existing file), keep
+        /// the old ones as .bak and reload the config.
+        /// </summary>
+        private void CarryOverLegacyFiles(MeadworksLog log)
+        {
+            string directory = System.IO.Path.GetDirectoryName(Config.ConfigFilePath) ?? BepInEx.Paths.ConfigPath;
+            string configName = System.IO.Path.GetFileName(Config.ConfigFilePath), legacyConfig = SolsticeCore.LegacyPluginGuid + ".cfg";
+            if (Report(log, LegacyFileMigration.Run(directory, legacyConfig, configName), legacyConfig, configName, "Settings were"))
+                Config.Reload();
+            Report(log, LegacyFileMigration.Run(BepInEx.Paths.ConfigPath, SeasonImport.LegacyMarkerName, SeasonImport.MarkerName),
+                SeasonImport.LegacyMarkerName, SeasonImport.MarkerName, "The seasons import marker was");
+        }
+
+        private static bool Report(MeadworksLog log, LegacyFileResult result, string legacyName, string currentName, string what)
+        {
+            switch (result.Outcome)
+            {
+                case LegacyFileOutcome.Migrated:
+                    log.Info(what + " carried over from " + legacyName + (result.Backup != null
+                        ? "; the old file is kept as " + System.IO.Path.GetFileName(result.Backup) + "."
+                        : ". " + result.Problem));
+                    return true;
+                case LegacyFileOutcome.KeptNew:
+                    log.Info(legacyName + " was left untouched because " + currentName + " already exists.");
+                    return false;
+                case LegacyFileOutcome.Failed:
+                    log.Warning(what + " not carried over from " + legacyName + " (" + result.Problem + "); the old file is untouched.");
+                    return false;
+                default:
+                    return false;
             }
         }
 

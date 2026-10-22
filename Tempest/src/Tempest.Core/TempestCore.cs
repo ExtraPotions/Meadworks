@@ -6,7 +6,7 @@ namespace ExtraPotions.Tempest
     {
         public const string PluginGuid = "com.meadworks.tempest";
         public const string ProductName = "Tempest";
-        public const string ProductVersion = "0.1.13";
+        public const string ProductVersion = "0.1.14";
         public const string Family = "Runestone";
 
         /// <summary>Localization namespace (design section 11): tokens <c>$meadworks_tempest_&lt;key&gt;</c>.</summary>

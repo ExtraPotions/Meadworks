@@ -1,6 +1,6 @@
 # Tempest
 
-Version 0.1.13. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.14. Requires Crucible 0.3.29 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Rare dangerous weather: blizzards in the lowlands and the Deep North and severe thunderstorms, announced five minutes ahead and the same for every player.
 
@@ -18,7 +18,7 @@ Rare dangerous weather: blizzards in the lowlands and the Deep North and severe 
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.29 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 

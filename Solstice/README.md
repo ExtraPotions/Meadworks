@@ -2,7 +2,7 @@
 
 Four seasons for Valheim: spring, summer, fall and winter follow the world calendar and change how the world works.
 
-Version 0.1.2. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.3. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -29,7 +29,7 @@ Version 0.1.2. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CH
 
 ## Configuration
 
-- Settings file: `BepInEx/config/com.extrapotions.solstice.cfg`. Edit it in game with Almanac (the Meadworks settings book) or any ConfigurationManager.
+- Settings file: `BepInEx/config/com.meadworks.solstice.cfg` (Solstice 0.1.2 and earlier used `com.extrapotions.solstice.cfg`; its values are carried over on the first start and the old file is kept as `com.extrapotions.solstice.cfg.bak`). Edit it in game with Almanac (the Meadworks settings book) or any ConfigurationManager.
 - In multiplayer the server's values win for the calendar and the effects, and admins can lock settings; locked settings show as read-only.
 - General: Enabled turns the effects and the seasonal weather off for everyone while the season stays readable by other mods.
 - Calendar: Days In Spring, Summer, Fall and Winter (1 to 100 each).

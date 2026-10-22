@@ -31,7 +31,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
         public void ConfigurePreferences(AlmanacPreferences value)
         {
             preferences=value??throw new ArgumentNullException(nameof(value));showAdvanced=value.ShowAdvanced.Value;
-            if(value.RememberWindow.Value)selected=value.LastPlugin.Value;
+            if(value.RememberWindow.Value)selected=LegacyPluginIds.Current(value.LastPlugin.Value);
             if(window?.Panel!=null)Reflow(window.Panel.rect.size);dirty=true;
         }
         void Preference<T>(ConfigEntry<T> entry,T value)
@@ -135,15 +135,15 @@ namespace ExtraPotions.Almanac.Runtime.UI
         }
         IEnumerable<IndexGroup> OrderedGroups()
         {
-            var pins=new HashSet<string>((preferences?.PinnedPlugins.Value??"").Split(new[]{','},StringSplitOptions.RemoveEmptyEntries).Select(value=>value.Trim()),StringComparer.Ordinal);
-            return discovery.Index.Groups.OrderBy(group=>pins.Contains(group.Key)?0:group.Key.StartsWith("com.meadworks.",StringComparison.Ordinal)?1:2)
+            var pins=new HashSet<string>((preferences?.PinnedPlugins.Value??"").Split(new[]{','},StringSplitOptions.RemoveEmptyEntries).Select(value=>LegacyPluginIds.Current(value.Trim())),StringComparer.Ordinal);
+            return discovery.Index.Groups.OrderBy(group=>pins.Contains(LegacyPluginIds.Current(group.Key))?0:group.Key.StartsWith("com.meadworks.",StringComparison.Ordinal)?1:2)
                 .ThenBy(group=>group.DisplayName,StringComparer.OrdinalIgnoreCase);
         }
         void TogglePin()
         {
             if(preferences==null||selected.Length==0)return;
             var pins=new HashSet<string>(preferences.PinnedPlugins.Value.Split(new[]{','},StringSplitOptions.RemoveEmptyEntries),StringComparer.Ordinal);
-            if(!pins.Remove(selected))pins.Add(selected);Preference(preferences.PinnedPlugins,string.Join(",",pins.OrderBy(value=>value)));dirty=true;
+            if(pins.RemoveWhere(pin=>LegacyPluginIds.Same(pin.Trim(),selected))==0)pins.Add(selected);Preference(preferences.PinnedPlugins,string.Join(",",pins.OrderBy(value=>value)));dirty=true;
         }
         void SelectGroup(string key)
         {selected=key;if(preferences?.RememberWindow.Value==true)Preference(preferences.LastPlugin,key);dirty=true;}

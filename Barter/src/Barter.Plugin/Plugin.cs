@@ -30,9 +30,9 @@ namespace ExtraPotions.Barter.Runtime
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public sealed class Plugin : BaseUnityPlugin
     {
-        public const string Guid = "com.extrapotions.barter";
+        public const string Guid = BarterCore.ProductId;
         public const string Name = "Barter";
-        public const string Version = "0.1.1";
+        public const string Version = "0.1.2";
         public const string Family = "Hoard";
 
         internal const string SourceModGuid = "shudnal.TradersExtended";
@@ -66,6 +66,7 @@ namespace ExtraPotions.Barter.Runtime
             {
                 if (!CruciblePlugin.IsReady)
                     throw new InvalidOperationException("Required Crucible is not ready");
+                CarryOverLegacySettings();
                 registration = CruciblePlugin.Services.Register(new ProductMetadata(Guid, Name, new System.Version(Version),
                     new System.Version(0, 1), new System.Version(0, 1), MultiplayerPolicy.RequiredOnAllPeers, Family));
                 AllowsUi = MeadworksHeadless.AllowsUi;
@@ -79,6 +80,32 @@ namespace ExtraPotions.Barter.Runtime
             {
                 Shutdown();
                 Log.Error("Barter initialization rejected: " + error);
+            }
+        }
+
+        /// <summary>
+        /// Barter's GUID was com.extrapotions.barter before 0.1.2, so BepInEx named its settings file after it. Before the settings
+        /// bind, copy that file to the new name (never over an existing one), keep the old one as a .bak and reload.
+        /// </summary>
+        private void CarryOverLegacySettings()
+        {
+            string directory = System.IO.Path.GetDirectoryName(Config.ConfigFilePath) ?? BepInEx.Paths.ConfigPath;
+            string legacyName = BarterCore.LegacyProductId + ".cfg";
+            var result = LegacyFileMigration.Run(directory, legacyName, System.IO.Path.GetFileName(Config.ConfigFilePath));
+            switch (result.Outcome)
+            {
+                case LegacyFileOutcome.Migrated:
+                    Config.Reload();
+                    Log.Info("Settings carried over from " + legacyName + (result.Backup != null
+                        ? "; the old file is kept as " + System.IO.Path.GetFileName(result.Backup) + "."
+                        : ". " + result.Problem));
+                    break;
+                case LegacyFileOutcome.KeptNew:
+                    Log.Info(legacyName + " was left untouched because " + System.IO.Path.GetFileName(Config.ConfigFilePath) + " already exists.");
+                    break;
+                case LegacyFileOutcome.Failed:
+                    Log.Warning("Settings were not carried over from " + legacyName + " (" + result.Problem + "); Barter starts with defaults and the old file is untouched.");
+                    break;
             }
         }
 

@@ -5,7 +5,10 @@ namespace ExtraPotions.Barter
     /// <summary>Barter.Core identity: Unity-free logic shared by the plugin and the portable tests.</summary>
     public static class BarterCore
     {
-        public const string ProductId = "com.extrapotions.barter";
+        public const string ProductId = "com.meadworks.barter";
+
+        /// <summary>The plugin GUID before 0.1.2. Its settings file is carried over once; other MeadWorks products accept either GUID for one release.</summary>
+        public const string LegacyProductId = "com.extrapotions.barter";
 
         /// <summary>Prefix of every trade list file Barter reads from the config folder (Barter.Haldor.Buy.yml).</summary>
         public const string FilePrefix = "Barter.";

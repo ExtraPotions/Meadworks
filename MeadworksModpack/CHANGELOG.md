@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.12 (2026-10-22)
+
+- Dependency pins: Barter 0.1.2, Solstice 0.1.3, Tempest 0.1.14, Almanac 0.1.18 and Wildblood 0.5.6 (release 8.2); the other 22 packages are unchanged.
+- Barter and Solstice now use MeadWorks plugin IDs (com.meadworks.barter, com.meadworks.solstice). Their settings carry over on the first start. Every player and the server must update Barter and Solstice together; older and newer versions cannot join each other.
+
 ## 0.1.11 (2026-10-21)
 
 - Dependency pins match the packages on Thunderstore: Crucible 0.3.29 (Crucible.UI 0.3.21), Barter 0.1.1, Bestiary 0.1.17, Delve 0.1.13, Mantle 0.1.26 and Solstice 0.1.2 (release 8.1), and the 8.0.1 republishes Almanac 0.1.17, Beacon 0.1.14, Edge 0.2.12, Ember 0.5.8, Hex 0.1.18, Inscribe 0.2.5, Keel 0.1.14, Kindle 0.1.23, Larder 0.2.14, Magpie 0.1.13, Saga 0.1.16, Shepherd 0.1.17, Tempest 0.1.13 and Thing 0.1.12; Burrow, Cairn, Threshold, Timber, Wayfarer, Wildblood and Wildroot are unchanged.

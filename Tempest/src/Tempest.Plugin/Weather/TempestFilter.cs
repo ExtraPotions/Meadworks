@@ -96,7 +96,8 @@ namespace ExtraPotions.Tempest.Runtime
         [HarmonyPatch(typeof(EnvMan), nameof(EnvMan.GetAvailableEnvironments))]
         static class GetAvailableEnvironmentsPatch
         {
-            [HarmonyAfter("com.extrapotions.solstice")]
+            // Solstice's Harmony owner is its plugin GUID: com.meadworks.solstice since Solstice 0.1.3, com.extrapotions.solstice before.
+            [HarmonyAfter("com.meadworks.solstice", "com.extrapotions.solstice")]
             static void Postfix(EnvMan __instance, BiomeSector biome, ref List<EnvEntry> __result)
             {
                 var filter = Current;

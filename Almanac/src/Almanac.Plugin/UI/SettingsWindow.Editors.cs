@@ -50,12 +50,16 @@ namespace ExtraPotions.Almanac.Runtime.UI
                 {var bit=(Enum)Enum.Parse(native.Entry.SettingType,option);if(!bit.Equals(Enum.ToObject(native.Entry.SettingType,0))&&value.HasFlag(bit))selected.Add(option);}
             }
             else selected.Add(native.RawSerialized());
+            // A mod can show a translated caption while the choice itself stays the stored identifier (Mantle trinket presets).
+            Func<string,string> label=null;
+            if(!flags&&native.Attributes.ObjToStr is Delegate show)
+                label=option=>{try{return (string)show.DynamicInvoke(TomlTypeConverter.ConvertToValue(option,native.Entry.SettingType))??option;}catch{return option;}};
             KitAlmanacChoice.Open(window!,native.Entry.Definition.Key,options,selected,flags,values=>
             {
                 string zero=options.FirstOrDefault(option=>Enum.Parse(native.Entry.SettingType,option).Equals(Enum.ToObject(native.Entry.SettingType,0)))??"0";
                 string text=flags?values.Count>0?string.Join(", ",values):zero:values[0];
                 WriteValue(native,TomlTypeConverter.ConvertToValue(text,native.Entry.SettingType));
-            });
+            },label);
             FollowDependency(native);
         }
         void ListEditor(NativeEntry native)

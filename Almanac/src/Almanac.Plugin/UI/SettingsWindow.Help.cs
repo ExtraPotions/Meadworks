@@ -70,7 +70,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
                 string caption=button.GetComponentInChildren<TMPro.TMP_Text>(true)?.text??id;
                 if(id=="Pin")
                 {
-                    bool pinned=(preferences?.PinnedPlugins.Value??"").Split(',').Any(value=>value.Trim()==selected);
+                    bool pinned=(preferences?.PinnedPlugins.Value??"").Split(',').Any(value=>ExtraPotions.Almanac.Index.LegacyPluginIds.Same(value.Trim(),selected));
                     caption=text(pinned?"Unpin":"Pin");
                     var label=button.GetComponentInChildren<TMPro.TMP_Text>(true);if(label!=null)label.text=caption;
                     button.interactable=selected.Length>0;

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 (2026-10-22)
+
+- 0.1.2. Barter is now a MeadWorks plugin everywhere: its plugin ID is `com.meadworks.barter` (was `com.extrapotions.barter`). Almanac lists it under Meadworks, and Crucible treats it like every other MeadWorks product.
+- Your settings carry over. On the first start, `com.extrapotions.barter.cfg` is copied to `com.meadworks.barter.cfg` and the old file is kept as `com.extrapotions.barter.cfg.bak`. An existing `com.meadworks.barter.cfg` is never overwritten. Trade lists, purse data and trade receipts keep their files.
+- Update every player and the server together: a 0.1.1 client and a 0.1.2 server (or the reverse) do not see the same plugin ID and cannot join.
+
 ## 0.1.1 (2026-10-21)
 
 - 0.1.1. The sell list stays on screen at 800x600, 1280x720, 1600x900 and 1920x1080. It sits to the right of the store when that fits, otherwise to the left, otherwise below, and it does not cover the purse. It moves again when the resolution changes while the store is open. Requires Crucible 0.3.28 / Crucible.UI 0.3.20.

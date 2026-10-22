@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.3 (2026-10-22)
+
+- 0.1.3. Solstice is now a MeadWorks plugin everywhere: its plugin ID is `com.meadworks.solstice` (was `com.extrapotions.solstice`). Almanac lists it under Meadworks, and Crucible treats it like every other MeadWorks product.
+- Your settings carry over. On the first start, `com.extrapotions.solstice.cfg` is copied to `com.meadworks.solstice.cfg` and the old file is kept as `com.extrapotions.solstice.cfg.bak`; the seasons import marker moves the same way, so an import that was already applied is not applied again. An existing new file is never overwritten. The world's season clock is unchanged.
+- A server that let players use Season Override through the admin "Players may use" list must allow it again after the update: that list names the plugin ID, so the old grant no longer matches. Until then Season Override stays admin-only.
+- Update every player and the server together: a 0.1.2 client and a 0.1.3 server (or the reverse) do not see the same plugin ID and cannot join.
+
 ## 0.1.2 (2026-10-21)
 
 - 0.1.2. One per-frame tick that throws is logged at most once a minute and no longer skips the other ticks.

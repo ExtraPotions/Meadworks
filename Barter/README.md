@@ -2,7 +2,7 @@
 
 Traders you can shape: per-trader buy and sell lists, custom currencies, prices that follow the trader's purse, and a sell list built on the Meadworks interface kit.
 
-Version 0.1.1. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.2. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -61,7 +61,7 @@ Every field except `prefab` is optional: `stack` (items per lot, default 1), `pr
 
 ## Configuration
 
-- Settings file: `BepInEx/config/com.extrapotions.barter.cfg`. Edit it in game with Almanac (the Meadworks settings book) or any ConfigurationManager.
+- Settings file: `BepInEx/config/com.meadworks.barter.cfg` (Barter 0.1.1 and earlier used `com.extrapotions.barter.cfg`; its values are carried over on the first start and the old file is kept as `com.extrapotions.barter.cfg.bak`). Edit it in game with Almanac (the Meadworks settings book) or any ConfigurationManager.
 - Trader Purse: on by default for every trader that has a Barter list (Haldor, Hildir and the Bog Witch with the shipped lists, the Custom Traders setting, and any trader you write a list for); traders from other mods without a list keep the game's prices. Settings: on or off, flexible pricing, minimum and maximum balance, daily increase and decrease, discount and markup, refill interval and the morning message.
 - Trade Lists: sell only discovered items, items always offered, remove the game's items or other mods' items from buy lists, quality price multiplier for sold gear, common valuables (every valued item sells at its value), custom traders and trader currencies (`Haldor:Coins,Hildir:SilverCoin`).
 - Interface: the sell panel, the purse card and hiding worn gear are your own choices.

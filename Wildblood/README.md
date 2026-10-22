@@ -2,7 +2,7 @@
 
 Creature stars that grow with the world, mutations, boss aspects, loot rules and bad-luck protection.
 
-Version 0.5.5. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.6. Requires Crucible 0.3.29 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -25,7 +25,7 @@ Version 0.5.5. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CH
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Crucible 0.3.29 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 
