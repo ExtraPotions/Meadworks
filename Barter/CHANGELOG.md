@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 (2026-10-21)
+
+- 0.1.1. The sell list stays on screen at 800x600, 1280x720, 1600x900 and 1920x1080. It sits to the right of the store when that fits, otherwise to the left, otherwise below, and it does not cover the purse. It moves again when the resolution changes while the store is open. Requires Crucible 0.3.28 / Crucible.UI 0.3.20.
+
 ## 0.1.0 (2026-10-21)
 
 - First release. Requires Crucible 0.3.27 / Crucible.UI 0.3.20.

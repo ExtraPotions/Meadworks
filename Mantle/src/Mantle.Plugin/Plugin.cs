@@ -17,10 +17,11 @@ using CrucibleUiPlugin = ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin;
 namespace Mantle
 {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
-    [BepInDependency(CruciblePlugin.Guid, CruciblePlugin.Version)]
+    // Quoted 8.0.1 minimums. CruciblePlugin.Version would follow a newer neighboring checkout and refuse 0.3.28.
+    [BepInDependency(CruciblePlugin.Guid, "0.3.28")]
     // The Crucible.UI kit is the standard Meadworks UI (mandatory; idle on a headless server). Mantle's adopted PackPanel
-    // inventory UI is the kit's own baseline and stays as adopted.
-    [BepInDependency(CrucibleUiPlugin.Guid, CrucibleUiPlugin.Version)]
+    // inventory UI is the kit's own baseline and stays as adopted. A later 0.3.x still loads.
+    [BepInDependency(CrucibleUiPlugin.Guid, "0.3.20")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     // Inscribe (Meadworks' EliteCrafting) is optional: when it is there, its Awake runs first so the backpack class and Deep
     // Pockets register through its API (Mantle.Elite.EliteSetup, parity choice #94); without it nothing of that runs. Load order
@@ -32,7 +33,7 @@ namespace Mantle
     {
         public const string PluginGuid = "com.meadworks.mantle";
         public const string PluginName = "Mantle";
-        public const string PluginVersion = "0.1.24";
+        public const string PluginVersion = "0.1.26";
         public static Plugin Instance { get; private set; }
         public static ManualLogSource Log { get; private set; }
         public static SyncedConfiguration Synced { get; private set; }

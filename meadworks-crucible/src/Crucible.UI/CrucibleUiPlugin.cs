@@ -22,7 +22,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
     {
         public const string Guid = "com.meadworks.crucible.ui";
         public const string Name = "ExtraPotions Meadworks: Crucible UI";
-        public const string Version = "0.3.20";
+        public const string Version = "0.3.21";
         public const string Product = KitText.Product;
 
         internal static MeadworksLog Log { get; private set; }
@@ -41,6 +41,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 Log.Info("Crucible.UI idle: headless process, no UI is created.");
                 return;
             }
+            KitCanvas.HangulWordBreaks();
             KitLook.Bind(Config);
             KitNoticePanel.Bind(Config);
             MeadworksPauseMenu.Bind(Config);
@@ -70,6 +71,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         {
             if (!Active)
                 return;
+            KitCanvas.HangulWordBreaks();
             KitDialogs.Tick();
             KitNativeMenus.Tick();
             GamePanelTheme.Update();

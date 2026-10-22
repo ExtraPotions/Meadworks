@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.12 (2026-10-21)
+
+- Thunderstore republish of the release 8 build; no code changes.
+
 ## 0.2.11 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

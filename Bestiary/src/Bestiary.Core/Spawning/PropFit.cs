@@ -122,6 +122,13 @@ namespace ExtraPotions.Bestiary.Spawning
         /// <summary>The head is the wider end. Equal width keeps the min end.</summary>
         public static bool HeadAtMax(float spreadMin, float spreadMax) => spreadMax > spreadMin;
 
+        /// <summary>Butt height above the ground. The tail hangs below the hand by the sine of the world pitch.</summary>
+        public static float ButtHeight(float handHeight, float elevationDegrees, float fromButt, float length)
+        {
+            double rad = elevationDegrees * (Math.PI / 180.0);
+            return handHeight - (float)Math.Sin(rad) * fromButt * length;
+        }
+
         /// <summary>Creature axes, right then up then forward. <paramref name="tiltDegrees"/> is up from forward.</summary>
         public static Axes SpearAim(float tiltDegrees)
         {

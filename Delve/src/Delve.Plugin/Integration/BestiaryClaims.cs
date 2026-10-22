@@ -1,29 +1,18 @@
 // Delve - ExtraPotions Meadworks. Copyright (C) 2026 expDARE (ExtraPotions Meadworks). SPDX-License-Identifier: GPL-3.0-or-later
-// Meadworks-original: the server calls Bestiary's claim reset when an admin regenerates every kind.
+// Meadworks-original: the authority calls Bestiary's claim reset after a full regenerate has finished.
 using System;
-using System.Collections.Generic;
 using ExtraPotions.Delve.Commands;
-using ExtraPotions.Delve.Engine;
-using ExtraPotions.Meadworks.Crucible;
+using ExtraPotions.Delve.Config;
 using CruciblePlugin = ExtraPotions.Meadworks.Crucible.Plugin;
 
 namespace ExtraPotions.Delve.Runtime
 {
     internal static class BestiaryClaims
     {
-        public static void ClearIf(DelveCommand command, bool dryRunAll) 
+        /// <summary>The armed regenerate has finished. Still the authority only; a client never writes the keys.</summary>
+        public static void ClearFinished()
         {
-            if (BestiaryClaimReset.Clears(command)) Clear(dryRunAll);
-        }
-
-        public static void ClearIf(IReadOnlyList<DelveKind> kinds, bool dryRunAll)
-        {
-            if (BestiaryClaimReset.CoversEveryKind(kinds)) Clear(dryRunAll);
-        }
-
-        private static void Clear(bool dryRunAll)
-        {
-            if (dryRunAll)
+            if (Plugin.Settings != null && Plugin.Settings.Get(DelveSettings.General.DryRunAll))
             {
                 Plugin.Log?.Info("Delve left Bestiary region claims in place (Dry Run All).");
                 return;

@@ -108,6 +108,7 @@ namespace ExtraPotions.Solstice.Runtime
                 return;
             }
             int day = envMan.GetCurrentDay();
+            if (lastDay != int.MinValue && day != lastDay) SeasonFrame.DayMoved = true;
             bool clockChanged = SeasonClockSync.Advance(day, settings.Calendar());
             var held = settings.HeldSeason(out var blocked);
             if (!dirty && !clockChanged && day == lastDay && held == lastHeld) return;

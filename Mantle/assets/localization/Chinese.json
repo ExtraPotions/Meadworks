@@ -129,7 +129,7 @@
     "cfg_7_trinkets__trinket_tuning_name": "饰品调整",
     "cfg_7_trinkets__trinket_tuning_help": "此主机/服务器设置由 Mantle 管理。关闭后恢复原版饰品数值，不额外奖励击杀肾上腺素。修改立即生效并保存在主机；客户端使用服务器覆盖值，同时保留自己保存的偏好。",
     "cfg_7_trinkets__trinket_preset_name": "饰品预设",
-    "cfg_7_trinkets__trinket_preset_help": "主机/服务器预设。原版保持游戏原有行为。保守为服务器确认的敌对目标击杀奖励有效肾上腺素阈值的5%，再乘以目标的原版倍率；盟友、驯服生物和玩家除外，不与队友分享。自定义使用完整且有效的表格。配方保持原版。",
+    "cfg_7_trinkets__trinket_preset_help": "主机/服务器预设。{0}保持游戏原有行为。{1}为服务器确认的敌对目标击杀奖励有效肾上腺素阈值的5%，再乘以目标的原版倍率；盟友、驯服生物和玩家除外，不与队友分享。{2}使用完整且有效的表格。配方保持原版。",
     "cfg_7_trinkets__custom_trinket_table_name": "自定义饰品表",
     "cfg_7_trinkets__custom_trinket_table_help": "主机/服务器的 JSON 数组，包含从当前游戏验证数据中读取的全部15种原版饰品。每行必须有 prefab、threshold（1-200点肾上腺素）、duration（0.1-300秒）、killFraction（0-0.10）和完全对应原版的 effects 映射。立即恢复资源：0-200点；技能：0-30级；护甲：0-40点；增益倍率：1-2（加成0-100%）；体力消耗修正：-1至0（-100%至0%）；移动：0-0.5（0-50%）；伤害加成：0-1（0-100%）；抗性：仅限原版枚举整数。未知、重复、不完整、非有限或超范围数值会拒绝整次修改并保留上一个有效表格。预制件和效果的 JSON 标识符保持不变。 精准格挡加成：0-1（0-100%）。",
     "cfg_7_trinkets__display_effective_values_name": "显示有效数值",

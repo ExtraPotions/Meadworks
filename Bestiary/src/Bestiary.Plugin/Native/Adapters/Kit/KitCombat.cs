@@ -296,7 +296,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
         {
             if (hit == null || __instance == null || __instance.m_nview == null || !__instance.m_nview.IsOwner()) return;
             if (!__instance.TryGetComponent(out KitPlates plates)) return;
-            float fire = SlagPlates.Counted(true, hit.m_damage.m_fire);
+            float fire = SlagPlates.Counted(SlagPlates.Direct((int)hit.m_hitType), hit.m_damage.m_fire);
             SafeCall.Run("Character.RPC_Damage slag plates", static (armor, blow) => armor.Soften(blow), plates, hit);
             if (fire > 0f) SafeCall.Run("Character.RPC_Damage slag plates", static (armor, amount) => armor.Melt(amount), plates, fire);
         }

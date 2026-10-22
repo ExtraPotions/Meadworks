@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.17 (2026-10-21)
+
+- Version 0.1.17.
+- Requires Crucible 0.3.28 / Crucible.UI 0.3.20.
+- Requires Wildblood 0.5.5.
+- A Slag Charred plate takes the fire on a direct hit. Burn, freeze, and poison ticks do not melt a plate.
+- Each side plate sits another 0.08 m outward (0.73 m from the chest) and 0.04 m further forward (0.12 m). The front plate is unchanged, and the plates still do not overlap from the front.
+- The Fuling spear grip is 0.12 of the length from the butt, and the head tilts 22 degrees up instead of 25. In the idle swing that put the butt 0.05 m into the ground, the butt stays about 0.19 m up. The head still points forward and up.
+
 ## 0.1.16 (2026-10-21)
 
 - Requires Crucible 0.3.27 / Crucible.UI 0.3.20.

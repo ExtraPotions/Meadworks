@@ -1,6 +1,6 @@
 {
   "name": "Edge",
-  "version_number": "0.2.11",
+  "version_number": "0.2.12",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Edge",
   "description": "Meadworks combat: weapon-family secondary attacks, quickstep, slope-aware swings, swim equipment recovery and Dodge Cancel (off by default). Required on all peers.",
   "dependencies": [

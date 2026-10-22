@@ -1,6 +1,6 @@
 # Keel
 
-Version 0.1.13. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.14. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Tune every ship, level a Sailing skill, and build eight new ships from the vanilla hulls.
 

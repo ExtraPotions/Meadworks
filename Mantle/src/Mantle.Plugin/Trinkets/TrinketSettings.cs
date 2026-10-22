@@ -41,8 +41,9 @@ namespace Mantle.Trinkets
                 "Mantle owns this host/server setting. Off restores native trinket values and adds no kill adrenaline. Changes apply live and are saved on the host; connected clients use the server overlay and keep their own saved preferences.",
                 tags: new object[] { new ConfigurationManagerAttributes("trinket_tuning") });
             Preset = synced.Bind(Section, "Trinket Preset", TrinketPreset.Native,
-                "Host/server preset. Native preserves the game. Conservative adds 5% of the effective adrenaline threshold per server-credited hostile kill, weighted by the target's native multiplier; no allies, tames, players or party sharing. Custom uses the complete validated table. Recipes stay native.",
-                acceptableValues: new PresetValue(), tags: new object[] { new ConfigurationManagerAttributes("trinket_preset") });
+                "Host/server preset. {0} preserves the game. {1} adds 5% of the effective adrenaline threshold per server-credited hostile kill, weighted by the target's native multiplier; no allies, tames, players or party sharing. {2} uses the complete validated table. Recipes stay native.",
+                acceptableValues: new PresetValue(), tags: new object[] { new ConfigurationManagerAttributes("trinket_preset"),
+                    new ConfigPresentation<TrinketPreset>(Plugin.PluginGuid, (entry, language) => TrinketPresentation.Preset(entry)) });
             validation = new TableValue();
             CustomTable = synced.Bind(Section, "Custom Trinket Table", "",
                 "Host/server JSON array of all 15 native trinkets, populated from this game's validated native data. Each row requires prefab, threshold (1-200 adrenaline points), duration (0.1-300 seconds), killFraction (0-0.10), and the exact native effects map. Resource bursts: 0-200 points; skills: 0-30 levels; armor: 0-40 points; beneficial multipliers: 1-2 (0-100% bonus); stamina-use modifiers: -1 to 0 (-100% to 0%); movement: 0-0.5 (0-50%); damage bonus: 0-1 (0-100%); resistances: native enum integers only. Unknown, duplicate, incomplete, nonfinite or out-of-range values reject the entire edit and retain the last valid table. Native prefabs and typed effect names remain stable JSON identifiers. Timed block bonus: 0-1 (0-100%).",
@@ -198,9 +199,24 @@ namespace Mantle.Trinkets
         {
             readonly string key;
             internal ConfigurationManagerAttributes(string key) { this.key = key; }
+            bool PresetChoices => key == "trinket_preset";
             public string DispName => Accessories.AccessoryText.Text("cfg_7_trinkets__" + key + "_name");
             public string Category => Accessories.AccessoryText.Text("cfg_7_trinkets_heading");
-            public string Description => Accessories.AccessoryText.Text("cfg_7_trinkets__" + key + "_help");
+            public string Description => PresetChoices ? TrinketPresentation.PresetHelp()
+                : Accessories.AccessoryText.Text("cfg_7_trinkets__" + key + "_help");
+            // Almanac shows ObjToStr on the value control and invokes it again after a language change. The saved value stays the enum name.
+            public Func<object, string> ObjToStr => PresetChoices ? new Func<object, string>(ShowPreset) : null;
+            public Func<string, object> StrToObj => PresetChoices ? new Func<string, object>(ReadPreset) : null;
+            static string ShowPreset(object value)
+            {
+                var preset = value is TrinketPreset named && Enum.IsDefined(typeof(TrinketPreset), named) ? named : TrinketPreset.Native;
+                return TrinketPresentation.PresetLabel(preset);
+            }
+            static object ReadPreset(string text)
+            {
+                if (!TrinketPresentation.TryParsePreset(text, out var preset)) throw new ArgumentException("Unknown trinket preset.");
+                return preset;
+            }
         }
     }
 }

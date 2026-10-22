@@ -14,6 +14,7 @@ namespace ExtraPotions.Barter.Runtime
     /// <summary>The trader's purse beside the store window: balance and currency, and how far the balance moves prices.</summary>
     internal sealed class PurseCard : IDisposable
     {
+        internal const string ObjectName = "Barter_purse";
         private static readonly Color Good = new Color(0.5f, 1f, 0.5f);
         private static readonly Color Bad = new Color(1f, 0.4f, 0.4f);
         private static readonly Color Dim = new Color(0.78f, 0.78f, 0.78f);
@@ -38,7 +39,7 @@ namespace ExtraPotions.Barter.Runtime
         internal static PurseCard Create(StoreGui store)
         {
             Transform root = store != null && store.m_rootPanel != null ? store.m_rootPanel.transform : null;
-            RectTransform panel = KitPanel.Create(root, "Barter_purse", new Vector2(250f, 154f));
+            RectTransform panel = KitPanel.Create(root, ObjectName, new Vector2(250f, 154f));
             if (panel == null)
                 return null;
 
@@ -100,7 +101,7 @@ namespace ExtraPotions.Barter.Runtime
         }
 
         /// <summary>Keeps the card on the HUD canvas as the store or the resolution moves.</summary>
-        internal void Fit() => PursePlacement.Apply(panel);
+        internal void Fit() => PanelPlacement.Apply(panel);
 
         private static void Describe(TMP_Text label, string key, float factor, bool reversed)
         {

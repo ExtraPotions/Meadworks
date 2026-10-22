@@ -90,8 +90,9 @@ namespace ExtraPotions.Delve.Runtime
                     foreach (var text in positional) { if (!TryKind(text, out var k)) return Unhandled; kinds.Add(k); }
                     if (kinds.Count == 0) return Unhandled;
                     var verdict = settings.RegenerateFor(true, Locked(peer));
-                    BestiaryClaims.ClearIf(kinds, settings.Get(DelveSettings.General.DryRunAll));
-                    var requested = engine.Request(kinds.Where(engine.Active), verdict == RegenerateVerdict.Allowed);
+                    bool skipDelay = verdict == RegenerateVerdict.Allowed;
+                    var requested = engine.Request(kinds.Where(engine.Active), skipDelay);
+                    engine.ConsiderClaimClear(kinds, requested, skipDelay);
                     return Done(new[] { Line(new[] { "requested", verdict.ToString() }.Concat(requested.Select(k => k.ToString()))) });
                 case DelveAdminContract.Sites:
                     if (!TryXz(positional, out var x, out var z)) return Unhandled;

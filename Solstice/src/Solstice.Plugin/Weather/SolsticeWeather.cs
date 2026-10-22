@@ -116,6 +116,7 @@ namespace ExtraPotions.Solstice.Runtime
                     var seasonRules = Rules();
                     SeasonEnvironmentVariants.Ensure(__instance, false);
                     if (seasonRules == null || seasonRules.Count == 0 || __result == null || biome == null) return;
+                    long started = SeasonFrame.Stamp();
                     var setup = __instance.GetBiomeEnvSetup(biome.Biome);
                     var baseline = __result.Where(e => e != null).Select(e => new EnvironmentWeight(e.m_environment, e.m_weight, e));
                     var applied = EnvironmentRules.Apply(seasonRules, setup?.m_name ?? "", biome.Biome.ToString(), baseline,
@@ -127,6 +128,7 @@ namespace ExtraPotions.Solstice.Runtime
                         else list.Add(new EnvEntry { m_environment = weight.Name, m_weight = weight.Weight, m_env = __instance.GetEnv(weight.Name) });
                     }
                     __result = list;
+                    SeasonFrame.Add(SeasonFrameSystem.WeatherListSwap, started);
                 }
                 catch (Exception error)
                 {

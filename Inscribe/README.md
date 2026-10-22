@@ -2,7 +2,7 @@
 
 Item rarity, inscriptions, runes that reshape your gear, gems and sockets.
 
-Version 0.2.4. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.5. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

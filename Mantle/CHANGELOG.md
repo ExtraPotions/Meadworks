@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.26 (2026-10-21)
+
+- 0.1.26. Requires Crucible 0.3.28 / Crucible.UI 0.3.20.
+- Trinket Preset shows the translated names for Native, Conservative, and Custom, including the setting help, and switches with the game's language. The config file still stores those English names.
+
+## 0.1.25 (2026-10-21)
+
+- Thunderstore republish of the release 8 build; no code changes.
+- Requires Crucible 0.3.28 / Crucible.UI 0.3.20 (Crucible 0.3.27 on Thunderstore is a source archive without DLLs).
+
 ## 0.1.24 (2026-10-21)
 
 - Requires Crucible 0.3.27 / Crucible.UI 0.3.20.

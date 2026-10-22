@@ -31,10 +31,10 @@ namespace ExtraPotions.Bestiary.Spawning
         public const float PlateMeters = 0.45f;
 
         /// <summary>Hand, as a fraction of the spear from the narrow butt. The wide end is the head.</summary>
-        public const float SpearFromButt = 0.25f;
+        public const float SpearFromButt = 0.12f;
 
         /// <summary>Degrees the head tilts up from the creature's forward axis.</summary>
-        public const float SpearTiltDegrees = 25f;
+        public const float SpearTiltDegrees = 22f;
 
         /// <summary>Longest axis, in meters, once the bone scale is divided out.</summary>
         public static float Meters(string creature)
@@ -72,8 +72,8 @@ namespace ExtraPotions.Bestiary.Spawning
         /// <summary>Front, then left, then right, in meters out from the chest bone. Sides sit further out and slightly forward of the shoulder guards. The front plate stays on the chest. <paramref name="onBody"/> lifts them when the rig has no chest bone.</summary>
         public static Grip PlateGrip(int index, bool onBody)
         {
-            var grip = index == 1 ? new Grip(-0.65f, 0.29f, 0.08f)
-                : index == 2 ? new Grip(0.65f, 0.29f, 0.08f)
+            var grip = index == 1 ? new Grip(-0.73f, 0.29f, 0.12f)
+                : index == 2 ? new Grip(0.73f, 0.29f, 0.12f)
                 : new Grip(0f, 0.31f, 0.30f);
             return onBody ? new Grip(grip.Right, grip.Up + 1.55f, grip.Forward) : grip;
         }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.13 (2026-10-21)
+
+- Requires Crucible 0.3.28 / Crucible.UI 0.3.20.
+- A full regenerate (`delve-regen`, or an admin request that names every kind) clears Bestiary region claims on the server only after the kinds it accepted have finished. Regenerate Without Waiting has to be on. A request that keeps the usual delays leaves the claims, including when the cheat is off or the Mischief gate locks it. Kinds that are switched off are not part of that regenerate. A request that is refused, canceled, or fails on that check leaves the claims. Dry Run All leaves the claims. Regenerating one kind does not. Finishing the same regenerate again does not clear them a second time.
+
 ## 0.1.12 (2026-10-21)
 
 - Requires Crucible 0.3.27 / Crucible.UI 0.3.20.

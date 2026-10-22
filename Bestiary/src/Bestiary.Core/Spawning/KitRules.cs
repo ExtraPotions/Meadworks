@@ -119,6 +119,14 @@ namespace ExtraPotions.Bestiary.Spawning
             return plates;
         }
 
+        // Valheim HitData.HitType ordinals for the three damage-over-time ticks.
+        public const int BurningTick = 5;
+        public const int FreezingTick = 6;
+        public const int PoisonTick = 7;
+
+        /// <summary>A direct hit. Burn, freeze, and poison ticks are not.</summary>
+        public static bool Direct(int hitType) => hitType != BurningTick && hitType != FreezingTick && hitType != PoisonTick;
+
         /// <summary>Fire counted toward a plate. Burn ticks are not a hit.</summary>
         public static float Counted(bool weaponHit, float fire) => weaponHit && fire > 0f ? fire : 0f;
 

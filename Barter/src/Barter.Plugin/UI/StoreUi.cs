@@ -71,6 +71,7 @@ namespace ExtraPotions.Barter.Runtime
                 SellService.Refresh(store);
             }
             purse?.Fit();
+            sell?.Fit();
             if (Time.unscaledTime < next)
                 return;
             next = Time.unscaledTime + RefreshSeconds;

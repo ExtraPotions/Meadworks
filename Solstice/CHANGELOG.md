@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.2 (2026-10-21)
+
+- 0.1.2. One per-frame tick that throws is logged at most once a minute and no longer skips the other ticks.
+- Snow-cover pass lines and per-texture source and frost averages, including sky, sun and ambient, are Debug. A snow frame over 50 ms still warns, at most once a minute.
+- A day change or a General Enabled toggle logs a Debug breakdown of Solstice's own tick times, and whether the weather list, environment variants, music invalidate, visuals repaint or minimap tint ran in that frame.
+
+## 0.1.1 (2026-10-21)
+
+- Thunderstore republish of the release 8 build; no code changes.
+- Requires Crucible 0.3.28 / Crucible.UI 0.3.20 (Crucible 0.3.27 on Thunderstore is a source archive without DLLs).
+
 ## 0.1.0 (2026-10-21)
 
 - First release. Requires Crucible 0.3.27 / Crucible.UI 0.3.20.

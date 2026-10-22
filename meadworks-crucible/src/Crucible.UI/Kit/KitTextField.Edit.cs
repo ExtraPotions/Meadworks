@@ -131,6 +131,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             if (idleFit == idle)
                 return;
             idleFit = idle;
+            KitCanvas.HangulWordBreaks();
             text.enableAutoSizing = idle;
             text.fontSizeMin = KitButtonText.MinSize;
             text.fontSizeMax = KitInputLayout.TextSize;

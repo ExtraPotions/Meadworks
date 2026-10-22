@@ -15,7 +15,7 @@ using UnityEngine.EventSystems;
 
 namespace ExtraPotions.Barter.Runtime
 {
-    /// <summary>The sell list of the open trader on the right of the store window.</summary>
+    /// <summary>The sell list of the open trader beside the store window.</summary>
     internal sealed class SellPanel : IDisposable
     {
         internal const string ObjectName = "Barter_sell";
@@ -122,7 +122,11 @@ namespace ExtraPotions.Barter.Runtime
                 info.text = BarterText.Text(SellService.Offers.Count == 0 ? "sell_empty" : controller ? "controller_help" : "sell_tip");
             else
                 info.text = reason.Length > 0 ? reason : Describe(selected);
+            Fit();
         }
+
+        /// <summary>Keeps the list on the HUD canvas as the store or the resolution moves.</summary>
+        internal void Fit() => PanelPlacement.Apply(panel);
 
         internal void ReleaseController() { controller = false; }
 

@@ -7,7 +7,7 @@ namespace ExtraPotions.Larder
     {
         public const string ProductId = "com.meadworks.larder";
         public const string Name = "Larder";
-        public const string Version = "0.2.13";
+        public const string Version = "0.2.14";
         public const string Family = "Hearth";
 
         /// <summary>Valheim build the design was written against (design header); reconfirmed natively at L01b.</summary>

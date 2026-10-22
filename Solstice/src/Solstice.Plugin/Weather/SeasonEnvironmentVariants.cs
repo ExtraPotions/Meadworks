@@ -74,6 +74,7 @@ namespace ExtraPotions.Solstice.Runtime
                 if (MeadworksHeadless.AllowsUi) DimLowlandClear(clone, variant.Name);
                 envMan.AppendEnvironment(clone);
                 Owned.Add(clone);
+                SeasonFrame.Mark(SeasonFrameSystem.EnvironmentVariants);
             }
             environmentCount = envMan.m_environments?.Count ?? 0;
             if (countUpdate && pending) attempts++;
@@ -89,6 +90,7 @@ namespace ExtraPotions.Solstice.Runtime
 
         public static void Restore(EnvMan? envMan)
         {
+            bool changed = false;
             if (envMan != null)
             {
                 var current = Source(envMan, envMan.m_currentEnv);
@@ -102,11 +104,14 @@ namespace ExtraPotions.Solstice.Runtime
                     {
                         envMan.QueueEnvironment(source);
                         envMan.InterpolateEnvironment(envMan.m_transitionDuration);
+                        changed = true;
                     }
                 }
                 if (envMan.m_environments != null)
-                    foreach (var clone in Owned) envMan.m_environments.Remove(clone);
+                    foreach (var clone in Owned)
+                        if (envMan.m_environments.Remove(clone)) changed = true;
             }
+            if (changed) SeasonFrame.Mark(SeasonFrameSystem.EnvironmentVariants);
             Owned.Clear();
             attempts = 0;
             observed = null;

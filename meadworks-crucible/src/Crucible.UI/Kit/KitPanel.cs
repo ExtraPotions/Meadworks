@@ -61,9 +61,20 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             return null;
         }
 
+        /// <summary>
+        /// Hangul breaks on spaces. Without this, TextMesh Pro breaks before every Hangul syllable. Chinese ideographs and Latin are unchanged.
+        /// </summary>
+        internal static void HangulWordBreaks()
+        {
+            if (TMP_Settings.instance == null || TMP_Settings.useModernHangulLineBreakingRules)
+                return;
+            TMP_Settings.useModernHangulLineBreakingRules = true;
+        }
+
         /// <summary>A text child with the kit's restyling (PackPanel StatRows: font set before the text wakes).</summary>
         public static TMP_Text Text(Transform parent, string name, string words, float size, Color colour, TextAlignmentOptions alignment, bool wraps)
         {
+            HangulWordBreaks();
             GameObject go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
             go.SetActive(false);

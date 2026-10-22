@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.11 (2026-10-21)
+
+- Dependency pins match the packages on Thunderstore: Crucible 0.3.29 (Crucible.UI 0.3.21), Barter 0.1.1, Bestiary 0.1.17, Delve 0.1.13, Mantle 0.1.26 and Solstice 0.1.2 (release 8.1), and the 8.0.1 republishes Almanac 0.1.17, Beacon 0.1.14, Edge 0.2.12, Ember 0.5.8, Hex 0.1.18, Inscribe 0.2.5, Keel 0.1.14, Kindle 0.1.23, Larder 0.2.14, Magpie 0.1.13, Saga 0.1.16, Shepherd 0.1.17, Tempest 0.1.13 and Thing 0.1.12; Burrow, Cairn, Threshold, Timber, Wayfarer, Wildblood and Wildroot are unchanged.
+- The installer carries the same package files as Thunderstore. What's new covers the 20 new versions.
+- Installer: updating a profile whose mods.yml was written by a newer r2modman (dependency lists indented four spaces) no longer stops with "Unsupported manager dependency metadata".
+
 ## 0.1.10 (2026-10-21)
 
 - Barter 0.1.0 and Solstice 0.1.0 join the suite: trader lists and purses, and four seasons by the world calendar.

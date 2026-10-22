@@ -475,6 +475,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         static int CountLines(TMP_Text fontProbe, string text, float width)
         {
             if (string.IsNullOrEmpty(text)) return 1;
+            KitCanvas.HangulWordBreaks();
             var rect = fontProbe.rectTransform;
             rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width < 1f ? 1f : width);
             rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 800f);

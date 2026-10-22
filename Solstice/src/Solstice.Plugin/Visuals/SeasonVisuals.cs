@@ -172,6 +172,7 @@ namespace ExtraPotions.Solstice.Runtime
 
         static void Apply(Season season, float cover, bool frozen, bool world, bool snow, bool water)
         {
+            SeasonFrame.Mark(SeasonFrameSystem.VisualsRepaint);
             int grass = 0, leaf = 0, terrain = 0, snowCount = 0, waterCount = 0;
             seen.Clear();
             var materials = Resources.FindObjectsOfTypeAll<Material>();
@@ -310,13 +311,24 @@ namespace ExtraPotions.Solstice.Runtime
                 stored = true;
             }
             image.color = on ? Tint(original, TintChannel.Map, season, false) : original;
+            if (on) SeasonFrame.Mark(SeasonFrameSystem.MinimapTint);
         }
 
         static void RestoreMap()
         {
             // The singleton can disappear before its images, so restore the objects whose colors we captured.
-            if (smallStored && smallImage != null) smallImage.color = smallOriginal;
-            if (largeStored && largeImage != null) largeImage.color = largeOriginal;
+            bool touched = false;
+            if (smallStored && smallImage != null)
+            {
+                smallImage.color = smallOriginal;
+                touched = true;
+            }
+            if (largeStored && largeImage != null)
+            {
+                largeImage.color = largeOriginal;
+                touched = true;
+            }
+            if (touched) SeasonFrame.Mark(SeasonFrameSystem.MinimapTint);
             smallStored = false;
             largeStored = false;
             smallImage = null;
@@ -326,6 +338,7 @@ namespace ExtraPotions.Solstice.Runtime
 
         static void Clear()
         {
+            if (cache.Count > 0) SeasonFrame.Mark(SeasonFrameSystem.VisualsRepaint);
             foreach (var pair in cache)
                 if (pair.Value.Material != null) Restore(pair.Value);
             cache.Clear();

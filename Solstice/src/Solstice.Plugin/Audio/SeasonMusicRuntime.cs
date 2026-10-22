@@ -24,8 +24,10 @@ namespace ExtraPotions.Solstice.Runtime
 
         public static void Invalidate()
         {
+            long started = SeasonFrame.Stamp();
             cachedSeason = int.MinValue;
             if (!Wanted()) Release();
+            SeasonFrame.Add(SeasonFrameSystem.MusicInvalidate, started);
         }
 
         public static void Shutdown()

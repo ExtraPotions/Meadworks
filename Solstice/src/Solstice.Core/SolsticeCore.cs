@@ -6,7 +6,7 @@ namespace ExtraPotions.Solstice
     {
         public const string PluginGuid = "com.extrapotions.solstice";
         public const string ProductName = "Solstice";
-        public const string ProductVersion = "0.1.0";
+        public const string ProductVersion = "0.1.2";
         public const string Family = "Runestone";
 
         /// <summary>Localisation namespace: tokens <c>$meadworks_solstice_&lt;key&gt;</c>.</summary>

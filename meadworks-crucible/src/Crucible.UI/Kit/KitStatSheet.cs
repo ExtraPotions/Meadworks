@@ -63,6 +63,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             if (key == shown)
                 return;
             shown = key;
+            KitCanvas.HangulWordBreaks();
             StatRows.Write(content, sheet, Width, KitCanvas.Font);
         }
 

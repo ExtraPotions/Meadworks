@@ -101,7 +101,9 @@ namespace ExtraPotions.Solstice.Runtime
         static int terrainMilli = int.MinValue;
         static int terrainIndex;
         static int reads, uploads, terrainDone, frames, peakMs;
-        static bool dirty = true, painted, warned, logging, warnedSpike;
+        static bool dirty = true, painted, warned, logging, warnedSpike, debugLog;
+        static double nextSlowWarn;
+        static readonly Stopwatch slowClock = Stopwatch.StartNew();
         static bool loggedRebuild, loggedRead, loggedNone;
 
         /// <summary>Cover used while a terrain mesh is rebuilding. 0 leaves the game's biome mask.</summary>
@@ -197,6 +199,7 @@ namespace ExtraPotions.Solstice.Runtime
             if (logging) FinishPass();
             reads = uploads = terrainDone = frames = peakMs = 0;
             warnedSpike = false;
+            debugLog = log != null && log.IsEnabled(LogSeverity.Debug);
             logging = true;
             dirty = false;
             targetMilli = coverMilli;
@@ -735,8 +738,9 @@ namespace ExtraPotions.Solstice.Runtime
             if (!MeanOpaque(source, out int sr, out int sg, out int sb, out int count)) return;
             if (!MeanOpaque(frost, out int fr, out int fg, out int fb, out _)) return;
             string label = SampleLabel(sourceId, textureName);
-            log?.Info("Snow cover " + label + ": " + count + " texels, source " + sr + " " + sg + " " + sb
-                + ", frost " + fr + " " + fg + " " + fb);
+            if (debugLog)
+                log?.Debug("Snow cover " + label + ": " + count + " texels, source " + sr + " " + sg + " " + sb
+                    + ", frost " + fr + " " + fg + " " + fb);
             if (sg >= 48 && fg < 40 && fg * 2 < sg)
                 log?.Warning("Snow cover " + label + " went dark. Source green " + sg + ", frost green " + fg + ".");
         }
@@ -808,11 +812,15 @@ namespace ExtraPotions.Solstice.Runtime
             frames++;
             int whole = milliseconds <= 0d ? 0 : (int)Math.Ceiling(milliseconds);
             if (whole > peakMs) peakMs = whole;
-            if (milliseconds > 50d && !warnedSpike)
-            {
+            if (milliseconds > 50d && !warnedSpike && WarnSlow("Snow cover frame " + whole + " ms."))
                 warnedSpike = true;
-                log?.Warning("Snow cover frame " + whole + " ms.");
-            }
+        }
+
+        static bool WarnSlow(string message)
+        {
+            if (!TickGuard.Report(ref nextSlowWarn, slowClock.Elapsed.TotalSeconds)) return false;
+            log?.Warning(message);
+            return true;
         }
 
         static void FinishPass()
@@ -821,16 +829,17 @@ namespace ExtraPotions.Solstice.Runtime
             if (desiredStep <= 0 && terrainMilli == targetMilli) painted = false;
             logging = false;
             if (desiredStep <= 0 && reads == 0 && uploads == 0 && terrainDone == 0) return;
-            log?.Info("Snow cover pass: step " + desiredStep
-                + ", reads " + reads
-                + ", uploads " + uploads
-                + ", sources " + originals.Count
-                + ", terrain " + terrainDone
-                + ", frames " + frames
-                + ", peak " + peakMs + " ms, "
-                + LightText() + ".");
+            if (debugLog)
+                log?.Debug("Snow cover pass: step " + desiredStep
+                    + ", reads " + reads
+                    + ", uploads " + uploads
+                    + ", sources " + originals.Count
+                    + ", terrain " + terrainDone
+                    + ", frames " + frames
+                    + ", peak " + peakMs + " ms, "
+                    + LightText() + ".");
             if (peakMs > 50 && !warnedSpike)
-                log?.Warning("Snow cover peak frame " + peakMs + " ms.");
+                WarnSlow("Snow cover peak frame " + peakMs + " ms.");
         }
 
         static int Milli(float cover)

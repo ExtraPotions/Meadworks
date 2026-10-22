@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.29 (2026-10-21)
+
+- Crucible 0.3.29, including Crucible.UI 0.3.21.
+- Korean text wraps at spaces. TextMesh Pro was breaking before every Hangul syllable, so a notice split words such as "요청하는". Chinese still breaks per character. English line breaks stay as they are. The same Hangul rule covers every wrapping label the kit draws.
+
+## 0.3.28 (2026-10-21)
+
+- Thunderstore republish of the release 8 build; no code changes.
+- Includes Crucible.UI 0.3.20 (unchanged).
+
 ## 0.3.27 (2026-10-21)
 
 - Includes Crucible.UI 0.3.20.

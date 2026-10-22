@@ -38,6 +38,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             input.onSelect=new TMP_InputField.SelectionEvent();input.OnInputSubmit=new OnInputSubmitEvent();
             input.onValidateInput=null;input.characterLimit=0;input.richText=false;
             input.lineType=TMP_InputField.LineType.MultiLineNewline;input.onFocusSelectAll=false;
+            KitCanvas.HangulWordBreaks();
             input.textComponent.textWrappingMode=TextWrappingModes.Normal;
             input.textComponent.alignment=TextAlignmentOptions.TopLeft;input.textComponent.fontSize=16;
             input.SetTextWithoutNotify(value??"");input.onValueChanged.AddListener(current=>changed?.Invoke(current));

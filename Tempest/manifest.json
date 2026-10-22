@@ -1,6 +1,6 @@
 {
   "name": "Tempest",
-  "version_number": "0.1.12",
+  "version_number": "0.1.13",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Tempest",
   "description": "Meadworks weather: rare blizzards and severe thunderstorms with a five-minute warning, the same for every player, plus a server weather filter. Required on all peers.",
   "dependencies": [

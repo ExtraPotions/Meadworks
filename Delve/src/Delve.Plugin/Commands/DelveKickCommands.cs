@@ -38,8 +38,9 @@ namespace ExtraPotions.Delve.Runtime
                     var verdict = settings.RegenerateFor(true, cheatLockedForCaller);
                     if (verdict == RegenerateVerdict.CheatLocked) MeadworksBlockedOptions.TryUse(Plugin.Guid, DelveSettings.Cheats.RegenerateWithoutWaiting.Id, ConfigScope.Cheat);
                     var mode = DelveCommands.Mode(verdict);
-                    BestiaryClaims.ClearIf(command, settings.Get(DelveSettings.General.DryRunAll));
-                    var kinds = engine.Request(command.Kinds.Where(engine.Active), mode == RegenerateMode.SkipDelay);
+                    bool skipDelay = mode == RegenerateMode.SkipDelay;
+                    var kinds = engine.Request(command.Kinds.Where(engine.Active), skipDelay);
+                    engine.ConsiderClaimClear(command.Kinds, kinds, skipDelay);
                     if (kinds.Count == 0) return new[] { "Delve: none of those kinds is on (switched off or stepped aside)." };
                     return new[] { DelveCommands.Reply(verdict, kinds) };
                 case CommandVerb.Surface:

@@ -7,10 +7,10 @@ using UnityEngine;
 namespace ExtraPotions.Barter.Runtime
 {
     /// <summary>
-    /// Pins the purse to the store. The fit runs in screen pixels of the store's root canvas, intersected with the
-    /// screen, so a scaled canvas is measured as drawn instead of as raw sizeDelta against the pixel width.
+    /// Pins the purse and the sell list from the store's screen box. Both are placed on every call, so a resolution
+    /// change while the store is open moves them again.
     /// </summary>
-    internal static class PursePlacement
+    internal static class PanelPlacement
     {
         const float Gap = 6f;
         static readonly Vector3[] corners = new Vector3[4];
@@ -29,17 +29,32 @@ namespace ExtraPotions.Barter.Runtime
             if (!TryBox(root, camera, out PanelBox canvasBox) || !TryBox(store, camera, out PanelBox storeBox))
                 return;
 
-            PanelBox? sellBox = null;
             var sell = store.Find(SellPanel.ObjectName) as RectTransform;
-            if (sell != null && sell.gameObject.activeInHierarchy && TryBox(sell, camera, out PanelBox sellMeasured))
-                sellBox = sellMeasured;
+            var purse = store.Find(PurseCard.ObjectName) as RectTransform;
+            bool sellOn = TrySize(sell, camera, out float sellWidth, out float sellHeight, out float sellUnit);
+            bool purseOn = TrySize(purse, camera, out float purseWidth, out float purseHeight, out float purseUnit);
+            float unit = 1f;
+            if (sellOn) unit = Mathf.Max(unit, sellUnit);
+            if (purseOn) unit = Mathf.Max(unit, purseUnit);
+            OpenPlace place = SidePanelFit.PlaceBoth(
+                Visible(canvasBox), storeBox,
+                sellOn, sellWidth, sellHeight,
+                purseOn, purseWidth, purseHeight,
+                Gap * unit, KitSkin.PanelOverhang * unit);
+            if (sellOn) Move(sell, store, camera, place.Sell.Box);
+            if (purseOn) Move(purse, store, camera, place.Purse.Box);
+        }
 
-            Vector2 scale = PixelsPerUnit(panel, camera);
-            float unit = Mathf.Max(scale.x, scale.y);
-            float width = (panel.rect.width > 1f ? panel.rect.width : panel.sizeDelta.x) * scale.x;
-            float height = (panel.rect.height > 1f ? panel.rect.height : panel.sizeDelta.y) * scale.y;
-            SidePlace place = SidePanelFit.Place(Visible(canvasBox), storeBox, sellBox, width, height, Gap * unit, KitSkin.PanelOverhang * unit);
-            Move(panel, store, camera, place.Box);
+        static bool TrySize(RectTransform rect, Camera camera, out float width, out float height, out float unit)
+        {
+            width = height = unit = 0f;
+            if (rect == null || !rect.gameObject.activeInHierarchy)
+                return false;
+            Vector2 scale = PixelsPerUnit(rect, camera);
+            unit = Mathf.Max(scale.x, scale.y);
+            width = (rect.rect.width > 1f ? rect.rect.width : rect.sizeDelta.x) * scale.x;
+            height = (rect.rect.height > 1f ? rect.rect.height : rect.sizeDelta.y) * scale.y;
+            return width > 1f && height > 1f;
         }
 
         static PanelBox Visible(PanelBox canvas)
@@ -91,7 +106,8 @@ namespace ExtraPotions.Barter.Runtime
 
         static void Move(RectTransform panel, RectTransform parent, Camera camera, PanelBox place)
         {
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, new Vector2(place.Right, place.Top), camera, out Vector2 local))
+            var screen = new Vector2(place.X + place.Width * panel.pivot.x, place.Y + place.Height * panel.pivot.y);
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, screen, camera, out Vector2 local))
                 return;
             Rect parentRect = parent.rect;
             float ax = Mathf.Lerp(parentRect.xMin, parentRect.xMax, (panel.anchorMin.x + panel.anchorMax.x) * 0.5f);

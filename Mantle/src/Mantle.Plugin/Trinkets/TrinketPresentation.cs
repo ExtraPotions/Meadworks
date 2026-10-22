@@ -62,6 +62,42 @@ namespace Mantle.Trinkets
             return text.ToString().TrimEnd();
         }
 
+        internal static string PresetKey(TrinketPreset preset)
+        {
+            if (!Enum.IsDefined(typeof(TrinketPreset), preset)) throw new ArgumentOutOfRangeException(nameof(preset));
+            return "trinket_preset_" + preset.ToString().ToLowerInvariant();
+        }
+
+        /// <summary>The name shown for a preset. Read on each call so a language change updates open settings. The config value stays the English identifier.</summary>
+        internal static string PresetLabel(TrinketPreset preset)
+        {
+            string key = PresetKey(preset);
+            string text = Text(key);
+            return string.IsNullOrWhiteSpace(text) || string.Equals(text, key, StringComparison.Ordinal) ? preset.ToString() : text;
+        }
+
+        internal static string PresetHelp() => AccessoryText.Format("cfg_7_trinkets__trinket_preset_help",
+            PresetLabel(TrinketPreset.Native), PresetLabel(TrinketPreset.Conservative), PresetLabel(TrinketPreset.Custom));
+
+        /// <summary>Almanac resolves this on each redraw. The catalog help is a template; the three names are read here so a language change fills them in.</summary>
+        internal static ConfigPresentationText Preset(ConfigEntry<TrinketPreset> entry)
+        {
+            if (entry == null) throw new ArgumentNullException(nameof(entry));
+            return new ConfigPresentationText(Text("cfg_7_trinkets__trinket_preset_name"),
+                Text("cfg_7_trinkets_heading"), PresetHelp());
+        }
+
+        internal static bool TryParsePreset(string text, out TrinketPreset preset)
+        {
+            preset = TrinketPreset.Native;
+            if (string.IsNullOrWhiteSpace(text)) return false;
+            text = text.Trim();
+            if (Enum.TryParse(text, true, out preset) && Enum.IsDefined(typeof(TrinketPreset), preset)) return true;
+            foreach (TrinketPreset option in Enum.GetValues(typeof(TrinketPreset)))
+                if (string.Equals(PresetLabel(option), text, StringComparison.Ordinal)) { preset = option; return true; }
+            return false;
+        }
+
         static string Name(string prefab)
         {
             var item = ObjectDB.instance ? ObjectDB.instance.GetItemPrefab(prefab)?.GetComponent<ItemDrop>() : null;

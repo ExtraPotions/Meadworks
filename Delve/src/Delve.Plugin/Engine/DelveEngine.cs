@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ExtraPotions.Delve.Commands;
 using ExtraPotions.Delve.Config;
 using ExtraPotions.Delve.Engine;
 using ExtraPotions.Delve.Integration;
@@ -35,6 +36,8 @@ namespace ExtraPotions.Delve.Runtime
         private readonly List<IDelveService> services = new List<IDelveService>();
         private readonly HashSet<DelveKind> carrying = new HashSet<DelveKind>();
         private readonly HashSet<DelveKind> evaluateNow = new HashSet<DelveKind>();
+        private readonly ClaimClearWatch claimClear = new ClaimClearWatch();
+        private bool claimClearReady;
         private object? world;
         private float nextCheck;
         private double lastSeconds = double.NaN;
@@ -83,7 +86,22 @@ namespace ExtraPotions.Delve.Runtime
         {
             if (Sidecar.RegenerateNow.Remove(kind)) sidecarDirty = true;
             if (deferred > 0) carrying.Add(kind); else carrying.Remove(kind);
+            if (claimClear.NoteSwept(kind, deferred)) claimClearReady = true;
         }
+
+        /// <summary>
+        /// A full regenerate was asked for. Arms a Bestiary claim clear only when <paramref name="asked"/> names every
+        /// kind, <paramref name="skipDelay"/> is the Regenerate cheat, and <paramref name="accepted"/> will run. The
+        /// clear waits until those regenerates finish. A usual-delay request leaves an armed job alone.
+        /// </summary>
+        public void ConsiderClaimClear(IEnumerable<DelveKind> asked, IReadOnlyCollection<DelveKind> accepted, bool skipDelay)
+        {
+            bool dryRun = Plugin.Settings != null && Plugin.Settings.Get(DelveSettings.General.DryRunAll);
+            claimClear.Request(BestiaryClaimReset.CoversEveryKind(asked), dryRun, skipDelay, accepted);
+        }
+
+        /// <summary>A scheduled sweep did not finish this kind (generation failed). The claim clear stays armed.</summary>
+        public void NoteClaimFailure(DelveKind kind) => claimClear.NoteFailure(kind);
 
         public void Report(DelveKind kind, KindReport report) => Status.Set(kind, report);
 
@@ -118,6 +136,13 @@ namespace ExtraPotions.Delve.Runtime
             return acted;
         }
 
+        private void FinishClaimClear()
+        {
+            if (!claimClearReady) return;
+            claimClearReady = false;
+            BestiaryClaims.ClearFinished();
+        }
+
         /// <summary>From Plugin.Update: starts with the world on the authority, checks on the interval, stops with the world.</summary>
         public void Update()
         {
@@ -141,6 +166,8 @@ namespace ExtraPotions.Delve.Runtime
 
         public void Stop()
         {
+            claimClear.Cancel();
+            claimClearReady = false;
             foreach (var service in services)
                 try { service.Stop(this); }
                 catch (Exception error) { Log.Warning("Delve stop " + service.GetType().Name + ": " + error.GetType().Name + ": " + error.Message); }
@@ -187,6 +214,8 @@ namespace ExtraPotions.Delve.Runtime
             Players = DelveWorld.Players();
             Budget = Settings.Get(DelveSettings.General.MaxActionsPerTick);
             Status.Resize(Settings.Get(DelveSettings.General.StatusReportLines));
+            claimClear.BeginCheck();
+            claimClearReady = false;
             var sweeping = new HashSet<DelveKind>();
             foreach (DelveKind kind in Enum.GetValues(typeof(DelveKind)))
             {
@@ -197,7 +226,11 @@ namespace ExtraPotions.Delve.Runtime
             evaluateNow.Clear();
             foreach (var service in services)
                 try { service.Check(this, sweeping); }
-                catch (Exception error) { Log.Error("Delve check " + service.GetType().Name + ": " + error.GetType().Name + ": " + error.Message); }
+                catch (Exception error)
+                {
+                    Log.Error("Delve check " + service.GetType().Name + ": " + error.GetType().Name + ": " + error.Message);
+                }
+            FinishClaimClear();
             foreach (DelveKind kind in Enum.GetValues(typeof(DelveKind)))
                 if (!Active(kind)) Status.Set(kind, new KindReport(0, 0, 0, 0, null, false, false, InactiveReason(kind)));
             if (sidecarDirty) SaveSidecar();

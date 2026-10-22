@@ -22,10 +22,9 @@ namespace ExtraPotions.Bestiary.Runtime
     /// turns itself off there with one notice.
     /// </summary>
     [BepInPlugin(Guid, Name, Version)]
-    [BepInDependency(CruciblePlugin.Guid, CruciblePlugin.Version)]
-    // The Crucible.UI kit is the standard Meadworks UI: a mandatory dependency (shipped in the Crucible package, idle on a
-    // headless server).
-    [BepInDependency(ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin.Guid, ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin.Version)]
+    // 0.1.17 requires Crucible 0.3.28. Its UI is 0.3.20, shipped in that package and idle on a headless server.
+    [BepInDependency(CruciblePlugin.Guid, "0.3.28")]
+    [BepInDependency(ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin.Guid, "0.3.20")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public sealed class Plugin : BaseUnityPlugin

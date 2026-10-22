@@ -1,6 +1,6 @@
 # Saga
 
-Version 0.1.15. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Boss kills turn the Forsaken powers into permanent passives, and Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks as they level.
 
@@ -31,7 +31,7 @@ Boss kills turn the Forsaken powers into permanent passives, and Defense, Sneak,
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Crucible 0.3.28 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
 
 ## Installation
 

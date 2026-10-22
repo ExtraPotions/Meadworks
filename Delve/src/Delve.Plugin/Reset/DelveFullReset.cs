@@ -270,6 +270,7 @@ namespace ExtraPotions.Delve.Runtime
                     RemoveIds(created);
                     e.Record(DelveKind.FullReset, "left " + site.Name + " at (" + at.x.ToString("0") + ", " + at.z.ToString("0")
                         + ") in place; generation failed (see the log)" + (now ? " (regenerate now)" : ""), false);
+                    if (scheduled) e.NoteClaimFailure(DelveKind.FullReset);
                     continue;
                 }
                 if (commit.RemoveOld)

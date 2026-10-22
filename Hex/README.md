@@ -1,6 +1,6 @@
 # Hex
 
-Version 0.1.17. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.18. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 A cheat toolkit for Valheim that the server controls: personal powers, spawning, skills, map tools, ESP and presets.
 
@@ -26,7 +26,7 @@ A cheat toolkit for Valheim that the server controls: personal powers, spawning,
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Crucible 0.3.28 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
 
 ## Installation
 
