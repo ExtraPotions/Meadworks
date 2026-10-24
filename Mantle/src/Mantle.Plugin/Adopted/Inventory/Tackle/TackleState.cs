@@ -4,8 +4,8 @@ using Mantle.Ring;
 namespace Mantle.Tackle
 {
     /// <summary>
-    /// Whether the tacklebox's pop-up is open: each player's own, never saved. A right click on the box in its slot toggles
-    /// it (<see cref="TackleboxUse"/>); the inventory opening or closing always closes it. The key ring's pop-up hangs in
+    /// Whether the tacklebox's pop-up is open: each player's own, never saved. A left click on the box in its slot toggles
+    /// it (<see cref="TackleClicks"/>); the inventory opening or closing always closes it. The key ring's pop-up hangs in
     /// the same place, so opening one shuts the other. The gamepad's selection follows each change (<see cref="TackleGamepad"/>).
     /// </summary>
     public static class TackleState

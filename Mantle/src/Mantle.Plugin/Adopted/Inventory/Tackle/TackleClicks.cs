@@ -11,7 +11,7 @@ namespace Mantle.Tackle
     /// the bait stays in hand. Rewritten before the slot rules look at the drop (<see cref="DragSettle"/>), so the slot
     /// itself still takes only tackleboxes, and a box dropped there swaps with the one in it.
     /// With nothing in hand, a plain click (or the gamepad's A) on the box in its slot opens or shuts the pop-up (playtest
-    /// 2026-10-20: left click, as the key ring's button); a right click still does too (<see cref="TackleboxUse"/>). A
+    /// 2026-10-20: left click, as the key ring's button); a right click takes it off (<see cref="TackleboxUse"/>). A
     /// Shift click picks the box up as a plain click did before, so it can still be moved out of the slot; a Ctrl click
     /// and a drop of another box onto the slot work as before.
     /// </summary>

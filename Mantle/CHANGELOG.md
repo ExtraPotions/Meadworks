@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.27 (2026-10-24)
+
+- Right-click a tacklebox in its slot to take it off into a free main inventory cell. With no room it stays equipped; left-click still opens the tackle inventory.
+
+
 ## 0.1.26 (2026-10-21)
 
 - 0.1.26. Requires Crucible 0.3.28 / Crucible.UI 0.3.20.

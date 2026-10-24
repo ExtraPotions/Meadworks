@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using HarmonyLib;
 using Mantle.Core;
 using Mantle.Slots;
+using Mantle.Worn;
 
 namespace Mantle.Tackle
 {
     /// <summary>
     /// Right clicks on the inventory screen (the game's use of an item), for the player's own inventory. On a tacklebox in
     /// the grid: it goes into the Tacklebox slot (what lay there, another box, takes its cell). On the box in its slot: the
-    /// pop-up with its cells opens or shuts (<see cref="TackleState"/>). On a bait in the box: the player fishes with that
+    /// box moves to a free main cell, or stays put when the inventory is full. On a bait in the box: the player fishes with that
     /// bait, through the game's own ammo equip (the rod takes the equipped bait first and the grid marks it); a right click
     /// on the marked bait unmarks it. The game itself would do nothing for either: a box is a Misc item, and bait is ammo
     /// the game never offers to equip. Only from the inventory screen; a hotbar key still offers it to what the player looks at.
@@ -25,7 +26,7 @@ namespace Mantle.Tackle
             if (!InventoryState.Manages(own) || !own.ContainsItem(item))
                 return true;
             if (TackleboxCatalog.Of(item) != null)
-                return !Box(own, item);
+                return !Box(__instance, own, item);
             if (!TackleRules.IsBait(item) || InventoryState.SlotAt(own, item.m_gridPos)?.Kind != SlotKind.Tackle)
                 return true;
             Choose(__instance, item);
@@ -33,15 +34,17 @@ namespace Mantle.Tackle
         }
 
         /// <summary>True when handled: no Tacklebox slot leaves the box to the game.</summary>
-        private static bool Box(Inventory inventory, ItemDrop.ItemData box)
+        private static bool Box(Humanoid player, Inventory inventory, ItemDrop.ItemData box)
         {
             IReadOnlyList<Vector2i> cells = InventoryState.CellsOf(SlotKind.Tacklebox);
             if (cells.Count == 0)
                 return false;
             if (box.m_gridPos == cells[0])
             {
-                if (Tacklebox.Active)
-                    TackleState.Toggle();
+                if (GearOut.Away(player, box, SlotKind.Tacklebox))
+                    TackleState.Close();
+                else
+                    Messages.Center(Words.NoRoomOff);
                 return true;
             }
             ItemDrop.ItemData there = inventory.GetItemAt(cells[0].x, cells[0].y);

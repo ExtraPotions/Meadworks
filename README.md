@@ -24,7 +24,7 @@ Crucible is the shared library every product requires. The Meadworks modpack dep
 | [Kindle](Kindle/) | 0.1.23 | Meadworks crafting: recipe search, sorting, favorites, list/grid views, batch crafting, recipe tracking, salvage and Cart Workbench. Client-optional. |
 | [Larder](Larder/) | 0.2.14 | Meadworks food and kitchen: food and mead values, eating, regeneration, stamina costs, kitchen stations and Cooking perks. Required on all peers. |
 | [Magpie](Magpie/) | 0.1.14 | Meadworks loot handling: magnet pickup, ground-stack merging, floating drops and a server-controlled loot multiplier cheat. Required on all peers. |
-| [Mantle](Mantle/) | 0.1.26 | Meadworks inventory and equipment: configurable grid, gear, ring and belt slots, backpacks, key ring, tacklebox and a Swap loadout button. Required on all peers (same version). |
+| [Mantle](Mantle/) | 0.1.27 | Meadworks inventory and equipment: configurable grid, gear, ring and belt slots, backpacks, key ring, tacklebox and a Swap loadout button. Required on all peers (same version). |
 | [Saga](Saga/) | 0.1.16 | Meadworks progression: boss kills turn the Forsaken powers into permanent passives, Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks, and one skill book shows every skill. Required on all peers. |
 | [Shepherd](Shepherd/) | 0.1.19 | Meadworks animal husbandry: feed troughs, the Husbandry skill, breeding with sires, star inheritance, twins, herd limits and lineage. Required on all peers. |
 | [Solstice](Solstice/) | 0.1.4 | Meadworks seasons: spring, summer, fall and winter by the world calendar, with seasonal growth, bees, food, stamina, fire, sap, rest and wind effects, and local winter snow and season colors. Cooperates with Tempest weather. Required on all peers. |
