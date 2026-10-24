@@ -30,6 +30,11 @@ namespace Burrow.Shared
                 return true;
             }
             ShowViewed(__instance, container);
+            if (!InventoryGui.UseButtonHeld() && __instance.m_containerHoldState >= 0)
+            {
+                __instance.m_containerHoldState = -1;
+                __instance.m_waitForContainerStack = false;
+            }
             if (Vector3.Distance(container.transform.position, player.transform.position) > __instance.m_autoCloseDistance)
             {
                 __instance.CloseContainer();

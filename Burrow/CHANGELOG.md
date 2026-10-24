@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.27 (2026-10-24)
+
+- Release the shared-chest opening hold when keyboard or controller Use is released, restoring the inventory cursor without changing normal owner stacking or shared-transfer safety.
+- Requires Crucible 0.3.32 and preserves the existing settings and item data.
+
 ## Unreleased
 
 - Avoid chest identity resolution during release retries when no loaded chest can hold that transaction. Matching or uncertain holds retain the existing identity, ownership and release checks.
