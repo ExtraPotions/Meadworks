@@ -1,6 +1,6 @@
 {
   "name": "Magpie",
-  "version_number": "0.1.13",
+  "version_number": "0.1.14",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Magpie",
   "description": "Meadworks loot handling: magnet pickup, ground-stack merging, floating drops and a server-controlled loot multiplier cheat. Required on all peers.",
   "dependencies": [

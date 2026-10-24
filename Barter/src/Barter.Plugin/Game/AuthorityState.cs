@@ -41,6 +41,7 @@ namespace ExtraPotions.Barter.Runtime
 
         internal static string Read(ZDO zdo, string field, string displayMirror = "")
         {
+            using var timing = RefillTiming.Measure(RefillTiming.Operation.AuthorityRead);
             if (!IsAuthority) return displayMirror;
             if (zdo == null || !CruciblePlugin.IsReady || !CruciblePlugin.Session.AuthorityReady)
                 throw new InvalidOperationException("Authority state is unavailable");
@@ -50,6 +51,7 @@ namespace ExtraPotions.Barter.Runtime
 
         internal static void Write(ZDO zdo, string field, string value)
         {
+            using var timing = RefillTiming.Measure(RefillTiming.Operation.AuthorityWrite);
             if (!IsAuthority || zdo == null || !CruciblePlugin.IsReady || !CruciblePlugin.Session.AuthorityReady)
                 throw new InvalidOperationException("Only the ready authority writes trader state");
             zdo.SetOwner(ZDOMan.GetSessionID());

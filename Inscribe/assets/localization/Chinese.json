@@ -27,7 +27,7 @@
     "rune_awakening": "觉醒符文",
     "rune_awakening_desc": "旧版 Inscribe 的符文：载入时即变为升华符文。",
     "rune_recasting": "重铸符文",
-    "rune_recasting_desc": "重铸优秀物品：两条铭文都替换为两条新铭文，仍为优秀物品。",
+    "rune_recasting_desc": "重铸优秀物品：两条铭文都替换为两条新铭文，仍为优秀物品。 在符文台可以为一条新铭文选择进攻、防御或实用类别；其他铭文按常规随机生成，符文消耗不变。",
     "rune_ascension": "升华符文",
     "rune_ascension_desc": "将物品提升一级稀有度并保留铭文：普通变为优秀并获得两条铭文；优秀变为稀有、稀有变为史诗，各增加一条。传说物品只来自首领和突袭。",
     "rune_cleansing": "净化符文",
@@ -205,6 +205,20 @@
     "enhancement_convert_no_room": "请在此背包中腾出空间：旧的强化物品和卷轴会在替代物放得下时转换。",
     "enhancement_convert_dropped": "放不进此背包的转换符文已掉落在你脚下。",
     "cfg_7_ground_glow__legendary_glint_name": "传说闪光",
-    "cfg_7_ground_glow__legendary_glint_help": "掉落的传说装备还会在地面上显示一道小小的青铜与象牙色闪光。其他稀有度不会闪光。仅限本客户端。"
+    "cfg_7_ground_glow__legendary_glint_help": "掉落的传说装备还会在地面上显示一道小小的青铜与象牙色闪光。其他稀有度不会闪光。仅限本客户端。",
+    "recast_focus_label": "重铸定向",
+    "recast_focus_any": "任意类别",
+    "recast_focus_offense": "进攻",
+    "recast_focus_defense": "防御",
+    "recast_focus_utility": "实用",
+    "recast_side_prefix": "前缀",
+    "recast_side_suffix": "后缀",
+    "recast_focus_help": "点击选择一条新铭文的类别。所有铭文都会被替换，其他铭文仍按常规随机生成。符文消耗不变。如果没有合法结果，则不消耗任何物品。你的选择保存在本机。",
+    "recast_side_help": "点击切换前缀或后缀。仅在选择类别后生效。其他铭文仍按常规重新随机生成。你的选择保存在本机。",
+    "cfg_8_interface_heading": "8 - 界面",
+    "cfg_8_interface__recasting_focus_name": "重铸定向",
+    "cfg_8_interface__recasting_side_name": "重铸位置",
+    "cfg_8_interface__recasting_focus_help": "符文台为一条新铭文保存的类别选择：不限、进攻、防御或实用。重铸仍会替换所有铭文，符文消耗不变，并遵循主机规则。你的选择保存在本机。",
+    "cfg_8_interface__recasting_side_help": "为定向铭文保存的前缀或后缀选择。仅在选择重铸类别后生效；其他铭文仍按常规重新随机生成。你的选择保存在本机。"
   }
 }

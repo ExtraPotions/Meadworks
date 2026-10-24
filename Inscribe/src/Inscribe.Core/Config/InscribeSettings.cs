@@ -125,6 +125,10 @@ namespace ExtraPotions.Inscribe.Config
             public const string Section = "8 - Interface";
 
             public static readonly InscribeSetting<bool> StationButton = InscribeSetting.Toggle(Section, "Station Button", true, Local, "Retained legacy preference for the removed station button; no effect.");
+            public static readonly InscribeSetting<ExtraPotions.Inscribe.Runes.RecastFocus> RecastingFocus = InscribeSetting.Choice(Section, "Recasting Focus", ExtraPotions.Inscribe.Runes.RecastFocus.Unrestricted, Local,
+                "Your saved Rune Table category for one new inscription: Unrestricted, Offense, Defense or Utility. Recasting still replaces all inscriptions at the same rune cost and uses the host's rules. Your choice is saved on this computer.");
+            public static readonly InscribeSetting<ExtraPotions.Inscribe.Runes.RecastSide> RecastingSide = InscribeSetting.Choice(Section, "Recasting Side", ExtraPotions.Inscribe.Runes.RecastSide.Prefix, Local,
+                "Your saved prefix or suffix choice for the focused inscription. Applies only when a Recasting category is selected; the other inscriptions still reroll normally. Your choice is saved on this computer.");
         }
 
         public static class Cheats
@@ -147,6 +151,7 @@ namespace ExtraPotions.Inscribe.Config
             Commands.ReadOnlyForEveryone,
             Display.ColoredItemNames, Display.TooltipDetail, Display.ShowDormant,
             Glow.GroundGlow, Glow.Intensity, Glow.Range, Glow.MaxLights, Glow.RefreshSeconds, Glow.GlowRunes, Glow.LootBeam, Glow.LegendaryGlint,
+            Interface.RecastingFocus, Interface.RecastingSide,
             Cheats.ItemCommands,
         });
 

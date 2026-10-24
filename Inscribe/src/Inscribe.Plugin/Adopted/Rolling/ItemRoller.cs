@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Changed by expDARE, 2026: Inscribe namespace; Crucible configuration, session and lifecycle boundaries.
 using ExtraPotions.Inscribe.Adopted.Affixes;
+using ExtraPotions.Inscribe.Runes;
 using ExtraPotions.Inscribe.Adopted.Rules;
 
 namespace ExtraPotions.Inscribe.Adopted.Rolling
@@ -34,6 +35,13 @@ namespace ExtraPotions.Inscribe.Adopted.Rolling
         public static RollOutcome RollFresh(ItemState current, RarityDef rarity, RollContext context)
         {
             return RollLog.Report("fresh " + rarity.Id, current, RollOps.RollFresh(current, rarity, context), context);
+        }
+
+        /// <summary>Replaces all affixes, steering one draw to the selected category and side; the rest draw normally.</summary>
+        public static RollOutcome Recast(ItemState current, RarityDef rarity, RollContext context, RecastFocus focus, RecastSide side)
+        {
+            if (focus == RecastFocus.Unrestricted) return RollFresh(current, rarity, context);
+            return RollLog.Report("recast " + focus + " " + side, current, RollOps.Recast(current, rarity, context, focus, side), context);
         }
 
         /// <summary>

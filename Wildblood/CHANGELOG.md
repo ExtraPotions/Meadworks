@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Version 0.5.7. Requires Crucible 0.3.29 / Crucible.UI 0.3.21.
+- Add the server-controlled Abandoned Bosses option, off by default. A recorded altar summon at full health with no nearby player can despawn after the configured delay and return its offering at the altar once. Normal kills give no refund.
+- Save summon, timer and refund progress in a durable ledger. The altar refuses another summon while its recorded boss lives or its previous offering is still recovering. Boss aspects, twins and phantoms keep their existing behavior; one summon can return only its original offering.
+- Add abandonment settings and summon refusal messages in all seven languages.
+
 ## 0.5.6 (2026-10-22)
 
 - Version 0.5.6. Requires Crucible 0.3.29 / Crucible.UI 0.3.21.

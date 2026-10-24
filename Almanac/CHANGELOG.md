@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Make the Advanced switch reveal specialist settings on mod pages and in Almanac, including world settings. Matching searches can reveal specialist rows while the switch is off; hidden settings and file-only entries keep their restrictions.
+- Hide the obsolete imported dock preference from settings menus while retaining its saved value and ConfigDrawers import target. Window layout is unchanged.
+- Add Debug-only Stopwatch and GC diagnostics for queued discovery refreshes, settings model rebuilds and durable journal writes. Accepted settings, authority and focused drafts keep their existing behavior.
+
 ## 0.1.19 (2026-10-22)
 
 - Requires Crucible 0.3.30 / Crucible.UI 0.3.21.

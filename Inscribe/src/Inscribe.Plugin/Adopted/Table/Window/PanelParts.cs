@@ -53,6 +53,7 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
         public ListRows? List { get; set; }
         public SlotRow? Runes { get; set; }
         public SlotRow? Essences { get; set; }
+        public RecastingControls? Recasting { get; set; }
         public TMP_Text? RuneLabel { get; set; }
         public TMP_Text? EssenceLabel { get; set; }
         public CostRow? Cost { get; set; }

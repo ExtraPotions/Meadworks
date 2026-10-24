@@ -3,6 +3,7 @@
 // Changed by expDARE, 2026: Inscribe namespace; Crucible configuration, session and lifecycle boundaries.
 using System;
 using ExtraPotions.Inscribe.Adopted.Affixes;
+using ExtraPotions.Inscribe.Runes;
 using ExtraPotions.Inscribe.Adopted.Rules;
 
 namespace ExtraPotions.Inscribe.Adopted.Rolling
@@ -17,6 +18,14 @@ namespace ExtraPotions.Inscribe.Adopted.Rolling
         /// <summary>A fresh roll at <paramref name="rarity"/>: every affix is replaced, the count drawn in its range.</summary>
         public static RollOutcome RollFresh(ItemState current, RarityDef rarity, RollContext context)
         {
+            return Recast(current, rarity, context, RecastFocus.Unrestricted, RecastSide.Prefix);
+        }
+
+        internal static RollOutcome Recast(ItemState current, RarityDef rarity, RollContext context, RecastFocus focus, RecastSide side)
+        {
+            if ((focus != RecastFocus.Unrestricted && focus != RecastFocus.Offense && focus != RecastFocus.Defense && focus != RecastFocus.Utility)
+                || (focus != RecastFocus.Unrestricted && side != RecastSide.Prefix && side != RecastSide.Suffix))
+                return Fail(RollFailure.NoEligibleAffix);
             ItemStateBuilder builder = current.ToBuilder();
             builder.ClearAffixes();
             builder.SetRarity(rarity.Id);
@@ -28,7 +37,15 @@ namespace ExtraPotions.Inscribe.Adopted.Rolling
             }
             try
             {
-                Fill(new AffixDraw(builder, context), count, allOrNothing: false);
+                AffixDraw draw = new AffixDraw(builder, context);
+                if (focus != RecastFocus.Unrestricted)
+                {
+                    AffixCategory category = focus == RecastFocus.Offense ? AffixCategory.Offense
+                        : focus == RecastFocus.Defense ? AffixCategory.Defense : AffixCategory.Utility;
+                    AffixKind kind = side == RecastSide.Prefix ? AffixKind.Prefix : AffixKind.Suffix;
+                    if (count <= 0 || !draw.TryAdd(category, kind)) return Fail(RollFailure.NoEligibleAffix);
+                }
+                Fill(draw, count, allOrNothing: false);
             }
             finally
             {

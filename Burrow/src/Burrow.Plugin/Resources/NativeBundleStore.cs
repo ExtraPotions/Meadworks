@@ -146,6 +146,7 @@ namespace Burrow.Resources {
         }
         internal void Release(string source){
             if(!bindings.TryGetValue(source,out var pair))return;
+            if(!pair.Before.Any(e=>e.Id.StartsWith("chest:",StringComparison.Ordinal))||!NativeReleaseGuard.MayHaveHold(source))return;
             foreach(var image in pair.Before.Where(e=>e.Id.StartsWith("chest:",StringComparison.Ordinal))){var chest=Chest(image.Id);if(chest&&chest.m_nview.IsOwner()&&chest.m_nview.GetZDO().GetString(HoldKey)==source)WriteKeys(chest,zdo=>{zdo.Set(HoldKey,"");zdo.Set(HoldUntil,0L);});}
         }
     }

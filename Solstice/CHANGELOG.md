@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- If legacy settings cannot be copied, initialization stops before saving defaults and retries on the next start. Existing settings and backups are preserved.
+
+
+- Add Debug-only Stopwatch and GC diagnostics for multi-frame winter work and day/toggle frames. Timings retain the existing work schedule.
+
 ## 0.1.3 (2026-10-22)
 
 - 0.1.3. Solstice is now a MeadWorks plugin everywhere: its plugin ID is `com.meadworks.solstice` (was `com.extrapotions.solstice`). Almanac lists it under Meadworks, and Crucible treats it like every other MeadWorks product.

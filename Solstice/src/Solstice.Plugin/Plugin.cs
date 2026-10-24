@@ -43,6 +43,9 @@ namespace ExtraPotions.Solstice.Runtime
         private bool traceEnabled;
         private bool timingsReady;
         private long updateTicks;
+        private bool traceFrame;
+        private int traceGc0, traceGc1, traceGc2, traceFrameId;
+        private long traceStart;
         private readonly Stopwatch clock = new Stopwatch();
         private readonly Stopwatch uptime = Stopwatch.StartNew();
         private readonly double[] nextFault = new double[TickCount];
@@ -90,9 +93,9 @@ namespace ExtraPotions.Solstice.Runtime
         {
             string directory = System.IO.Path.GetDirectoryName(Config.ConfigFilePath) ?? BepInEx.Paths.ConfigPath;
             string configName = System.IO.Path.GetFileName(Config.ConfigFilePath), legacyConfig = SolsticeCore.LegacyPluginGuid + ".cfg";
-            if (Report(log, LegacyFileMigration.Run(directory, legacyConfig, configName), legacyConfig, configName, "Settings were"))
+            if (Report(log, LegacyFileMigration.PrepareSettings(directory, legacyConfig, configName), legacyConfig, configName, "Settings were"))
                 Config.Reload();
-            Report(log, LegacyFileMigration.Run(BepInEx.Paths.ConfigPath, SeasonImport.LegacyMarkerName, SeasonImport.MarkerName),
+            Report(log, LegacyFileMigration.PrepareSettings(BepInEx.Paths.ConfigPath, SeasonImport.LegacyMarkerName, SeasonImport.MarkerName),
                 SeasonImport.LegacyMarkerName, SeasonImport.MarkerName, "The seasons import marker was");
         }
 
@@ -145,6 +148,13 @@ namespace ExtraPotions.Solstice.Runtime
         {
             if (!Ready) return;
             EnsureTicks();
+            traceFrame = log != null && log.IsEnabled(LogSeverity.Debug);
+            if (traceFrame)
+            {
+                traceStart = Stopwatch.GetTimestamp();
+                traceFrameId = UnityEngine.Time.frameCount;
+                traceGc0 = GC.CollectionCount(0); traceGc1 = GC.CollectionCount(1); traceGc2 = GC.CollectionCount(2);
+            }
             clock.Restart();
             elapsed[0] = Time(0, ticks![0]);
             if (!started || log == null) return;
@@ -175,13 +185,26 @@ namespace ExtraPotions.Solstice.Runtime
             var ran = SeasonFrame.Ran;
             long weather = SeasonFrame.WeatherSwapTicks;
             long music = SeasonFrame.MusicTicks;
-            bool logged = timingsReady && (day || enabled) && log != null;
+            bool eventFrame = timingsReady && (day || enabled) && log != null;
+            bool logged = eventFrame && traceFrame && log!.IsEnabled(LogSeverity.Debug);
             if (logged)
-                log!.Debug(FrameText(day, enabled, updateTicks, elapsed, weather, music, ran));
+            {
+                long traceEnd = Stopwatch.GetTimestamp();
+                int gc0 = GC.CollectionCount(0) - traceGc0, gc1 = GC.CollectionCount(1) - traceGc1, gc2 = GC.CollectionCount(2) - traceGc2;
+                try
+                {
+                    log!.Debug(FrameText(day, enabled, updateTicks, elapsed, weather, music, ran)
+                    + " frame=" + traceFrameId + " endFrame=" + UnityEngine.Time.frameCount
+                    + " thread=" + System.Threading.Thread.CurrentThread.ManagedThreadId
+                    + " startTicks=" + traceStart + " endTicks=" + traceEnd
+                    + " gc=" + gc0 + "/" + gc1 + "/" + gc2);
+                }
+                catch { } // Diagnostic output cannot interrupt frame bookkeeping.
+            }
             SeasonFrame.DayMoved = false;
             traceEnabled = false;
             timingsReady = false;
-            if (logged || !hold) SeasonFrame.ClearWork();
+            if (eventFrame || !hold) SeasonFrame.ClearWork();
         }
 
         private void EnsureTicks()

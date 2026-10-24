@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Refresh the full installer from the 27 verified package/source pairs installed on both PCs, including the lag and Advanced-switch fixes. Held product builds remain excluded.
+- Compare installed runtime DLL hashes as well as versions when reporting updates, so fixes shipped under an unchanged version appear as changed.
+- Include the recorded source origins and matching baseline source for the carried Crucible.UI dependency.
+
 ## 0.1.14 (2026-10-22)
 
 - Dependency pins: Bestiary 0.1.18 and Shepherd 0.1.18 (release 8.4); the other 25 packages are unchanged.

@@ -133,6 +133,8 @@ namespace ExtraPotions.Inscribe.Runtime
                     case InscribeSetting<string> s: entry = Bind(s, null); break;
                     case InscribeSetting<ConfirmMode> m: entry = Bind(m, null); break;
                     case InscribeSetting<TooltipDetail> t: entry = Bind(t, null); break;
+                    case InscribeSetting<ExtraPotions.Inscribe.Runes.RecastFocus> focus: entry = Bind(focus, null); break;
+                    case InscribeSetting<ExtraPotions.Inscribe.Runes.RecastSide> side: entry = Bind(side, null); break;
                     default: throw new NotSupportedException(setting.Id + ": unsupported value type " + setting.ValueType.Name + ".");
                 }
             }

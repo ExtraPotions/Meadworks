@@ -21,6 +21,7 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
                 return false;
             }
             StoneJob job = StoneJob.Create(view.Player, stone, target, new TableSupply(view.Store, essence));
+            job = RecastingControls.Apply(job, view.Player, stoneId);
             return !StonePipeline.Evaluate(job).Refused;
         }
     }

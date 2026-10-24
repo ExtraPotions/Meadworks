@@ -111,7 +111,10 @@ namespace ExtraPotions.Delve.Runtime
             bool dryRun = e.DryRun(DelveKind.Chests);
             var options = Options(e);
             int tracked = 0, waiting = 0, deferred = 0, acted = 0, loaded = 0, inFull = 0;
-            foreach (ZDO zdo in ZDOMan.instance.m_objectsByID.Values.ToList())
+            long snapshotStart = DelveCheckTiming.Start(e.CheckTiming);
+            var snapshot = ZDOMan.instance.m_objectsByID.Values.ToList();
+            e.CheckTiming?.Stage("chest_snapshot", snapshotStart, DelveKind.Chests, snapshot.Count);
+            foreach (ZDO zdo in snapshot)
             {
                 if (!prefabs.TryGetValue(zdo.GetPrefab(), out Container prefab) || !exclusions.Allows(prefab.name)) continue;
                 tracked++;

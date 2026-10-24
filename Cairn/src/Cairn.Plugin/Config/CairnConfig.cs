@@ -52,6 +52,7 @@ namespace ExtraPotions.Cairn.Runtime
                 MeadworksBlockedOptions.Track(Product, pair.Value, Map(pair.Key.Scope));
             log.Verbose("Configuration bound: " + Count(SettingScope.Local) + " Local, " + Count(SettingScope.ServerAuthoritative)
                 + " ServerAuthoritative, " + CairnSettings.All.Count(s => s.Hidden) + " hidden.");
+            log.Info("Retired setting retained and ignored: " + CairnSettings.Radius.ShowRadiusInputs.Id + ". Its saved value is preserved.");
             return config;
         }
 
@@ -150,8 +151,7 @@ namespace ExtraPotions.Cairn.Runtime
                 ReferenceEquals(setting, CairnSettings.Hud.ShowHeading) ||
                 ReferenceEquals(setting, CairnSettings.Hud.ShowMarkers) ||
                 ReferenceEquals(setting, CairnSettings.Hud.TempestWarnings) ||
-                ReferenceEquals(setting, CairnSettings.Radius.ShowRadius) ||
-                ReferenceEquals(setting, CairnSettings.Radius.ShowRadiusInputs))
+                ReferenceEquals(setting, CairnSettings.Radius.ShowRadius))
                 dependency = new ConfigDependency(() => Get(CairnSettings.Hud.Enabled), () => "Requires " + CairnSettings.Hud.Enabled.Section + ": " + CairnSettings.Hud.Enabled.Key + ".");
             if (ReferenceEquals(setting, CairnSettings.Radius.MinimumRadius) ||
                 ReferenceEquals(setting, CairnSettings.Radius.MaximumRadius) ||

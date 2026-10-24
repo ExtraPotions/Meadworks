@@ -11,6 +11,18 @@ namespace ExtraPotions.Wildblood.AdoptedCm;
 
 internal static partial class CreatureModifierManager
 {
+    internal static void ForgetCreatureCaches(Character character)
+    {
+        if (object.ReferenceEquals(character, null)) return;
+        int id = character.GetInstanceID();
+        if (ModifierHotPathStates.TryGetValue(id, out var hot)
+            && object.ReferenceEquals(hot.Character, character))
+            ModifierHotPathStates.Remove(id);
+        if (ModifierHudRefreshStates.TryGetValue(id, out var hud)
+            && object.ReferenceEquals(hud.Character, character))
+            ModifierHudRefreshStates.Remove(id);
+    }
+
     private sealed class ReapingOverlay
     {
         internal readonly long Generation = CruciblePlugin.Session.Generation;

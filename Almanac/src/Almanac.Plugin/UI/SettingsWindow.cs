@@ -23,6 +23,8 @@ namespace ExtraPotions.Almanac.Runtime.UI
     public sealed partial class SettingsWindow : IDisposable
     {
         readonly ConfigDiscovery discovery;
+        readonly MeadworksLog? log;
+        int timingFiles,timingEntries,timingRows;
         readonly EntryWriter writer;
         readonly Func<ConfigEntryBase,NativeWriteFacts> resolve;
         readonly Func<ConfigEntryBase,bool> hidden;
@@ -53,13 +55,13 @@ namespace ExtraPotions.Almanac.Runtime.UI
         public SettingsWindow(ConfigDiscovery discovery,EntryWriter writer,
             Func<ConfigEntryBase,NativeWriteFacts> resolveNativeWriteFacts,
             Func<ConfigEntryBase,bool> hiddenByServerPolicy,Func<string,string>? translate=null,
-            Func<string,string,bool>? matchesSearch=null)
+            Func<string,string,bool>? matchesSearch=null,MeadworksLog? logger=null)
         {
             this.discovery=discovery??throw new ArgumentNullException(nameof(discovery));
             this.writer=writer??throw new ArgumentNullException(nameof(writer));
             resolve=resolveNativeWriteFacts??throw new ArgumentNullException(nameof(resolveNativeWriteFacts));
             hidden=hiddenByServerPolicy??throw new ArgumentNullException(nameof(hiddenByServerPolicy));
-            text=translate??(value=>value);searchMatch=matchesSearch;
+            text=translate??(value=>value);searchMatch=matchesSearch;log=logger;
             discovery.Changed+=Changed;
         }
         public KitWindow? Window=>window;
@@ -213,6 +215,18 @@ namespace ExtraPotions.Almanac.Runtime.UI
         }
         void Rebuild()
         {
+            var timing=new StallTiming(log);
+            long before=revision;
+            timingFiles=timingEntries=timingRows=0;
+            try{RebuildModel();}
+            finally
+            {
+                if(timing.Enabled)timing.Finish().Complete("Almanac.model", "open="+IsOpen+" productPage="+essentialView
+                    +" files="+timingFiles+" entries="+timingEntries+" rows="+timingRows+" presentationChanged="+(revision!=before));
+            }
+        }
+        void RebuildModel()
+        {
             NativeKeyConflicts.Refresh();
             var groups=new List<(IndexGroup Group,List<RowModel> Rows)>();
             var fingerprint=new System.Text.StringBuilder(presentationLanguage+"|"+selected+"|"+queryText+"|"+string.Join(",",filters.OrderBy(value=>value))+"|"+showAdvanced+"|"+TierFingerprint()+"|"+rightWidth+"|"+string.Join(",",collapsed.OrderBy(value=>value)));
@@ -226,6 +240,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
                 int serverAt=rows.Count; // The "Set by the server" line sits above the settings, where it is seen without scrolling.
                 foreach(var file in group.Files)
                 {
+                    timingFiles++;
                     if(file.Kind==FileKind.UnboundConfig||file.Kind==FileKind.DataFile)
                     {
                         if(essentialView)continue; // The mod's page lists everyday settings only; files stay in the full view.
@@ -239,6 +254,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
                     var entries=new List<RowModel>();
                     foreach(var handle in discovery.Entries(file.Path))
                     {
+                        timingEntries++;
                         try
                         {
                             var native=new NativeEntry(handle);var facts=Facts(handle);var reason=Locked(native,facts);
@@ -309,6 +325,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
                 if(rows.Count>0||preferences?.ShowEmptyPlugins.Value==true&&Matches(group.DisplayName+" "+group.Key))
                 {
                     groups.Add((group,rows));
+                    timingRows+=rows.Count;
                     foreach(var row in rows)fingerprint.Append(row.Key).Append(row.Title).Append(row.Info);
                 }
             }
@@ -407,12 +424,13 @@ namespace ExtraPotions.Almanac.Runtime.UI
         void BindPlugin(RectTransform rect,IndexGroup group,int index)
         {
             foreach(var control in rect.GetComponentsInChildren<Selectable>(true))window?.Unfocusable(control);
-            Clear(rect);var entries=group.Files.SelectMany(file=>discovery.Entries(file.Path)).Where(entry=>!Hidden(entry)&&new NativeEntry(entry).Attributes.Browsable!=false).ToArray();
-            // A mod's MeadWorks menu page counts the settings it lists (its own and companion Essential rows), not every bound key.
+            Clear(rect);var entries=group.Files.SelectMany(file=>discovery.Entries(file.Path)
+                .Where(entry=>MatchesKnownEntry(group,file,new NativeEntry(entry)))).ToArray();
+            // Companion rows share the product's current visibility and reset scope.
             if(essentialView&&group.Key==productFilter)
                 entries=OrderedGroups().Where(owner=>owner.Key==group.Key||SettingTierRules.Companion(productFilter,owner.Key))
-                    .SelectMany(owner=>owner.Files.SelectMany(file=>discovery.Entries(file.Path)).Where(entry=>!Hidden(entry)&&new NativeEntry(entry).Attributes.Browsable!=false
-                        &&SettingTierRules.ShowOnProductPage(Tier(owner,entry)))).ToArray();
+                    .SelectMany(owner=>owner.Files.SelectMany(file=>discovery.Entries(file.Path)
+                        .Where(entry=>MatchesKnownEntry(owner,file,new NativeEntry(entry))))).ToArray();
             int locked=entries.Count(entry=>Locked(new NativeEntry(entry),Facts(entry)).Length>0),changed=entries.Count(ChangedInSession);
             string caption=group.DisplayName+" ("+entries.Length+")"+(locked>0?" | "+text("Locked")+": "+locked:"")+(changed>0?" | "+text("Changed")+": "+changed:"");
             var button=AlmanacButtons.Create(rect,"Plugin",caption,()=>SelectGroup(group.Key),Vector2.zero,new Vector2(Mathf.Max(100,rect.rect.width-20),36));

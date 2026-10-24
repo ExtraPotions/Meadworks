@@ -43,6 +43,15 @@ namespace ExtraPotions.Solstice
     /// </summary>
     public static class LegacyFileMigration
     {
+        /// <summary>Prepares settings before binding entries, so a failed copy cannot be hidden by a saved defaults file.</summary>
+        public static LegacyFileResult PrepareSettings(string directory, string legacyName, string currentName)
+        {
+            var result = Run(directory, legacyName, currentName);
+            if (result.Outcome == LegacyFileOutcome.Failed)
+                throw new IOException("Legacy settings could not be carried over; initialization stopped before defaults were saved. " + result.Problem);
+            return result;
+        }
+
         public static LegacyFileResult Run(string directory, string legacyName, string currentName)
         {
             if (string.IsNullOrEmpty(directory)) throw new ArgumentException("A config directory is required.", nameof(directory));

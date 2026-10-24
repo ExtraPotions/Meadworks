@@ -179,9 +179,8 @@ namespace ExtraPotions.Meadworks.Crucible {
         /// Server, once a second: peers that neither answered the greeting nor sent any Crucible frame before their
         /// quiet wait ends are vanilla. The quiet wait does not run while the peer's send queue is above
         /// <see cref="PeerPresenceTracker.SendBacklogBytes"/>, and it never runs past the ceiling measured from the
-        /// greeting. Unless AllowVanilla is effective they are refused with a native center message and the native
-        /// version error, then disconnected after the grace second; effective AllowVanilla admits them with a native
-        /// notice. The peer-info gate is unchanged. Installed (with the greeting) only while the handshake flag is on.
+        /// greeting. They are refused with a native center message and the native version error, then disconnected
+        /// after the grace second. Installed (with the greeting) only while the handshake flag is on.
         /// </summary>
         static void CheckSilentPeers(ZNet? net,double now){
             var peers=MeadworksAdmission.Peers;
@@ -194,11 +193,6 @@ namespace ExtraPotions.Meadworks.Crucible {
             foreach(var uid in silent){
                 var peer=connected.FirstOrDefault(p=>p.m_uid==uid);if(peer?.m_rpc==null||leaving.ContainsKey(peer))continue;
                 var name=uid.ToString(CultureInfo.InvariantCulture);
-                if(AdmissionPolicy.ForSilentPeer(decision)==SilentPeerAction.AdmitAsVanilla){
-                    Log.Info("Peer "+name+" joined without Meadworks; admitted in server-only mode.");
-                    MeadworksServerNotices.TrySend(Plugin.Guid,uid,AdmissionPolicy.VanillaWelcomeNotice);
-                    continue;
-                }
                 var code=RefusalCodes.New();LastRefusalCode=code;
                 Log.Error("Refusing peer "+name+": no Meadworks answer within "+peers.Waited(uid,now).ToString("0",CultureInfo.InvariantCulture)+" s (vanilla client, or a client with Network.PeerClassHandshake off). "+decision.Summary+" Refusal code "+code+".");
                 MeadworksServerNotices.TrySend(Plugin.Guid,uid,AdmissionPolicy.VanillaRefusalNotice);

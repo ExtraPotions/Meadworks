@@ -163,7 +163,7 @@
     "help_setting_1_daylight_radius_scale": "Intensidad del beneficio diurno y la penalización por oscuridad; 0 lo desactiva.",
     "help_setting_1_weather_radius_scale": "Intensidad de la penalización por niebla, bruma y ventiscas; 0 lo desactiva.",
     "help_setting_1_show_radius": "Muestra el radio de exploración actual en el HUD.",
-    "help_setting_1_show_radius_inputs": "Solo diagnóstico: se guarda en el archivo de configuración; el HUD ya no lo muestra.",
+    "help_setting_1_show_radius_inputs": "Preferencia antigua sin efecto. El valor guardado se conserva por compatibilidad; no muestra los datos del radio ni activa registros de diagnóstico.",
     "help_setting_4_enabled": "Muestra el reloj, clima y brújula del HUD.",
     "help_setting_4_toggle_key": "Tecla para mostrar u ocultar el HUD.",
     "help_setting_4_settings_key": "Tecla para abrir la ventana de marcadores de la brújula de Cairn.",

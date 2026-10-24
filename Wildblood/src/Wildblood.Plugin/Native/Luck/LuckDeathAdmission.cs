@@ -226,7 +226,21 @@ internal static class LuckDeathAdmission
         world = ZNet.instance.GetWorldUID();
         return world != 0 && world == CruciblePlugin.Session.WorldId;
     }
-    private static string Epoch(long generation) => processEpoch + "." + generation.ToString(CultureInfo.InvariantCulture);
+    private sealed class EpochValue
+    {
+        internal readonly long Generation;
+        internal readonly string Text;
+        internal EpochValue(long generation, string text) { Generation = generation; Text = text; }
+    }
+    private static EpochValue? epochValue;
+    private static string Epoch(long generation)
+    {
+        var cached = System.Threading.Volatile.Read(ref epochValue);
+        if (cached != null && cached.Generation == generation) return cached.Text;
+        var created = new EpochValue(generation, processEpoch + "." + generation.ToString(CultureInfo.InvariantCulture));
+        System.Threading.Volatile.Write(ref epochValue, created);
+        return created.Text;
+    }
     private static bool Active => !stopped && !faulted && Plugin.Ready && CruciblePlugin.IsReady && CapabilityReady && StorageManager.CurrentMode == LuckMode.Attributed
         && Plugin.Settings?.Get(Config.WildbloodSettings.Cheats.LuckyKills) != true && CharacterDropPatch.WeightedDecisionApplied;
 

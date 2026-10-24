@@ -37,6 +37,15 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
             entries.Add(entry);
             return new HusbandrySetting<T>(entry, scope, value);
         }
+        public HusbandrySetting<T> BindHidden<T>(string section, string key, T value, string description,
+            bool synced = true, AcceptableValueBase? acceptableValues = null)
+        {
+            var scope = synced ? ConfigScope.ServerAuthoritative : ConfigScope.Local;
+            var entry = MeadworksConfig.BindHidden(file, section, key, value, description, scope, acceptableValues);
+            MeadworksBlockedOptions.Track(Plugin.Guid, entry, scope);
+            entries.Add(entry);
+            return new HusbandrySetting<T>(entry, scope, value);
+        }
         public HusbandrySetting<bool> Cheat(string key, string description)
         {
             var entry = MeadworksConfig.BindCheat(file, "12 - Cheats", key, false, description, MischiefCategory.World);

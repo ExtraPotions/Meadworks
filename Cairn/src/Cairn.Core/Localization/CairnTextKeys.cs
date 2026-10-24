@@ -118,6 +118,8 @@ namespace ExtraPotions.Cairn.Localization
                 new TextKey("sleep_sleeping", 2), new TextKey("sleep_boost", 1), new TextKey("sleep_skip", 1),
                 new TextKey("setting_remove", 1), new TextKey("setting_allow_removing", 1),
                 new TextKey("help_remove", 1), new TextKey("help_allow_removing", 1),
+                new TextKey(Setting(CairnSettings.Radius.ShowRadiusInputs), 0),
+                new TextKey(SettingHelp(CairnSettings.Radius.ShowRadiusInputs), 0),
             }
             .Concat(Enum.GetValues(typeof(CairnModule)).Cast<CairnModule>().Select(m => new TextKey(StepAsideNotice.KeyOf(m), 1)))
             .Concat(Enum.GetValues(typeof(WeatherCategory)).Cast<WeatherCategory>().Select(c => new TextKey(Weather(c), 0)))

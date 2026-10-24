@@ -43,6 +43,7 @@ namespace ExtraPotions.Delve.Runtime
         private double lastSeconds = double.NaN;
         private string? sidecarPath;
         private bool sidecarDirty;
+        internal DelveCheckTiming? CheckTiming { get; private set; }
 
         public DelveEngine(MeadworksLog log)
         {
@@ -103,7 +104,11 @@ namespace ExtraPotions.Delve.Runtime
         /// <summary>A scheduled sweep did not finish this kind (generation failed). The claim clear stays armed.</summary>
         public void NoteClaimFailure(DelveKind kind) => claimClear.NoteFailure(kind);
 
-        public void Report(DelveKind kind, KindReport report) => Status.Set(kind, report);
+        public void Report(DelveKind kind, KindReport report)
+        {
+            Status.Set(kind, report);
+            CheckTiming?.Report(kind, report);
+        }
 
         public void Record(DelveKind kind, string what, bool dryRun)
         {
@@ -206,34 +211,64 @@ namespace ExtraPotions.Delve.Runtime
 
         private void Check()
         {
-            double seconds = ZNet.instance.GetTimeSeconds();
-            DayLengthSeconds = Math.Max(1, EnvMan.instance.m_dayLengthSec);
-            Now = WorldClock.Now(seconds, DayLengthSeconds, DateTime.UtcNow);
-            bool dawn = !double.IsNaN(lastSeconds) && WorldClock.DawnBetween(lastSeconds, seconds, DayLengthSeconds);
-            lastSeconds = seconds;
-            Players = DelveWorld.Players();
-            Budget = Settings.Get(DelveSettings.General.MaxActionsPerTick);
-            Status.Resize(Settings.Get(DelveSettings.General.StatusReportLines));
-            claimClear.BeginCheck();
-            claimClearReady = false;
-            var sweeping = new HashSet<DelveKind>();
-            foreach (DelveKind kind in Enum.GetValues(typeof(DelveKind)))
+            CheckTiming = DelveCheckTiming.Begin(Log.IsEnabled(LogSeverity.Debug));
+            bool dawn = false, completed = false;
+            int serviceFailures = 0;
+            HashSet<DelveKind>? sweeping = null;
+            try
             {
-                if (!Active(kind)) continue;
-                if (carrying.Contains(kind) || evaluateNow.Contains(kind) || WorldClock.ShouldSweep(ClockOf(kind).Clock, dawn, RegenerateNow(kind)))
-                    sweeping.Add(kind);
-            }
-            evaluateNow.Clear();
-            foreach (var service in services)
-                try { service.Check(this, sweeping); }
-                catch (Exception error)
+                double seconds = ZNet.instance.GetTimeSeconds();
+                DayLengthSeconds = Math.Max(1, EnvMan.instance.m_dayLengthSec);
+                Now = WorldClock.Now(seconds, DayLengthSeconds, DateTime.UtcNow);
+                dawn = !double.IsNaN(lastSeconds) && WorldClock.DawnBetween(lastSeconds, seconds, DayLengthSeconds);
+                lastSeconds = seconds;
+                Players = DelveWorld.Players();
+                Budget = Settings.Get(DelveSettings.General.MaxActionsPerTick);
+                Status.Resize(Settings.Get(DelveSettings.General.StatusReportLines));
+                claimClear.BeginCheck();
+                claimClearReady = false;
+                sweeping = new HashSet<DelveKind>();
+                foreach (DelveKind kind in Enum.GetValues(typeof(DelveKind)))
                 {
-                    Log.Error("Delve check " + service.GetType().Name + ": " + error.GetType().Name + ": " + error.Message);
+                    if (!Active(kind)) continue;
+                    if (carrying.Contains(kind) || evaluateNow.Contains(kind) || WorldClock.ShouldSweep(ClockOf(kind).Clock, dawn, RegenerateNow(kind)))
+                        sweeping.Add(kind);
                 }
-            FinishClaimClear();
-            foreach (DelveKind kind in Enum.GetValues(typeof(DelveKind)))
-                if (!Active(kind)) Status.Set(kind, new KindReport(0, 0, 0, 0, null, false, false, InactiveReason(kind)));
-            if (sidecarDirty) SaveSidecar();
+                evaluateNow.Clear();
+                foreach (var service in services)
+                {
+                    long serviceStart = DelveCheckTiming.Start(CheckTiming);
+                    try { service.Check(this, sweeping); }
+                    catch (Exception error)
+                    {
+                        serviceFailures++;
+                        Log.Error("Delve check " + service.GetType().Name + ": " + error.GetType().Name + ": " + error.Message);
+                    }
+                    finally { CheckTiming?.Stage(service.GetType().Name, serviceStart); }
+                }
+                FinishClaimClear();
+                foreach (DelveKind kind in Enum.GetValues(typeof(DelveKind)))
+                    if (!Active(kind)) Status.Set(kind, new KindReport(0, 0, 0, 0, null, false, false, InactiveReason(kind)));
+                if (sidecarDirty) SaveSidecar();
+                completed = true;
+            }
+            finally
+            {
+                var timing = CheckTiming;
+                CheckTiming = null;
+                if (timing != null)
+                {
+                    try
+                    {
+                        Log.Debug(timing.Finish(Time.frameCount, System.Threading.Thread.CurrentThread.ManagedThreadId, dawn, Now.Day, ZDOMan.instance?.m_objectsByID.Count ?? 0,
+                            (IEnumerable<DelveKind>?)sweeping ?? Array.Empty<DelveKind>(), Budget, completed, sidecarDirty, serviceFailures));
+                    }
+                    catch (Exception)
+                    {
+                        // Diagnostic formatting or listeners must not change the regeneration outcome.
+                    }
+                }
+            }
         }
 
         private static string InactiveReason(DelveKind kind)
@@ -273,18 +308,31 @@ namespace ExtraPotions.Delve.Runtime
         public void SaveSidecar()
         {
             if (sidecarPath == null || !sidecarDirty || Sidecar.ReadOnly) return;
+            long saveStart = DelveCheckTiming.Start(CheckTiming);
             try
             {
                 var tmp = sidecarPath + ".tmp";
-                File.WriteAllText(tmp, Sidecar.Write());
-                if (File.Exists(sidecarPath)) File.Delete(sidecarPath);
-                File.Move(tmp, sidecarPath);
+                long serializeStart = DelveCheckTiming.Start(CheckTiming);
+                string text;
+                try { text = Sidecar.Write(); }
+                finally { CheckTiming?.Stage("sidecar_serialize", serializeStart); }
+                long writeStart = DelveCheckTiming.Start(CheckTiming);
+                try { File.WriteAllText(tmp, text); }
+                finally { CheckTiming?.Stage("sidecar_write", writeStart, chars: text.Length); }
+                long publishStart = DelveCheckTiming.Start(CheckTiming);
+                try
+                {
+                    if (File.Exists(sidecarPath)) File.Delete(sidecarPath);
+                    File.Move(tmp, sidecarPath);
+                }
+                finally { CheckTiming?.Stage("sidecar_publish", publishStart); }
                 sidecarDirty = false;
             }
             catch (Exception error)
             {
                 Log.Warning("Delve sidecar write failed: " + error.GetType().Name + ": " + error.Message);
             }
+            finally { CheckTiming?.Stage("sidecar_save", saveStart); }
         }
 
         /// <summary>The shared guard input for a site: players, held, player-built objects and base areas near it.</summary>

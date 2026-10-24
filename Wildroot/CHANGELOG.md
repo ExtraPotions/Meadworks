@@ -1,3 +1,7 @@
+## 0.1.21 - Local candidate
+
+- Hide retired Farm Toggle Key from settings and key-conflict lists while preserving its saved chord and existing migration.
+
 # Changelog
 
 ## 0.1.20 (2026-10-21)

@@ -10,6 +10,9 @@ namespace ExtraPotions.Meadworks.Crucible {
         sealed class Listener {internal ProductRegistration Owner=null!;internal Action<OperationResult> Callback=null!;internal Action Cleanup=null!;}
         readonly OperationRegistry operations;readonly SessionTracker sessions;readonly Func<double> clock;
         readonly Dictionary<RequestIdentity,Work> work=new Dictionary<RequestIdentity,Work>();readonly List<Listener> listeners=new List<Listener>();readonly RequestLedger ledger=new RequestLedger();bool stopped;
+        Work[]? workSnapshot;
+        Work[] SnapshotWork()=>workSnapshot??(workSnapshot=work.Values.ToArray());
+        void RemoveWork(RequestIdentity id){if(work.Remove(id))workSnapshot=null;}
         public Func<AuthorityContext,bool>? ValidateLiveAuthority{get;set;}
         public RequestRouter(OperationRegistry operations,SessionTracker sessions,Func<double> monotonicClock){this.operations=operations??throw new ArgumentNullException(nameof(operations));this.sessions=sessions??throw new ArgumentNullException(nameof(sessions));clock=monotonicClock??throw new ArgumentNullException(nameof(monotonicClock));}
         static bool Terminal(OperationState state)=>state==OperationState.Succeeded||state==OperationState.Rejected||state==OperationState.Cancelled;
@@ -19,7 +22,7 @@ namespace ExtraPotions.Meadworks.Crucible {
             if(stopped||!Current(peer)||envelope.SessionId!=peer.Session.SessionId||envelope.WorldId!=peer.Session.WorldId)return new RequestAdmission(false,"SessionUnavailable");
             if(envelope.PayloadLength>16384)return new RequestAdmission(false,"PayloadTooLarge");
             var id=new RequestIdentity(peer.ActorId,envelope.WorldId,envelope.SessionId,envelope.RequestId);
-            var expired=new List<RequestIdentity>();ledger.Expire(clock(),expired);foreach(var old in expired)work.Remove(old);
+            var expired=new List<RequestIdentity>();ledger.Expire(clock(),expired);foreach(var old in expired)RemoveWork(old);
             var entry=operations.Find(envelope.OperationId,envelope.Protocol);
             if(entry==null)return new RequestAdmission(false,"OperationUnavailable");
             if(work.TryGetValue(id,out var existing)){
@@ -31,14 +34,15 @@ namespace ExtraPotions.Meadworks.Crucible {
             if(pending.Length>=256||pending.Count(w=>w.Context.SenderId==peer.SenderId)>=32)return new RequestAdmission(false,"PendingCapacity");
             // Completed ids are held for a bounded window (RequestLedger), so replays inside it reuse the stored outcome
             // while a long session never fills the ledger; only an actor's own quota or a burst of young ids refuses.
-            var evicted=new List<RequestIdentity>();bool room=ledger.Admit(id.ActorId,0,clock(),evicted);foreach(var old in evicted)work.Remove(old);
+            var evicted=new List<RequestIdentity>();bool room=ledger.Admit(id.ActorId,0,clock(),evicted);foreach(var old in evicted)RemoveWork(old);
             if(!room)return new RequestAdmission(false,"LedgerCapacity");
             var item=new Work{Envelope=new RequestEnvelope(envelope.OperationId,envelope.Protocol,envelope.WorldId,envelope.SessionId,envelope.RequestId,envelope.Payload),Context=peer.ForRequest(id),Entry=entry,Expires=clock()+10,Result=new OperationResult(id,OperationState.Queued,"Queued")};
-            work.Add(id,item);return new RequestAdmission(true,"Queued",item.Result);
+            work.Add(id,item);workSnapshot=null;return new RequestAdmission(true,"Queued",item.Result);
         }
         public void Drain() {
             if(stopped)return;
-            foreach(var item in work.Values.ToArray()) {
+            var snapshot=SnapshotWork();
+            foreach(var item in snapshot) {
                 if(Terminal(item.Result.State))continue;
                 if(!item.Entry.Active){Set(item,item.Context.DecisionMade?OperationState.RecoveryRequired:OperationState.Cancelled,"OwnerUnavailable");continue;}
                 try {
@@ -76,7 +80,7 @@ namespace ExtraPotions.Meadworks.Crucible {
         public OperationState Cancel(RequestIdentity id){if(!work.TryGetValue(id,out var item))return OperationState.Rejected;if(Terminal(item.Result.State))return item.Result.State;Set(item,item.Context.DecisionMade?OperationState.RecoveryRequired:OperationState.Cancelled,"Canceled");return item.Result.State;}
         public OperationResult Status(RequestIdentity id){if(!work.TryGetValue(id,out var item))return new OperationResult(id,OperationState.Rejected,"UnknownRequest");if(!item.Entry.Active)return new OperationResult(id,item.Context.DecisionMade||item.Result.State==OperationState.Succeeded?OperationState.RecoveryRequired:OperationState.Rejected,"OwnerUnavailable");return item.Result;}
         public IDisposable Subscribe(ProductRegistration owner,Action<OperationResult> callback){owner.EnsureActive();if(callback==null)throw new ArgumentNullException(nameof(callback));if(stopped)throw new ObjectDisposedException(nameof(RequestRouter));var listener=new Listener{Owner=owner,Callback=callback};listener.Cleanup=()=>{listeners.Remove(listener);owner.Disposed-=listener.Cleanup;};owner.Disposed+=listener.Cleanup;listeners.Add(listener);return new OwnedDisposal(listener.Cleanup);}
-        public void ResetSession(SessionSnapshot next){if(next==null)throw new ArgumentNullException(nameof(next));foreach(var item in work.Values.ToArray()){if(item.Context.Session.SessionId==next.SessionId&&item.Context.Session.Generation==next.Generation)continue;if(!Terminal(item.Result.State))Set(item,item.Context.DecisionMade?OperationState.RecoveryRequired:OperationState.Cancelled,"SessionChanged");if(!item.Context.DecisionMade||Terminal(item.Result.State)){work.Remove(item.Context.Identity);ledger.Forget(item.Context.Identity);}}}
+        public void ResetSession(SessionSnapshot next){if(next==null)throw new ArgumentNullException(nameof(next));foreach(var item in work.Values.ToArray()){if(item.Context.Session.SessionId==next.SessionId&&item.Context.Session.Generation==next.Generation)continue;if(!Terminal(item.Result.State))Set(item,item.Context.DecisionMade?OperationState.RecoveryRequired:OperationState.Cancelled,"SessionChanged");if(!item.Context.DecisionMade||Terminal(item.Result.State)){RemoveWork(item.Context.Identity);ledger.Forget(item.Context.Identity);}}}
         public RequestDiagnostics Diagnostics()=>new RequestDiagnostics(work.Values.Count(w=>!Terminal(w.Result.State)),work.Values.Count(w=>Terminal(w.Result.State)),work.Values.Count(w=>w.Result.State==OperationState.RecoveryRequired));
         public void Stop(){if(stopped)return;foreach(var item in work.Values.Where(w=>!Terminal(w.Result.State)).ToArray())Set(item,item.Context.DecisionMade?OperationState.RecoveryRequired:OperationState.Cancelled,"Shutdown");foreach(var listener in listeners.ToArray())listener.Cleanup();stopped=true;}
     }

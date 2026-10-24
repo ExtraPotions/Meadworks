@@ -163,7 +163,7 @@
     "help_setting_1_daylight_radius_scale": "Stärke von Tageslichtbonus und Dunkelheitsabzug; 0 deaktiviert.",
     "help_setting_1_weather_radius_scale": "Stärke des Abzugs durch Nebel und Schneesturm; 0 deaktiviert.",
     "help_setting_1_show_radius": "Zeigt den aktuellen Erkundungsradius im HUD.",
-    "help_setting_1_show_radius_inputs": "Nur zur Diagnose: bleibt in der Konfigurationsdatei; das HUD zeigt es nicht mehr an.",
+    "help_setting_1_show_radius_inputs": "Beibehaltene Einstellung ohne Wirkung. Der gespeicherte Wert bleibt aus Kompatibilitätsgründen erhalten; er zeigt keine Radiusdaten an und aktiviert keine Diagnoseprotokolle.",
     "help_setting_4_enabled": "Zeigt Uhr, Wetter und Kompass im HUD.",
     "help_setting_4_toggle_key": "Taste zum Anzeigen oder Ausblenden des HUD.",
     "help_setting_4_settings_key": "Taste zum Öffnen des Fensters für Kompassmarkierungen von Cairn.",

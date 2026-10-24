@@ -118,6 +118,7 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
             // The pure essence item first (what you have), then the essences to choose from.
             parts.Essences = new SlotRow(parts.Description, template, Tables.Essences.All.Length + 1,
                 new Rect(text.x, y + LabelHeight, text.width, SlotSize), essence);
+            parts.Recasting = new RecastingControls(parts.Description, new Rect(text.x, y + LabelHeight + 4f, text.width, SlotSize - 8f));
         }
 
         // The rows end above the button's row: the cost slots move onto it (PlaceCost), so their old row is free.

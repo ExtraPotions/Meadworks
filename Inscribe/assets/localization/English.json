@@ -27,7 +27,7 @@
     "rune_awakening": "Awakening Rune",
     "rune_awakening_desc": "An old rune from an earlier Inscribe: it becomes an Ascension Rune as soon as it loads.",
     "rune_recasting": "Recasting Rune",
-    "rune_recasting_desc": "Recasts an Uncommon item: both inscriptions are replaced by two new ones. It stays Uncommon.",
+    "rune_recasting_desc": "Recasts an Uncommon item: both inscriptions are replaced by two new ones. It stays Uncommon. At the Rune Table you can focus one new inscription on Offense, Defense or Utility; the others roll normally at the same rune cost.",
     "rune_ascension": "Ascension Rune",
     "rune_ascension_desc": "Raises an item one rarity step and keeps its inscriptions: Common becomes Uncommon with two inscriptions; Uncommon becomes Rare and Rare becomes Epic, with one more each. At the Rune Table an essence chooses what it adds. Legendary gear comes only from bosses and raids.",
     "rune_cleansing": "Cleansing Rune",
@@ -205,6 +205,20 @@
     "enhancement_convert_no_room": "Make room in this inventory: old enhanced items and scrolls convert once their replacement fits.",
     "enhancement_convert_dropped": "Converted runes that did not fit in this inventory were dropped at your feet.",
     "cfg_7_ground_glow__legendary_glint_name": "Legendary Glint",
-    "cfg_7_ground_glow__legendary_glint_help": "Dropped Legendary gear also shows a small bronze and ivory glint on the ground. Other rarities never glint. This client only."
+    "cfg_7_ground_glow__legendary_glint_help": "Dropped Legendary gear also shows a small bronze and ivory glint on the ground. Other rarities never glint. This client only.",
+    "recast_focus_label": "Recasting focus",
+    "recast_focus_any": "Any category",
+    "recast_focus_offense": "Offense",
+    "recast_focus_defense": "Defense",
+    "recast_focus_utility": "Utility",
+    "recast_side_prefix": "Prefix",
+    "recast_side_suffix": "Suffix",
+    "recast_focus_help": "Click to choose a category for one new inscription. All inscriptions are replaced; the others roll normally. The rune cost stays the same. If no legal result exists, nothing is spent. Your choice is saved on this computer.",
+    "recast_side_help": "Click to switch between prefix and suffix. Applies only when a category is selected. The other inscriptions still reroll normally. Your choice is saved on this computer.",
+    "cfg_8_interface_heading": "8 - Interface",
+    "cfg_8_interface__recasting_focus_name": "Recasting Focus",
+    "cfg_8_interface__recasting_side_name": "Recasting Side",
+    "cfg_8_interface__recasting_focus_help": "Your saved Rune Table category for one new inscription: Unrestricted, Offense, Defense or Utility. Recasting still replaces all inscriptions at the same rune cost and uses the host's rules. Your choice is saved on this computer.",
+    "cfg_8_interface__recasting_side_help": "Your saved prefix or suffix choice for the focused inscription. Applies only when a Recasting category is selected; the other inscriptions still reroll normally. Your choice is saved on this computer."
   }
 }

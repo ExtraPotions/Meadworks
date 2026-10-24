@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Hide the ignored Tamed Stars setting while retaining its saved value and local scope. Wildblood continues to control creature stars.
+
 ## 0.1.18 (2026-10-22)
 
 - Version 0.1.18.

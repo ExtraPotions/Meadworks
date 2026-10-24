@@ -56,13 +56,14 @@ namespace ExtraPotions.Meadworks.Crucible {
         }
         /// <summary>Non-generic editor seam through the same typed amendment and Jotunn route. No coercion or direct write.</summary>
         public static ConfigAmendResult Amend(ConfigEntryBase entry,object? value,string? label=null){
+            using var timing=EditTiming.Begin("Amend");
             if(entry==null)throw new ArgumentNullException(nameof(entry));
             if(!TryGetMetadata(entry,out var metadata))throw new InvalidOperationException("No registered Meadworks owner for this configuration entry.");
             var type=entry.SettingType;
             if(entry.GetType()!=typeof(ConfigEntry<>).MakeGenericType(type))throw new ArgumentException("Expected the exact registered BepInEx configuration entry type.",nameof(entry));
             if(value==null?type.IsValueType&&Nullable.GetUnderlyingType(type)==null:!type.IsInstanceOfType(value))
                 throw new ArgumentException("The value must have the entry's exact managed setting type.",nameof(value));
-            try{return (ConfigAmendResult)TypedAmend.MakeGenericMethod(type).Invoke(null,new object?[]{entry,metadata.ProductId,metadata.Scope,value,label,metadata.ServerLocked})!;}
+            try{var result=(ConfigAmendResult)TypedAmend.MakeGenericMethod(type).Invoke(null,new object?[]{entry,metadata.ProductId,metadata.Scope,value,label,metadata.ServerLocked})!;timing.Success();return result;}
             catch(TargetInvocationException error) when(error.InnerException!=null){ExceptionDispatchInfo.Capture(error.InnerException).Throw();throw;}
         }
     }

@@ -163,7 +163,7 @@
     "help_setting_1_daylight_radius_scale": "日光加成和黑暗惩罚的强度。0 表示关闭。",
     "help_setting_1_weather_radius_scale": "雾、薄雾和暴风雪惩罚的强度。0 表示关闭。",
     "help_setting_1_show_radius": "在 HUD 上显示当前探索半径。",
-    "help_setting_1_show_radius_inputs": "仅用于诊断：保留在配置文件中；HUD 不再显示它。",
+    "help_setting_1_show_radius_inputs": "保留但不生效的旧偏好。为兼容旧配置保留已保存的值；不会显示半径计算数据，也不会启用诊断日志。",
     "help_setting_4_enabled": "显示时钟、天气和罗盘 HUD。",
     "help_setting_4_toggle_key": "显示或隐藏 HUD 的键盘按键。",
     "help_setting_4_settings_key": "打开 Cairn 罗盘标记窗口的键盘按键。",

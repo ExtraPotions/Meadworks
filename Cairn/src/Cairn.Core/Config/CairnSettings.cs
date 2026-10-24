@@ -44,7 +44,7 @@ namespace ExtraPotions.Cairn.Config
             public static readonly CairnSetting<float> DaylightRadiusScale = CairnSetting.Number(Section, "Daylight Radius Scale", 0.2f, 0f, 1f, ServerAuthoritative, "How much daylight widens and darkness narrows the radius. 0 turns it off.");
             public static readonly CairnSetting<float> WeatherRadiusScale = CairnSetting.Number(Section, "Weather Radius Scale", 0.5f, 0f, 1f, ServerAuthoritative, "How much fog, mist and snowstorms narrow the radius. 0 turns it off.");
             public static readonly CairnSetting<bool> ShowRadius = CairnSetting.Toggle(Section, "Show Radius", false, Local, "Show the current exploration radius on the HUD.");
-            public static readonly CairnSetting<bool> ShowRadiusInputs = CairnSetting.Toggle(Section, "Show Radius Inputs", false, Local, "Diagnostic record of every input of the exploration radius (light, weather, altitude, location, factors). Kept in this file only; the HUD no longer draws it.");
+            public static readonly CairnSetting<bool> ShowRadiusInputs = CairnSetting.Toggle(Section, "Show Radius Inputs", false, Local, "Retained ignored preference. The saved value is preserved for compatibility; it does not show radius inputs or enable diagnostic logging.", hidden: true);
 
             internal static IEnumerable<CairnSetting> Items => new CairnSetting[]
             {

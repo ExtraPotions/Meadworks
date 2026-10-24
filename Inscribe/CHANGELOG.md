@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The Rune Table can focus one new Recasting inscription on Offense, Defense or Utility, with a choice of prefix or suffix. Other inscriptions roll normally at the same rune cost. Any category keeps the unrestricted roll; an impossible result spends nothing.
+- Recasting category and side choices are saved locally and restored when the table opens again.
+- Recasting controls and help are available in all seven supported languages.
+
 - The identification check that runs in a normal game now follows Common, Uncommon, Rare, Epic and Legendary, including the Legendary ground glint. It no longer checks enhancement levels, the +N badge, enhancement scrolls or the Enhance tab, which Inscribe 0.2.0 removed.
 
 ## 0.2.5 (2026-10-21)

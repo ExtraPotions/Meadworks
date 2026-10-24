@@ -46,6 +46,7 @@ namespace ExtraPotions.Wildblood.Adopted.Patches
             Struck struck = Struck.Of(__instance, hit);
             __state.Warding = DamageReactionPatch.Capture(struck);
             Guard.Run("Character.RPC_Damage scaling", static s => DamageScalingPatch.Scale(s), struck);
+            Guard.Run("Character.RPC_Damage tamed pressure", static s => ExtraPotions.Wildblood.Runtime.NativeTamedPressure.Apply(s), struck);
             Guard.Run("Character.RPC_Damage devour commit", static s => DevourHitPatch.Commit(s), struck);
             RecapSourcePatch.Note(__instance, hit);
             __state.ScreecherHealth = ShriekDamagePatch.Capture(struck);

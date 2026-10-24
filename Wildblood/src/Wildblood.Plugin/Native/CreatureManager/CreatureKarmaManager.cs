@@ -35,6 +35,7 @@ internal static partial class CreatureKarmaManager
 
     private const string CountedDeathKey = "wildblood.cm.KarmaDeathCounted";
     private const string EnforcerKey = "wildblood.cm.KarmaEnforcer";
+    private static readonly string LegacyEnforcerKey = LegacyPressureKey(EnforcerKey);
     private const string EnforcerSummonedKey = "wildblood.cm.KarmaEnforcerSummoned";
     private const string EnforcerNameKey = "wildblood.cm.KarmaEnforcerName";
     private const string EnforcerLevelBonusKey = "wildblood.cm.KarmaEnforcerLevelBonus";
@@ -2610,7 +2611,8 @@ DeepNorth:
             return false;
         }
 
-        return ReadPressureBool(nview.GetZDO(), EnforcerKey, false) == true;
+        ZDO? zdo = nview.GetZDO();
+        return zdo == null ? false : zdo.GetBool(EnforcerKey, zdo.GetBool(LegacyEnforcerKey, false));
     }
 
     internal static bool IsKarmaSummonedCreature(Character character)
@@ -2744,7 +2746,7 @@ DeepNorth:
         }
     }
 
-    internal static bool IsEnforcerZdo(ZDO zdo) => ReadPressureBool(zdo, EnforcerKey, false);
+    internal static bool IsEnforcerZdo(ZDO zdo) => zdo == null ? false : zdo.GetBool(EnforcerKey, zdo.GetBool(LegacyEnforcerKey, false));
 
     private static void StoreEnforcerPresenceAnchor(ZDO zdo)
     {

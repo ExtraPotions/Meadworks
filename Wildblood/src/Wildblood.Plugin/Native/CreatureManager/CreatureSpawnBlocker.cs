@@ -164,6 +164,10 @@ internal static class CreatureSpawnBlocker
                 new SimulationDistance(interior ? 0 : distance.NearSimulationDistance, 0, distance.IsClassic), NearbyZdos);
             foreach (ZDO zdo in NearbyZdos)
             {
+                if (zdo == null) continue;
+                if (bosses && NearbyBossPrefabs.TryGetValue(zdo.GetPrefab(), out bool knownBoss) &&
+                    !knownBoss && (!enforcers || !CreatureKarmaManager.IsEnforcerZdo(zdo)))
+                    continue;
                 if (!CreatureKarmaManager.IsTrackedCharacterZdoAlive(zdo) ||
                     !InQueryArea(zdo.GetPosition(), zone, interior, distance)) continue;
                 ZNetView? instance = ZNetScene.instance.FindInstance(zdo);

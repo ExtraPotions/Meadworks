@@ -5,14 +5,12 @@ using Jotunn.Utils;
 namespace ExtraPotions.Meadworks.Crucible {
     [BepInPlugin(Guid,Name,Version)]
     [BepInDependency(Jotunn.Main.ModGuid,"2.30.2")]
-    // VersionCheckOnly (server-only mode, docs/server-only-mode.md): Jotunn compares versions whenever both sides run
-    // Crucible but no longer refuses a client without it. Under Network.AdmissionMode Strict the silent-peer refusal
-    // (NativePeerJoin) refuses that client instead; AllowVanilla admits it when every installed product allows it.
+    // Jotunn compares modded versions; Crucible's peer-info gate and silent-peer refusal enforce Strict admission.
     [NetworkCompatibility(CompatibilityLevel.VersionCheckOnly,VersionStrictness.Minor)]
     public sealed class Plugin:BaseUnityPlugin {
         public const string Guid="com.meadworks.crucible";
         public const string Name="ExtraPotions Meadworks: Crucible";
-        public const string Version="0.3.30";
+        public const string Version="0.3.32";
         public static ProductRegistry Services { get; private set; }=null!;
         public static bool IsReady { get; private set; }
         internal static BepInEx.Logging.ManualLogSource? Log { get; private set; }
@@ -46,6 +44,7 @@ namespace ExtraPotions.Meadworks.Crucible {
             sessions=new NativeSessionAdapter(Services);dispatcher=new RequestDispatcher();transport=new NativeRequestTransport(Services,sessions,dispatcher,ServerPresence);RequestClient=new NativeRequestClient(Services,sessions,transport);
             PeerClassHandshake=transport.PeerClassHandshake=MeadworksConfig.Bind(Config,"Network","PeerClassHandshake",true,"Checks MeadWorks versions when a player joins: the server turns away clients missing a required MeadWorks mod or running a different major.minor version, and a client turns off required mods the server lacks. On by default; turn it off only to diagnose join problems. Restart the game after changing this setting.").Value;
             MeadworksAdmission.Bind(Config);MeadworksAdmission.Register(registration);MeadworksBuildHashes.Register(registration);
+            MeadworksAdmission.Report();
             if(PeerClassHandshake)NativePeerJoin.Install(Services);
             // Pre-spawn refusal of clients without Meadworks: on every game, whatever Network.PeerClassHandshake says.
             NativePeerJoin.InstallPeerInfoGate();

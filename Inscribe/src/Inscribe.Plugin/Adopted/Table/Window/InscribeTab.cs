@@ -89,6 +89,7 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
             Essence? essence = TableIcons.Steers(TableIcons.Def(_rune)) && Essences.IsOffered(_essence) ? _essence : null;
             var supply = new TableSupply(view.Store, essence);
             StoneJob job = StoneJob.Create(view.Player, rune, _item, supply);
+            job = RecastingControls.Apply(job, view.Player, _rune);
             StoneResult result = StonePipeline.Evaluate(job);
             if (result.Refused)
             {

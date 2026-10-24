@@ -45,8 +45,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
                 string value=WorldValue(metadata);
                 bool match=Matches(group.DisplayName+" World "+metadata.Config.Definition+" "+title+" "+value+" "+reason);
                 var tier=Tier(group,metadata.Config);
-                if(!match||(essentialView?!SettingTierRules.ShowOnProductPage(tier)
-                    :Presentation.Decide(native.Attributes,showAdvanced,Searching&&match,false)!=Visibility.Visible||!SettingTierRules.ShowInAlmanac(tier,showAdvanced)))continue;
+                if(!match||!TierShows(tier,native,null,match,group.Key))continue;
                 if(filters.Any(filter=>filter!="meadworks"&&filter!="synced"&&!(filter=="changed"&&metadata.WorldText!=null)&&!(filter=="locked"&&reason.Length>0)))continue;
                 string key=WorldRowKey(metadata);
                 worldRows.Add(new RowModel{Key=key,Title=title,Info=display.Help,World=metadata});

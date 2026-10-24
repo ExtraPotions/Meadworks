@@ -6,6 +6,9 @@ namespace ExtraPotions.Meadworks.Crucible {
     public sealed class PeerCommandRouter {
         sealed class Work {internal PeerCommandContext Context=null!;internal PeerCommandEntry Entry=null!;internal RequestEnvelope Envelope=null!;internal OperationResult Result=null!;internal double Deadline;internal Func<ExecutionFrame>? Poll;}
         readonly PeerCommandRegistry registry;readonly SessionTracker sessions;readonly Func<double> clock;readonly Dictionary<RequestIdentity,Work> work=new Dictionary<RequestIdentity,Work>();readonly RequestLedger ledger=new RequestLedger();bool stopped;
+        Work[]? workSnapshot;
+        Work[] SnapshotWork()=>workSnapshot??(workSnapshot=work.Values.ToArray());
+        void RemoveWork(RequestIdentity id){if(work.Remove(id))workSnapshot=null;}
         public Func<PeerCommandContext,bool>? ValidateLiveAuthority{get;set;}
         public PeerCommandRouter(PeerCommandRegistry registry,SessionTracker sessions,Func<double> monotonicClock){this.registry=registry??throw new ArgumentNullException(nameof(registry));this.sessions=sessions??throw new ArgumentNullException(nameof(sessions));clock=monotonicClock??throw new ArgumentNullException(nameof(monotonicClock));}
         static bool Terminal(OperationState state)=>state==OperationState.Succeeded||state==OperationState.Rejected||state==OperationState.Cancelled;
@@ -20,7 +23,7 @@ namespace ExtraPotions.Meadworks.Crucible {
             if(stopped||!NativeCurrent(context)||context.Session.WorldId!=envelope.WorldId||context.Session.SessionId!=envelope.SessionId)return new RequestAdmission(false,"SessionUnavailable");
             if(envelope.PayloadLength>16384)return new RequestAdmission(false,"PayloadTooLarge");
             var identity=new RequestIdentity(context.LocalPeerId,envelope.WorldId,envelope.SessionId,envelope.RequestId);
-            var expired=new List<RequestIdentity>();ledger.Expire(clock(),expired);foreach(var old in expired)work.Remove(old);
+            var expired=new List<RequestIdentity>();ledger.Expire(clock(),expired);foreach(var old in expired)RemoveWork(old);
             var entry=registry.Find(envelope.OperationId,envelope.Protocol);if(entry==null)return new RequestAdmission(false,"CommandUnavailable");
             if(work.TryGetValue(identity,out var existing)){
                 if(!ReferenceEquals(existing.Entry,entry)||!entry.Active||!entry.Owner.IsActive)return new RequestAdmission(false,"OwnerUnavailable");
@@ -29,15 +32,15 @@ namespace ExtraPotions.Meadworks.Crucible {
             }
             // Old terminal epochs cannot be replayed; uncertain outcomes remain
             // retained until their product's durable recovery establishes them.
-            foreach(var old in work.Where(pair=>Terminal(pair.Value.Result.State)&&(pair.Value.Context.Session.SessionId!=sessions.Current.SessionId||pair.Value.Context.Session.WorldId!=sessions.Current.WorldId)).Select(pair=>pair.Key).ToArray()){work.Remove(old);ledger.Forget(old);}
+            foreach(var old in work.Where(pair=>Terminal(pair.Value.Result.State)&&(pair.Value.Context.Session.SessionId!=sessions.Current.SessionId||pair.Value.Context.Session.WorldId!=sessions.Current.WorldId)).Select(pair=>pair.Key).ToArray()){RemoveWork(old);ledger.Forget(old);}
             // Completed ids are held for a bounded window (RequestLedger); unresolved receipts still count toward the
             // 4096 capacity and are never evicted.
-            var evicted=new List<RequestIdentity>();bool room=ledger.Admit(identity.ActorId,work.Count-ledger.Count,clock(),evicted);foreach(var old in evicted)work.Remove(old);
+            var evicted=new List<RequestIdentity>();bool room=ledger.Admit(identity.ActorId,work.Count-ledger.Count,clock(),evicted);foreach(var old in evicted)RemoveWork(old);
             if(!room)return new RequestAdmission(false,"LedgerCapacity");
             var pending=work.Values.Where(w=>!Terminal(w.Result.State)).ToArray();
             if(pending.Length>=256||pending.Count(w=>w.Context.LocalPeerId==context.LocalPeerId)>=32)return new RequestAdmission(false,"PendingCapacity");
             var item=new Work{Context=context.ForRequest(identity),Envelope=new RequestEnvelope(envelope.OperationId,envelope.Protocol,envelope.WorldId,envelope.SessionId,envelope.RequestId,envelope.Payload),Entry=entry,Deadline=clock()+10,Result=new OperationResult(identity,OperationState.Queued,"Queued")};
-            work.Add(identity,item);return new RequestAdmission(true,"Queued",item.Result);
+            work.Add(identity,item);workSnapshot=null;return new RequestAdmission(true,"Queued",item.Result);
         }
         static OperationResult Unavailable(Work item,string code)=>new OperationResult(item.Result.Identity,item.Context.DecisionMade||item.Result.State==OperationState.Succeeded||item.Result.State==OperationState.RecoveryRequired?OperationState.RecoveryRequired:OperationState.Cancelled,code);
         public OperationResult Status(RequestIdentity identity){
@@ -61,7 +64,8 @@ namespace ExtraPotions.Meadworks.Crucible {
         public void Cancel(RequestIdentity identity){if(identity==null)throw new ArgumentNullException(nameof(identity));if(work.TryGetValue(identity,out var item)&&!Terminal(item.Result.State))Set(item,item.Context.DecisionMade?OperationState.RecoveryRequired:OperationState.Cancelled,"Canceled");}
         public void Drain(){
             if(stopped)return;
-            foreach(var item in work.Values.ToArray()){
+            var snapshot=SnapshotWork();
+            foreach(var item in snapshot){
                 if(Terminal(item.Result.State)||item.Result.State==OperationState.RecoveryRequired)continue;
                 try{
                     if(!item.Entry.Active||!item.Entry.Owner.IsActive){Set(item,OperationState.Cancelled,"OwnerUnavailable");continue;}

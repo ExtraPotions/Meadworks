@@ -3,7 +3,7 @@
   "product": "Crucible",
   "default": "Advanced",
   "settings": {
-    "Network/AdmissionMode": "Advanced",
+    "Network/AdmissionMode": "FileOnly",
     "Mischief/Personal": "Advanced",
     "Mischief/Economy": "Advanced",
     "Mischief/World": "Advanced",

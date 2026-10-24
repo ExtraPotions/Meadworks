@@ -163,7 +163,7 @@
     "help_setting_1_daylight_radius_scale": "Strength of the daylight bonus and darkness penalty; 0 disables.",
     "help_setting_1_weather_radius_scale": "Strength of the fog, mist and snowstorm penalty; 0 disables.",
     "help_setting_1_show_radius": "Show the current exploration radius on the HUD.",
-    "help_setting_1_show_radius_inputs": "Diagnostic only: kept in the config file; the HUD no longer draws it.",
+    "help_setting_1_show_radius_inputs": "Retained ignored preference. The saved value is preserved for compatibility; it does not show radius inputs or enable diagnostic logging.",
     "help_setting_4_enabled": "Show the clock, weather and compass HUD.",
     "help_setting_4_toggle_key": "Keyboard key to show or hide the HUD.",
     "help_setting_4_settings_key": "Keyboard key to open Cairn's compass markers window.",

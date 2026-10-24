@@ -27,7 +27,7 @@
     "rune_awakening": "Rune des Erwachens",
     "rune_awakening_desc": "Eine alte Rune aus einem früheren Inscribe: Sie wird beim Laden zur Rune des Aufstiegs.",
     "rune_recasting": "Rune der Umgießung",
-    "rune_recasting_desc": "Gießt einen ungewöhnlichen Gegenstand um: Beide Inschriften werden durch zwei neue ersetzt. Er bleibt ungewöhnlich.",
+    "rune_recasting_desc": "Gießt einen ungewöhnlichen Gegenstand um: Beide Inschriften werden durch zwei neue ersetzt. Er bleibt ungewöhnlich. Am Runentisch kannst du eine neue Inschrift auf Angriff, Verteidigung oder Nutzen ausrichten; die übrigen werden zu denselben Runenkosten normal ausgewürfelt.",
     "rune_ascension": "Rune des Aufstiegs",
     "rune_ascension_desc": "Hebt einen Gegenstand um eine Seltenheitsstufe und behält seine Inschriften: Gewöhnlich wird Ungewöhnlich mit zwei Inschriften; Ungewöhnlich wird Selten und Selten wird Episch, mit je einer weiteren. Am Runentisch wählt eine Essenz, was sie hinzufügt. Legendäre Ausrüstung gibt es nur von Bossen und Überfällen.",
     "rune_cleansing": "Rune der Reinigung",
@@ -205,6 +205,20 @@
     "enhancement_convert_no_room": "Schaffe Platz in diesem Inventar: Alte verbesserte Gegenstände und Rollen werden umgewandelt, sobald ihr Ersatz hineinpasst.",
     "enhancement_convert_dropped": "Umgewandelte Runen, die nicht in dieses Inventar passten, wurden vor deinen Füßen fallen gelassen.",
     "cfg_7_ground_glow__legendary_glint_name": "Legendäres Funkeln",
-    "cfg_7_ground_glow__legendary_glint_help": "Fallengelassene legendäre Ausrüstung zeigt zusätzlich ein kleines Funkeln in Bronze und Elfenbein am Boden. Andere Seltenheiten funkeln nie. Nur dieser Client."
+    "cfg_7_ground_glow__legendary_glint_help": "Fallengelassene legendäre Ausrüstung zeigt zusätzlich ein kleines Funkeln in Bronze und Elfenbein am Boden. Andere Seltenheiten funkeln nie. Nur dieser Client.",
+    "recast_focus_label": "Neuschmiedefokus",
+    "recast_focus_any": "Jede Kategorie",
+    "recast_focus_offense": "Angriff",
+    "recast_focus_defense": "Verteidigung",
+    "recast_focus_utility": "Nutzen",
+    "recast_side_prefix": "Präfix",
+    "recast_side_suffix": "Suffix",
+    "recast_focus_help": "Klicken, um die Kategorie für eine neue Inschrift zu wählen. Alle Inschriften werden ersetzt; die übrigen werden normal ausgewürfelt. Die Runenkosten bleiben gleich. Gibt es kein gültiges Ergebnis, wird nichts verbraucht. Deine Wahl wird auf diesem Computer gespeichert.",
+    "recast_side_help": "Klicken, um zwischen Präfix und Suffix zu wechseln. Gilt nur bei ausgewählter Kategorie. Die übrigen Inschriften werden weiterhin normal neu ausgewürfelt. Deine Wahl wird auf diesem Computer gespeichert.",
+    "cfg_8_interface_heading": "8 - Oberfläche",
+    "cfg_8_interface__recasting_focus_name": "Neuschmiedefokus",
+    "cfg_8_interface__recasting_side_name": "Neuschmiedeposition",
+    "cfg_8_interface__recasting_focus_help": "Gespeicherte Kategorie am Runentisch für eine neue Inschrift: uneingeschränkt, Angriff, Verteidigung oder Nutzen. Neuschmieden ersetzt weiterhin alle Inschriften zu denselben Runenkosten und verwendet die Regeln des Hosts. Deine Wahl wird auf diesem Computer gespeichert.",
+    "cfg_8_interface__recasting_side_help": "Gespeicherte Präfix- oder Suffixwahl für die fokussierte Inschrift. Gilt nur bei ausgewählter Neuschmiedekategorie; die übrigen Inschriften werden normal neu ausgewürfelt. Deine Wahl wird auf diesem Computer gespeichert."
   }
 }

@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- If legacy settings cannot be copied, initialization stops before saving defaults and retries on the next start. Existing settings and backups are preserved.
+
+
+- Reuse proven authority-record paths during receipt scans and direct reads. Every fresh key read, record authentication, recovery and durable prune remains in place.
+- Read small authority records without allocating the full 4 MB size limit. File bounds, authentication and durable trade/refill writes remain enforced.
+- Resolve repeated world prefabs once per morning purse-refill pass. Each trader's current rules, pending balance and durable refill commits are still checked separately.
+- 0.1.3: Add Debug-only morning refill timing for the world scan, authenticated authority reads and writes, local and cloud storage, forced flushes and cloud completion. Refill rules, durable commits and the morning trigger are unchanged.
+
 ## 0.1.2 (2026-10-22)
 
 - 0.1.2. Barter is now a MeadWorks plugin everywhere: its plugin ID is `com.meadworks.barter` (was `com.extrapotions.barter`). Almanac lists it under Meadworks, and Crucible treats it like every other MeadWorks product.

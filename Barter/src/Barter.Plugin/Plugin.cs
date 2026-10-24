@@ -32,7 +32,7 @@ namespace ExtraPotions.Barter.Runtime
     {
         public const string Guid = BarterCore.ProductId;
         public const string Name = "Barter";
-        public const string Version = "0.1.2";
+        public const string Version = "0.1.3";
         public const string Family = "Hoard";
 
         internal const string SourceModGuid = "shudnal.TradersExtended";
@@ -91,7 +91,7 @@ namespace ExtraPotions.Barter.Runtime
         {
             string directory = System.IO.Path.GetDirectoryName(Config.ConfigFilePath) ?? BepInEx.Paths.ConfigPath;
             string legacyName = BarterCore.LegacyProductId + ".cfg";
-            var result = LegacyFileMigration.Run(directory, legacyName, System.IO.Path.GetFileName(Config.ConfigFilePath));
+            var result = LegacyFileMigration.PrepareSettings(directory, legacyName, System.IO.Path.GetFileName(Config.ConfigFilePath));
             switch (result.Outcome)
             {
                 case LegacyFileOutcome.Migrated:
@@ -102,9 +102,6 @@ namespace ExtraPotions.Barter.Runtime
                     break;
                 case LegacyFileOutcome.KeptNew:
                     Log.Info(legacyName + " was left untouched because " + System.IO.Path.GetFileName(Config.ConfigFilePath) + " already exists.");
-                    break;
-                case LegacyFileOutcome.Failed:
-                    Log.Warning("Settings were not carried over from " + legacyName + " (" + result.Problem + "); Barter starts with defaults and the old file is untouched.");
                     break;
             }
         }

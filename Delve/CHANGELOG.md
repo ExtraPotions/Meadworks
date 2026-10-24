@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Reuse player dungeon lookups within each regeneration sweep. Geometry, radius and player-snapshot changes rebuild the lookup; current generator, door and resource holds are still checked for each site.
+- Reject impossible-height dungeon lookups before copying tracked site lists. Entrance, indoor occupancy, regeneration schedules and protection rules keep their existing behavior.
+- Add one Debug timing summary per regeneration check, including dawn detection, service and dungeon sweep timings, scan counts, current regeneration reports, and sidecar serialization and disk timings. Diagnostics allocate nothing when Debug logging is off. Regeneration schedules, guards, saves, and action budgets are unchanged.
+- Bump the local development version to 0.1.14.
+
 ## 0.1.13 (2026-10-21)
 
 - Requires Crucible 0.3.28 / Crucible.UI 0.3.20.

@@ -12,6 +12,8 @@
     "7 - Ground Glow/Loot Beam": "Essential",
     "4 - Drops/Wildblood Star Synergy": "FileOnly",
     "5 - Commands/Read-Only Commands For Everyone": "FileOnly",
-    "7 - Ground Glow/Glow Refresh Seconds": "FileOnly"
+    "7 - Ground Glow/Glow Refresh Seconds": "FileOnly",
+    "8 - Interface/Recasting Focus": "FileOnly",
+    "8 - Interface/Recasting Side": "FileOnly"
   }
 }

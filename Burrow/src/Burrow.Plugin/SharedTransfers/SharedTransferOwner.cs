@@ -22,6 +22,7 @@ namespace Burrow.SharedTransfers {
         readonly HashSet<Inventory> held=new HashSet<Inventory>();
         readonly HashSet<Container> blocked=new HashSet<Container>();
         readonly Dictionary<Container,uint> importedRevisions=new Dictionary<Container,uint>();
+        readonly Dictionary<Container,OwnerImportSnapshot<ZDOID>> importedImages=new Dictionary<Container,OwnerImportSnapshot<ZDOID>>();
         InventoryDecisionJournal journal;NativeBundleStore native;OwnerStore store;DurableInventoryParticipant participant;
         long world;bool disposed,fault;double nextRecoveryTick;
         [ThreadStatic]static PlanScope plan;
@@ -80,14 +81,17 @@ namespace Burrow.SharedTransfers {
                 byte[] metadata=OwnerDecisionCodec.Metadata(request,receipt);string source=OwnerDecisionCodec.Source(request);
                 // Both metadata and the complete retained migration ledger are bounded
                 // before journal admission, hence an oversized reply cannot consume items.
-                Migration(chest,new OwnerDecisionCodec.Entry{Metadata=metadata,Before=before,After=intended});
-                native.Bind(source,before,intended);
-                var admission=participant.Prepare(source,source,OwnerDecisionCodec.Fingerprint(request),before,intended,metadata);
-                if(admission!=InventoryDecision.Prepared)return OperationExecution<TransferReceipt>.Success(TransferReceipt.Denied(request,"busy"));
-                native.Hold(source,false);RefreshLocks();
-                var result=participant.Commit(source);var record=journal.Find(source);
-                if(record.State==InventoryDecision.Decided||record.State==InventoryDecision.Committed)context.MarkDecisionMade();
-                Release(record,result);RefreshLocks();return OperationExecution<TransferReceipt>.Success(result==InventoryDecision.Committed?receipt:result==InventoryDecision.Aborted?TransferReceipt.Denied(request,"aborted"):Recovery(request));
+                var entry=new OwnerDecisionCodec.Entry{Metadata=metadata,Before=before,After=intended};
+                string fingerprint=OwnerDecisionCodec.Fingerprint(request);
+                using(store.Preflight(chest,source,fingerprint,entry)){
+                    native.Bind(source,before,intended);
+                    var admission=participant.Prepare(source,source,fingerprint,before,intended,metadata);
+                    if(admission!=InventoryDecision.Prepared)return OperationExecution<TransferReceipt>.Success(TransferReceipt.Denied(request,"busy"));
+                    native.Hold(source,false);RefreshLocks();
+                    var result=participant.Commit(source);var record=journal.Find(source);
+                    if(record.State==InventoryDecision.Decided||record.State==InventoryDecision.Committed)context.MarkDecisionMade();
+                    Release(record,result);RefreshLocks();return OperationExecution<TransferReceipt>.Success(result==InventoryDecision.Committed?receipt:result==InventoryDecision.Aborted?TransferReceipt.Denied(request,"aborted"):Recovery(request));
+                }
             }catch(Exception error){plan=null;Plugin.Log.LogWarning("Burrow shared transfer retained or refused: "+error.GetType().Name);RefreshLocks();return OperationExecution<TransferReceipt>.Success(Recovery(request));}
         }
         static bool TryActor(string actorId,string sender,out Player player,out ZDO character){
@@ -132,14 +136,20 @@ namespace Burrow.SharedTransfers {
             if(existing==null)entries.Add(added);else if(!existing.Metadata.SequenceEqual(added.Metadata)||!existing.Before.SequenceEqual(added.Before)||!existing.After.SequenceEqual(added.After))throw new InvalidDataException("Migration decision conflict.");return OwnerDecisionCodec.Migration(entries);
         }
         void Import(Container chest,bool force=false){
-            uint revision=chest.m_nview.GetZDO().DataRevision;
-            if(!force&&importedRevisions.TryGetValue(chest,out var previous)&&previous==revision)return;
+            var zdo=chest.m_nview.GetZDO();uint revision=zdo.DataRevision;
+            bool imported=importedImages.TryGetValue(chest,out var image);
+            if(!force&&imported&&image.Matches(zdo,world,zdo.GetOwner(),zdo.OwnerRevision,zdo.m_uid,zdo.GetByteArray(MigrationKey),zdo.GetByteArray(NativeChestIdentity.Key))){importedRevisions[chest]=revision;return;}
+            if(!force&&!imported&&importedRevisions.TryGetValue(chest,out var previous)&&previous==revision)return;
+            importedImages.Remove(chest);
             try{foreach(var entry in Entries(chest)){
                 var value=OwnerDecisionCodec.ReadMetadata(entry.Metadata);string source=OwnerDecisionCodec.Source(value.Request),fingerprint=OwnerDecisionCodec.Fingerprint(value.Request);var record=journal.Find(source);
                 if(record==null){if(!journal.CanAdmit)throw new InvalidOperationException("Owner receipt capacity.");native.Bind(source,entry.Before,entry.After);record=journal.Prepare(source,source,fingerprint,Time.realtimeSinceStartupAsDouble+10,entry.Before,entry.After,entry.Metadata);journal.Transition(record,InventoryDecision.Decided);}
                 else if(record.Source!=source||record.Fingerprint!=fingerprint||!record.Metadata.SequenceEqual(entry.Metadata)||!record.Before.SequenceEqual(entry.Before)||!record.After.SequenceEqual(entry.After)||record.State==InventoryDecision.Aborted)throw new InvalidDataException("Local migration conflict.");
                 if(record.State==InventoryDecision.Prepared)journal.Transition(record,InventoryDecision.Decided);
-            }blocked.Remove(chest);importedRevisions[chest]=revision;}catch{blocked.Add(chest);importedRevisions[chest]=revision;throw;}
+            }blocked.Remove(chest);importedRevisions[chest]=revision;
+                // ZDO arrays may be reused by another writer. Retain copies only after the complete import succeeds.
+                importedImages[chest]=new OwnerImportSnapshot<ZDOID>(zdo,world,zdo.GetOwner(),zdo.OwnerRevision,zdo.m_uid,zdo.GetByteArray(MigrationKey),zdo.GetByteArray(NativeChestIdentity.Key));
+            }catch{blocked.Add(chest);importedRevisions[chest]=revision;throw;}
         }
         void Release(InventoryDecisionRecord record,InventoryDecision state){if(state==InventoryDecision.Committed||state==InventoryDecision.Aborted)native.Release(record.Source);else native.Hold(record.Source,true);}
         void RefreshLocks(){held.Clear();if(journal==null||native==null)return;foreach(var record in journal.Snapshot().Where(r=>r.State==InventoryDecision.Prepared||r.State==InventoryDecision.Decided||r.State==InventoryDecision.Committed&&!native.ReceiptConfirmed(r.Source)))foreach(var inventory in native.Inventories(record.Source))if(inventory!=null)held.Add(inventory);foreach(var chest in blocked)if(chest&&chest.GetInventory()!=null)held.Add(chest.GetInventory());}
@@ -149,16 +159,23 @@ namespace Burrow.SharedTransfers {
             double now=Time.realtimeSinceStartupAsDouble;if(now<nextRecoveryTick)return;nextRecoveryTick=now+0.5;
             // Losing ownership invalidates the cache even when the inventory itself
             // did not change. Reacquisition always imports the current decision blob.
-            foreach(var chest in importedRevisions.Keys.Where(c=>!Owns(c)).ToArray())importedRevisions.Remove(chest);
+            foreach(var chest in importedRevisions.Keys.Where(c=>!Owns(c)).ToArray()){importedRevisions.Remove(chest);importedImages.Remove(chest);}
             foreach(var chest in ContainerScan.All().Where(Owns))try{Import(chest);}catch(Exception error){Plugin.Log.LogWarning("Burrow shared migration held: "+error.GetType().Name);}
             try{participant.Expire();foreach(var record in journal.Snapshot()){if(record.State==InventoryDecision.Aborted)native.Release(record.Source);else if(record.State==InventoryDecision.Decided||record.State==InventoryDecision.Committed&&!native.ReceiptConfirmed(record.Source)){native.Hold(record.Source,true);Release(record,participant.Commit(record.Id));}}RefreshLocks();}
             catch(Exception error){fault=true;Plugin.Log.LogError("Burrow shared recovery retained: "+error.GetType().Name);RefreshLocks();}
         }
-        void Close(){journal?.Dispose();journal=null;native=null;store=null;participant=null;held.Clear();blocked.Clear();importedRevisions.Clear();nextRecoveryTick=0;}
+        void Close(){journal?.Dispose();journal=null;native=null;store=null;participant=null;held.Clear();blocked.Clear();importedRevisions.Clear();importedImages.Clear();nextRecoveryTick=0;}
         public void Dispose(){disposed=true;Close();}
         sealed class OwnerStore:IInventoryImageStore,IInventoryCheckpointStore,IInventoryDecisionObserver {
             readonly SharedTransferOwner owner;readonly NativeBundleStore store;
+            readonly OwnerMigrationPreflights<ZDOID> preflights=new OwnerMigrationPreflights<ZDOID>();
             internal OwnerStore(SharedTransferOwner owner,NativeBundleStore store){this.owner=owner;this.store=store;}
+            internal IDisposable Preflight(Container chest,string source,string fingerprint,OwnerDecisionCodec.Entry entry){
+                var zdo=chest.m_nview.GetZDO();
+                var baseline=new OwnerImportSnapshot<ZDOID>(zdo,owner.world,zdo.GetOwner(),zdo.OwnerRevision,zdo.m_uid,zdo.GetByteArray(MigrationKey),zdo.GetByteArray(NativeChestIdentity.Key));
+                byte[] migration=owner.Migration(chest,entry);
+                return preflights.Enter(source,fingerprint,chest,baseline,entry.Metadata,entry.Before,entry.After,migration);
+            }
             public bool IsBound(string source)=>store.IsBound(source);
             public byte[] Capture(string source)=>store.Capture(source);
             public void Apply(string source,byte[] bytes)=>store.Apply(source,bytes);
@@ -166,7 +183,9 @@ namespace Burrow.SharedTransfers {
             public bool ReceiptConfirmed(string source)=>store.ReceiptConfirmed(source);
             public void DecisionFlushed(InventoryDecisionRecord record){
                 var value=OwnerDecisionCodec.ReadMetadata(record.Metadata);var chest=Chest(value.Request.Chest);if(!Owns(chest))throw new IOException("Shared chest owner changed.");
-                byte[] blob=owner.Migration(chest,new OwnerDecisionCodec.Entry{Metadata=record.Metadata,Before=record.Before,After=record.After});chest.m_nview.GetZDO().Set(MigrationKey,blob);
+                var entry=new OwnerDecisionCodec.Entry{Metadata=record.Metadata,Before=record.Before,After=record.After};var zdo=chest.m_nview.GetZDO();
+                if(!preflights.TryUse(record.Source,record.Fingerprint,chest,zdo,owner.world,zdo.GetOwner(),zdo.OwnerRevision,zdo.m_uid,zdo.GetByteArray(MigrationKey),zdo.GetByteArray(NativeChestIdentity.Key),entry.Metadata,entry.Before,entry.After,out var blob))blob=owner.Migration(chest,entry);
+                chest.m_nview.GetZDO().Set(MigrationKey,blob);
                 if(!chest.m_nview.GetZDO().GetByteArray(MigrationKey).SequenceEqual(blob))throw new IOException("Shared chest migration save failed.");store.Hold(record.Source,true);
             }
         }

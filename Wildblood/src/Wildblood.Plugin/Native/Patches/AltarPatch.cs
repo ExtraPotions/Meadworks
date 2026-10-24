@@ -52,8 +52,11 @@ namespace ExtraPotions.Wildblood.Adopted.Patches
     [HarmonyPatch(typeof(OfferingBowl), "SpawnBoss")]
     public static class AltarLockPatch
     {
-        private static void Prefix(OfferingBowl __instance) =>
+        private static void Prefix(OfferingBowl __instance)
+        {
+            ExtraPotions.Wildblood.Runtime.NativeBossAbandon.Reserve(__instance);
             SafeCall.Run("OfferingBowl.SpawnBoss aspect", () => Lock(__instance));
+        }
 
         private static void Lock(OfferingBowl bowl)
         {

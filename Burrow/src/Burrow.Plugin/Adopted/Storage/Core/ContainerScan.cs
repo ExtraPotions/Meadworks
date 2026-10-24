@@ -114,6 +114,13 @@ namespace Burrow.Core
             return new List<Container>(loaded);
         }
 
+        internal static bool AnyTracked<T>(T state, Func<Container, T, bool> matches)
+        {
+            foreach (Container container in loaded)
+                if (container != null && matches(container, state)) return true;
+            return false;
+        }
+
         /// <summary>
         /// Claims an unowned container immediately; asks an existing owner to hand over its latest data and
         /// returns false until a later call owns it. Occupied, held and another client's vehicle storage never move.

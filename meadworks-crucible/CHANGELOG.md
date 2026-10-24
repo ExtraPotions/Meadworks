@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Verify a saved setting with a targeted native-compatible readback instead of parsing every setting a second time. Initial disk parsing, unrelated saved values, forced flush, conflict detection and atomic publication remain unchanged.
+- Reuse request-router snapshots while membership is unchanged, avoiding per-frame copies of completed request history. Reentrant requests and session changes retain their existing dispatch and recovery behavior.
+
+- Crucible 0.3.31 always requires MeadWorks clients. The retired AllowVanilla setting is hidden; existing config values remain intact, with one startup diagnostic explaining that Strict applies.
+
+- Crucible 0.3.31 adds Debug-only timings for settings edits, including staging, parsing, saving, forced flush, conflict checks and readback.
+
+- Added prepared native TestBridge scenarios for Wildblood 0.5.7 boss abandonment, exact offering refunds, multiplayer contention, group deaths and reload identities. Native execution remains pending.
+
 ## 0.3.30 (2026-10-22)
 
 - Crucible 0.3.30; Crucible.UI stays at 0.3.21.

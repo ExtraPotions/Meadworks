@@ -31,5 +31,5 @@ internal static class CreatureTargetingPatch
 [HarmonyPatch(typeof(Character),"OnDestroy")]
 internal static class CreatureTargetingDestroyPatch
 {
-    static void Prefix(Character __instance)=>CreatureTargeting.ForgetCharacter(__instance);
+    static void Prefix(Character __instance){CreatureTargeting.ForgetCharacter(__instance);CreatureSpawnBlocker.ForgetCharacter(__instance);CreatureModifierManager.ForgetCreatureCaches(__instance);}
 }

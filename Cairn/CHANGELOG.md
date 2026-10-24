@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Hide the retired Show Radius Inputs setting from settings menus. Its boolean key, local scope, saved value and Pathfinder import remain intact; it does not change the HUD or enable diagnostic logging.
+
 ## 0.1.17 (2026-10-21)
 
 - Requires Crucible 0.3.27 / Crucible.UI 0.3.20.

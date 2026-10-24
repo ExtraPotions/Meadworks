@@ -98,15 +98,22 @@ namespace ExtraPotions.Meadworks.Crucible {
         /// relays it); everybody else is refused and told why (<see cref="MeadworksBlockedOptions"/>).
         /// </summary>
         public static ConfigAmendResult Amend<T>(ConfigEntry<T> entry,string productId,ConfigScope scope,T value,string? label=null,bool serverLocked=true){
+            using var timing=EditTiming.Begin("Amend<T>");
             if(entry==null)throw new ArgumentNullException(nameof(entry));
-            var decision=MeadworksAuthority.Decide(productId,scope,serverLocked);
-            var route=ConfigAmendment.Route(Plugin.IsReady?Plugin.Session.Role:SessionRole.Menu,decision);
-            switch(route){
-                case AmendRoute.Refused:MeadworksBlockedOptions.Notify(BlockedOption.From(productId,entry.Definition.Key,decision),label);return new ConfigAmendResult(route,decision,false);
-                case AmendRoute.Own:AssignOwn(entry,value);return new ConfigAmendResult(route,decision,true);
-                case AmendRoute.Publish:return new ConfigAmendResult(route,decision,JotunnConfigBridge.Publish(()=>AssignOwn(entry,value)));
-                default:return new ConfigAmendResult(route,decision,JotunnConfigBridge.Publish(()=>entry.Value=value));
+            AuthorityDecision decision;AmendRoute route;
+            using(timing.Step(EditStep.Authority)){
+                decision=MeadworksAuthority.Decide(productId,scope,serverLocked);
+                route=ConfigAmendment.Route(Plugin.IsReady?Plugin.Session.Role:SessionRole.Menu,decision);
             }
+            timing.Describe(productId,route);
+            ConfigAmendResult result;
+            switch(route){
+                case AmendRoute.Refused:MeadworksBlockedOptions.Notify(BlockedOption.From(productId,entry.Definition.Key,decision),label);result=new ConfigAmendResult(route,decision,false);break;
+                case AmendRoute.Own:AssignOwn(entry,value);result=new ConfigAmendResult(route,decision,true);break;
+                case AmendRoute.Publish:result=new ConfigAmendResult(route,decision,JotunnConfigBridge.Publish(()=>AssignOwn(entry,value)));break;
+                default:result=new ConfigAmendResult(route,decision,JotunnConfigBridge.Publish(()=>entry.Value=value));break;
+            }
+            timing.Success();return result;
         }
 
         public static int EnsureSchema(ConfigFile config,int target,IReadOnlyList<MigrationStep>? steps=null) {

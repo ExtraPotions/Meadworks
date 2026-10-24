@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using ExtraPotions.Wildblood.Adopted.Util;
 
 namespace ExtraPotions.Wildblood.Adopted.Runtime {
-    internal enum NativeRpcOwner { EliteEffects, Tier, BossCredit, BossBoard, BossRecall, BossHints, Shriek, StealReply, CreatureFlash, CreatureDevour, CreatureBoss, CreatureThieving, CreatureClone, CreatureDecoy, CreatureBlink, CreatureShriek, CreatureBrutal, CreatureColossal, CreatureGravitic, CreaturePhantom, CreatureHowl, CMModifierEffects, CMModifierCharacter, CMKarma, LuckPlayer, TheftStatus, RaidAdmission }
+    internal enum NativeRpcOwner { EliteEffects, Tier, BossCredit, BossBoard, BossRecall, BossHints, Shriek, StealReply, CreatureFlash, CreatureDevour, CreatureBoss, CreatureThieving, CreatureClone, CreatureDecoy, CreatureBlink, CreatureShriek, CreatureBrutal, CreatureColossal, CreatureGravitic, CreaturePhantom, CreatureHowl, CMModifierEffects, CMModifierCharacter, CMKarma, LuckPlayer, TheftStatus, RaidAdmission, BossAbandon, BossRefundDelivery }
 
     /// <summary>Product-owned native registration groups; source wire names and callback algorithms stay intact.</summary>
     internal static class NativeRpcOwnership {

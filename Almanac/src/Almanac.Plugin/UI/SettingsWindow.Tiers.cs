@@ -1,5 +1,5 @@
 // Copyright (C) 2026 expDARE. SPDX-License-Identifier: GPL-3.0-or-later
-// Setting tiers: a mod's MeadWorks menu page lists its Essential settings; the full view keeps every setting.
+// Product pages exclude File-only rows; Advanced and search reveal specialist settings.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +21,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
         readonly HashSet<string> serverExpanded=new HashSet<string>(StringComparer.Ordinal);
         RowModel[] shownRows=Array.Empty<RowModel>();
 
-        /// <summary>True while the window shows a mod's MeadWorks menu page (Essential settings and actions only).</summary>
+        /// <summary>True while the window remains scoped to one mod's MeadWorks menu page.</summary>
         public bool EssentialView=>essentialView;
 
         /// <summary>Leaves the mod's page for every setting of the same mod.</summary>
@@ -61,13 +61,12 @@ namespace ExtraPotions.Almanac.Runtime.UI
             catch{return SettingTier.Advanced;}
         }
 
-        /// <summary>The mod's page shows Essential rows; the full view keeps Almanac's Advanced rules and adds File-only rows only with Advanced on.</summary>
-        bool TierShows(SettingTier tier,NativeEntry native,IndexedFile file,bool match)
+        static bool UsesTiers(string product)=>product.StartsWith("com.meadworks.",StringComparison.Ordinal)||SettingTiers.For(product).Declared;
+
+        bool TierShows(SettingTier tier,NativeEntry native,IndexedFile? file,bool match,string? product=null)
         {
-            if(essentialView)return SettingTierRules.ShowOnProductPage(tier);
-            return Presentation.Decide(native.Attributes,showAdvanced,Searching&&match,false)==Visibility.Visible
-                &&!(file.AllEntriesAdvanced&&!showAdvanced&&!(Searching&&match))
-                &&SettingTierRules.ShowInAlmanac(tier,showAdvanced);
+            return SettingsVisibility.Shows(tier,UsesTiers(product??file?.GroupKey??""),native.Attributes,
+                essentialView,showAdvanced,Searching&&match,file?.AllEntriesAdvanced==true);
         }
 
         static bool ServerFolds(NativeWriteFacts facts)

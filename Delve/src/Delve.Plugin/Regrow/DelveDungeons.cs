@@ -76,7 +76,12 @@ namespace ExtraPotions.Delve.Runtime
                     continue;
                 }
                 k.Visit();
-                if (sweeping.Contains(k.Kind)) k.Sweep();
+                if (sweeping.Contains(k.Kind))
+                {
+                    long sweepStart = DelveCheckTiming.Start(e.CheckTiming);
+                    try { k.Sweep(); }
+                    finally { e.CheckTiming?.Stage("dungeon_sweep", sweepStart, k.Kind); }
+                }
                 k.Flush();
             }
         }
@@ -163,6 +168,7 @@ namespace ExtraPotions.Delve.Runtime
             private readonly List<Vector3> otherDungeons = new List<Vector3>();
             private readonly Dictionary<(int, int, int), RecordSpot> unassigned = new Dictionary<(int, int, int), RecordSpot>();
             private readonly WelcomeMemory welcomed = new WelcomeMemory();
+            private long geometryRevision;
             private bool ready;
 
             public DungeonKind(DelveDungeons owner, KindInfo info)
@@ -203,6 +209,7 @@ namespace ExtraPotions.Delve.Runtime
 
             public void Clear()
             {
+                geometryRevision++;
                 ready = false;
                 sitesById.Clear();
                 otherDungeons.Clear();
@@ -241,7 +248,11 @@ namespace ExtraPotions.Delve.Runtime
                     int prefab = zdo.GetPrefab();
                     if (prefab == generator) AddSite(zdo);
                     else if (BossKind && prefab == door) doors.Add(zdo);
-                    else if (DelveDungeonIndex.IsGenerator(prefab)) otherDungeons.Add(zdo.GetPosition());
+                    else if (DelveDungeonIndex.IsGenerator(prefab))
+                    {
+                        otherDungeons.Add(zdo.GetPosition());
+                        geometryRevision++;
+                    }
                     else if (intactOf.ContainsKey(prefab)) things.Add(zdo);
                 }
                 if (BossKind) FindDoors(doors);
@@ -273,11 +284,13 @@ namespace ExtraPotions.Delve.Runtime
                     }
                 }
                 sitesById[zdo.m_uid] = site;
+                geometryRevision++;
                 return site;
             }
 
             private Site? SiteAt(Vector3 p)
             {
+                if (p.y < DungeonSites.InteriorHeight) return null;
                 var list = sitesById.Values.ToList();
                 var index = DungeonSites.InsideOf(V(p), list.Select(s => V(s.Position)).ToList(), otherDungeons.Select(V).ToList(), owner.Radii(info).Inside);
                 return index.HasValue ? list[index.Value] : null;
@@ -285,6 +298,7 @@ namespace ExtraPotions.Delve.Runtime
 
             private Site? EntranceAt(Vector3 p)
             {
+                if (p.y >= DungeonSites.InteriorHeight) return null;
                 var list = sitesById.Values.ToList();
                 var index = DungeonSites.EntranceOf(V(p), list.Select(s => V(s.Entrance)).ToList(), owner.Radii(info).Entrance);
                 return index.HasValue ? list[index.Value] : null;
@@ -404,6 +418,7 @@ namespace ExtraPotions.Delve.Runtime
                 var standing = new Dictionary<(int, int, int), ZDO>();
                 var doors = new List<ZDO>();
                 var bosses = new List<ZDO>();
+                long scanStart = DelveCheckTiming.Start(E.CheckTiming);
                 foreach (ZDO zdo in ZDOMan.instance.m_objectsByID.Values)
                 {
                     int prefab = zdo.GetPrefab();
@@ -416,6 +431,7 @@ namespace ExtraPotions.Delve.Runtime
                         if (!standing.TryGetValue(key, out ZDO other) || !IsWhole(other)) standing[key] = zdo; // a whole one wins
                     }
                 }
+                E.CheckTiming?.Stage("dungeon_scan", scanStart, Kind, ZDOMan.instance.m_objectsByID.Count, standing.Count);
                 foreach (ZDO thing in standing.Values) Remember(thing);
                 foreach (var spot in unassigned.Values.ToList())
                 {
@@ -426,6 +442,7 @@ namespace ExtraPotions.Delve.Runtime
                 var bossAlive = new HashSet<Site>(bosses.Select(b => SiteAt(b.GetPosition())).Where(s => s != null)!);
                 int tracked = 0, waiting = 0, deferred = 0, acted = 0;
                 var blocked = new Dictionary<GuardResult, int>();
+                SweepOccupancy<Site, DelvePlayer>? playerSites = null;
                 string? note = null;
                 foreach (var site in sitesById.Values.ToList())
                 {
@@ -434,7 +451,8 @@ namespace ExtraPotions.Delve.Runtime
                     RecordSpot bossSpot = default;
                     bool place = !BossKind || BossSpot(site, out bossSpot);
                     var missing = site.Spots.Where(kv => !(standing.TryGetValue(kv.Key, out ZDO z) && IsWhole(z))).ToList();
-                    bool occupied = Occupied(site, standing);
+                    playerSites ??= new SweepOccupancy<Site, DelvePlayer>(ProjectPlayers);
+                    bool occupied = Occupied(site, standing, playerSites.Contains(site, E.Players, geometryRevision, owner.Radii(info).Inside));
                     var outcome = DungeonRegrowRules.Decide(site.LastVisit, E.Now, clock, delay, now, BossKind, bossAlive.Contains(site), place, missing.Count, occupied);
                     if (outcome == DungeonOutcome.Regenerate && E.Settings.Get(DelveSettings.General.PlayerBaseGuard) && DelveBases.Near(site.Entrance).Any(a => a.Contains(V(site.Entrance))))
                     {
@@ -535,10 +553,21 @@ namespace ExtraPotions.Delve.Runtime
                 }
             }
 
-            /// <summary>A player up in the dungeon, or holding its generator, its door or any of its objects.</summary>
-            private bool Occupied(Site site, Dictionary<(int, int, int), ZDO> standing)
+            private HashSet<Site> ProjectPlayers(IReadOnlyList<DelvePlayer> players)
             {
-                if (E.Players.Any(p => SiteAt(p.Position) == site)) return true;
+                var occupied = new HashSet<Site>();
+                foreach (var player in players)
+                {
+                    var site = SiteAt(player.Position);
+                    if (site != null) occupied.Add(site);
+                }
+                return occupied;
+            }
+
+            /// <summary>A player up in the dungeon, or holding its generator, its door or any of its objects.</summary>
+            private bool Occupied(Site site, Dictionary<(int, int, int), ZDO> standing, bool playerInside)
+            {
+                if (playerInside) return true;
                 if (DelveWorld.HeldByPlayer(ZDOMan.instance.GetZDO(site.Generator)) || DelveWorld.HeldByPlayer(ZDOMan.instance.GetZDO(site.Door))) return true;
                 foreach (var key in site.Spots.Keys)
                     if (standing.TryGetValue(key, out ZDO zdo) && DelveWorld.HeldByPlayer(zdo)) return true;

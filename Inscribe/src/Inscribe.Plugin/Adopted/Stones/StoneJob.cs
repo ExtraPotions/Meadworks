@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Changed by expDARE, 2026: Inscribe namespace; Crucible configuration, session and lifecycle boundaries.
 using ExtraPotions.Inscribe.Adopted.Affixes;
+using ExtraPotions.Inscribe.Runes;
 using ExtraPotions.Inscribe.Adopted.Items;
 using ExtraPotions.Inscribe.Adopted.Rolling;
 using ExtraPotions.Inscribe.Adopted.Rules;
@@ -88,7 +89,7 @@ namespace ExtraPotions.Inscribe.Adopted.Stones
             new StoneJob(player, rune, target, supply);
 
         /// <summary>The same use read afresh (after a confirm dialog, the inventory or the table may have changed).</summary>
-        public StoneJob Again(Player player) => new StoneJob(player, Stone, Target, Supply) { Socket = Socket, AffixIndex = AffixIndex };
+        public StoneJob Again(Player player) => new StoneJob(player, Stone, Target, Supply) { Socket = Socket, AffixIndex = AffixIndex, Focus = Focus, FocusSide = FocusSide };
 
         /// <summary>The same use read afresh, its gem aimed at <paramref name="socket"/> (the player's pick).</summary>
         public StoneJob AtSocket(Player player, int socket) => new StoneJob(player, Stone, Target, Supply) { Socket = socket };
@@ -98,6 +99,13 @@ namespace ExtraPotions.Inscribe.Adopted.Stones
 
         /// <summary>The same use read afresh, aimed at inscription <paramref name="index"/> (the player's pick).</summary>
         public StoneJob AtAffix(Player player, int index) => new StoneJob(player, Stone, Target, Supply) { AffixIndex = index };
+
+        public RecastFocus Focus { get; private set; } = RecastFocus.Unrestricted;
+
+        public RecastSide FocusSide { get; private set; } = RecastSide.Prefix;
+
+        public StoneJob WithFocus(Player player, RecastFocus focus, RecastSide side) =>
+            new StoneJob(player, Stone, Target, Supply) { Socket = Socket, AffixIndex = AffixIndex, Focus = focus, FocusSide = side };
 
         private static Inventory? SourceOf(Inventory own, ItemDrop.ItemData stone)
         {

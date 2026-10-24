@@ -43,9 +43,11 @@ namespace ExtraPotions.Inscribe.Adopted.Rolling
         public ItemStateBuilder Builder { get; }
 
         /// <summary>Draws one affix and appends it. False (nothing changed) when the pool has no candidate.</summary>
-        public bool TryAdd()
+        public bool TryAdd() => TryAdd(null, null);
+
+        internal bool TryAdd(AffixCategory? category, AffixKind? kind)
         {
-            if (!TryDraw(out AffixRoll roll, out AffixDef def))
+            if (!TryDraw(category, kind, out AffixRoll roll, out AffixDef def))
             {
                 return false;
             }
@@ -55,11 +57,11 @@ namespace ExtraPotions.Inscribe.Adopted.Rolling
             return true;
         }
 
-        private bool TryDraw(out AffixRoll roll, out AffixDef def)
+        private bool TryDraw(AffixCategory? category, AffixKind? kind, out AffixRoll roll, out AffixDef def)
         {
             roll = default;
             def = null!;
-            Gather();
+            Gather(category, kind);
             int index = PickAffix();
             if (index < 0)
             {
@@ -104,13 +106,14 @@ namespace ExtraPotions.Inscribe.Adopted.Rolling
             into.AddRange(_candidates);
         }
 
-        private void Gather()
+        private void Gather(AffixCategory? category = null, AffixKind? kind = null)
         {
             _candidates.Clear();
             IReadOnlyList<PoolEntry> pool = _context.Rules.Affixes.Pool(_context.Class.ClassId);
             for (int i = 0; i < pool.Count; i++)
             {
-                if (IsCandidate(pool[i]))
+                if ((!category.HasValue || pool[i].Def.Category == category.Value)
+                    && (!kind.HasValue || pool[i].Def.Kind == kind.Value) && IsCandidate(pool[i]))
                 {
                     _candidates.Add(pool[i]);
                 }

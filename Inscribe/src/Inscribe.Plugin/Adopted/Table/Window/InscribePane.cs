@@ -19,6 +19,8 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
                 choice.Item);
             PaneText.Body(parts, choice.Item != null ? InscribeText.Describe(choice) : Words.Localize("$ecf_table_no_gear_desc"));
             PaneText.Labels(parts, "$ecf_table_label_rune", "$ecf_table_label_essence");
+            if (choice.Rune == "recasting" && parts.EssenceLabel != null)
+                parts.EssenceLabel.text = Runtime.InscribeText.Text("recast_focus_label");
             FillRunes(view, choice);
             FillEssences(view, choice);
             FillPills(parts, choice);
@@ -76,6 +78,12 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
 
         private static void FillEssences(TableView view, InscribeChoice choice)
         {
+            if (choice.Rune == "recasting")
+            {
+                view.Parts.Essences?.Show(false);
+                view.Parts.Recasting?.Show(true);
+                return;
+            }
             SlotRow? row = view.Parts.Essences;
             if (row == null)
             {

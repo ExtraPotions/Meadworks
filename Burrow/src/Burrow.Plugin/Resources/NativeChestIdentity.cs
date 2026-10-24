@@ -8,7 +8,7 @@ using Burrow.Core;
 namespace Burrow.Resources {
     /// <summary>Only native owners write identity. Lookup never claims ownership.</summary>
     internal static class NativeChestIdentity {
-        const string Key="burrow.chest-identity.v1";
+        internal const string Key="burrow.chest-identity.v1";
         static readonly Dictionary<string,List<ZDO>> index=new Dictionary<string,List<ZDO>>(StringComparer.Ordinal);
         static long indexedWorld;static double rebuildAt;
         // Clients receive world identity from the authenticated Core handshake;

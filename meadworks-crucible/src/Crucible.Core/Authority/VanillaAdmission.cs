@@ -8,7 +8,7 @@ namespace ExtraPotions.Meadworks.Crucible {
     public enum AdmissionMode {
         /// <summary>Every client must run Crucible and the required products (the shipped behavior).</summary>
         Strict,
-        /// <summary>The admin opts in to vanilla/console clients; effective only for a compatible feature set.</summary>
+        /// <summary>Retained for legacy configuration parsing. The effective admission policy is Strict.</summary>
         AllowVanilla,
     }
 
@@ -46,21 +46,17 @@ namespace ExtraPotions.Meadworks.Crucible {
     public sealed class AdmissionDecision {
         public AdmissionMode Requested { get; }
         public AdmissionMode Effective { get; }
-        /// <summary>Why AllowVanilla is not in effect: one line per product or Jotunn entry that must be disabled.</summary>
+        /// <summary>Why a retained legacy request is not supported.</summary>
         public IReadOnlyList<string> Reasons { get; }
         public bool AdmitsVanilla=>Effective==AdmissionMode.AllowVanilla;
         internal AdmissionDecision(AdmissionMode requested,AdmissionMode effective,IReadOnlyList<string> reasons){Requested=requested;Effective=effective;Reasons=reasons;}
         /// <summary>One line for the server log.</summary>
-        public string Summary=>Requested==AdmissionMode.Strict?"Admission mode Strict: every client must run Meadworks."
-            :Effective==AdmissionMode.AllowVanilla?"Admission mode AllowVanilla: clients without Meadworks may join and receive server-side features."
-            :"Admission mode AllowVanilla requested, staying Strict until these are disabled or declare vanilla support: "+string.Join(" | ",Reasons);
+        public string Summary=>Requested==AdmissionMode.Strict?"Admission mode Strict: every client must run Meadworks.":AdmissionPolicy.RetiredModeNotice;
     }
 
     /// <summary>
-    /// Optional server-only mode (decision 2026-10-08; user policy: refuse vanilla admission while incompatible
-    /// content/features are active, until the admin selects a compatible feature set; saves and items are untouched).
-    /// AllowVanilla is effective only when every installed product is server-only-capable or mixed and no installed
-    /// mod's Jotunn metadata requires the mod on clients; otherwise the server stays Strict and names each blocker.
+    /// Every client must run Meadworks. Legacy admission values and capability identifiers remain readable,
+    /// but product declarations and Jotunn metadata cannot enable unmodded-client admission.
     /// </summary>
     public static class AdmissionPolicy {
         public const string VanillaSupportCapability="meadworks.admission.vanillasupport";
@@ -69,6 +65,7 @@ namespace ExtraPotions.Meadworks.Crucible {
         public static readonly Version CapabilityVersion=new Version(1,0);
         /// <summary>Default of <c>Network.AdmissionMode</c>: every client must run Meadworks.</summary>
         public const AdmissionMode DefaultMode=AdmissionMode.Strict;
+        public const string RetiredModeNotice="Network.AdmissionMode AllowVanilla is no longer supported; Strict applies and every client must run Meadworks. The saved value is retained.";
         /// <summary>
         /// Literal text for the native center message before a vanilla client is refused. The server cannot read a vanilla
         /// client's language, so one line carries English, Spanish, French, German, Russian, Chinese and Korean.
@@ -98,19 +95,9 @@ namespace ExtraPotions.Meadworks.Crucible {
             var list=(products??throw new ArgumentNullException(nameof(products))).ToList();
             if(list.Any(p=>p==null))throw new ArgumentException("Null product.",nameof(products));
             if(list.Select(p=>p.Id).Distinct(StringComparer.Ordinal).Count()!=list.Count)throw new ArgumentException("Duplicate product id.",nameof(products));
-            var blockers=(jotunnBlockers??throw new ArgumentNullException(nameof(jotunnBlockers))).Where(b=>!string.IsNullOrWhiteSpace(b)).Select(b=>b.Trim()).Distinct(StringComparer.Ordinal).OrderBy(b=>b,StringComparer.Ordinal).ToList();
+            if(jotunnBlockers==null)throw new ArgumentNullException(nameof(jotunnBlockers));
             if(requested==AdmissionMode.Strict)return new AdmissionDecision(requested,AdmissionMode.Strict,Array.Empty<string>());
-            var reasons=new List<string>();
-            foreach(var p in list.OrderBy(p=>p.Id,StringComparer.Ordinal)){
-                if(SupportOf(p)!=VanillaSupport.ClientRequired)continue;
-                reasons.Add(p.Declared==null
-                    ?p.Name+" has not declared vanilla support; disable it or keep Strict."
-                    :p.Name+" requires the mod on every client; disable it or keep Strict.");
-            }
-            foreach(var b in blockers)reasons.Add("Jotunn: "+b+" requires the mod on every client.");
-            return reasons.Count==0
-                ?new AdmissionDecision(requested,AdmissionMode.AllowVanilla,Array.Empty<string>())
-                :new AdmissionDecision(requested,AdmissionMode.Strict,reasons.AsReadOnly());
+            return new AdmissionDecision(requested,AdmissionMode.Strict,Array.AsReadOnly(new[]{RetiredModeNotice}));
         }
 
         /// <summary>Strict refuses a peer that never answered the greeting (bounded missing-handshake handling).</summary>
@@ -120,7 +107,7 @@ namespace ExtraPotions.Meadworks.Crucible {
         /// <summary>
         /// Peer-info gate: every modded client (any MeadWorks version, since every product needs Jotunn) sends Jotunn's
         /// mod list on that connection before its peer info, so a peer that sent none runs no mods. Strict refuses it
-        /// there, before it spawns; AllowVanilla lets it continue to the greeting. Version differences are not judged
+        /// there, before it spawns. Version differences are not judged
         /// here: older MeadWorks clients continue to the existing greeting and Charter checks.
         /// </summary>
         public static HandshakePeerAction ForPeerInfo(AdmissionDecision decision,bool sentModList)=>

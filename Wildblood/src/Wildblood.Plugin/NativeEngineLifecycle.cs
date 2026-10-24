@@ -64,10 +64,14 @@ internal static class NativeEngineLifecycle
             generation = session.Generation;
         }
         Run("loaded crossbow lifecycle", LoadedWeapons.Tick);
+        Run("summon payment recovery", NativeSummonPayment.Tick);
         bool ready = Plugin.NativeRulesReady && NativeModifierRules.Ready && session.AuthorityReady
             && session.WorldId != 0 && ZNet.instance != null && ZNet.m_world != null
             && ZNet.instance.GetWorldUID() == session.WorldId;
+        Run("boss tamed pressure", NativeTamedPressure.Tick);
         if (ready) Run("boss progression settlement", BossProgress.Tick);
+        if (ready) Run("abandoned summoned bosses", NativeBossAbandon.Tick);
+        if (ready) Run("summoned offering delivery", NativeSummonDelivery.Tick);
         bool nextModifiers = ready && WildbloodModules.Active(WildbloodModule.Traits);
         bool nextPressure = ready && WildbloodModules.Active(WildbloodModule.Pressure);
         bool nextAttributed = StorageManager.CurrentMode == LuckMode.Attributed;
@@ -134,6 +138,9 @@ internal static class NativeEngineLifecycle
 
     static void ResetWorld()
     {
+        NativeTamedPressure.Reset();
+        NativeBossAbandon.Reset();
+        NativeSummonDelivery.Reset();
         LoadedWeapons.Reset();
         Run("AI targeting reset", CreatureTargeting.ResetRuntimeState);
         Adopted.Horde.WildSpawn.End(false);

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Avoid chest identity resolution during release retries when no loaded chest can hold that transaction. Matching or uncertain holds retain the existing identity, ownership and release checks.
+- Reuse an admitted write's validated migration image at its durable decision flush when the chest, ownership, history and entry still match. Recovery, reentrant scope changes and changed data retain full validation.
+- Reuse a successfully validated owner migration image when only unrelated chest data changes. New migration or identity bytes, ownership changes and forced request validation still require a full import.
+- Reuse validated shared-transfer history instead of decoding and hashing completed transfers every frame. Pending transfers still reconcile, and saved history is validated again when opened.
+
 ## 0.3.25 (2026-10-21)
 
 - Requires Crucible 0.3.27 / Crucible.UI 0.3.20.

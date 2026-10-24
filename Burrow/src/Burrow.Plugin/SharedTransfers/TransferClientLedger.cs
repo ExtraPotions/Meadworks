@@ -29,6 +29,7 @@ namespace Burrow.SharedTransfers {
     }
     internal sealed class TransferClientLedger:IDisposable {
         readonly InventoryDecisionJournal intents,outcomes,debits,settlements;
+        IReadOnlyList<TransferClientIntent> all=Array.Empty<TransferClientIntent>();
         internal TransferClientLedger(string directory){
             try{
                 intents=new InventoryDecisionJournal(Path.Combine(directory,"intent.bin"));
@@ -40,14 +41,25 @@ namespace Burrow.SharedTransfers {
                 // ordinary reservation restart semantics abort Prepared holds.
                 foreach(var journal in new[]{debits,settlements})foreach(var record in journal.Snapshot())
                     if(record.State==InventoryDecision.Prepared)journal.Transition(record,InventoryDecision.Decided);
+                all=Array.AsReadOnly(intents.Snapshot().Select(record=>new TransferClientIntent(record)).ToArray());
                 foreach(var intent in All){
                     if(intent.Record.State==InventoryDecision.Aborted)throw new InvalidDataException("Requester intent was aborted.");
                     if(intent.Record.State==InventoryDecision.Committed&&Settlement(intent)==null)throw new InvalidDataException("Requester settlement missing.");
                 }
             }catch{Dispose();throw;}
         }
-        internal IReadOnlyList<TransferClientIntent> All=>intents.Snapshot().Select(r=>new TransferClientIntent(r)).ToArray();
-        internal IReadOnlyList<TransferClientIntent> Incomplete=>All.Where(i=>i.Record.State!=InventoryDecision.Committed).ToArray();
+        internal IReadOnlyList<TransferClientIntent> All=>all;
+        internal IReadOnlyList<TransferClientIntent> Incomplete {
+            get {
+                List<TransferClientIntent>? pending=null;
+                for(int index=0;index<all.Count;index++) {
+                    var intent=all[index];
+                    if(intent.Record.State==InventoryDecision.Committed)continue;
+                    (pending??=new List<TransferClientIntent>()).Add(intent);
+                }
+                return pending==null?Array.Empty<TransferClientIntent>():pending.AsReadOnly();
+            }
+        }
         internal bool CanAdmit=>intents.CanAdmit&&outcomes.CanAdmit&&debits.CanAdmit&&settlements.CanAdmit&&Incomplete.Count==0;
         internal TransferClientIntent Admit(TransferRequest request,byte[] before,byte[] escrow,int targetX,int targetY){
             if(!CanAdmit)throw new InvalidOperationException("Requester already holds inventory or ledger is full.");
@@ -58,7 +70,13 @@ namespace Burrow.SharedTransfers {
                 metadata=stream.ToArray();
             }
             if(metadata.Length>TransferWire.Maximum)throw new InvalidDataException("Requester intent exceeds bound.");
-            return new TransferClientIntent(intents.Prepare(request.Root,request.Root,TransferWire.Hash(frozen),0,before,escrow,metadata));
+            var admitted=new TransferClientIntent(intents.Prepare(request.Root,request.Root,TransferWire.Hash(frozen),0,before,escrow,metadata));
+            // Publish a new snapshot: a receipt callback may admit while Tick still enumerates the previous history.
+            var next=new TransferClientIntent[all.Count+1];
+            for(int index=0;index<all.Count;index++)next[index]=all[index];
+            next[all.Count]=admitted;
+            all=Array.AsReadOnly(next);
+            return admitted;
         }
         internal bool HasOutcome(TransferClientIntent intent)=>outcomes.Find(intent.Root)!=null;
         internal TransferReceipt Outcome(TransferClientIntent intent){

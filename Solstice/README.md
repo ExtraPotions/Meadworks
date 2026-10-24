@@ -2,7 +2,7 @@
 
 Four seasons for Valheim: spring, summer, fall and winter follow the world calendar and change how the world works.
 
-Version 0.1.3. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.4. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -43,8 +43,16 @@ Version 0.1.3. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CH
 ## Multiplayer
 
 - Required on all peers: install it on the server and on every client, same major.minor version. The server saves the season with the world and clients read it. Until that arrives, a client does not apply a season of its own.
-- Joining a server without Meadworks: Crucible waits for the server's reply (10 seconds by default), then treats it as a vanilla server; Solstice turns off for that session. It also turns off on a Meadworks server that does not run Solstice.
-- Players without Meadworks (vanilla clients) cannot join a server that runs Meadworks yet: Crucible is required on every peer.
+- Joining a server without Meadworks: Crucible waits for its server Hello, then treats a server that does not reply as vanilla; Solstice turns off for that session. The wait is Crucible's local `Authority / VanillaServerTimeoutSeconds` setting, 10 seconds by default. It also turns off on a Meadworks server that does not run Solstice. The server's separate 60-second peer-answer window is for clients joining a Meadworks host.
+- Players without Meadworks (vanilla clients) cannot join a server that runs Meadworks: Crucible is required on every peer.
+
+## Upgrading from 0.1.2 or earlier
+
+Solstice's config owner changed from `com.extrapotions.solstice` to `com.meadworks.solstice` in 0.1.3. The first start carries over the settings file and seasons-import marker when their current files do not already exist. Existing current files take priority, and old files remain recoverable.
+
+Per-cheat player permissions are stored separately by Crucible under `Mischief / Players May Use`. Each entry includes the config owner, section and key. The old Season Override grant is `com.extrapotions.solstice|Cheats.Season Override`; the current entry is `com.meadworks.solstice|Cheats.Season Override`. Settings-file migration does not migrate this permission list, and an old-owner entry does not grant the new-owner cheat.
+
+After backing up the host/server settings, an administrator can review Season Override's player permission in the MeadWorks menus and explicitly allow the current entry if intended. Preserve the old records and unrelated grants while reviewing them. Category permissions and other cheats retain their existing policy; the rename does not automatically broaden access.
 
 ## Replaces / compatibility
 

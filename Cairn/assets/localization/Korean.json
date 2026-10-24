@@ -163,7 +163,7 @@
     "help_setting_1_daylight_radius_scale": "일광 보너스와 어둠 불이익의 강도입니다. 0이면 해제합니다.",
     "help_setting_1_weather_radius_scale": "안개와 눈보라 불이익의 강도입니다. 0이면 해제합니다.",
     "help_setting_1_show_radius": "현재 탐험 반경을 HUD에 표시합니다.",
-    "help_setting_1_show_radius_inputs": "진단 전용: 설정 파일에 남아 있지만 HUD에는 더 이상 표시되지 않습니다.",
+    "help_setting_1_show_radius_inputs": "호환성을 위해 보존되는 이전 설정으로, 효과는 없습니다. 저장된 값은 유지되며 반경 계산값을 표시하거나 진단 로그를 활성화하지 않습니다.",
     "help_setting_4_enabled": "시계, 날씨와 나침반 HUD를 표시합니다.",
     "help_setting_4_toggle_key": "HUD를 표시하거나 숨기는 키입니다.",
     "help_setting_4_settings_key": "Cairn의 나침반 표식 창을 여는 키보드 키입니다.",

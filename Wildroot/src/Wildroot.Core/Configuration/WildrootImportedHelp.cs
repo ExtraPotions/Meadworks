@@ -239,6 +239,6 @@ namespace ExtraPotions.Wildroot {
   };
   public static IEnumerable<string> Keys=>descriptions.Keys;
   public static string? Description(string id)=>descriptions.TryGetValue(id,out var text)?text:null;
-  public static bool IsInternal(string id)=>id is "Planting.EnableDebugMessages" or "Catalog.EnableDebugMessages" or "Catalog.EnableLocalization" or "Catalog.Language";
+  public static bool IsInternal(string id)=>id is "Planting.EnableDebugMessages" or "Catalog.EnableDebugMessages" or "Catalog.EnableLocalization" or "Catalog.Language" or "Farm.ToggleKey";
  }
 }

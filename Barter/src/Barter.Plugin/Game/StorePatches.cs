@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using ExtraPotions.Barter.Config;
 using ExtraPotions.Barter.Currency;
+using ExtraPotions.Barter.Trading;
+using ExtraPotions.Meadworks.Crucible;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
@@ -25,14 +27,30 @@ namespace ExtraPotions.Barter.Runtime
         {
             if (!Plugin.Active || ZNet.instance == null || !ZNet.instance.IsServer() || !IsMorning(oldDayFraction, newDayFraction))
                 return;
+            bool timing = Plugin.Log != null && Plugin.Log.IsEnabled(LogSeverity.Debug);
+            int frame = timing ? Time.frameCount : 0;
+            bool completed = false;
+            if (timing) RefillTiming.Begin();
             try
             {
                 if (Purses.Refill() && ZRoutedRpc.instance != null)
                     ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.Everybody, "ShowMessage", (int)MessageHud.MessageType.TopLeft, BarterText.Token("purse_refilled"));
+                completed = true;
             }
             catch (Exception error)
             {
                 Plugin.Log?.Warning("Purse refill failed: " + error.GetType().Name + ": " + error.Message);
+            }
+            finally
+            {
+                if (timing)
+                {
+                    RefillTiming.Result cost = RefillTiming.End();
+                    // Diagnostics must not let a failing log listener escape the morning hook.
+                    try {
+                        Plugin.Log.Debug(FormattableString.Invariant($"stall-timing event=morning-refill frame={frame} thread={System.Threading.Thread.CurrentThread.ManagedThreadId} old_fraction={oldDayFraction:R} new_fraction={newDayFraction:R} day={cost.Day} backend={ZNet.World?.m_fileSource} completed={completed} world_zdos={ZDOMan.instance?.m_objectsByID.Count ?? 0} scanned={cost.Scanned} traders={cost.Traders} refilled={cost.Refilled} frequency={System.Diagnostics.Stopwatch.Frequency} total_ticks={cost.TotalTicks} scan_and_rules_ticks={cost.TotalTicks - cost.AuthorityRead.Ticks - cost.AuthorityWrite.Ticks} auth_read_count={cost.AuthorityRead.Count} auth_read_ticks={cost.AuthorityRead.Ticks} auth_write_count={cost.AuthorityWrite.Count} auth_write_ticks={cost.AuthorityWrite.Ticks} local_read_count={cost.LocalRead.Count} local_read_ticks={cost.LocalRead.Ticks} local_write_count={cost.LocalWrite.Count} local_write_ticks={cost.LocalWrite.Ticks} cloud_read_count={cost.CloudRead.Count} cloud_read_ticks={cost.CloudRead.Ticks} cloud_write_count={cost.CloudWrite.Count} cloud_write_ticks={cost.CloudWrite.Ticks} promote_count={cost.Promote.Count} promote_ticks={cost.Promote.Ticks} flush_count={cost.Flush.Count} flush_ticks={cost.Flush.Ticks} cloud_finish_count={cost.CloudFinish.Count} cloud_finish_ticks={cost.CloudFinish.Ticks}"));
+                    } catch { }
+                }
             }
         }
     }

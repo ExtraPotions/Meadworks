@@ -14,11 +14,12 @@ namespace ExtraPotions.Delve.Engine
         public const string ChestFirstDay = "delve.chest.first_day";
         public const string ChestLastBy = "delve.chest.last_by";
         public const string ChestLastDay = "delve.chest.last_day";
+        public const string FullResetRetry = "delve.fullreset.retry";
 
         /// <summary>The fixed keys; per-kind keys come from <see cref="Spots"/>, <see cref="VisitDay"/> and <see cref="VisitUtc"/>.</summary>
         public static IReadOnlyList<string> Fixed { get; } = Array.AsReadOnly(new[]
         {
-            ChestSinceDay, ChestSinceUtc, ChestFirstBy, ChestFirstDay, ChestLastBy, ChestLastDay,
+            ChestSinceDay, ChestSinceUtc, ChestFirstBy, ChestFirstDay, ChestLastBy, ChestLastDay, FullResetRetry,
         });
 
         private static string Stem(DelveKind kind) => DelveCore.ZdoPrefix + kind.ToString().ToLowerInvariant();

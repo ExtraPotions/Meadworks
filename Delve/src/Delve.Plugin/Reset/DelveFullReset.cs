@@ -25,6 +25,7 @@ namespace ExtraPotions.Delve.Runtime
         private const float DefaultEntrance = 30f;
         private static readonly int visitDay = DelveKeys.VisitDay(DelveKind.FullReset).GetStableHashCode();
         private static readonly int visitUtc = DelveKeys.VisitUtc(DelveKind.FullReset).GetStableHashCode();
+        private static readonly int forcedRetry = DelveKeys.FullResetRetry.GetStableHashCode();
         private static readonly int tombstone = "Player_tombstone".GetStableHashCode();
         private static readonly int player = "Player".GetStableHashCode();
         private static readonly int queen = KindCatalog.Citadel.Boss.GetStableHashCode();
@@ -136,7 +137,7 @@ namespace ExtraPotions.Delve.Runtime
                     || DelveDungeonIndex.NameOf(native.GetPrefab()) != name || DelveDungeonIndex.ModeOf(name) != DungeonMode.Full) continue;
                 bool pending = requests.TryGetValue(native.m_uid, out var request);
                 yield return new DungeonSiteReport(native.m_uid.ToString(), DelveKind.FullReset, name, V(native.GetPosition()),
-                    clock, delay, LastVisit(native), now, e.RegenerateNow(DelveKind.FullReset) || pending && request!.SkipDelay,
+                    clock, delay, LastVisit(native), now, e.RegenerateNow(DelveKind.FullReset) || native.GetBool(forcedRetry) || pending && request!.SkipDelay,
                     FullResetRules.EffectiveDryRun(e.DryRun(DelveKind.FullReset)), pending);
             }
         }
@@ -153,7 +154,7 @@ namespace ExtraPotions.Delve.Runtime
             var sites = FullSites().ToList();
             Visit(e, sites);
             bool scheduled = sweeping.Contains(DelveKind.FullReset);
-            if (scheduled || exact.Count > 0) Sweep(e, sites, exact, scheduled);
+            if (scheduled || exact.Count > 0 || sites.Any(site => site.Zdo.GetBool(forcedRetry))) Sweep(e, sites, exact, scheduled);
             Flush();
         }
 
@@ -212,15 +213,16 @@ namespace ExtraPotions.Delve.Runtime
             foreach (var site in sites)
             {
                 var generator = site.Zdo;
+                bool retry = generator.GetBool(forcedRetry);
                 bool requested = exact.TryGetValue(generator.m_uid, out var request);
-                if (!scheduled && !requested) continue;
+                if (!scheduled && !requested && !retry) continue;
                 if (requested && !RequestCurrent(generator.m_uid, request!))
                 {
                     e.Record(DelveKind.FullReset, "site request " + generator.m_uid + " refused before guard evaluation; no retry queued", false);
                     continue;
                 }
                 tracked++;
-                bool now = globalNow || requested && request!.SkipDelay;
+                bool now = globalNow || retry || requested && request!.SkipDelay;
                 var box = InteriorOf(generator);
                 var objects = DelveWorld.ObjectsNear(generator.GetPosition(), Math.Max(box.Max.X - box.Min.X, box.Max.Z - box.Min.Z) / 2f)
                     .Where(z => box.Contains(V(z.GetPosition()))).ToList();
@@ -229,6 +231,7 @@ namespace ExtraPotions.Delve.Runtime
                 bool built = objects.Any(z => z.GetPrefab() != tombstone && z.GetLong(ZDOVars.s_creator) != 0L);
                 bool inBase = baseGuard && DelveBases.Near(generator.GetPosition()).Any(a => a.Contains(V(generator.GetPosition())));
                 var outcome = FullResetRules.Decide(LastVisit(generator), e.Now, clock, delay, now, playerInside, tomb, built, clearance, inBase);
+                if (retry && outcome != FullResetOutcome.Reset) deferred++;
                 if (requested && outcome != FullResetOutcome.Reset)
                     e.Record(DelveKind.FullReset, "site request " + generator.m_uid + " not reset: " + outcome + "; no retry queued", false);
                 switch (outcome)
@@ -249,6 +252,8 @@ namespace ExtraPotions.Delve.Runtime
                 if (e.Budget <= 0)
                 {
                     deferred++;
+                    if (scheduled && globalNow && !dryRun)
+                        generator.Set(forcedRetry, true);
                     if (requested) e.Record(DelveKind.FullReset, "site request " + generator.m_uid + " not reset: action budget; no retry queued", false);
                     continue;
                 }
@@ -258,7 +263,8 @@ namespace ExtraPotions.Delve.Runtime
                 Vector3 at = generator.GetPosition();
                 if (dryRun)
                 {
-                    SetVisit(generator, e.Now);
+                    if (retry) deferred++;
+                    else SetVisit(generator, e.Now);
                     e.Record(DelveKind.FullReset, "wiped " + wipe.Count + " objects in " + site.Name + " at (" + at.x.ToString("0") + ", " + at.z.ToString("0") + ") and generated it again"
                         + (now ? " (regenerate now)" : ""), true);
                     continue;
@@ -270,7 +276,13 @@ namespace ExtraPotions.Delve.Runtime
                     RemoveIds(created);
                     e.Record(DelveKind.FullReset, "left " + site.Name + " at (" + at.x.ToString("0") + ", " + at.z.ToString("0")
                         + ") in place; generation failed (see the log)" + (now ? " (regenerate now)" : ""), false);
-                    if (scheduled) e.NoteClaimFailure(DelveKind.FullReset);
+                    if (scheduled)
+                    {
+                        deferred++;
+                        if (globalNow)
+                            generator.Set(forcedRetry, true);
+                        e.NoteClaimFailure(DelveKind.FullReset);
+                    }
                     continue;
                 }
                 if (commit.RemoveOld)
@@ -283,7 +295,8 @@ namespace ExtraPotions.Delve.Runtime
                     var previous = ZDOMan.instance.GetZDO(generator.m_uid);
                     if (previous != null && previous.m_uid != fresh!.m_uid) RemoveOne(previous);
                 }
-                pendingVisits[fresh!.m_uid] = e.Now;
+                fresh!.Set(forcedRetry, false);
+                pendingVisits[fresh.m_uid] = e.Now;
                 string citadel = Citadel(e, site.Name, fresh, box, new HashSet<ZDOID>(wipe.Select(z => z.m_uid)));
                 e.Record(DelveKind.FullReset, "wiped " + wipe.Count + " objects in " + site.Name + " at (" + at.x.ToString("0") + ", " + at.z.ToString("0") + ") and "
                     + "generated it again" + citadel + (now ? " (regenerate now)" : ""), false);

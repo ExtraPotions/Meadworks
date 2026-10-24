@@ -73,10 +73,18 @@ namespace ExtraPotions.Almanac.Runtime.UI
                 var file=discovery.Index.Find(entry.ConfigFile.ConfigFilePath);
                 var group=discovery.Index.Groups.FirstOrDefault(item=>item.Files.Any(current=>current.Path==file?.Path));
                 if(group==null||!discovery.IsPluginBrowsable(group.Key)||!discovery.Entries(file!.Path).Any(current=>ReferenceEquals(current,entry)))return false;
-                var native=new NativeEntry(entry);var facts=Facts(entry);string reason=Locked(native,facts);
-                string label=Presentation.DisplayName(native.Attributes,entry.Definition.Key);
-                bool matches=Matches(group.DisplayName+" "+group.Key+" "+entry.Definition.Section+" "+entry.Definition.Key+" "+label+" "+native.Text()+" "+(native.Attributes.Description??entry.Description.Description)+" "+reason);
-                if(!matches||Hidden(entry)||native.Attributes.Browsable==false||!InProductScope(group)||!TierShows(Tier(group,entry),native,file,matches))return false;
+                return MatchesKnownEntry(group,file!,new NativeEntry(entry));
+            }
+            catch{return false;}
+        }
+        bool MatchesKnownEntry(IndexGroup group,IndexedFile file,NativeEntry native)
+        {
+            try
+            {
+                var entry=native.Entry;var facts=Facts(entry);string reason=Locked(native,facts);
+                var display=EntryPresentation.Resolve(native,presentationLanguage,text);
+                bool matches=Matches(group.DisplayName+" "+group.Key+" "+entry.Definition.Section+" "+entry.Definition.Key+" "+display.Label+" "+display.Section+" "+display.Help+" "+native.Text()+" "+reason);
+                if(!matches||!discovery.IsPluginBrowsable(group.Key)||Hidden(entry)||native.Attributes.Browsable==false||!InProductScope(group)||!TierShows(Tier(group,entry),native,file,matches))return false;
                 bool changed=native.RawSerialized()!=TomlTypeConverter.ConvertToString(Presentation.ResetTarget(native.Attributes,entry.DefaultValue),entry.SettingType);
                 return PassFilters(native,facts,changed,reason,group);
             }

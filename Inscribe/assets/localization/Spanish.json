@@ -27,7 +27,7 @@
     "rune_awakening": "Runa del despertar",
     "rune_awakening_desc": "Una runa antigua de un Inscribe anterior: se convierte en una Runa de ascensión en cuanto se carga.",
     "rune_recasting": "Runa de refundición",
-    "rune_recasting_desc": "Refunde un objeto Poco común: sus dos inscripciones se sustituyen por dos nuevas. Sigue siendo Poco común.",
+    "rune_recasting_desc": "Refunde un objeto Poco común: sus dos inscripciones se sustituyen por dos nuevas. Sigue siendo Poco común. En la mesa de runas puedes enfocar una nueva inscripción en ataque, defensa o utilidad; las demás se generan normalmente al mismo coste en runas.",
     "rune_ascension": "Runa de ascensión",
     "rune_ascension_desc": "Eleva un objeto un grado de rareza y conserva sus inscripciones: Común pasa a Poco común con dos inscripciones; Poco común pasa a Raro y Raro a Épico, con una más cada vez. En la Mesa de runas, una esencia elige lo que añade. Lo Legendario solo viene de jefes e incursiones.",
     "rune_cleansing": "Runa purificadora",
@@ -205,6 +205,20 @@
     "enhancement_convert_no_room": "Haz sitio en este inventario: los objetos mejorados y los pergaminos antiguos se convierten cuando cabe lo que los sustituye.",
     "enhancement_convert_dropped": "Las runas convertidas que no cabían en este inventario se dejaron caer a tus pies.",
     "cfg_7_ground_glow__legendary_glint_name": "Destello legendario",
-    "cfg_7_ground_glow__legendary_glint_help": "El equipo Legendario que cae también muestra un pequeño destello bronce y marfil en el suelo. Las demás rarezas nunca destellan. Solo este cliente."
+    "cfg_7_ground_glow__legendary_glint_help": "El equipo Legendario que cae también muestra un pequeño destello bronce y marfil en el suelo. Las demás rarezas nunca destellan. Solo este cliente.",
+    "recast_focus_label": "Enfoque de reforja",
+    "recast_focus_any": "Cualquier categoría",
+    "recast_focus_offense": "Ataque",
+    "recast_focus_defense": "Defensa",
+    "recast_focus_utility": "Utilidad",
+    "recast_side_prefix": "Prefijo",
+    "recast_side_suffix": "Sufijo",
+    "recast_focus_help": "Haz clic para elegir la categoría de una nueva inscripción. Todas se reemplazan; las demás se generan normalmente. El coste en runas no cambia. Si no hay un resultado válido, no se gasta nada. Tu elección se guarda en este equipo.",
+    "recast_side_help": "Haz clic para alternar entre prefijo y sufijo. Solo se aplica cuando se elige una categoría. Las demás inscripciones se vuelven a generar normalmente. Tu elección se guarda en este equipo.",
+    "cfg_8_interface_heading": "8 - Interfaz",
+    "cfg_8_interface__recasting_focus_name": "Enfoque de reforja",
+    "cfg_8_interface__recasting_side_name": "Posición de reforja",
+    "cfg_8_interface__recasting_focus_help": "Categoría guardada de la mesa de runas para una nueva inscripción: sin restricción, ataque, defensa o utilidad. La reforja sigue reemplazando todas las inscripciones al mismo coste en runas y usa las reglas del anfitrión. Tu elección se guarda en este equipo.",
+    "cfg_8_interface__recasting_side_help": "Elección guardada de prefijo o sufijo para la inscripción enfocada. Solo se aplica si se elige una categoría de reforja; las demás inscripciones se generan normalmente. Tu elección se guarda en este equipo."
   }
 }

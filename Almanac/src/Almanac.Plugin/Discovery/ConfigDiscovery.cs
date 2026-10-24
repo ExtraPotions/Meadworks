@@ -14,6 +14,7 @@ using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using ExtraPotions.Almanac.Index;
 using HarmonyLib;
+using ExtraPotions.Meadworks.Crucible;
 using UnityEngine;
 
 namespace ExtraPotions.Almanac.Runtime.Discovery
@@ -27,6 +28,10 @@ namespace ExtraPotions.Almanac.Runtime.Discovery
     {
         static WeakReference<ConfigDiscovery>? active;
         readonly Action<string>? warn;
+        readonly MeadworksLog? log;
+        bool traceRefresh;
+        int refreshedFiles, refreshedEntries;
+        long indexTicks;
         readonly bool windows=Path.DirectorySeparatorChar=='\\';
         readonly Dictionary<string,LiveRecord> live=new Dictionary<string,LiveRecord>();
         readonly Dictionary<string,bool> browsable=new Dictionary<string,bool>(StringComparer.Ordinal);
@@ -36,8 +41,8 @@ namespace ExtraPotions.Almanac.Runtime.Discovery
         float nextRefresh;
         bool initialized,discovered;
 
-        public ConfigDiscovery(Action<string>? warning=null)
-        {warn=warning;Index=new ConfigIndex(windows);}
+        public ConfigDiscovery(Action<string>? warning=null, MeadworksLog? logger=null)
+        {warn=warning;log=logger;Index=new ConfigIndex(windows);}
         public ConfigIndex Index {get;}
         /// <summary>Delivered on Tick, including a null entry for reload/poll invalidation.</summary>
         public event Action<ConfigFile,ConfigEntryBase?>? Changed;
@@ -61,7 +66,7 @@ namespace ExtraPotions.Almanac.Runtime.Discovery
         // A constructor can run off the main thread; neither the index nor UI is touched from this hook.
         static void Constructing(object[] __args,out Origin __state)
         {
-            __state=new Origin();
+            __state=new Origin{StagingConstruction=MeadworksConfig.CurrentOwnValueStagingConstruction};
             try
             {
                 var owner=__args.OfType<BepInPlugin>().FirstOrDefault();
@@ -147,8 +152,13 @@ namespace ExtraPotions.Almanac.Runtime.Discovery
         }
         void DrainConstructed()
         {
-            while(constructed.TryDequeue(out var item))
-                if(item.File.TryGetTarget(out var file)&&!ShadowsPluginConfig(file))Try(()=>{Index.AddHookedFile(file.ConfigFilePath,item.Owner.Declared,CallingOwner(item.Owner.Calling),Infos(file));Remember(file);Refresh(file,true);});
+            int remaining=constructed.Count;
+            while(remaining-->0&&constructed.TryDequeue(out var item))
+            {
+                // Requeue only this initial batch so an unfinished constructor cannot spin the drain.
+                if(MeadworksConfig.IsOwnValueStagingConstructionPending(item.Owner.StagingConstruction)){constructed.Enqueue(item);continue;}
+                if(item.File.TryGetTarget(out var file)&&!MeadworksConfig.IsOwnValueStaging(file)&&!ShadowsPluginConfig(file))Try(()=>{Index.AddHookedFile(file.ConfigFilePath,item.Owner.Declared,CallingOwner(item.Owner.Calling),Infos(file));Remember(file);Refresh(file,true);});
+            }
         }
         public ConfigFile? LiveFile(string path)=>live.TryGetValue(Key(path),out var record)&&record.File.TryGetTarget(out var file)?file:null;
         public IReadOnlyList<ConfigEntryBase> Entries(string path)
@@ -167,22 +177,50 @@ namespace ExtraPotions.Almanac.Runtime.Discovery
         {
             if(Index.Find(file.ConfigFilePath)==null)return false;
             var record=live[Key(file.ConfigFilePath)];if(!force&&record.Count==file.Count)return false;
-            Index.UpdateEntries(file.ConfigFilePath,Infos(file));Index.AddOrphanedKeys(file.ConfigFilePath,Orphans(file.ConfigFilePath).Keys);
-            record.Count=file.Count;return true;
+            long refreshStart=traceRefresh?Stopwatch.GetTimestamp():0;
+            try
+            {
+                Index.UpdateEntries(file.ConfigFilePath,Infos(file));Index.AddOrphanedKeys(file.ConfigFilePath,Orphans(file.ConfigFilePath).Keys);
+                record.Count=file.Count;
+                if(traceRefresh){refreshedFiles++;refreshedEntries+=file.Count;}
+                return true;
+            }
+            finally{if(traceRefresh)indexTicks+=Stopwatch.GetTimestamp()-refreshStart;}
         }
         public void Tick(bool visible)
         {
             if(!initialized)return;
-            DrainConstructed();
-            while(notices.TryDequeue(out var notice))if(notice.File.TryGetTarget(out var file))Try(()=>{
-                // Ignore notifications from an old handle superseded at the same path.
-                if(!ReferenceEquals(LiveFile(file.ConfigFilePath),file))return;
-                Refresh(file,true);Changed?.Invoke(file,notice.Entry!=null&&notice.Entry.TryGetTarget(out var current)?current:null);
-            });
-            if(!visible||!discovered||Time.unscaledTime<nextRefresh)return;
-            nextRefresh=Time.unscaledTime+0.5f;
-            foreach(var record in live.Values.ToArray())if(record.File.TryGetTarget(out var file))Try(()=>{if(Refresh(file))Changed?.Invoke(file,null);}); // An unchanged file must not force a full window rebuild.
+            var timing=new StallTiming(log);
+            int queuedConstructed=timing.Enabled?constructed.Count:0,queuedNotices=timing.Enabled?notices.Count:0;
+            long begin=timing.Enabled?Stopwatch.GetTimestamp():0,drained=begin,noted=begin;
+            traceRefresh=timing.Enabled;refreshedFiles=refreshedEntries=0;indexTicks=0;
+            try
+            {
+                DrainConstructed();
+                if(timing.Enabled)drained=Stopwatch.GetTimestamp();
+                while(notices.TryDequeue(out var notice))if(notice.File.TryGetTarget(out var file))Try(()=>{
+                    // Ignore notifications from an old handle superseded at the same path.
+                    if(!ReferenceEquals(LiveFile(file.ConfigFilePath),file))return;
+                    Refresh(file,true);Changed?.Invoke(file,notice.Entry!=null&&notice.Entry.TryGetTarget(out var current)?current:null);
+                });
+                if(timing.Enabled)noted=Stopwatch.GetTimestamp();
+                if(!visible||!discovered||Time.unscaledTime<nextRefresh)return;
+                nextRefresh=Time.unscaledTime+0.5f;
+                foreach(var record in live.Values.ToArray())if(record.File.TryGetTarget(out var file))Try(()=>{if(Refresh(file))Changed?.Invoke(file,null);}); // An unchanged file must not force a full window rebuild.
+            }
+            finally
+            {
+                traceRefresh=false;
+                if(timing.Enabled&&(queuedConstructed!=0||queuedNotices!=0||refreshedFiles!=0))
+                {
+                    long pollTicks=Stopwatch.GetTimestamp()-noted;
+                    timing.Finish().Complete("Almanac.discovery", "open="+visible+" constructedQueued="+queuedConstructed+" noticesQueued="+queuedNotices
+                        +" refreshes="+refreshedFiles+" entries="+refreshedEntries+" constructedMs="+StallTiming.Ms(drained-begin)
+                        +" noticesMs="+StallTiming.Ms(noted-drained)+" pollMs="+StallTiming.Ms(pollTicks)+" indexMs="+StallTiming.Ms(indexTicks));
+                }
+            }
         }
+
         void Try(Action action){try{action();}catch(Exception error){warn?.Invoke("Configuration discovery: "+error.GetType().Name+": "+error.Message);}}
         public void Dispose()
         {
@@ -191,7 +229,7 @@ namespace ExtraPotions.Almanac.Runtime.Discovery
             while(constructed.TryDequeue(out _)){}while(notices.TryDequeue(out _)){}Changed=null;
             if(active!=null&&active.TryGetTarget(out var current)&&ReferenceEquals(current,this))active=null;
         }
-        sealed class Origin {internal PluginIdentity? Declared;internal Assembly[] Calling=Array.Empty<Assembly>();}
+        sealed class Origin {internal PluginIdentity? Declared;internal Assembly[] Calling=Array.Empty<Assembly>();internal object? StagingConstruction;}
         sealed class Constructed
         {internal readonly WeakReference<ConfigFile> File;internal readonly Origin Owner;internal Constructed(ConfigFile file,Origin origin){File=new WeakReference<ConfigFile>(file);Owner=origin;}}
         sealed class Notice

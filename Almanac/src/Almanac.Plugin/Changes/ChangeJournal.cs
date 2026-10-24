@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Diagnostics;
+using ExtraPotions.Meadworks.Crucible;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -67,6 +69,7 @@ namespace ExtraPotions.Almanac.Runtime.Changes
     public sealed class ChangeJournal:IDisposable
     {
         readonly EntryWriter writer;
+        readonly MeadworksLog? log;
         readonly ConfigDiscovery discovery;
         readonly Func<ConfigEntryBase,NativeWriteFacts> resolve;
         readonly AlmanacPreferences preferences;
@@ -85,8 +88,9 @@ namespace ExtraPotions.Almanac.Runtime.Changes
             {Entry=new WeakReference<ConfigEntryBase>(entry);Before=before;After=after;Confirm=confirm;World=CorePlugin.Session.WorldId;Generation=CorePlugin.Session.Generation;Epoch=CorePlugin.Session.SessionId;}
         }
         bool disposed;
-        public ChangeJournal(EntryWriter writer,ConfigDiscovery discovery,Func<ConfigEntryBase,NativeWriteFacts> resolver,string configdir,AlmanacPreferences prefs)
+        public ChangeJournal(EntryWriter writer,ConfigDiscovery discovery,Func<ConfigEntryBase,NativeWriteFacts> resolver,string configdir,AlmanacPreferences prefs,MeadworksLog? logger=null)
         {
+            log=logger;
             this.writer=writer??throw new ArgumentNullException(nameof(writer));this.discovery=discovery??throw new ArgumentNullException(nameof(discovery));
             resolve=resolver??throw new ArgumentNullException(nameof(resolver));preferences=prefs??throw new ArgumentNullException(nameof(prefs));
             path=System.IO.Path.Combine(System.IO.Path.GetFullPath(configdir),"Meadworks","almanac","journal.log");writer.Written+=Written;
@@ -227,15 +231,40 @@ namespace ExtraPotions.Almanac.Runtime.Changes
         static string Id(ConfigEntryBase entry)=>System.IO.Path.GetFullPath(entry.ConfigFile.ConfigFilePath)+"\0"+entry.Definition.Section+"\0"+entry.Definition.Key;
         void Append(ChangeRecord row,string before)
         {
+            var timing=new StallTiming(log);
+            long flushTicks=0,readTicks=0,writeTicks=0;
+            int retained=0,appended=0;
+            bool complete=false;
+            try
+            {
             int max=Math.Max(64,Math.Min(8192,preferences.JournalSizeKb.Value))*1024;
             string values=Sensitive(row.Section+"."+row.Key)?"[redacted]\t[redacted]":Escape(before)+"\t"+Escape(row.LastValue);
             string line=row.Time.ToString("O",CultureInfo.InvariantCulture)+"\t"+Escape(row.Path)+"\t"+Escape(row.Section)+"\t"+Escape(row.Key)+"\t"+Escape(row.Route)+"\t"+values+"\n";
             byte[] tail=Encoding.UTF8.GetBytes(line);if(tail.Length>max)tail=Encoding.UTF8.GetBytes(row.Time.ToString("O",CultureInfo.InvariantCulture)+"\t[entry too large]\n");
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path)!);
+            appended=tail.Length;
+            long readStart=timing.Enabled?Stopwatch.GetTimestamp():0;
             bool truncated=false;byte[] existing=Array.Empty<byte>();if(File.Exists(path))using(var input=new FileStream(path,FileMode.Open,FileAccess.Read,FileShare.Read))
             {int count=(int)Math.Min(input.Length,max-tail.Length);truncated=input.Length>count;existing=new byte[count];input.Position=input.Length-count;int read=0;while(read<count){int got=input.Read(existing,read,count-read);if(got==0)break;read+=got;}if(read!=count)Array.Resize(ref existing,read);}
+            if(timing.Enabled)readTicks=Stopwatch.GetTimestamp()-readStart;
             int start=0;if(truncated&&existing.Length!=0){while(start<existing.Length&&existing[start]!='\n')start++;if(start<existing.Length)start++;}
-            using(var output=new FileStream(path,FileMode.Create,FileAccess.Write,FileShare.Read)){output.Write(existing,start,existing.Length-start);output.Write(tail,0,tail.Length);output.Flush(true);}
+            retained=existing.Length-start;
+            long writeStart=timing.Enabled?Stopwatch.GetTimestamp():0;
+            using(var output=new FileStream(path,FileMode.Create,FileAccess.Write,FileShare.Read))
+            {
+                output.Write(existing,start,existing.Length-start);output.Write(tail,0,tail.Length);
+                long flushStart=timing.Enabled?Stopwatch.GetTimestamp():0;
+                if(timing.Enabled)writeTicks=flushStart-writeStart;
+                try{output.Flush(true);}
+                finally{if(timing.Enabled)flushTicks=Stopwatch.GetTimestamp()-flushStart;}
+            }
+            complete=true;
+            }
+            finally
+            {
+                if(timing.Enabled)timing.Finish().Complete("Almanac.journal", "complete="+complete+" retainedBytes="+retained+" appendedBytes="+appended
+                    +" readMs="+StallTiming.Ms(readTicks)+" writeMs="+StallTiming.Ms(writeTicks)+" flushMs="+StallTiming.Ms(flushTicks));
+            }
         }
         static bool Sensitive(string key){string name=new string(key.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant).ToArray());return new[]{"password","passwd","token","secret","apikey","credential","privatekey"}.Any(name.Contains);}
         static string Escape(string text)=>text.Replace("\\","\\\\").Replace("\r","\\r").Replace("\n","\\n").Replace("\t","\\t").Replace("\0","\\0");

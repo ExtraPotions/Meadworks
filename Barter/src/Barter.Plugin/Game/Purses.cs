@@ -140,17 +140,28 @@ namespace ExtraPotions.Barter.Runtime
 
             bool message = false;
             int today = EnvMan.instance.GetCurrentDay();
+            RefillTiming.SetDay(today);
+            var traderPrefabs = new Dictionary<int, (string Prefab, string Trader)>();
             foreach (ZDO zdo in ZDOMan.instance.m_objectsByID.Values.Where(zdo => zdo != null))
             {
-                string prefab = ZNetScene.instance.GetPrefab(zdo.GetPrefab())?.name;
-                string trader = TraderNames.Normalize(prefab);
-                if (string.IsNullOrEmpty(prefab) || !HasPurse(trader))
+                RefillTiming.Scanned();
+                int prefabId = zdo.GetPrefab();
+                if (!traderPrefabs.TryGetValue(prefabId, out var identity))
+                {
+                    string prefab = ZNetScene.instance.GetPrefab(prefabId)?.name;
+                    string name = TraderNames.Normalize(prefab);
+                    identity = (prefab, !string.IsNullOrEmpty(prefab) && HasPurse(name) ? name : "");
+                    traderPrefabs.Add(prefabId, identity);
+                }
+                if (identity.Trader.Length == 0)
                     continue;
 
+                string trader = identity.Trader;
                 PurseRules rules = Rules(trader);
                 if (!rules.Enabled)
                     continue;
 
+                RefillTiming.Trader();
                 PurseLedger ledger = ReadLedger(zdo, PurseRefill.Initial(rules));
                 if (ledger.Pending) continue;
                 int current = ledger.Balance;
@@ -162,8 +173,9 @@ namespace ExtraPotions.Barter.Runtime
                 AuthorityState.Write(zdo, "refill-day", today.ToString(CultureInfo.InvariantCulture));
                 WriteLedger(zdo, ledger);
                 zdo.Set(DayKey, today);
+                RefillTiming.Refilled();
                 message |= TraderPolicies.Get(BarterSettings.Purse.ReplenishMessage, trader, Plugin.Settings.Get(BarterSettings.Purse.ReplenishMessage));
-                Plugin.Log?.Verbose($"{prefab} balance updated {current} -> {next}");
+                Plugin.Log?.Verbose($"{identity.Prefab} balance updated {current} -> {next}");
             }
             return message;
         }

@@ -82,7 +82,7 @@ namespace ExtraPotions.Almanac.Runtime
                 preferences=new AlmanacPreferences(Config);AlmanacSyntax.Preferences=preferences;
                 // A rejected catalog leaves the interface in English; it never blocks Almanac.
                 if(AllowsUi)try{AlmanacText.Initialize(Info.Metadata,Logger);}catch(Exception error){log.Warning("Almanac translations unavailable: "+error.GetBaseException().Message);}
-                if(AllowsUi){discovery = new ConfigDiscovery(message=>log.Warning(message));discovery.Initialize();}
+                if(AllowsUi){discovery = new ConfigDiscovery(message=>log.Warning(message),log);discovery.Initialize();}
                 Ready = true;
                 log.Info(AllowsUi ? "Almanac registered."
                     : "Almanac registered on a headless process; no UI is created.");
@@ -110,9 +110,9 @@ namespace ExtraPotions.Almanac.Runtime
                     ()=>preferences?.BackupCount.Value??10,locks.HiddenByServerPolicy,message=>log?.Warning(message));
                 Profiles=profiles;
                 entryWriter=new EntryWriter(locks.Resolve,message=>log?.Warning(message));
-                journal=new ChangeJournal(entryWriter,discovery,locks.Resolve,Paths.ConfigPath,preferences!);
+                journal=new ChangeJournal(entryWriter,discovery,locks.Resolve,Paths.ConfigPath,preferences!,log);
                 profiles.Written+=journal.RecordConfirmed;
-                window = new SettingsWindow(discovery,entryWriter,locks.Resolve,locks.HiddenByServerPolicy,AlmanacText.T);
+                window = new SettingsWindow(discovery,entryWriter,locks.Resolve,locks.HiddenByServerPolicy,AlmanacText.T,logger:log);
                 SettingsWindow=window;
                 menuSettings=MeadworksMenuSettings.Register(guid=>Ready&&AllowsUi&&window.CanOpenProduct(guid),guid=>window.OpenProduct(guid));
                 window.ConfigurePreferences(preferences!);

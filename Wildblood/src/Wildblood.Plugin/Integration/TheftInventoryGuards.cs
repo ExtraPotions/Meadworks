@@ -22,7 +22,7 @@ namespace ExtraPotions.Wildblood.Adopted.Transfers {
         internal static void Initialize()=>mainThread=Thread.CurrentThread.ManagedThreadId;
         static void MainThread(){if(mainThread!=Thread.CurrentThread.ManagedThreadId)throw new InvalidOperationException("Wildblood inventory hold requires the Unity thread.");}
         internal static bool Loading(Player player)=>loading.Contains(player);
-        internal static bool Export(object value){MainThread();return value is Inventory inventory&&(TheftTransfers.RawHeld(inventory)||NativeRaidChest.Held(inventory));}
+        internal static bool Export(object value){MainThread();return value is Inventory inventory&&(TheftTransfers.RawHeld(inventory)||NativeRaidChest.Held(inventory)||NativeSummonPayment.Held(inventory)||NativeSummonDelivery.Held(inventory));}
         internal static bool ForeignHeld(Inventory inventory,bool admission=false){
             MainThread();if(!CruciblePlugin.IsReady)return admission;
             var caps=CruciblePlugin.Services.Capabilities;
@@ -37,8 +37,8 @@ namespace ExtraPotions.Wildblood.Adopted.Transfers {
             return false;
         }
         static void Warn(string text){if(foreignWarned)return;foreignWarned=true;TheftTransfers.Warn("Wildblood theft refused: "+text);}
-        static bool OwnHeld(Inventory inventory)=>!Applying&&!snapshots.Contains(inventory)&&(TheftTransfers.RawHeld(inventory)||NativeRaidChest.Held(inventory));
-        internal static bool Held(Inventory inventory)=>!Applying&&!snapshots.Contains(inventory)&&(TheftTransfers.RawHeld(inventory)||NativeRaidChest.Held(inventory)||ForeignHeld(inventory));
+        static bool OwnHeld(Inventory inventory)=>!Applying&&!snapshots.Contains(inventory)&&(TheftTransfers.RawHeld(inventory)||NativeRaidChest.Held(inventory)||NativeSummonPayment.Held(inventory)||NativeSummonDelivery.Held(inventory));
+        internal static bool Held(Inventory inventory)=>!Applying&&!snapshots.Contains(inventory)&&(TheftTransfers.RawHeld(inventory)||NativeRaidChest.Held(inventory)||NativeSummonPayment.Held(inventory)||NativeSummonDelivery.Held(inventory)||ForeignHeld(inventory));
         internal static void DrainDeaths(){foreach(var player in deaths.ToArray()){if(!player||player!=Player.m_localPlayer){deaths.Remove(player);continue;}if(Held(player.GetInventory()))continue;deaths.Remove(player);if(!player.IsDead()&&player.GetHealth()<=0)player.OnDeath();}}
         [HarmonyPatch(typeof(PlayerProfile),nameof(PlayerProfile.LoadPlayerData))]
         internal static class TheftProfileLoadGuard {

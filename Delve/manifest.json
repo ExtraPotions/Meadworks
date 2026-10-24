@@ -1,6 +1,6 @@
 {
   "name": "Delve",
-  "version_number": "0.1.13",
+  "version_number": "0.1.14",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Delve",
   "description": "Meadworks world regeneration: dungeon sizes, chest refills, dungeon resources, the Queen and camp creatures come back on timers, never near players or their buildings. Server-only.",
   "dependencies": [

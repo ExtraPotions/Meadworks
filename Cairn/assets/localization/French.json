@@ -163,7 +163,7 @@
     "help_setting_1_daylight_radius_scale": "Intensité du bonus de lumière et du malus d'obscurité ; 0 désactive.",
     "help_setting_1_weather_radius_scale": "Intensité du malus de brouillard, brume et blizzard ; 0 désactive.",
     "help_setting_1_show_radius": "Affiche le rayon d'exploration actuel dans l'ATH.",
-    "help_setting_1_show_radius_inputs": "Diagnostic uniquement : conservé dans le fichier de configuration ; l'ATH ne l'affiche plus.",
+    "help_setting_1_show_radius_inputs": "Ancienne préférence sans effet. La valeur enregistrée est conservée pour compatibilité ; elle n'affiche pas les données du rayon et n'active pas les journaux de diagnostic.",
     "help_setting_4_enabled": "Affiche horloge, météo et boussole dans l'ATH.",
     "help_setting_4_toggle_key": "Touche pour afficher ou masquer l'ATH.",
     "help_setting_4_settings_key": "Touche pour ouvrir la fenêtre des repères de la boussole de Cairn.",

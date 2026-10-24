@@ -40,7 +40,7 @@ Version 0.3.30, with Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG
 - Joining a server without Meadworks: Crucible waits for the server's reply (10 seconds by default, setting `VanillaServerTimeoutSeconds`), then treats it as a vanilla server; required Meadworks products turn off for that session and cheats stay locked.
 - A joining MeadWorks client is not dropped while the server is still sending that peer's first data. The server waits until the send queue drops to 64 KB, then allows 60 seconds for the MeadWorks answer, and never waits longer than 5 minutes from the greeting. A peer that never answers is still refused. This wait is separate from `VanillaServerTimeoutSeconds`.
 - A required mod is still checked against the server's peer class. A client that marks that mod server-only is refused when the major.minor does not match, and admitted when it does.
-- Server admins can set `Network.AdmissionMode` to `AllowVanilla`. It takes effect only when every installed mod allows players without Meadworks; otherwise the server stays Strict and its log names each mod that blocks it.
+- Admission is always Strict: every client must run MeadWorks. The retired `Network.AdmissionMode = AllowVanilla` value still parses and remains saved, but is hidden from settings menus. Startup logs and the `meadworks` diagnostics command explain that Strict applies. See [admission compatibility](docs/server-only-mode.md).
 
 ## Compatibility
 

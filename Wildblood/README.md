@@ -2,9 +2,11 @@
 
 Creature stars that grow with the world, mutations, boss aspects, loot rules and bad-luck protection.
 
-Version 0.5.6. Requires Crucible 0.3.29 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.7 (unreleased). Requires Crucible 0.3.29 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
+
+- Tamed Pressure is an optional host/server boss rule, off by default. For known bosses, every 5 seconds it selects up to 4 nearest living tamed MonsterAI creatures within 32 horizontal meters of each boss. Pressure schedules generic damage equal to 1% of maximum health per second. Tiny amounts accumulate into pulses that clear Valheim’s minimum-damage threshold; normal damage scaling still applies. Affected tames receive 25% more damage and deal 25% less damage. **This can kill tames.** Effects can last up to 5.5 seconds after leaving range or a boss dying; turning it off stops them immediately. Stars, max health and traits stay unchanged. This feature steps aside while BossRules is installed. Discovery is incremental: newly spawned or unloaded bosses can take longer to be found in large or changing worlds. Known-boss refresh is independent of discovery. Global discovery visits at most 128 objects and advances at most 128 ordinary/portal bucket steps per native Tick; a full empty-world pass needs at least 4096 ticks (about 68 seconds at 60 ticks/second), plus object visits. Local nearest-target selection covers a fixed area but its work depends on nearby creature density.
 
 - Stars: creatures roll up to 8 stars from a difficulty you choose (per world), shown as small stars and large stars worth five. Health and damage can also rise with distance from the world center (off by default). Raid extra stars stop at that biome's difficulty cap.
 - `4 - Traits / Tamed Stars` (on by default, set by the server) changes new births, and gives a parked tame its stored stars back while `1 - General / Stars Enabled` is on and `2 - Stars / Star Mode` is Wildblood. On, a newborn may inherit stars, and Shepherd follows this. A tamed creature that an older build left at the game's level, with a stored star roll, regains those stars at once if it is loaded, or the next time it loads. Its health stays the same share of the bar (a full bar stays full). Its size and color match the stars. The creature's owner writes the level and health, and other players see them. Bosses, fresh births without parking metadata, and creatures with no stored star roll stay as they are. Parked births can regain stored stars too; without a restore mark, the current level must match the saved parked level. The restore does not rewrite mutations. Off, a newborn keeps its parent's level, as the game does, and no bonus star is added. Turning it off does not remove stars a tame already has, including stars it just regained. Taming never removes stars, health, or mutations.
@@ -52,6 +54,16 @@ Version 0.5.6. Requires Crucible 0.3.29 / Crucible.UI 0.3.21. Changes are in [CH
 - Health Per Extra Player, Damage Per Extra Player and Max Players For Scaling set the game's own multiplayer difficulty while the Pressure module is on. Karma and Enforcers are not affected.
 - These three settings stand down, leaving the game's or the other mod's values alone, while CreatureManager (or a plugin GUID on the server's Yield Scaling To list) is installed, and for the rest of the session once another mod is seen changing those values; Wildblood says so once.
 - Keys: the death recap and the lore open from the Meadworks menu. Their own keys are unbound by default; set them (or a lore gamepad chord) in the Recap and Display settings.
+
+## Abandoned summoned bosses
+
+`5 - Bosses / Abandoned Bosses` is off by default and controlled by the host or dedicated server. When enabled, a recorded summoned boss must remain at full health with no player inside `Abandon Range` (100 meters by default) for `Abandon Minutes` (10 by default). A nearby player or missing health resets the timer. The server then removes the abandoned summon and returns its original offering at the altar once. A normal kill gives no refund.
+
+The altar refuses another summon while its recorded boss lives or the previous summon is recovering. Summon records and pending refunds survive owner changes and world reloads. Keep the world's matching Wildblood journal files when backing up or restoring. If recovery cannot prove the previous outcome, the altar stays held instead of producing another offering. Twins share the summon and its one original offering; phantom offspring do not create another refundable offering.
+
+Pick up refunded offerings manually with room in your inventory. Automatic pickup stays off for these items. The first successful claim reserves that stack for that character, including after reconnecting. Wildblood saves the recipient's inventory before confirming delivery and keeps the consumed token so a world rollback cannot grant that stack again. Keep both the server's and each player's Wildblood journal folders with their matching world and character backups.
+
+This applies to altar summons recorded by this version. Existing bosses and creatures created by commands are not adopted for refunds. The setting and ledger run on dedicated servers without a display. Native multiplayer, crash and reload checks remain required before release; this unreleased build has not been qualified in game.
 
 ## Paid raids
 

@@ -27,7 +27,7 @@
     "rune_awakening": "Rune d'éveil",
     "rune_awakening_desc": "Une ancienne rune d'un Inscribe précédent : elle devient une Rune d'ascension dès son chargement.",
     "rune_recasting": "Rune de refonte",
-    "rune_recasting_desc": "Refond un objet Peu commun : ses deux inscriptions sont remplacées par deux nouvelles. Il reste Peu commun.",
+    "rune_recasting_desc": "Refond un objet Peu commun : ses deux inscriptions sont remplacées par deux nouvelles. Il reste Peu commun. À la table des runes, vous pouvez orienter une nouvelle inscription vers l'attaque, la défense ou l'utilité ; les autres sont tirées normalement au même coût en runes.",
     "rune_ascension": "Rune d'ascension",
     "rune_ascension_desc": "Élève un objet d'un rang de rareté et garde ses inscriptions : Commun devient Peu commun avec deux inscriptions ; Peu commun devient Rare et Rare devient Épique, avec une de plus à chaque fois. À la Table des runes, une essence choisit ce qu'elle ajoute. Le Légendaire ne vient que des boss et des raids.",
     "rune_cleansing": "Rune de purification",
@@ -205,6 +205,20 @@
     "enhancement_convert_no_room": "Faites de la place dans cet inventaire : les anciens objets améliorés et parchemins se convertissent quand leur remplacement tient.",
     "enhancement_convert_dropped": "Les runes converties qui ne tenaient pas dans cet inventaire ont été déposées à vos pieds.",
     "cfg_7_ground_glow__legendary_glint_name": "Éclat légendaire",
-    "cfg_7_ground_glow__legendary_glint_help": "L'équipement Légendaire tombé au sol affiche aussi un petit éclat bronze et ivoire. Les autres raretés n'en ont jamais. Ce client uniquement."
+    "cfg_7_ground_glow__legendary_glint_help": "L'équipement Légendaire tombé au sol affiche aussi un petit éclat bronze et ivoire. Les autres raretés n'en ont jamais. Ce client uniquement.",
+    "recast_focus_label": "Orientation de refonte",
+    "recast_focus_any": "Toute catégorie",
+    "recast_focus_offense": "Attaque",
+    "recast_focus_defense": "Défense",
+    "recast_focus_utility": "Utilité",
+    "recast_side_prefix": "Préfixe",
+    "recast_side_suffix": "Suffixe",
+    "recast_focus_help": "Cliquez pour choisir la catégorie d'une nouvelle inscription. Toutes sont remplacées ; les autres sont tirées normalement. Le coût en runes reste identique. Si aucun résultat valide n'existe, rien n'est dépensé. Votre choix est enregistré sur cet ordinateur.",
+    "recast_side_help": "Cliquez pour alterner entre préfixe et suffixe. S'applique uniquement lorsqu'une catégorie est choisie. Les autres inscriptions sont toujours tirées à nouveau normalement. Votre choix est enregistré sur cet ordinateur.",
+    "cfg_8_interface_heading": "8 - Interface",
+    "cfg_8_interface__recasting_focus_name": "Orientation de refonte",
+    "cfg_8_interface__recasting_side_name": "Position de refonte",
+    "cfg_8_interface__recasting_focus_help": "Catégorie enregistrée de la table des runes pour une nouvelle inscription : sans restriction, attaque, défense ou utilité. La refonte remplace toujours toutes les inscriptions au même coût en runes et utilise les règles de l'hôte. Votre choix est enregistré sur cet ordinateur.",
+    "cfg_8_interface__recasting_side_help": "Choix enregistré du préfixe ou du suffixe de l'inscription orientée. S'applique uniquement lorsqu'une catégorie de refonte est choisie ; les autres inscriptions sont tirées normalement. Votre choix est enregistré sur cet ordinateur."
   }
 }

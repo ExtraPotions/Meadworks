@@ -138,7 +138,9 @@ namespace Burrow.SharedTransfers {
             if(!Open())return;
             try{
                 evaluated=true;held=false;
-                foreach(var intent in ledger.All){
+                var history=ledger.All;
+                for(int index=0;index<history.Count;index++){
+                    var intent=history[index];
                     if(verified.Contains(intent.Root))continue;
                     if(intent.Record.State==InventoryDecision.Committed&&ledger.FinalReceiptConfirmed(intent,Store)){verified.Add(intent.Root);continue;}
                     held=true;

@@ -2,7 +2,7 @@
 
 Traders you can shape: per-trader buy and sell lists, custom currencies, prices that follow the trader's purse, and a sell list built on the Meadworks interface kit.
 
-Version 0.1.2. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.3. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

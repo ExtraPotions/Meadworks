@@ -93,6 +93,7 @@ namespace ExtraPotions.Inscribe.Adopted.Tables.Window
                 }
             }
             PanelLayout.PlaceTabs(Parts, i => _tabs[i].Shown);
+            Parts.Recasting?.Show(false);
             Current.Fill(view);
         }
 

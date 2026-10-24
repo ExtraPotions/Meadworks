@@ -101,6 +101,8 @@ namespace ExtraPotions.Solstice.Runtime
         static int terrainMilli = int.MinValue;
         static int terrainIndex;
         static int reads, uploads, terrainDone, frames, peakMs;
+        static long passStart, beginTicks, clutterTicks, textureTicks, terrainTicks, managedTicks, readTicks, uploadTicks, readPeakTicks, uploadPeakTicks;
+        static int passFrame, passGc0, passGc1, passGc2, readPeakFrame, uploadPeakFrame, managedPeakFrame;
         static bool dirty = true, painted, warned, logging, warnedSpike, debugLog;
         static double nextSlowWarn;
         static readonly Stopwatch slowClock = Stopwatch.StartNew();
@@ -140,7 +142,12 @@ namespace ExtraPotions.Solstice.Runtime
                     return;
                 var frame = Stopwatch.StartNew();
                 bool changed = dirty || step != desiredStep || coverMilli != targetMilli;
-                if (changed) BeginPass(cover, step, coverMilli);
+                if (changed)
+                {
+                    BeginPass(cover, step, coverMilli);
+                    if (debugLog) beginTicks += frame.ElapsedTicks;
+                }
+                long phaseStart = debugLog ? Stopwatch.GetTimestamp() : 0;
                 Cover = cover;
                 bool cluttered = false;
                 if (clutterMilli != coverMilli)
@@ -149,13 +156,22 @@ namespace ExtraPotions.Solstice.Runtime
                     clutterMilli = coverMilli;
                     cluttered = true;
                 }
+                if (debugLog) clutterTicks += Stopwatch.GetTimestamp() - phaseStart;
                 if (!cluttered)
                 {
+                    if (debugLog) phaseStart = Stopwatch.GetTimestamp();
                     if (!TexturesIdle()) PumpTextures();
+                    if (debugLog)
+                    {
+                        textureTicks += Stopwatch.GetTimestamp() - phaseStart;
+                        phaseStart = Stopwatch.GetTimestamp();
+                    }
                     if (terrainMilli != coverMilli && frame.Elapsed.TotalMilliseconds < 30) PumpTerrain();
+                    if (debugLog) terrainTicks += Stopwatch.GetTimestamp() - phaseStart;
                 }
+                if (debugLog) managedTicks += frame.ElapsedTicks;
                 Note(frame.Elapsed.TotalMilliseconds);
-                if (TexturesIdle() && clutterMilli == coverMilli && terrainMilli == coverMilli) FinishPass();
+                if (TexturesIdle() && clutterMilli == coverMilli && terrainMilli == coverMilli) FinishPass(true);
             }
             catch (Exception error)
             {
@@ -201,6 +217,13 @@ namespace ExtraPotions.Solstice.Runtime
             warnedSpike = false;
             debugLog = log != null && log.IsEnabled(LogSeverity.Debug);
             logging = true;
+            if (debugLog)
+            {
+                passStart = Stopwatch.GetTimestamp(); passFrame = UnityEngine.Time.frameCount;
+                readPeakFrame = uploadPeakFrame = managedPeakFrame = passFrame;
+                passGc0 = GC.CollectionCount(0); passGc1 = GC.CollectionCount(1); passGc2 = GC.CollectionCount(2);
+                beginTicks = clutterTicks = textureTicks = terrainTicks = managedTicks = readTicks = uploadTicks = readPeakTicks = uploadPeakTicks = 0;
+            }
             dirty = false;
             targetMilli = coverMilli;
             desiredStep = step;
@@ -382,6 +405,20 @@ namespace ExtraPotions.Solstice.Runtime
         // Player builds cannot compile a frost shader. Blit only makes a readable copy.
         static bool ReadSource(BakeJob job)
         {
+            long start = debugLog ? Stopwatch.GetTimestamp() : 0;
+            try { return ReadSourceCore(job); }
+            finally
+            {
+                if (debugLog)
+                {
+                    long ticks = Stopwatch.GetTimestamp() - start;
+                    readTicks += ticks;
+                    if (ticks > readPeakTicks) { readPeakTicks = ticks; readPeakFrame = UnityEngine.Time.frameCount; }
+                }
+            }
+        }
+        static bool ReadSourceCore(BakeJob job)
+        {
             Texture source = null;
             foreach (var kept in saved.Values)
                 if (kept.SourceId == job.Key.Source && kept.Original != null) { source = kept.Original; break; }
@@ -512,6 +549,20 @@ namespace ExtraPotions.Solstice.Runtime
         }
 
         static void Upload(BakeJob job, Color32[] pixels)
+        {
+            long start = debugLog ? Stopwatch.GetTimestamp() : 0;
+            try { UploadCore(job, pixels); }
+            finally
+            {
+                if (debugLog)
+                {
+                    long ticks = Stopwatch.GetTimestamp() - start;
+                    uploadTicks += ticks;
+                    if (ticks > uploadPeakTicks) { uploadPeakTicks = ticks; uploadPeakFrame = UnityEngine.Time.frameCount; }
+                }
+            }
+        }
+        static void UploadCore(BakeJob job, Color32[] pixels)
         {
             if (pixels == null || !originals.TryGetValue(job.Key.Source, out var image)) return;
             var texture = job.Texture;
@@ -811,7 +862,11 @@ namespace ExtraPotions.Solstice.Runtime
         {
             frames++;
             int whole = milliseconds <= 0d ? 0 : (int)Math.Ceiling(milliseconds);
-            if (whole > peakMs) peakMs = whole;
+            if (whole > peakMs)
+            {
+                peakMs = whole;
+                if (debugLog) managedPeakFrame = UnityEngine.Time.frameCount;
+            }
             if (milliseconds > 50d && !warnedSpike && WarnSlow("Snow cover frame " + whole + " ms."))
                 warnedSpike = true;
         }
@@ -823,24 +878,45 @@ namespace ExtraPotions.Solstice.Runtime
             return true;
         }
 
-        static void FinishPass()
+        static void FinishPass(bool complete = false)
         {
             if (!logging) return;
             if (desiredStep <= 0 && terrainMilli == targetMilli) painted = false;
             logging = false;
-            if (desiredStep <= 0 && reads == 0 && uploads == 0 && terrainDone == 0) return;
-            if (debugLog)
-                log?.Debug("Snow cover pass: step " + desiredStep
+            if (!debugLog && desiredStep <= 0 && reads == 0 && uploads == 0 && terrainDone == 0) return;
+            if (debugLog && log != null && log.IsEnabled(LogSeverity.Debug))
+            {
+                long passEnd = Stopwatch.GetTimestamp();
+                int gc0 = GC.CollectionCount(0) - passGc0, gc1 = GC.CollectionCount(1) - passGc1, gc2 = GC.CollectionCount(2) - passGc2;
+                try
+                {
+                    log.Debug("Snow cover pass: step " + desiredStep
                     + ", reads " + reads
                     + ", uploads " + uploads
                     + ", sources " + originals.Count
                     + ", terrain " + terrainDone
                     + ", frames " + frames
                     + ", peak " + peakMs + " ms, "
-                    + LightText() + ".");
+                    + LightText() + ". StallTiming Solstice.winter complete=" + complete
+                    + " frame=" + passFrame + " endFrame=" + UnityEngine.Time.frameCount
+                    + " thread=" + System.Threading.Thread.CurrentThread.ManagedThreadId
+                    + " startTicks=" + passStart + " endTicks=" + passEnd
+                    + " elapsedMs=" + Milliseconds(passEnd - passStart)
+                    + " managedMs=" + Milliseconds(managedTicks) + " beginMs=" + Milliseconds(beginTicks)
+                    + " clutterMs=" + Milliseconds(clutterTicks) + " texturesMs=" + Milliseconds(textureTicks)
+                    + " terrainMs=" + Milliseconds(terrainTicks) + " readMs=" + Milliseconds(readTicks)
+                    + " uploadMs=" + Milliseconds(uploadTicks) + " readPeakMs=" + Milliseconds(readPeakTicks)
+                    + " uploadPeakMs=" + Milliseconds(uploadPeakTicks)
+                    + " readPeakFrame=" + readPeakFrame + " uploadPeakFrame=" + uploadPeakFrame + " managedPeakFrame=" + managedPeakFrame
+                    + " gc=" + gc0 + "/" + gc1 + "/" + gc2);
+                }
+                catch { } // Diagnostic output must not abort winter work.
+            }
             if (peakMs > 50 && !warnedSpike)
                 WarnSlow("Snow cover peak frame " + peakMs + " ms.");
         }
+
+        static string Milliseconds(long ticks) => (ticks * 1000d / Stopwatch.Frequency).ToString("0.000", CultureInfo.InvariantCulture);
 
         static int Milli(float cover)
         {

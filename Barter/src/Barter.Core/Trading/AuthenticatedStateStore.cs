@@ -83,7 +83,7 @@ namespace ExtraPotions.Barter.Trading
             return key;
         }
         private sealed class Record { internal string Object = "", Field = "", Value = ""; }
-        private Record Decode(string path, long world, byte[] key)
+        private Record Decode(string path, long world, byte[] key, string? objectId = null, string? field = null)
         {
             byte[] record = files.Read(path, MaximumRecordBytes);
             if (record.Length < 48 || record.Length > MaximumRecordBytes) throw new InvalidDataException("Authority record bound");
@@ -97,23 +97,30 @@ namespace ExtraPotions.Barter.Trading
                 if (reader.ReadInt32() != 1 || reader.ReadInt64() != world) throw new InvalidDataException("Authority world mismatch");
                 var decoded = new Record { Object = reader.ReadString(), Field = reader.ReadString(), Value = reader.ReadString() };
                 Identity(decoded.Object, decoded.Field);
-                string expectedPath = RecordPath(world, decoded.Object, decoded.Field).Replace('\\', '/');
-                string actualPath = path.Replace('\\', '/');
-                if (actualPath != expectedPath && actualPath != expectedPath + ".pending" && actualPath != expectedPath + ".backup")
-                    throw new InvalidDataException("Authority record filename mismatch");
+                if (objectId != null)
+                {
+                    // Direct reads already selected the canonical path for this exact identity.
+                    if (decoded.Object != objectId || decoded.Field != field) throw new InvalidDataException("Authority state identity mismatch");
+                }
+                else
+                {
+                    string expectedPath = RecordPath(world, decoded.Object, decoded.Field).Replace('\\', '/');
+                    string actualPath = path.Replace('\\', '/');
+                    if (actualPath != expectedPath && actualPath != expectedPath + ".pending" && actualPath != expectedPath + ".backup")
+                        throw new InvalidDataException("Authority record filename mismatch");
+                }
                 if (decoded.Value.Length > MaximumValueLength || stream.Position != stream.Length) throw new InvalidDataException("Authority state value bound");
                 return decoded;
             }
         }
-        public string Read(long world, string objectId, string field)
+        public string Read(long world, string objectId, string field) => Read(world, objectId, field, RecordPath(world, objectId, field));
+        private string Read(long world, string objectId, string field, string path)
         {
-            string path = RecordPath(world, objectId, field); byte[] key = Key(world, false);
+            byte[] key = Key(world, false);
             Record? record = Recover(path, p =>
             {
                 if (key.Length != 32) throw new InvalidDataException("Authority key missing");
-                Record decoded = Decode(p, world, key);
-                if (decoded.Object != objectId || decoded.Field != field) throw new InvalidDataException("Authority state identity mismatch");
-                return decoded;
+                return Decode(p, world, key, objectId, field);
             });
             return record?.Value ?? "";
         }
@@ -167,7 +174,7 @@ namespace ExtraPotions.Barter.Trading
                 Record? record = Recover(path, p => Decode(p, world, key));
                 if (record == null) continue;
                 if (record.Object == objectId && record.Field.StartsWith(prefix ?? "", StringComparison.Ordinal))
-                { Read(world, objectId, record.Field); fields.Add(record.Field); }
+                { Read(world, objectId, record.Field, path); fields.Add(record.Field); }
             }
             return fields.ToArray();
         }
@@ -178,7 +185,7 @@ namespace ExtraPotions.Barter.Trading
             .Distinct(StringComparer.Ordinal).ToArray();
         public void Remove(long world, string objectId, string field)
         {
-            Read(world, objectId, field); string path = RecordPath(world, objectId, field);
+            string path = RecordPath(world, objectId, field); Read(world, objectId, field, path);
             // Recovery copies go first so an interrupted prune cannot resurrect a removed receipt.
             foreach (string suffix in new[] { ".pending", ".backup", "" }) files.Delete(path + suffix);
         }
@@ -240,16 +247,25 @@ namespace ExtraPotions.Barter.Trading
             public bool Exists(string path) => File.Exists(path);
             public byte[] Read(string path, int maximumBytes)
             {
+                using var timing = RefillTiming.Measure(RefillTiming.Operation.LocalRead);
                 if (new FileInfo(path).Length > maximumBytes) throw new InvalidDataException("Authority file bound");
                 byte[] bytes = File.ReadAllBytes(path); if (bytes.Length > maximumBytes) throw new InvalidDataException("Authority file bound"); return bytes;
             }
             public void WriteNew(string path, byte[] bytes)
             {
+                using var timing = RefillTiming.Measure(RefillTiming.Operation.LocalWrite);
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
-                using (var stream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None)) { stream.Write(bytes, 0, bytes.Length); stream.Flush(true); }
+                using (var stream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    stream.Write(bytes, 0, bytes.Length);
+                    using (RefillTiming.Measure(RefillTiming.Operation.Flush)) stream.Flush(true);
+                }
             }
             public void Promote(string pending, string current, string backup)
-            { if (File.Exists(current)) File.Replace(pending, current, backup); else File.Move(pending, current); }
+            {
+                using var timing = RefillTiming.Measure(RefillTiming.Operation.Promote);
+                if (File.Exists(current)) File.Replace(pending, current, backup); else File.Move(pending, current);
+            }
             public IEnumerable<string> Files(string directory, string pattern) => Directory.Exists(directory) ? Directory.EnumerateFiles(directory, pattern) : Array.Empty<string>();
             public void Delete(string path) => File.Delete(path);
         }

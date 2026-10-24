@@ -24,6 +24,8 @@ namespace ExtraPotions.Solstice.Runtime
 
         private readonly ConfigFile file;
         private readonly Dictionary<SolsticeSetting, ConfigEntryBase> entries = new Dictionary<SolsticeSetting, ConfigEntryBase>();
+        private SeasonCalendar? cachedCalendar;
+        private int cachedSpring, cachedSummer, cachedFall, cachedWinter;
 
         private SolsticeConfig(ConfigFile file)
         {
@@ -94,7 +96,23 @@ namespace ExtraPotions.Solstice.Runtime
         }
 
         /// <summary>The calendar from the current season lengths.</summary>
-        public SeasonCalendar Calendar() => SolsticeSettings.CalendarFrom(Get);
+        public SeasonCalendar Calendar()
+        {
+            int spring = Get(SolsticeSettings.Calendar.DaysIn(Season.Spring));
+            int summer = Get(SolsticeSettings.Calendar.DaysIn(Season.Summer));
+            int fall = Get(SolsticeSettings.Calendar.DaysIn(Season.Fall));
+            int winter = Get(SolsticeSettings.Calendar.DaysIn(Season.Winter));
+            if (cachedCalendar != null && cachedSpring == spring && cachedSummer == summer
+                && cachedFall == fall && cachedWinter == winter)
+                return cachedCalendar;
+            var calendar = new SeasonCalendar(spring, summer, fall, winter);
+            cachedSpring = spring;
+            cachedSummer = summer;
+            cachedFall = fall;
+            cachedWinter = winter;
+            cachedCalendar = calendar;
+            return calendar;
+        }
 
         /// <summary>The shield dome rules from the current values.</summary>
         public ProtectionRules Protection() => SolsticeSettings.RulesFrom(Get);
