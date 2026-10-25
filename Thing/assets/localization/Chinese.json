@@ -394,6 +394,15 @@
     "cfg_hotkeys__ward_override_key_name": "守护石绕过快捷键",
     "cfg_hotkeys__ward_override_key_help": "可选按键，用于开启或关闭守护石绕过。仅限管理员。",
     "cfg_hotkeys__remove_drops_key_name": "清除掉落物快捷键",
-    "cfg_hotkeys__remove_drops_key_help": "可选按键，预览你周围清除掉落物半径内的掉落物品；输入 thing drops confirm 将其清除。仅限管理员。"
+    "cfg_hotkeys__remove_drops_key_help": "可选按键，预览你周围清除掉落物半径内的掉落物品；输入 thing drops confirm 将其清除。仅限管理员。",
+    "cfg_general__allow_sub_admin_delegation_name": "允许副管理员委派",
+    "cfg_general__allow_sub_admin_delegation_help": "允许服务器房主或当前管理员向在线玩家授予非破宭性副管理员权限。",
+    "ui_grant_subadmin": "副管理员（非破宭性）",
+    "ui_help_grant_subadmin": "授予所有非破宭性权限（作为副管理员）。需要进行两次确认。",
+    "ui_subadmin_confirm_1": "是否向此玩家授予非破宭性副管理员权限？",
+    "ui_subadmin_confirm_2": "二次确认：确定要向该玩家授予副管理员权限吗？",
+    "ui_subadmin_revoke_self": "放梃副管理员权限",
+    "ui_subadmin_revoke_self_hint": "放梃自己的副管理员权限。",
+    "ui_subadmin_revoke_self_confirm": "确定要放梃自己的副管理员权限吗？"
   }
 }

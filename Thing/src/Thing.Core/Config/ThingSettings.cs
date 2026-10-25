@@ -32,6 +32,8 @@ namespace ExtraPotions.Thing.Config
                 "Asks before kick, ban, terrain reset, remove drops and remote configuration writes.");
             public static readonly ThingSetting<bool> AdminListEditable = ThingSetting.Toggle(Section, "Admin List Editable In Game", false, Server,
                 "Lets existing admins add and remove admins in game. Off: adminlist.txt is changed only on the server.");
+            public static readonly ThingSetting<bool> AllowSubAdminDelegation = ThingSetting.Toggle(Section, "Allow Sub-Admin Delegation", true, Server,
+                "Allows the server host or current admin to delegate all non-destructive permissions to online players as sub-admin.");
             public static readonly ThingSetting<int> AuditLogDays = ThingSetting.Integer(Section, "Audit Log Days", 30, 1, 365, Server,
                 "Days the audit log keeps its daily files.");
             public static readonly ThingSetting<bool> ShowPlatformIds = ThingSetting.Toggle(Section, "Show Platform IDs", true, Server,
@@ -103,7 +105,7 @@ namespace ExtraPotions.Thing.Config
 
         public static IReadOnlyList<ThingSetting> All { get; } = Array.AsReadOnly(new ThingSetting[]
         {
-            General.AdminWindowKey, General.ConfirmDestructive, General.AdminListEditable, General.AuditLogDays,
+            General.AdminWindowKey, General.ConfirmDestructive, General.AdminListEditable, General.AllowSubAdminDelegation, General.AuditLogDays,
             General.ShowPlatformIds, General.LockedPlayerSettings,
             Moderation.KickReasonRequired, Moderation.TempBanDefaultHours, Moderation.MuteDefaultMinutes, Moderation.TeleportNeedsTargetConfirmation,
             Communication.MessageOfTheDay, Communication.ShutdownWarnings,

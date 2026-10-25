@@ -394,6 +394,15 @@
     "cfg_hotkeys__ward_override_key_name": "Taste für Wächterstein-Override",
     "cfg_hotkeys__ward_override_key_help": "Optionale Taste, die den Wächterstein-Override ein- oder ausschaltet. Nur für Admins.",
     "cfg_hotkeys__remove_drops_key_name": "Taste für Drops entfernen",
-    "cfg_hotkeys__remove_drops_key_help": "Optionale Taste, die eine Vorschau der fallengelassenen Gegenstände innerhalb des Radius für Drops entfernen um dich zeigt; mit thing drops confirm werden sie entfernt. Nur für Admins."
+    "cfg_hotkeys__remove_drops_key_help": "Optionale Taste, die eine Vorschau der fallengelassenen Gegenstände innerhalb des Radius für Drops entfernen um dich zeigt; mit thing drops confirm werden sie entfernt. Nur für Admins.",
+    "cfg_general__allow_sub_admin_delegation_name": "Unter-Admin-Delegierung erlauben",
+    "cfg_general__allow_sub_admin_delegation_help": "Erlaubt dem Server-Host oder aktuellen Admin, zerstoerungsfreie Unter-Admin-Berechtigungen an Online-Spieler zu vergeben.",
+    "ui_grant_subadmin": "Unter-Admin (Zerstoerungsfrei)",
+    "ui_help_grant_subadmin": "Vergibt alle zerstoerungsfreien Rechte wie ein Unter-Admin. Erfordert zwei Bestaetigungen.",
+    "ui_subadmin_confirm_1": "Diesem Spieler zerstoerungsfreie Unter-Admin-Rechte gewaehren?",
+    "ui_subadmin_confirm_2": "Zweite Bestaetigung: Dem Spieler wirklich Unter-Admin-Rechte gewaehren?",
+    "ui_subadmin_revoke_self": "Unter-Admin entziehen",
+    "ui_subadmin_revoke_self_hint": "Entziehe dir selbst deine Unter-Admin-Berechtigung.",
+    "ui_subadmin_revoke_self_confirm": "Moechtest du dir die Unter-Admin-Rechte wirklich selbst entziehen?"
   }
 }

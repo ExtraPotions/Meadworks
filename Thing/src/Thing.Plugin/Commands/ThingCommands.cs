@@ -21,7 +21,7 @@ namespace ExtraPotions.Thing.Runtime
     {
         public override string Name => CommandParser.Name;
 
-        public override string Help => "Thing server administration: help, status, kick, ban, tempban, unban, warn, mute, unmute, freeze <player>, unfreeze <player>, say, saytop, shutdown, cancelshutdown, save, permitted [offset], permit <platform id>, unpermit <platform id>, admins [offset], admin add|remove <platform id>, grant self, grant <platform id> <world|spawn|teleport|freeze|inventory|ward> <on|off>, seed, time <HH:mm|preset> [freeze], resumetime, ward [on|off], terrain <radius>, terrain confirm, terrain cancel, drops, drops confirm, drops cancel, pickup <1-10|reset>, regenerate nature, resetresources.";
+        public override string Help => "Thing server administration: help, status, kick, ban, tempban, unban, warn, mute, unmute, freeze <player>, unfreeze <player>, say, saytop, shutdown, cancelshutdown, save, permitted [offset], permit <platform id>, unpermit <platform id>, admins [offset], admin add|remove <platform id>, grant self, grant self remove, grant <platform id> <world|spawn|teleport|freeze|inventory|ward|subadmin> <on|off>, seed, time <HH:mm|preset> [freeze], resumetime, ward [on|off], terrain <radius>, terrain confirm, terrain cancel, drops, drops confirm, drops cancel, pickup <1-10|reset>, regenerate nature, resetresources.";
 
         public override void Run(string[] args)
         {
@@ -79,7 +79,7 @@ namespace ExtraPotions.Thing.Runtime
             }
             var playerPage = !fromLocalAuthority && !requesterIsAdmin && parsed.Kind == CommandKind.Status && args.Count >= 2
                 && string.Equals(args[0], "ui-read", StringComparison.OrdinalIgnoreCase) && string.Equals(args[1], "players", StringComparison.OrdinalIgnoreCase)
-                && ThingAccess.Has(admin.Id, AdminRight.Inventory);
+                && AdminPermissions.Covers(ThingAccess.Of(admin.Id), ThingAction.InventoryView);
             if (playerPage && ThingUiQueries.TryRead(args, admin, fromLocalAuthority, requesterIsAdmin, out var grantedPage, playersOnly: true))
             {
                 foreach (var line in grantedPage) yield return line;
@@ -117,7 +117,7 @@ namespace ExtraPotions.Thing.Runtime
             }
             var online = ThingServer.Online();
             OnlinePlayer? target = null;
-            if (parsed.Target.Length > 0)
+            if (parsed.Target.Length > 0 && parsed.Target != "self")
             {
                 var found = PlayerMatch.Find(parsed.Target, online.Select(o => o.Actor));
                 if (found.HasValue) target = online.First(o => o.Actor.Id == found.Value.Id);
@@ -137,7 +137,8 @@ namespace ExtraPotions.Thing.Runtime
                     foreach (var line in ThingLists.Run(parsed, admin, fromLocalAuthority)) yield return line;
                     yield break;
                 case ThingAction.GrantEdit:
-                    foreach (var line in ThingAccess.Edit(parsed, admin)) yield return line;
+                    if (parsed.Target == "self") parsed = new ParsedCommand(parsed.Kind, parsed.Action, admin.Id, parsed.Text);
+                    foreach (var line in ThingAccess.Edit(parsed, admin, fromLocalAuthority || requesterIsAdmin)) yield return line;
                     yield break;
                 case ThingAction.MessageOfTheDay:
                 case ThingAction.Announcements:

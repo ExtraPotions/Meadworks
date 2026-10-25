@@ -6,4 +6,4 @@ Thing.Core.dll and Thing.dll are distributed under GPL-3.0-or-later. The bounded
 
 Valheim_Admin_Tool 0.5.0 remains a behaviour reference only (no licence); its code and binaries were not read. The approved root package icon is the only image; no DLLs or archives are included.
 
-The Corresponding Source for this version is at https://github.com/ExtraPotions/Meadworks/tree/main/Thing. No copyright transfer is inferred.
+Matching Corresponding Source accompanies this package as `expDARE-Thing-0.1.13-source.zip`. The public source repository is https://github.com/ExtraPotions/Meadworks/tree/main/Thing. The matching archive identifies the source for these exact binaries. No copyright transfer is inferred.

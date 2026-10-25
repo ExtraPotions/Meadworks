@@ -99,7 +99,7 @@ namespace ExtraPotions.Thing.Runtime
             var playerRead = parsed.Kind == CommandKind.Status && args.Count >= 2
                 && string.Equals(args[0], "ui-read", StringComparison.OrdinalIgnoreCase)
                 && string.Equals(args[1], "players", StringComparison.OrdinalIgnoreCase)
-                && (held & AdminRight.Inventory) == AdminRight.Inventory;
+                && AdminPermissions.Covers(held, ThingAction.InventoryView);
             var refusal = RemoteAdmin.Refusal(active, isAdmin || self || covered || playerRead);
             if (refusal != null)
             {

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.13 (2026-10-25)
+
+- Requires Crucible 0.3.32 / Crucible.UI 0.3.21, matching the compiled dependency minimums.
+- Adds the Sub-Admin grant for non-destructive tools. It does not grant shutdown, access-list changes, regeneration, item take/delete, or destructive world/configuration actions. Separate existing grants retain their permissions.
+- Disabling Allow Sub-Admin Delegation blocks new sub-admin grants. Existing grants remain effective, and revocation stays available. Revoking your own sub-admin grant preserves your other grants.
+- Sub-admins can view player inventories; take and delete still require the separate inventory grant.
+- Keeps inventory recovery and teleport grant expiry running on dedicated servers without a local player.
+
 ## 0.1.12 (2026-10-21)
 
 - Thunderstore republish of the release 8 build; no code changes.

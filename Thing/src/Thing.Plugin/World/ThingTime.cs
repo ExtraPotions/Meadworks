@@ -40,7 +40,7 @@ namespace ExtraPotions.Thing.Runtime
             { state.Release(); bound = null; return false; }
             if (state.ShouldRelease(id => net.GetPeers().Any(peer => peer != null && peer.IsReady() && peer.m_rpc != null
                     && peer.m_rpc.IsConnected() && peer.m_socket?.GetHostName() == id),
-                    id => net.IsAdmin(id) || ThingAccess.Has(id, AdminRight.World),
+                    id => net.IsAdmin(id) || AdminPermissions.Covers(ThingAccess.Of(id), ThingAction.GlobalTime),
                     Plugin.Settings.Get(ThingSettings.World.GlobalTimeReleaseOnLeave)))
             {
                 ThingServer.Audit(new Actor(state.SetBy, ""), ThingAction.ReleaseTime, default, AuditOutcome.Done, "time freeze owner left or lost admin rights");
@@ -55,7 +55,7 @@ namespace ExtraPotions.Thing.Runtime
             var env = EnvMan.instance;
             if (!Plugin.Ready || net == null || !net.IsServer() || !ThingServer.Active || !CruciblePlugin.Session.AuthorityReady
                 || !ThingModules.Active(ThingModule.WorldTools) || env == null
-                || (!localAuthority && !net.IsAdmin(admin.Id) && !ThingAccess.Has(admin.Id, AdminRight.World)))
+                || (!localAuthority && !net.IsAdmin(admin.Id) && !AdminPermissions.Covers(ThingAccess.Of(admin.Id), command.Action)))
                 return ThingText.Text("time_unavailable");
             if (command.Action == ThingAction.ReleaseTime)
             {

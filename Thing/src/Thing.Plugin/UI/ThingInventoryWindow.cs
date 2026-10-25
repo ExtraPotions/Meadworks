@@ -19,10 +19,19 @@ namespace ExtraPotions.Thing.Runtime
         static ItemSlot[] slots = Array.Empty<ItemSlot>();
         static int revision;
         static bool vacant = true;
+        static Button takeButton, deleteButton;
+
+        internal static void Tick()
+        {
+            if (window == null) return;
+            if (!ThingPanel.CanViewInventory) { Close(); return; }
+            if (takeButton != null) takeButton.interactable = ThingPanel.CanMutateInventory;
+            if (deleteButton != null) deleteButton.interactable = ThingPanel.CanMutateInventory;
+        }
 
         internal static void Open(string id, string name)
         {
-            if (!ThingPanel.CanPeople || string.IsNullOrEmpty(id)) return;
+            if (!ThingPanel.CanViewInventory || string.IsNullOrEmpty(id)) return;
             Close();
             playerId = id; playerName = name ?? id; armed = ""; selected = ""; slots = Array.Empty<ItemSlot>();
             window = KitWindow.Create("Thing_Inventory", new Vector2(720, 560));
@@ -40,6 +49,8 @@ namespace ExtraPotions.Thing.Runtime
             if (list != null) KitAlmanacDialog.Place(list.Root, new Vector2(20, -90), new Vector2(680, 340));
             var take = KitButton.Create(window.Panel, "Take", ThingPanel.Ui("inventory_take"), Take, new Vector2(20, -450), new Vector2(210, 40));
             var delete = KitButton.Create(window.Panel, "Delete", ThingPanel.Ui("inventory_delete"), Delete, new Vector2(250, -450), new Vector2(210, 40));
+            takeButton = take; deleteButton = delete;
+            Tick();
             var close = KitButton.Create(window.Panel, "Close", ThingPanel.Ui("close"), Close, new Vector2(480, -450), new Vector2(210, 40));
             KitTooltip.Set(take.gameObject, ThingPanel.Ui("inventory_take"), ThingPanel.Ui("help_inventory"));
             KitTooltip.Set(delete.gameObject, ThingPanel.Ui("inventory_delete"), ThingPanel.Ui("help_inventory"));
@@ -54,7 +65,7 @@ namespace ExtraPotions.Thing.Runtime
             if (armed.Length > 0 && ThingPanel.CanPeople) ThingPanelJobs.Start(new[] { "release", armed }, _ => { }, ThingInventory.OperationId);
             armed = "";
             list?.Dispose(); list = null;
-            var old = window; window = null; slots = Array.Empty<ItemSlot>(); selected = "";
+            var old = window; window = null; takeButton = deleteButton = null; slots = Array.Empty<ItemSlot>(); selected = "";
             if (old != null) { old.Closed -= Close; old.Close(); old.Destroy(); }
         }
 
@@ -99,11 +110,12 @@ namespace ExtraPotions.Thing.Runtime
 
         static void Act(bool delete)
         {
-            if (window == null || ThingPanelJobs.Busy) return;
+            if (window == null || ThingPanelJobs.Busy || !ThingPanel.CanMutateInventory) return;
             if (!ItemSlot.TryParse(selected, out var slot)) { ThingPanel.Message(ThingPanel.Ui("select_item")); return; }
             var body = ThingText.Format(delete ? "ui_inventory_delete_body" : "ui_inventory_take_body", Label(slot), slot.Stack.ToString());
             ThingPanelForms.Confirm(window, body, () =>
             {
+                if (!ThingPanel.CanMutateInventory) return;
                 if (!delete) Send(new[] { "take", playerId, slot.Text });
                 else ThingPanelJobs.Start(new[] { "delete", playerId, slot.Text }, lines =>
                 {
@@ -119,7 +131,11 @@ namespace ExtraPotions.Thing.Runtime
             });
         }
 
-        static void Send(string[] args) => ThingPanelJobs.Start(args, Note, ThingInventory.OperationId, () => ThingPanel.Message(ThingPanel.Ui("inventory_failed")));
+        static void Send(string[] args)
+        {
+            if (!ThingPanel.CanMutateInventory) return;
+            ThingPanelJobs.Start(args, Note, ThingInventory.OperationId, () => ThingPanel.Message(ThingPanel.Ui("inventory_failed")));
+        }
 
         static void Note(IReadOnlyList<string> lines)
         {

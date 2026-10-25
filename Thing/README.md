@@ -1,6 +1,6 @@
 # Thing
 
-Version 0.1.12. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.13. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Server administration and moderation from inside the game, checked against the server's own admin list.
 
@@ -21,11 +21,17 @@ Server administration and moderation from inside the game, checked against the s
 - Console commands for the same actions, for example `thing say`, `thing terrain`, `thing drops`, `thing ward` and `thing seed`.
 - Every action is checked on the server against its own `adminlist.txt` by platform ID, never by display name, and refusal reasons reach the player in their language.
 
+## Qualification for 0.1.13
+
+Focused dedicated-server checks passed recovery scheduling without a local player and the tested permission boundaries. A separate two-host check passed actual requests from a non-admin client: Save while Sub-Admin was granted, refusal of shutdown and another player's grant, self-revocation retaining Freeze, and refusal of Save after revocation. Both checks used this package's exact Thing and Thing.Core binaries.
+
+These checks do not establish full other-player Take/Delete durability, lost-reply recovery, item accounting, disconnect/rejoin or cold/crash recovery. Those existing inventory features retain their unverified limits. No whole-suite, every-tool, physical-input or arbitrary-mod compatibility claim is made. This code-only release does not include the new art or material candidates.
+
 ## Requirements
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.28 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later compatible 0.3.x, with Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 
@@ -59,7 +65,7 @@ Server administration and moderation from inside the game, checked against the s
 - Languages: English, Spanish, Simplified Chinese, Russian, French, German and Korean (non-English text is machine-assisted).
 - Inspired by / replaces (behavior reimplemented, no code reused): Valheim_Admin_Tool (QoLTeam), administration part.
 - Listed under Thunderstore's AI Generated category; tested in-game.
-- Source: Corresponding Source for this exact version, free of charge: https://github.com/ExtraPotions/Meadworks/tree/main/Thing
+- Source: matching Corresponding Source is provided as `expDARE-Thing-0.1.13-source.zip`. The public source repository is https://github.com/ExtraPotions/Meadworks/tree/main/Thing; the matching source archive accompanies this release package.
 
 ## Changelog
 

@@ -398,6 +398,13 @@ namespace ExtraPotions.Thing.Localization
             new TextKey("grant_saved", 0),
             new TextKey("grant_unchanged", 0),
             new TextKey("grant_unsaved", 0),
+            new TextKey("ui_grant_subadmin", 0),
+            new TextKey("ui_help_grant_subadmin", 0),
+            new TextKey("ui_subadmin_confirm_1", 0),
+            new TextKey("ui_subadmin_confirm_2", 0),
+            new TextKey("ui_subadmin_revoke_self", 0),
+            new TextKey("ui_subadmin_revoke_self_hint", 0),
+            new TextKey("ui_subadmin_revoke_self_confirm", 0),
         });
     }
 }

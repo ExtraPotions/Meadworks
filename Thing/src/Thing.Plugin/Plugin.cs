@@ -113,22 +113,25 @@ namespace ExtraPotions.Thing.Runtime
             Settings?.Tick(UnityEngine.Time.unscaledTime);
             ThingModules.Tick(log);
             ThingNotices.Tick();
-            ThingPlayerFreeze.Tick();
             ThingServer.Tick();
-            ThingTime.Tick();
             ThingRemoteCommands.Tick();
             ThingYamlFiles.Tick();
-            ThingTerrainCommands.Tick();
-            ThingDropCommands.Tick();
             ThingTeleportCommands.Tick();
-            ThingWard.Tick();
-            ThingPickup.Tick();
-            ThingPanel.Tick();
             ThingInventory.Tick();
-            if (Settings != null && Player.m_localPlayer != null && ThingModules.Active(ThingModule.WorldTools))
+            ThingWard.Tick();
+            if (Player.m_localPlayer != null)
             {
-                if (MeadworksInput.Pressed(Settings.ShortcutValue(ThingSettings.Hotkeys.WardOverride))) ThingWard.Run(new[] { "ward" });
-                if (MeadworksInput.Pressed(Settings.ShortcutValue(ThingSettings.Hotkeys.RemoveDrops))) ThingDropCommands.Run(new[] { "drops" });
+                ThingPlayerFreeze.Tick();
+                ThingTime.Tick();
+                ThingTerrainCommands.Tick();
+                ThingDropCommands.Tick();
+                ThingPickup.Tick();
+                ThingPanel.Tick();
+                if (Settings != null && ThingModules.Active(ThingModule.WorldTools))
+                {
+                    if (MeadworksInput.Pressed(Settings.ShortcutValue(ThingSettings.Hotkeys.WardOverride))) ThingWard.Run(new[] { "ward" });
+                    if (MeadworksInput.Pressed(Settings.ShortcutValue(ThingSettings.Hotkeys.RemoveDrops))) ThingDropCommands.Run(new[] { "drops" });
+                }
             }
         }
 

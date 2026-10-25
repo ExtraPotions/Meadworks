@@ -108,7 +108,9 @@ namespace ExtraPotions.Thing.Runtime
                 return Done("released");
             }
             if (request.Count < 2 || request[0] != "view" && request[0] != "take" && request[0] != "delete") return Done("denied");
-            if (!full && !ThingAccess.Has(adminId, AdminRight.Inventory)) return Done("denied");
+            var action = request[0] == "view" ? ThingAction.InventoryView
+                : request[0] == "take" ? ThingAction.InventoryTake : ThingAction.InventoryDelete;
+            if (!full && !AdminPermissions.Covers(ThingAccess.Of(adminId), action)) return Done("denied");
             ledger.ReleaseIdle(adminId, request.Count == 4 && request[0] == "delete" ? request[3] : null);
             var platform = request[1];
             if (!GameListIdentity.Valid(platform) || platform == adminId) return Done("denied");

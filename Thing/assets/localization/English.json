@@ -314,6 +314,13 @@
     "ui_help_grant_inventory": "Lets this player view a connected player's inventory and take or delete one stack. The server moves the stack so it is not copied. Delete asks twice and is written to the server log.",
     "ui_grant_ward": "Ward",
     "ui_help_grant_ward": "Lets this player bypass ward protection for their own character while the server allows ward override. Turning the server switch off stops the bypass.",
+    "ui_grant_subadmin": "Sub-Admin (Non-Destructive)",
+    "ui_help_grant_subadmin": "Grant all non-destructive permissions as a sub-admin. Requires two confirmations.",
+    "ui_subadmin_confirm_1": "Grant non-destructive Sub-Admin permissions to this player?",
+    "ui_subadmin_confirm_2": "Second Confirmation: Are you sure you want to grant Sub-Admin permissions?",
+    "ui_subadmin_revoke_self": "Revoke Sub-Admin",
+    "ui_subadmin_revoke_self_hint": "Remove your own sub-admin permissions.",
+    "ui_subadmin_revoke_self_confirm": "Are you sure you want to revoke your sub-admin permissions?",
     "ui_inventory": "Inventory",
     "ui_help_inventory": "View the selected player's inventory. Take or delete asks the server to move or remove that one stack. Nothing is copied.",
     "ui_inventory_empty": "This player is not carrying anything this view can list.",
@@ -394,6 +401,8 @@
     "cfg_hotkeys__ward_override_key_name": "Ward Override Key",
     "cfg_hotkeys__ward_override_key_help": "Optional key that turns the ward override on or off. Admins only.",
     "cfg_hotkeys__remove_drops_key_name": "Remove Drops Key",
-    "cfg_hotkeys__remove_drops_key_help": "Optional key that previews the dropped items within Remove Drops Radius around you; run thing drops confirm to remove them. Admins only."
+    "cfg_hotkeys__remove_drops_key_help": "Optional key that previews the dropped items within Remove Drops Radius around you; run thing drops confirm to remove them. Admins only.",
+    "cfg_general__allow_sub_admin_delegation_name": "Allow Sub-Admin Delegation",
+    "cfg_general__allow_sub_admin_delegation_help": "Allows the server host or current admin to delegate all non-destructive permissions to online players as sub-admin."
   }
 }

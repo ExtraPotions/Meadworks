@@ -16,7 +16,7 @@ namespace ExtraPotions.Thing.Commands
 
     public sealed class ParsedCommand
     {
-        internal ParsedCommand(CommandKind kind, ThingAction action = ThingAction.ListPlayers, string target = "", string text = "", TimeSpan? duration = null, int minutes = 0, bool freeze = false, MessageEditRequest? message = null, bool topLeft = false, bool untilLifted = false, RegenerationRequest? regeneration = null, ExtraPotions.Thing.RemoteConfig.ConfigEditRequest? configFile = null)
+        public ParsedCommand(CommandKind kind, ThingAction action = ThingAction.ListPlayers, string target = "", string text = "", TimeSpan? duration = null, int minutes = 0, bool freeze = false, MessageEditRequest? message = null, bool topLeft = false, bool untilLifted = false, RegenerationRequest? regeneration = null, ExtraPotions.Thing.RemoteConfig.ConfigEditRequest? configFile = null)
         {
             Kind = kind;
             Action = action;
@@ -89,7 +89,7 @@ namespace ExtraPotions.Thing.Commands
             { "unpermit", "thing unpermit <platform id>" },
             { "admins", "thing admins [offset 0 to 9999]" },
             { "admin", "thing admin <add|remove> <platform id>" },
-            { "grant", "thing grant self | get <platform id> | <platform id> add|remove | <platform id> <world|spawn|teleport|freeze|inventory|ward> <on|off>" },
+            { "grant", "thing grant self | self remove | get <platform id> | <platform id> add|remove | <platform id> <world|spawn|teleport|freeze|inventory|ward|subadmin> <on|off>" },
             { "config", "thing config list [offset] | entries <file id> [offset] | get <file id> <entry id>" },
             { "set", "thing set <file id> <entry id> <version> <encoded value chunks>" },
         };
@@ -145,6 +145,11 @@ namespace ExtraPotions.Thing.Commands
                 case "grant":
                     if (rest.Count == 1 && rest[0].Equals("self", StringComparison.OrdinalIgnoreCase))
                         return new ParsedCommand(CommandKind.Action, action, text: "self");
+                    if (rest.Count == 2 && rest[0].Equals("self", StringComparison.OrdinalIgnoreCase) && rest[1].Equals("remove", StringComparison.OrdinalIgnoreCase))
+                        return new ParsedCommand(CommandKind.Action, action, "self", "remove");
+                    if (rest.Count == 3 && rest[0].Equals("self", StringComparison.OrdinalIgnoreCase) && AdminPermissions.TryBit(rest[1], out _)
+                        && (rest[2].Equals("on", StringComparison.OrdinalIgnoreCase) || rest[2].Equals("off", StringComparison.OrdinalIgnoreCase)))
+                        return new ParsedCommand(CommandKind.Action, action, "self", rest[1].ToLowerInvariant() + " " + rest[2].ToLowerInvariant());
                     if (rest.Count == 2 && rest[0].Equals("get", StringComparison.OrdinalIgnoreCase) && GameListIdentity.Valid(rest[1]))
                         return new ParsedCommand(CommandKind.Action, action, rest[1], "get");
                     if (rest.Count == 2 && GameListIdentity.Valid(rest[0]) && (rest[1].Equals("add", StringComparison.OrdinalIgnoreCase) || rest[1].Equals("remove", StringComparison.OrdinalIgnoreCase)))

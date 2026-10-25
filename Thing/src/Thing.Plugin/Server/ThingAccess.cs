@@ -6,6 +6,7 @@ using System.IO;
 using ExtraPotions.Meadworks.Crucible;
 using ExtraPotions.Thing.Admin;
 using ExtraPotions.Thing.Commands;
+using ExtraPotions.Thing.Config;
 using ExtraPotions.Thing.Moderation;
 using ExtraPotions.Thing.UI;
 
@@ -60,11 +61,27 @@ namespace ExtraPotions.Thing.Runtime
                 yield return new ThingUiRow("grant", id, id, AdminPermissions.Format(table.Get(world, id)));
         }
 
-        internal static IEnumerable<string> Edit(ParsedCommand command, Actor admin)
+        internal static IEnumerable<string> Edit(ParsedCommand command, Actor admin, bool isFullAdmin = true)
         {
             if (world == 0 || !readable) { yield return ThingText.Text("grant_unsaved"); yield break; }
             var id = command.Target ?? "";
             if (command.Text == "get") { yield return AdminPermissions.Wire(false, Of(id)); yield break; }
+
+            // Sub-admin or self-revocation check:
+            // "The player chosen can remove this permission from themselves at will, but cannot grant it to other players."
+            bool isSelfRevoke = !string.IsNullOrEmpty(admin.Id) && admin.Id == id && (command.Text == "subadmin off" || command.Text == "remove");
+            if (!isFullAdmin && !isSelfRevoke)
+            {
+                yield return ThingText.Text("grant_unsaved");
+                yield break;
+            }
+
+            if (command.Text == "subadmin on" && Plugin.Settings?.Get(ThingSettings.General.AllowSubAdminDelegation) != true)
+            {
+                yield return ThingText.Text("refused_disabled_by_server");
+                yield break;
+            }
+
             var changed = false;
             if (command.Text == "add") changed = table.Remember(world, id);
             else if (command.Text == "remove") changed = table.Forget(world, id);

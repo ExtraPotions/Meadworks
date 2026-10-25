@@ -394,6 +394,15 @@
     "cfg_hotkeys__ward_override_key_name": "Tecla de elusión de estatuas guardianas",
     "cfg_hotkeys__ward_override_key_help": "Tecla opcional que activa o desactiva la elusión de estatuas guardianas. Solo administradores.",
     "cfg_hotkeys__remove_drops_key_name": "Tecla para eliminar objetos del suelo",
-    "cfg_hotkeys__remove_drops_key_help": "Tecla opcional que muestra una vista previa de los objetos del suelo dentro del radio de eliminación a tu alrededor; ejecuta thing drops confirm para eliminarlos. Solo administradores."
+    "cfg_hotkeys__remove_drops_key_help": "Tecla opcional que muestra una vista previa de los objetos del suelo dentro del radio de eliminación a tu alrededor; ejecuta thing drops confirm para eliminarlos. Solo administradores.",
+    "cfg_general__allow_sub_admin_delegation_name": "Permitir delegacion de subadministrador",
+    "cfg_general__allow_sub_admin_delegation_help": "Permite que el anfitrion o administrador delegue permisos no destructivos de subadministrador a jugadores conectados.",
+    "ui_grant_subadmin": "Subadministrador (no destructivo)",
+    "ui_help_grant_subadmin": "Otorga todos los permisos no destructivos como subadministrador. Requiere dos confirmaciones.",
+    "ui_subadmin_confirm_1": "?Otorgar a este jugador permisos de subadministrador no destructivos?",
+    "ui_subadmin_confirm_2": "Segunda confirmacion: ?realmente desea otorgar permisos de subadministrador a este jugador?",
+    "ui_subadmin_revoke_self": "Revocar subadministrador",
+    "ui_subadmin_revoke_self_hint": "Revoca tus propios permisos de subadministrador.",
+    "ui_subadmin_revoke_self_confirm": "?Seguro que deseas revocar tus permisos de subadministrador?"
   }
 }

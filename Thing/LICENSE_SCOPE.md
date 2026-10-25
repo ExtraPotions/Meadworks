@@ -8,7 +8,7 @@ All original Thing code, including Thing.Core, is GPL-3.0-or-later. Copyright (C
 
 ## Original artwork and documentation
 
-Original documentation and artwork use CC BY-NC-SA 4.0, with complete terms in licenses/CC-BY-NC-SA-4.0.txt; see LICENSE-ASSETS.md. Thing ships no image, model or sound.
+Original documentation and artwork use CC BY-NC-SA 4.0, with complete terms in licenses/CC-BY-NC-SA-4.0.txt; see LICENSE-ASSETS.md. Thing ships its approved original package icon; no other image, model or sound is included.
 
 ## Adopted sources
 

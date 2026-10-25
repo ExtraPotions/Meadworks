@@ -20,7 +20,8 @@ namespace ExtraPotions.Thing.Admin
         Freeze = 8,
         Inventory = 16,
         Ward = 32,
-        All = World | Spawn | Teleport | Freeze | Inventory | Ward,
+        SubAdmin = 64,
+        All = World | Spawn | Teleport | Freeze | Inventory | Ward | SubAdmin,
     }
 
     public static class AdminPermissions
@@ -53,6 +54,39 @@ namespace ExtraPotions.Thing.Admin
 
         public static bool Covers(AdminRight held, ThingAction action)
         {
+            if ((held & AdminRight.SubAdmin) != 0)
+            {
+                switch (action)
+                {
+                    case ThingAction.ListPlayers:
+                    case ThingAction.TeleportTo:
+                    case ThingAction.Bring:
+                    case ThingAction.Mute:
+                    case ThingAction.Unmute:
+                    case ThingAction.FreezePlayer:
+                    case ThingAction.UnfreezePlayer:
+                    case ThingAction.Warn:
+                    case ThingAction.AuditView:
+                    case ThingAction.AdminListView:
+                    case ThingAction.Broadcast:
+                    case ThingAction.MessageOfTheDay:
+                    case ThingAction.Announcements:
+                    case ThingAction.CancelShutdown:
+                    case ThingAction.SaveWorld:
+                    case ThingAction.GlobalTime:
+                    case ThingAction.ReleaseTime:
+                    case ThingAction.RegenerationPage:
+                    case ThingAction.WardOverride:
+                    case ThingAction.ShowSeed:
+                    case ThingAction.PoiService:
+                    case ThingAction.RemoteConfigRead:
+                    case ThingAction.HexSpawn:
+                    case ThingAction.PermitListView:
+                    case ThingAction.GrantEdit:
+                    case ThingAction.InventoryView:
+                        return true;
+                }
+            }
             var need = For(action);
             return need != AdminRight.None && (held & need) == need;
         }
@@ -67,6 +101,7 @@ namespace ExtraPotions.Thing.Admin
                 case "freeze": bit = AdminRight.Freeze; return true;
                 case "inventory": bit = AdminRight.Inventory; return true;
                 case "ward": bit = AdminRight.Ward; return true;
+                case "subadmin": bit = AdminRight.SubAdmin; return true;
                 default: bit = AdminRight.None; return false;
             }
         }
@@ -80,6 +115,7 @@ namespace ExtraPotions.Thing.Admin
             if ((set & AdminRight.Freeze) != 0) names.Add("freeze");
             if ((set & AdminRight.Inventory) != 0) names.Add("inventory");
             if ((set & AdminRight.Ward) != 0) names.Add("ward");
+            if ((set & AdminRight.SubAdmin) != 0) names.Add("subadmin");
             return string.Join(",", names);
         }
 

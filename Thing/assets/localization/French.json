@@ -394,6 +394,15 @@
     "cfg_hotkeys__ward_override_key_name": "Touche de contournement des balises",
     "cfg_hotkeys__ward_override_key_help": "Touche facultative qui active ou désactive le contournement des balises. Administrateurs uniquement.",
     "cfg_hotkeys__remove_drops_key_name": "Touche de suppression des objets au sol",
-    "cfg_hotkeys__remove_drops_key_help": "Touche facultative qui affiche un aperçu des objets au sol dans le rayon de suppression autour de vous ; exécutez thing drops confirm pour les supprimer. Administrateurs uniquement."
+    "cfg_hotkeys__remove_drops_key_help": "Touche facultative qui affiche un aperçu des objets au sol dans le rayon de suppression autour de vous ; exécutez thing drops confirm pour les supprimer. Administrateurs uniquement.",
+    "cfg_general__allow_sub_admin_delegation_name": "Autoriser la delegation sous-administrateur",
+    "cfg_general__allow_sub_admin_delegation_help": "Permet a l'hote ou a l'administrateur d'accorder des permissions non destructives de sous-administrateur aux joueurs en ligne.",
+    "ui_grant_subadmin": "Sous-administrateur (non destructif)",
+    "ui_help_grant_subadmin": "Accorde toutes les permissions non destructives en tant que sous-administrateur. Necessite deux confirmations.",
+    "ui_subadmin_confirm_1": "Accorder a ce joueur des permissions de sous-administrateur non destructives ?",
+    "ui_subadmin_confirm_2": "Deuxieme confirmation : voulez-vous vraiment accorder les permissions de sous-administrateur ?",
+    "ui_subadmin_revoke_self": "Revoquer sous-administrateur",
+    "ui_subadmin_revoke_self_hint": "Revoquer vos propres permissions de sous-administrateur.",
+    "ui_subadmin_revoke_self_confirm": "Voulez-vous vraiment revoquer vos permissions de sous-administrateur ?"
   }
 }

@@ -146,7 +146,7 @@ namespace ExtraPotions.Thing.Runtime
                 foreach (var id in grants.Prune(id => Plugin.Settings != null && Plugin.Settings.Get(ThingSettings.World.WardOverrideAllowed)
                     && ThingServer.Active && ThingModules.ProductActive(out _) && bindings.TryGetValue(id, out var binding)
                     && binding.Generation == currentGeneration
-                    && (binding.Peer == null || ZNet.instance.IsAdmin(id) || ThingAccess.Has(id, AdminRight.Ward)) && Resolve(id, binding.Peer, out var player)
+                    && (binding.Peer == null || ZNet.instance.IsAdmin(id) || AdminPermissions.Covers(ThingAccess.Of(id), ThingAction.WardOverride)) && Resolve(id, binding.Peer, out var player)
                     && CharacterId(player!) == binding.Character && player!.GetPlayerID() == binding.PlayerId))
                 {
                     bindings.Remove(id);

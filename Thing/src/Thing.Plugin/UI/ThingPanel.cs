@@ -57,7 +57,11 @@ namespace ExtraPotions.Thing.Runtime
         static bool SelfKnown => ThingSelf.Known && CruciblePlugin.IsReady && ThingSelf.Generation == CruciblePlugin.Session.Generation;
         internal static bool CanEditGrants => CanAdmin || SelfKnown && ThingSelf.FullAdmin;
         internal static bool CanPeople => CanAdmin || SelfKnown && (ThingSelf.FullAdmin || ThingSelf.Held != AdminRight.None);
-        static bool Holds(AdminRight bit) => CanAdmin || SelfKnown && (ThingSelf.FullAdmin || (ThingSelf.Held & bit) == bit);
+        internal static bool CanViewInventory => CanAdmin || SelfKnown && (ThingSelf.FullAdmin || AdminPermissions.Covers(ThingSelf.Held, ThingAction.InventoryView));
+        internal static bool CanMutateInventory => Holds(AdminRight.Inventory);
+        static bool Holds(AdminRight bit) => CanAdmin || SelfKnown && (ThingSelf.FullAdmin || (ThingSelf.Held & bit) == bit
+            || bit == AdminRight.Teleport && AdminPermissions.Covers(ThingSelf.Held, ThingAction.TeleportTo)
+            || bit == AdminRight.Freeze && AdminPermissions.Covers(ThingSelf.Held, ThingAction.FreezePlayer));
         static string shownFor = "";
         static AdminRight shown;
         static bool shownReady;
@@ -69,6 +73,7 @@ namespace ExtraPotions.Thing.Runtime
         public static void Tick()
         {
             ThingPanelMenu.Tick();
+            ThingInventoryWindow.Tick();
             if (Plugin.Settings == null || !Plugin.Ready || !Plugin.AllowsUi) { ResetWindow(); return; }
             var context = window?.IsOpen == true ? InputContext.Window : InputContext.Gameplay;
             if (MeadworksInput.Pressed(Plugin.Settings.ShortcutValue(ThingSettings.General.AdminWindowKey), context))
@@ -369,6 +374,8 @@ namespace ExtraPotions.Thing.Runtime
                 case "pickup_radius": hint="pickup_radius_hint";break;
                 case "tab_server_config": hint="config_hint";break;
                 case "clear": hint="clear_announcements_warning";break;
+                case "grant_subadmin": hint="help_grant_subadmin";break;
+                case "subadmin_revoke_self": hint="subadmin_revoke_self_hint";break;
                 default: hint="help_"+key;break;
             }
             KitTooltip.Set(control, Ui(key), Ui(hint));
@@ -417,9 +424,11 @@ namespace ExtraPotions.Thing.Runtime
                 Add("freeze_player", () => { var target = SelectedPlayer(); if (target == null) return; Send(new[] { "freeze", target }); }, 220, y + 92, 170, 1, 22);
                 Add("unfreeze_player", () => { var target = SelectedPlayer(); if (target == null) return; Send(new[] { "unfreeze", target }); }, 410, y + 92, 170, 2, 22);
             }
-            if (Holds(AdminRight.Inventory))
+            if (CanViewInventory)
                 Add("inventory", () => { var target = Selected; if (target == null || target.Kind != "player") { Message(Ui("select_player")); return; } ThingInventoryWindow.Open(target.Id, target.Caption); }, 600, y + 92, 360, 3, 22);
             if (CanEditGrants) DrawGrantToggles(y + 146);
+            else if ((ThingSelf.Held & AdminRight.SubAdmin) != 0)
+                Add("subadmin_revoke_self", () => ThingPanelForms.Confirm(window!, Ui("subadmin_revoke_self_confirm"), () => Send(new[] { "grant", "self", "subadmin", "off" })), 220, y + 146, 350, 1, 23);
         }
 
         static void DrawGrantPage()
@@ -457,11 +466,50 @@ namespace ExtraPotions.Thing.Runtime
                 EnsureGrant(target.Id);
                 return;
             }
+
+            var id = target.Id;
+            var isSubAdmin = (shown & AdminRight.SubAdmin) != 0;
+            var subadminToggle = KitToggle.Create(content!, "Grant_subadmin", isSubAdmin, value =>
+            {
+                if (!CanEditGrants || ThingPanelJobs.Busy || !shownReady || shownFor != id || !GrantReply.IsCurrent(id, Selected?.Id ?? "")) return;
+                if (!value)
+                {
+                    ThingPanelJobs.Start(new[] { "grant", id, "subadmin", "off" }, lines =>
+                    {
+                        if (RememberGrant(id, lines)) Draw(false);
+                        else if (GrantReply.IsCurrent(id, Selected?.Id ?? "")) GrantFailed(id);
+                    }, failure: () => { if (GrantReply.IsCurrent(id, Selected?.Id ?? "")) GrantFailed(id); });
+                }
+                else
+                {
+                    var confirm1 = string.Format(Ui("subadmin_confirm_1"), target.Caption);
+                    var confirm2 = string.Format(Ui("subadmin_confirm_2"), target.Caption);
+                    ThingPanelForms.Confirm(window!, confirm1, () =>
+                    {
+                        ThingPanelForms.Confirm(window!, confirm2, () =>
+                        {
+                            ThingPanelJobs.Start(new[] { "grant", id, "subadmin", "on" }, lines =>
+                            {
+                                if (RememberGrant(id, lines)) Draw(false);
+                                else if (GrantReply.IsCurrent(id, Selected?.Id ?? "")) GrantFailed(id);
+                            }, failure: () => { if (GrantReply.IsCurrent(id, Selected?.Id ?? "")) GrantFailed(id); });
+                        });
+                    });
+                }
+            }, new Vector2(220, -y), new Vector2(350, 36), Ui("grant_subadmin"), Ui("grant_subadmin"));
+            if (subadminToggle != null)
+            {
+                subadminToggle.Tooltip(Ui("grant_subadmin"), Ui("help_grant_subadmin"));
+                Register(subadminToggle.Button, 1, 29);
+                actions.Add(subadminToggle.Button);
+            }
+            y += 42f;
+
             var bits = new[] { AdminRight.World, AdminRight.Spawn, AdminRight.Teleport, AdminRight.Freeze, AdminRight.Inventory, AdminRight.Ward };
             var names = new[] { "world", "spawn", "teleport", "freeze", "inventory", "ward" };
             for (var i = 0; i < bits.Length; i++)
             {
-                var bit = bits[i]; var name = names[i]; var id = target.Id;
+                var bit = bits[i]; var name = names[i];
                 var toggle = KitToggle.Create(content!, "Grant_" + name, (shown & bit) == bit, value =>
                 {
                     if (!CanEditGrants || ThingPanelJobs.Busy || !shownReady || shownFor != id || !GrantReply.IsCurrent(id, Selected?.Id ?? "")) return;
