@@ -1,6 +1,11 @@
+## Changes in 0.1.15
+
+- Guard ship and container naming during object teardown.
+- Handle an unavailable ship crew list when resolving the helmsman.
+
 # Keel
 
-Version 0.1.14. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.15. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Tune every ship, level a Sailing skill, and build eight new ships from the vanilla hulls.
 
@@ -20,7 +25,7 @@ Tune every ship, level a Sailing skill, and build eight new ships from the vanil
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 

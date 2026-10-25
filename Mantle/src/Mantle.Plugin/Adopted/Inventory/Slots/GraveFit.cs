@@ -60,7 +60,7 @@ namespace Mantle.Slots
                 Vector2i at = item.m_gridPos;
                 if (at.y >= mainRows && inventory.GetItemAt(at.x, at.y - shift) == null)
                     continue;
-                if (inventory.FindFreeStackSpace(item.m_shared.m_name, item.m_worldLevel) >= item.m_stack)
+                if (MainCells.FreeStackSpace(inventory, item) >= item.m_stack)
                     continue;
                 need++;
             }

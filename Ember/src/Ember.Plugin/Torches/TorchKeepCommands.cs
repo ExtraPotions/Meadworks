@@ -72,6 +72,7 @@ namespace ExtraPotions.Ember.Runtime
                 || !PrivateArea.CheckAccess(fire.transform.position)) return;
             if (Vector3.Distance(actor.transform.position, fire.transform.position) > actor.m_maxInteractDistance + fire.GetHoverOffset()) return;
             var view = fire.GetComponent<ZNetView>();
+            if (!view || !view.IsValid() || view.GetZDO() == null) return;
             if (!view.HasOwner()) view.ClaimOwnership();
             pendingActor = actor; pendingSession = CruciblePlugin.Session.Generation;
             pending = CruciblePlugin.RequestClient.InvokeAsync<Request, string>(Operation,
@@ -183,12 +184,17 @@ namespace ExtraPotions.Ember.Runtime
                 }
                 pending = null; pendingActor = null;
             }
-            if (!player || !TorchScheduleRuntime.Enabled || !player.TakeInput()
-                || !MeadworksInput.Pressed(Plugin.Settings!.Shortcut(EmberSettings.Torches.TorchSwitchKey))) return;
+            if (!player || !TorchScheduleRuntime.Enabled || Plugin.Settings == null || !player.TakeInput()
+                || !MeadworksInput.Pressed(Plugin.Settings.Shortcut(EmberSettings.Torches.TorchSwitchKey))) return;
             var hovered = player.GetHoverObject();
             var fire = hovered ? hovered.GetComponentInParent<Fireplace>() : null;
             if (fire && TorchScheduleRuntime.Switchable(fire))
-                RequestKeep(fire, !fire.GetComponent<ZNetView>().GetZDO().GetBool(TorchScheduleRuntime.KeepKey));
+            {
+                var view = fire.GetComponent<ZNetView>();
+                var zdo = view != null && view.IsValid() ? view.GetZDO() : null;
+                if (zdo != null)
+                    RequestKeep(fire, !zdo.GetBool(TorchScheduleRuntime.KeepKey));
+            }
         }
 
         internal static void Shutdown()

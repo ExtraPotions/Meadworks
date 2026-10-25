@@ -61,7 +61,16 @@ namespace Mantle.Layout
             public static bool Prefix(Inventory __instance, ItemDrop.ItemData item, int stack, ref bool __result)
             {
                 if (!InventoryState.Manages(__instance))
-                    return true;
+                {
+                    if (item?.m_shared == null)
+                        return true;
+                    if (stack <= 0)
+                        stack = item.m_stack;
+                    int room = MainCells.FreeStackSpace(__instance, item);
+                    int freeSlots = __instance.GetEmptySlots();
+                    __result = room + freeSlots * item.m_shared.m_maxStackSize >= stack;
+                    return false;
+                }
                 __result = InPlaceUpgrade.Fits(__instance, item) || MainCells.CanAdd(__instance, InventoryState.Layout, item, stack);
                 return false;
             }

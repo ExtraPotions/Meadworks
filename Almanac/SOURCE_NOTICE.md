@@ -13,3 +13,8 @@ The Corresponding Source for this version is at https://github.com/ExtraPotions/
 The native uGUI drawer host (src/Almanac.Plugin/UI/AlmanacUguiDrawer.cs) follows the behavior of BepInEx.ConfigDrawers 1.1.1 by Vapok (MIT): the CustomUguiDrawer member names, the delegate parameter rules and the scope member names. No ConfigDrawers code is copied.
 
 The text editor coloring, live JSON/YAML checks (src/Almanac.Core/Editors/TextSyntax.cs) and the table editor (src/Almanac.Core/Editors/TableText.cs) follow the described behavior of BepInEx.ConfigDrawers 1.1.3 (code editor and data tables); no ConfigDrawers code is copied.
+
+
+## Corresponding source for Almanac 0.1.23
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

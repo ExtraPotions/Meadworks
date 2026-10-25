@@ -112,7 +112,8 @@ namespace ExtraPotions.Magpie.Runtime.Pickup
             if (settings == null) return true;
             if (!settings.Flag(MagpieSettings.ShowPickupMessages)) return false;
             if (!settings.Flag(MagpieSettings.GroupPickupMessages)) return true;
-            Messages.Add(item.m_shared.m_name, amount, Time.time, item, grouping: true);
+            var name = item.m_shared?.m_name ?? "";
+            Messages.Add(name, amount, Time.time, item, grouping: true);
             return false;
         }
 
@@ -120,11 +121,12 @@ namespace ExtraPotions.Magpie.Runtime.Pickup
         {
             Items.Clear();
             Seen.Clear();
+            if (player == null) return;
             var count = Physics.OverlapSphereNonAlloc(center, radius, Hits, player.m_autoPickupMask);
             for (var i = 0; i < count; i++)
             {
                 var item = ItemOf(Hits[i], out var dummy);
-                if (item == null || !Seen.Add(item)) continue;
+                if (item == null || item.gameObject == null || !Seen.Add(item)) continue;
                 var facts = Facts(player, item, ignore, fits: true);
                 if (PickupRules.Decide(facts) == PickupAction.Skip) continue;
                 Items.Add(new Tracked { Item = item, Dummy = dummy });
@@ -215,14 +217,17 @@ namespace ExtraPotions.Magpie.Runtime.Pickup
         {
             var view = item.m_nview;
             var valid = view != null && view.IsValid();
+            var sharedName = item.m_itemData?.m_shared?.m_name;
             return new PickupFacts(item.m_autoPickup, item.IsPiece(), valid,
-                item.m_itemData != null && player.HaveUniqueKey(item.m_itemData.m_shared.m_name),
+                sharedName != null && player != null && player.HaveUniqueKey(sharedName),
                 ignore.Contains(Utils.GetPrefabName(item.gameObject)), valid && item.CanPickup(), valid && item.InTar(), fits);
         }
 
         private static bool Fits(Player player, ItemDrop item)
         {
+            if (player == null || item == null || item.m_itemData == null) return false;
             var inventory = player.GetInventory();
+            if (inventory == null) return false;
             return inventory.CanAddItem(item.m_itemData)
                 && item.m_itemData.GetWeight() + inventory.GetTotalWeight() <= player.GetMaxCarryWeight();
         }

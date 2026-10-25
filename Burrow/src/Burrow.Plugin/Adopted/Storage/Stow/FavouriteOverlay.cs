@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 
 namespace Burrow.Stow
@@ -7,6 +8,8 @@ namespace Burrow.Stow
     [HarmonyPatch(typeof(InventoryGrid), nameof(InventoryGrid.UpdateGui))]
     public static class FavouriteOverlay
     {
+        private static readonly ConditionalWeakTable<InventoryElement, SlotMarks> cachedMarks = new ConditionalWeakTable<InventoryElement, SlotMarks>();
+
         [HarmonyPostfix]
         public static void Postfix(InventoryGrid __instance, Player player)
         {
@@ -19,11 +22,17 @@ namespace Burrow.Stow
             Inventory inventory = grid.m_inventory;
             foreach (InventoryElement element in grid.m_elements)
             {
-                SlotMarks marks = element.GetComponent<SlotMarks>();
-                if (marks == null && (!show || inventory == null))
-                    continue;
-                if (marks == null)
-                    marks = SlotMarks.Attach(element);
+                if (element == null) continue;
+                if (!cachedMarks.TryGetValue(element, out SlotMarks marks) || marks == null)
+                {
+                    marks = element.GetComponent<SlotMarks>();
+                    if (marks == null && (!show || inventory == null))
+                        continue;
+                    if (marks == null)
+                        marks = SlotMarks.Attach(element);
+                    cachedMarks.Remove(element);
+                    cachedMarks.Add(element, marks);
+                }
                 ItemDrop.ItemData item = show && inventory != null ? inventory.GetItemAt(element.Position.x, element.Position.y) : null;
                 bool favouriteItem = item != null && Favourites.IsFavouriteItem(item);
                 bool favouriteSlot = show && playerGrid && Favourites.IsFavouriteSlot(element.Position);

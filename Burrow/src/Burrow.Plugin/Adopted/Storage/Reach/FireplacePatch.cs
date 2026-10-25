@@ -28,7 +28,10 @@ namespace Burrow.Reach
                 __result = StationFeed.Pull(user, accepts);
                 return false;
             }
-            if (Mathf.CeilToInt(fuel) >= __instance.m_maxFuel || user.GetInventory().HaveItem(__instance.m_fuelItem.m_itemData.m_shared.m_name))
+            string fuelName = __instance.m_fuelItem?.m_itemData?.m_shared?.m_name;
+            if (string.IsNullOrEmpty(fuelName) || user == null || user.GetInventory() == null)
+                return true;
+            if (Mathf.CeilToInt(fuel) >= __instance.m_maxFuel || user.GetInventory().HaveItem(fuelName))
                 return true;
             __state = StationFeed.Borrow(user, accepts);
             return true;
@@ -47,8 +50,9 @@ namespace Burrow.Reach
 
         private static bool CanRefuel(Fireplace fireplace)
         {
-            return fireplace.m_canRefill && !fireplace.m_infiniteFuel && fireplace.m_fuelItem != null
-                && fireplace.m_nview != null && fireplace.m_nview.IsValid();
+            return fireplace != null && fireplace.m_canRefill && !fireplace.m_infiniteFuel
+                && fireplace.m_fuelItem != null && fireplace.m_fuelItem.m_itemData?.m_shared != null
+                && fireplace.m_nview != null && fireplace.m_nview.IsValid() && fireplace.m_nview.GetZDO() != null;
         }
 
         /// <summary>The game's toggle rule: plain Use on a burning fire that can be turned off switches it, adds nothing.</summary>

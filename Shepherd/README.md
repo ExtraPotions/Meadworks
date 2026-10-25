@@ -1,6 +1,11 @@
+## Changes in 0.1.20
+
+- Use the modern native tameable discovery API while preserving InstanceID seed order.
+- Preserve husbandry registration ownership and activation-failure rollback.
+
 # Shepherd
 
-Version 0.1.18. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.20. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 The ECR breeding refresh and its adoption boundaries are recorded in [docs/ecr-breeding-refresh.md](docs/ecr-breeding-refresh.md).
 
@@ -27,7 +32,7 @@ Animal keeping as part of your base: feed troughs, a Husbandry skill, and breedi
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.28 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 

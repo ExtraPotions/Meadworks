@@ -31,10 +31,12 @@ namespace ExtraPotions.Kindle.Runtime
         internal static int Need(Piece.Requirement requirement,TrackedRecipe entry)=>(int)Math.Min(int.MaxValue,(long)requirement.GetAmount(entry.Quality)*entry.Amount);
         internal static int Have(Piece.Requirement requirement)
         {
-            var player=Player.m_localPlayer;if(!player)return 0;
+            var player=Player.m_localPlayer;if(!player || requirement == null || !requirement.m_resItem)return 0;
             string id=requirement.m_resItem.name;
-            return provider!=null && counts.TryGetValue(id,out var count) && count.Available.HasValue ? count.Available.Value
-                : player.GetInventory().CountItems(requirement.m_resItem.m_itemData.m_shared.m_name);
+            if (provider!=null && counts.TryGetValue(id,out var count) && count.Available.HasValue)
+                return count.Available.Value;
+            var sharedName = requirement.m_resItem.m_itemData?.m_shared?.m_name ?? requirement.m_resItem.name;
+            return player.GetInventory() != null ? player.GetInventory().CountItems(sharedName) : 0;
         }
         internal static void Shutdown()
         {

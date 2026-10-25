@@ -1,11 +1,11 @@
 {
   "name": "Kindle",
-  "version_number": "0.1.23",
+  "version_number": "0.1.24",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Kindle",
   "description": "Meadworks crafting: recipe search, sorting, favorites, list/grid views, batch crafting, recipe tracking, salvage and Cart Workbench. Client-optional.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.26"
+    "expDARE-Crucible-0.3.32"
   ]
 }

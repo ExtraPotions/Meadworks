@@ -1,6 +1,6 @@
 {
   "name": "Almanac",
-  "version_number": "0.1.22",
+  "version_number": "0.1.23",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Almanac",
   "description": "Meadworks settings book: one in-game window for every installed mod's settings, showing which ones the server locks and why, with settings imports. Client-optional.",
   "dependencies": [

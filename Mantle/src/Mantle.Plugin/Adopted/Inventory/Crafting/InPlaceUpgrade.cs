@@ -83,21 +83,49 @@ namespace Mantle.Crafting
             }
         }
 
-        /// <summary>Inventory.CanAddItem: the crafted item fits while it takes the place of the item it upgrades.</summary>
+        /// <summary>Inventory.CanAddItem: the crafted item fits while it takes the place of the item it upgrades or fits an empty dedicated slot.</summary>
         public static bool Fits(Inventory inventory, ItemDrop.ItemData item)
         {
             InventoryGui gui = InventoryGui.instance;
             if (!crafting || gui == null || gui.m_craftRecipe == null || gui.m_craftRecipe.m_item == null
                 || gui.m_craftRecipe.m_item.m_itemData.m_shared.m_name != item.m_shared.m_name)
                 return false;
-            return old != null ? inventory.GetItemAt(slot.x, slot.y) == null : Upgraded(gui, InventoryState.Player, out _) != null;
+            if (old != null ? inventory.GetItemAt(slot.x, slot.y) == null : Upgraded(gui, InventoryState.Player, out _) != null)
+                return true;
+            if (InventoryState.Layout != null)
+            {
+                var legal = MainCells.LegalExtraCells(InventoryState.Layout, item);
+                for (int i = 0; i < legal.Count; i++)
+                    if (inventory.GetItemAt(legal[i].x, legal[i].y) == null)
+                        return true;
+            }
+            return false;
         }
 
-        /// <summary>Inventory.FindEmptySlot: during the game's craft the emptied slot is the free cell, so the new item goes there.</summary>
+        /// <summary>Inventory.FindEmptySlot: during the game's craft the emptied slot is the free cell, or an empty dedicated slot.</summary>
         public static bool FreeSlot(Inventory inventory, out Vector2i cell)
         {
             cell = slot;
-            return (old != null || upgrading) && inventory.GetItemAt(slot.x, slot.y) == null;
+            if ((old != null || upgrading) && inventory.GetItemAt(slot.x, slot.y) == null)
+                return true;
+            if (crafting && InventoryState.Layout != null && InventoryGui.instance != null)
+            {
+                var gui = InventoryGui.instance;
+                var itemData = gui.m_craftUpgradeItem ?? gui.m_craftRecipe?.m_item?.m_itemData;
+                if (itemData != null)
+                {
+                    var legal = MainCells.LegalExtraCells(InventoryState.Layout, itemData);
+                    for (int i = 0; i < legal.Count; i++)
+                    {
+                        if (inventory.GetItemAt(legal[i].x, legal[i].y) == null)
+                        {
+                            cell = legal[i];
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         /// <summary>The game's quality upgrade of the pack in the Backpack slot: the placement waits, the slot is noted.</summary>

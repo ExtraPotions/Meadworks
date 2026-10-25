@@ -1,3 +1,7 @@
+## 0.1.19
+
+- Ignore missing or destroyed ship transforms in Kraken crew, nearest-ship and waterline queries.
+
 # Changelog
 
 ## 0.1.18 (2026-10-22)

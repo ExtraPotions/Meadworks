@@ -43,6 +43,11 @@ namespace ExtraPotions.Ember.Runtime
         }
 
         static readonly Dictionary<Door, Tracked> doors = new Dictionary<Door, Tracked>();
+        static readonly List<Door> deadDoors = new List<Door>();
+        static readonly List<Player> othersPool = new List<Player>();
+        static readonly List<KeyValuePair<Door, Tracked>> doorSnapshot = new List<KeyValuePair<Door, Tracked>>();
+        static bool checking;
+        static int generation;
         static MeadworksLog? log;
         static float timer;
         static Player? lastPlayer;
@@ -54,7 +59,16 @@ namespace ExtraPotions.Ember.Runtime
 
         public static void Shutdown()
         {
+            generation++;
             doors.Clear();
+            if (!checking)
+            {
+                deadDoors.Clear();
+                othersPool.Clear();
+                doorSnapshot.Clear();
+            }
+            timer = 0f;
+            wasEnabled = false;
             lastPlayer = null;
         }
 
@@ -74,7 +88,7 @@ namespace ExtraPotions.Ember.Runtime
 
         public static void Tick(float dt)
         {
-            if (!Plugin.Ready || Plugin.Settings == null || !MeadworksHeadless.AllowsUi) return;
+            if (checking || !Plugin.Ready || Plugin.Settings == null || !MeadworksHeadless.AllowsUi) return;
             ToggleKey();
             timer += dt;
             if (timer < CheckSeconds) return;
@@ -95,47 +109,78 @@ namespace ExtraPotions.Ember.Runtime
 
         static void Check(Player player)
         {
-            var settings = Plugin.Settings!;
-            var keep = settings.Get(EmberSettings.Doors.KeepOpenWhileOthersNear);
-            var reach = DoorKinds.All.Max(k => settings.Door(k).Open) + NearMargin;
-            var position = player.transform.position;
-            var others = Player.GetAllPlayers().Where(p => p != null && p != player && !p.IsDead()).ToList();
-            foreach (var pair in doors.ToList())
+            if (checking) return;
+            checking = true;
+            int observedGeneration = generation;
+            try
             {
-                var door = pair.Key;
-                var t = pair.Value;
-                if (door == null)
+                doorSnapshot.Clear();
+                doorSnapshot.AddRange(doors);
+                var settings = Plugin.Settings!;
+                var keep = settings.Get(EmberSettings.Doors.KeepOpenWhileOthersNear);
+                var reach = DoorKinds.All.Max(k => settings.Door(k).Open) + NearMargin;
+                var position = player.transform.position;
+                othersPool.Clear();
+                if (keep)
                 {
-                    doors.Remove(door!);
-                    continue;
+                    foreach (var p in Player.GetAllPlayers())
+                    {
+                        if (p != null && p != player && !p.IsDead())
+                            othersPool.Add(p);
+                    }
                 }
-                if (!t.Tracker.InRange && !t.Tracker.AutoOpened && (door.transform.position - position).sqrMagnitude > reach * reach) continue;
-                if (door.m_nview == null || !door.m_nview.IsValid()) continue;
-                var zdo = door.m_nview.GetZDO();
-                if (zdo == null) continue;
-                // A door the automation opened is left alone while it is still swinging (the game refuses UseDoor and
-                // CanInteract until the animation settles). Stepping now would read "automation not allowed" and drop the
-                // door without closing it, which a player walking off quickly (short Close Distance) hits at once.
-                if (t.Tracker.AutoOpened && !door.CanInteract()) continue;
-                var kind = settings.Door(t.Kind);
-                var facts = new DoorFacts(true, door.gameObject.layer == Piece.s_ghostLayer, door.CanInteract(),
-                    t.Piece != null ? t.Piece.GetCreator() : 0L, player.GetPlayerID(), door.m_keyItem != null,
-                    door.m_keyItem != null && door.HaveKey(player, false));
-                var allowed = DoorRules.AutomationEnabled(kind.Mechanic, t.Kind.HasCheckForKey, kind.CheckForKey, facts);
-                var otherNear = keep && others.Any(o => Distance(door, t, o.transform.position) <= kind.Close);
-                var tick = new DoorTick(Distance(door, t, position), kind.Open, kind.Close, allowed,
-                    zdo.GetInt(ZDOVars.s_state), door.m_invertedOpenClosedText, keep, otherNear);
-                switch (t.Tracker.Step(tick))
+
+                deadDoors.Clear();
+                foreach (var pair in doorSnapshot)
                 {
-                    case DoorAction.Open:
-                        try { door.Interact(player, false, false); }
-                        catch (Exception error) { log?.Warning("Door interaction failed: " + error.GetType().Name + ": " + error.Message); }
-                        break;
-                    case DoorAction.Close:
-                        // UseDoor toggles: from any open state it reaches the closed state of DoorState.ClosedState.
-                        door.m_nview.InvokeRPC("UseDoor", true);
-                        break;
+                    if (observedGeneration != generation) return;
+                    var door = pair.Key;
+                    var t = pair.Value;
+                    if (door == null)
+                    {
+                        deadDoors.Add(door!);
+                        continue;
+                    }
+                    if (!t.Tracker.InRange && !t.Tracker.AutoOpened && (door.transform.position - position).sqrMagnitude > reach * reach) continue;
+                    if (door.m_nview == null || !door.m_nview.IsValid()) continue;
+                    var zdo = door.m_nview.GetZDO();
+                    if (zdo == null) continue;
+                    // A door the automation opened is left alone while it is still swinging (the game refuses UseDoor and
+                    // CanInteract until the animation settles). Stepping now would read "automation not allowed" and drop the
+                    // door without closing it, which a player walking off quickly (short Close Distance) hits at once.
+                    if (t.Tracker.AutoOpened && !door.CanInteract()) continue;
+                    var kind = settings.Door(t.Kind);
+                    var facts = new DoorFacts(true, door.gameObject.layer == Piece.s_ghostLayer, door.CanInteract(),
+                        t.Piece != null ? t.Piece.GetCreator() : 0L, player.GetPlayerID(), door.m_keyItem != null,
+                        door.m_keyItem != null && door.HaveKey(player, false));
+                    var allowed = DoorRules.AutomationEnabled(kind.Mechanic, t.Kind.HasCheckForKey, kind.CheckForKey, facts);
+                    var otherNear = keep && othersPool.Any(o => Distance(door, t, o.transform.position) <= kind.Close);
+                    var tick = new DoorTick(Distance(door, t, position), kind.Open, kind.Close, allowed,
+                        zdo.GetInt(ZDOVars.s_state), door.m_invertedOpenClosedText, keep, otherNear);
+                    switch (t.Tracker.Step(tick))
+                    {
+                        case DoorAction.Open:
+                            try { door.Interact(player, false, false); }
+                            catch (Exception error) { log?.Warning("Door interaction failed: " + error.GetType().Name + ": " + error.Message); }
+                            break;
+                        case DoorAction.Close:
+                            // UseDoor toggles: from any open state it reaches the closed state of DoorState.ClosedState.
+                            door.m_nview.InvokeRPC("UseDoor", true);
+                            break;
+                    }
                 }
+                if (deadDoors.Count > 0)
+                {
+                    foreach (var d in deadDoors) doors.Remove(d);
+                    deadDoors.Clear();
+                }
+            }
+            finally
+            {
+                deadDoors.Clear();
+                othersPool.Clear();
+                doorSnapshot.Clear();
+                checking = false;
             }
         }
 

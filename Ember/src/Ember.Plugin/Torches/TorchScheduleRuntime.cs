@@ -28,8 +28,9 @@ namespace ExtraPotions.Ember.Runtime
 
         internal static void Initialize(ProductRegistration registration) => TorchKeepCommands.Initialize(registration);
 
-        internal static bool Listed(ZDO zdo)
+        internal static bool Listed(ZDO? zdo)
         {
+            if (zdo == null) return false;
             string text = Plugin.Settings?.Get(EmberSettings.Torches.TorchPieces) ?? "";
             if (text != listText)
             {
@@ -47,7 +48,12 @@ namespace ExtraPotions.Ember.Runtime
             return view && view.IsValid() && (!mustOwn || view.IsOwner()) && piece && piece.IsPlacedByPlayer();
         }
 
-        public static bool Switchable(Fireplace fire) => Enabled && PlayerFire(fire, false) && Listed(fire.GetComponent<ZNetView>().GetZDO());
+        public static bool Switchable(Fireplace fire)
+        {
+            if (!Enabled || !PlayerFire(fire, false)) return false;
+            var view = fire.GetComponent<ZNetView>();
+            return view != null && view.IsValid() && Listed(view.GetZDO());
+        }
 
         public static bool? NightNow()
         {
@@ -68,7 +74,9 @@ namespace ExtraPotions.Ember.Runtime
         public static void Apply(Fireplace fire)
         {
             if (!PlayerFire(fire, true) || !ZNet.instance || !ZNetScene.instance) return;
-            var zdo = fire.GetComponent<ZNetView>().GetZDO();
+            var view = fire.GetComponent<ZNetView>();
+            var zdo = view != null && view.IsValid() ? view.GetZDO() : null;
+            if (zdo == null) return;
             var change = TorchSchedule.Step(Enabled, Listed(zdo), zdo.GetBool(KeepKey), zdo.GetInt(PhaseKey), Enabled ? NightNow() : null);
             if (!change.Write) return;
             if (change.On.HasValue) SetOn(fire, change.On.Value);
@@ -100,7 +108,9 @@ namespace ExtraPotions.Ember.Runtime
             foreach (var fire in TorchRuntime.Registered.ToArray())
             {
                 if (!PlayerFire(fire, true) || !ZNet.instance || !ZNetScene.instance) continue;
-                var zdo = fire.GetComponent<ZNetView>().GetZDO();
+                var view = fire.GetComponent<ZNetView>();
+                var zdo = view != null && view.IsValid() ? view.GetZDO() : null;
+                if (zdo == null) continue;
                 if (zdo.GetInt(PhaseKey) == TorchSchedule.Day) SetOn(fire, true);
                 if (zdo.GetInt(PhaseKey) != 0) zdo.Set(PhaseKey, 0);
             }
@@ -116,12 +126,14 @@ namespace ExtraPotions.Ember.Runtime
         static void Postfix(Fireplace __instance, ref string __result)
         {
             var player = Player.m_localPlayer;
-            if (string.IsNullOrEmpty(__result) || !player || !TorchScheduleRuntime.Switchable(__instance)
+            if (string.IsNullOrEmpty(__result) || !player || Plugin.Settings == null || !TorchScheduleRuntime.Switchable(__instance)
                 || !PrivateArea.CheckAccess(__instance.transform.position, 0f, false)) return;
-            var zdo = __instance.GetComponent<ZNetView>().GetZDO();
+            var view = __instance.GetComponent<ZNetView>();
+            var zdo = view != null && view.IsValid() ? view.GetZDO() : null;
+            if (zdo == null) return;
             if (zdo.GetInt(TorchScheduleRuntime.PhaseKey) == TorchSchedule.Day && zdo.GetInt(ZDOVars.s_state, 1) != 1)
                 __result += "\n" + EmberText.Text("torch_nightfall");
-            var key = Plugin.Settings!.Shortcut(EmberSettings.Torches.TorchSwitchKey);
+            var key = Plugin.Settings.Shortcut(EmberSettings.Torches.TorchSwitchKey);
             if (key.MainKey != UnityEngine.KeyCode.None)
                 __result += "\n[<color=yellow><b>" + string.Join(" + ", key.Modifiers.Select(k => k.ToString()).Concat(new[] { key.MainKey.ToString() })) + "</b></color>] "
                     + EmberText.Text(zdo.GetBool(TorchScheduleRuntime.KeepKey) ? "torch_schedule" : "torch_keep");

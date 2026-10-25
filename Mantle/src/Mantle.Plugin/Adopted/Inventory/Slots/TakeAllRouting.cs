@@ -25,7 +25,7 @@ namespace Mantle.Slots
                 var copy = item.Clone();
                 // Without a free cell only partial stacks can take more; the game's add would otherwise log an occupied-slot warning.
                 if (!__instance.CanAddItem(copy))
-                    copy.m_stack = System.Math.Min(copy.m_stack, __instance.FindFreeStackSpace(copy.m_shared.m_name, copy.m_worldLevel));
+                    copy.m_stack = System.Math.Min(copy.m_stack, Mantle.Layout.MainCells.FreeStackSpace(__instance, copy));
                 if (copy.m_stack <= 0) continue;
                 int before = __instance.GetAllItems().Sum(i => i.m_stack);
                 __instance.AddItem(copy);

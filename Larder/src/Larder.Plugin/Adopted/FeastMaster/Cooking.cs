@@ -43,7 +43,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.FeastMaster
         public static CookingSwap Swap(CookingStation station)
         {
             ZNetView view = station.m_nview;
-            if (view == null || !view.IsValid() || !view.IsOwner())
+            if (view == null || !view.IsValid() || !view.IsOwner() || view.GetZDO() == null)
                 return default;
             CookingSwap saved = new CookingSwap { CanOvercook = station.m_canOvercookItems };
             station.m_canOvercookItems &= NativeFeastMaster.Value(Settings.FoodCanBurn) && !NativeFeastMaster.InstantKitchen;

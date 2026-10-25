@@ -49,8 +49,8 @@ namespace ExtraPotions.Keel.Runtime
         {
             var controls = ship != null ? ship.m_shipControlls : null;
             var user = controls != null ? controls.GetUser() : 0L;
-            if (user == 0L) return null;
-            foreach (var player in ship!.m_players)
+            if (user == 0L || ship == null || ship.m_players == null) return null;
+            foreach (var player in ship.m_players)
                 if (player != null && player.GetPlayerID() == user) return player;
             return null;
         }

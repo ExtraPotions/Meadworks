@@ -1,8 +1,12 @@
+## Changes in 0.1.23
+
+- Guard pause handling when the settings window or game instance is unavailable.
+
 # Almanac
 
 One in-game settings book for every installed mod's configuration, aware of server locks.
 
-Version 0.1.21. Requires Crucible 0.3.30 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.23. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -24,7 +28,7 @@ The Advanced switch in the header controls specialist settings. Pin/Unpin manage
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2 (installed with Crucible)
-- Crucible 0.3.30 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 

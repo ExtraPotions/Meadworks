@@ -6,7 +6,7 @@ namespace ExtraPotions.Delve
     {
         public const string PluginGuid = "com.meadworks.delve";
         public const string ProductName = "Delve";
-        public const string ProductVersion = "0.1.14";
+        public const string ProductVersion = "0.1.15";
         public const string Family = "Runestone";
 
         /// <summary>Localization namespace (design section 11): tokens <c>$meadworks_delve_&lt;key&gt;</c>.</summary>

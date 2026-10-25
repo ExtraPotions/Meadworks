@@ -1,3 +1,10 @@
+## 0.5.9
+
+- Keep automatic door checks at 0.05 seconds while reusing scan collections and handling callback mutation and shutdown safely.
+- Avoid an intermediate dead-fireplace cleanup list when no tracked entries have died.
+- Guard torch keep, schedule and hover paths when network state is unavailable.
+- Reject missing torch shared data before durability calculations.
+
 # Changelog
 
 ## 0.5.8 (2026-10-21)

@@ -9,7 +9,7 @@ namespace Mantle.Consume
     /// <summary>
     /// The keys of section "2. Slots" that eat and drink from the slots (<see cref="ConsumeKeys"/>, <see cref="MeadSlotKeys"/>),
     /// and in "5. Look" the bar that shows them on the screen (<see cref="ConsumeBar"/>). Keys are
-    /// each player's own, so they are not synced. Z is free in the game (only its debug mode uses it, for flying); OpenKeep's Find Key is also Z, but only inside the inventory, where these keys do nothing. Left Alt
+    /// each player's own, so they are not synced. Left Alt
     /// is free in the game; the game's hotbar keys ignore it, so <see cref="MeadSlotKeys"/> holds the hotbar back while it is held.
     /// Mantle, 2026-10-10 (parity choice #29): the Mead Slot keys replace the Mead Key (B, every mead at once), as in
     /// PackPanel 0.15. They default to PackPanel's Left Alt + 1 to 5 (the user, 2026-10-12 17:40: match Solo, an exception to
@@ -26,7 +26,7 @@ namespace Mantle.Consume
 
         public static void Bind(SyncedConfiguration synced)
         {
-            FoodKey = synced.Bind(InventorySettings.SlotsSection, "Food Key", new KeyboardShortcut(KeyCode.Z),
+            FoodKey = synced.Bind(InventorySettings.SlotsSection, "Food Key", KeyboardShortcut.Empty,
                 "Outside the inventory, with no hammer, hoe or cultivator in hand: eats every food in the Food slots that can be eaten now, left to right. Per player.", synced: false);
             BindMeadSlotKeys(synced);
             Bar = synced.Bind(InventorySettings.LookSection, "Food And Mead Bar", true,

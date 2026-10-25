@@ -106,7 +106,9 @@ namespace ExtraPotions.Kindle.Runtime
         }
         internal static string DisplayName(Recipe recipe,int quality)
         {
-            string name=Localization.instance.Localize(recipe.m_item.m_itemData.m_shared.m_name);
+            if (recipe == null) return string.Empty;
+            string rawName = recipe.m_item?.m_itemData?.m_shared?.m_name ?? recipe.m_item?.gameObject?.name ?? recipe.name ?? string.Empty;
+            string name = Localization.instance != null ? Localization.instance.Localize(rawName) : rawName;
             return quality>1 ? KindleText.Format("tracker_upgrade",name,quality) : name;
         }
         private static void Message(string text,bool top=false) => KindleText.Notice(text,top);
@@ -127,7 +129,7 @@ namespace ExtraPotions.Kindle.Runtime
             panel.Update(show,free);if(!show)return;
             if(builtVersion!=version){panel.Rebuild(entries);builtVersion=version;nextCount=0;}
             if(Time.unscaledTime<nextCount)return;
-            nextCount=Time.unscaledTime+0.5f;
+            nextCount=Time.unscaledTime+1.25f;
             try
             {
                 string style=TrackerStyle.Signature;

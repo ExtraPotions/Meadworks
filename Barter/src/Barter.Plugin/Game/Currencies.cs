@@ -59,6 +59,8 @@ namespace ExtraPotions.Barter.Runtime
                 return null;
             Vanilla(store);
             ItemDrop currency = trader == null ? Vanilla() : OfTrader(TradeWorld.TraderName(trader));
+            if (currency == null)
+                currency = Vanilla();
             if (currency != null)
             {
                 store.m_coinPrefab = currency;
@@ -70,10 +72,14 @@ namespace ExtraPotions.Barter.Runtime
         /// <summary>Puts the coin back when the window closes, so nothing else sees the swapped prefab.</summary>
         internal static void Restore(StoreGui store)
         {
-            if (store != null && vanilla != null)
+            if (store != null)
             {
-                store.m_coinPrefab = vanilla;
-                SetIcons(store.m_rootPanel, vanilla);
+                ItemDrop coin = vanilla ?? TradeWorld.Item(BarterCore.VanillaCurrency);
+                if (coin != null)
+                {
+                    store.m_coinPrefab = coin;
+                    SetIcons(store.m_rootPanel, coin);
+                }
             }
         }
 

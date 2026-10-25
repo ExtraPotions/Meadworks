@@ -23,3 +23,8 @@ The additions `Larder.Core/Exertion/IgnoredCreatures.cs` and the ignored-creatur
 The build-only BepInEx.AssemblyPublicizer 0.4.3 dependency retains its MIT notice in THIRD_PARTY_NOTICES/BepInEx.AssemblyPublicizer-MIT.txt; its binary is not bundled.
 
 Rested acquisition delay selectively adapts OpenKeep Homestead RestPatch, RestDelay and RestSettings at `3bb778330f23645ccddb42fbc0c6ffab72c842b6` (GPL-3.0-or-later). Existing FeastMaster/Grindstone pins remain unchanged. The exact raw pinned root LICENSE is byte-identical to the retained ValheimMods GPL notice. Larder uses its existing Recovery configuration/authority and changed-only patch lifecycle, binds the real native default instead of adopting the upstream five-second default, and restores its temporary native instance delay after a call or exception when the field still holds the applied value, preserving a different later-written delay. OpenKeep source coexistence disables only this delay hook.
+
+
+## Corresponding source for Larder 0.2.15
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

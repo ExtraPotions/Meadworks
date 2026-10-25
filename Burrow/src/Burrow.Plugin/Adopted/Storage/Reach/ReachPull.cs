@@ -106,8 +106,22 @@ namespace Burrow.Reach
         /// <summary>How many of the item the inventory can still take: free stack space plus empty slots.</summary>
         public static int Fits(Inventory inventory, ItemDrop.ItemData item)
         {
+            if (inventory == null || item?.m_shared == null)
+                return 0;
             int perSlot = Math.Max(1, item.m_shared.m_maxStackSize);
-            return inventory.FindFreeStackSpace(item.m_shared.m_name, item.m_worldLevel) + inventory.GetEmptySlots() * perSlot;
+            int room = 0;
+            foreach (ItemDrop.ItemData existing in inventory.GetAllItems())
+            {
+                if (existing != null && existing.m_shared != null
+                    && existing.m_shared.m_name == item.m_shared.m_name
+                    && existing.m_quality == item.m_quality
+                    && existing.m_worldLevel == item.m_worldLevel
+                    && existing.m_stack < existing.m_shared.m_maxStackSize)
+                {
+                    room += existing.m_shared.m_maxStackSize - existing.m_stack;
+                }
+            }
+            return room + inventory.GetEmptySlots() * perSlot;
         }
 
         /// <summary>

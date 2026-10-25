@@ -1,3 +1,8 @@
+## 0.1.4
+
+- Restore native currency when a trader currency prefab is unavailable.
+- Guard trader world snapshots during scene teardown.
+
 # Changelog
 
 ## Unreleased

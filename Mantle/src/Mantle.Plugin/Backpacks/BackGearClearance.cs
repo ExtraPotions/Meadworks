@@ -10,6 +10,7 @@ namespace Mantle.Backpacks
         private readonly Gear left = new Gear();
         private readonly Gear right = new Gear();
         private Bounds pack;
+        private bool applied;
 
         internal static void Follow(Transform mount, VisEquipment equipment)
         {
@@ -21,6 +22,9 @@ namespace Mantle.Backpacks
                 clearance = mount.gameObject.AddComponent<BackGearClearance>();
                 clearance.pack = ModelBounds.In(mount.gameObject, mount);
             }
+            if (clearance.applied && clearance.left.Matches(equipment.m_leftBackItemInstance)
+                && clearance.right.Matches(equipment.m_rightBackItemInstance))
+                return;
             clearance.left.Follow(equipment.m_leftBackItemInstance);
             clearance.right.Follow(equipment.m_rightBackItemInstance);
             float distance = Mathf.Max(clearance.Distance(clearance.left), clearance.Distance(clearance.right));
@@ -28,6 +32,7 @@ namespace Mantle.Backpacks
             Vector3 offset = mount.TransformVector(Vector3.back * distance);
             clearance.left.Move(offset);
             clearance.right.Move(offset);
+            clearance.applied = true;
         }
 
         internal static void Let(Transform mount)
@@ -53,6 +58,7 @@ namespace Mantle.Backpacks
 
         private void Release()
         {
+            applied = false;
             left.Restore();
             right.Restore();
         }
@@ -63,6 +69,12 @@ namespace Mantle.Backpacks
             private Transform parent;
             private MeshFilter[] meshes;
             private Vector3 offset;
+
+            internal bool Matches(GameObject instance)
+            {
+                Transform next = instance != null ? instance.transform : null;
+                return Item == next && (next == null || parent == next.parent);
+            }
 
             internal void Follow(GameObject instance)
             {

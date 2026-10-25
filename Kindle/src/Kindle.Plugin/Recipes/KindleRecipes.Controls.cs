@@ -53,14 +53,14 @@ namespace ExtraPotions.Kindle.Runtime
                 tiles.Mark(rect,Favourite(recipe),starSprite,starColour);
                 tiles.Greyed(rect,!pair.CanCraft);
                 if(RecipeViews.IsGrid(config.Get(KindleSettings.RecipeList.RecipeView)))
-                    tiles.Tooltip(rect,Localize(recipe.m_item.m_itemData.m_shared.m_name),recipe.m_amount>1?"x"+recipe.m_amount:"");
+                    tiles.Tooltip(rect,Localize(recipe.m_item?.m_itemData?.m_shared?.m_name ?? recipe.m_item?.gameObject?.name ?? recipe.name),recipe.m_amount>1?"x"+recipe.m_amount:"");
             }
         }
         static void ToggleFavourite(Recipe recipe)
         {
             if(!Active || !recipe || !config.Get(KindleSettings.RecipeList.Favourites))return;
             ReadFavourites();bool on=favourites.Toggle(Key(recipe));WriteFavourites();
-            KindleText.Notice(KindleText.Format(on?"recipe_favorite_on":"recipe_favorite_off",Localize(recipe.m_item.m_itemData.m_shared.m_name)));
+            KindleText.Notice(KindleText.Format(on?"recipe_favorite_on":"recipe_favorite_off",Localize(recipe.m_item?.m_itemData?.m_shared?.m_name ?? recipe.m_item?.gameObject?.name ?? recipe.name)));
         }
         static void Only(KitClickKind kind)
         {

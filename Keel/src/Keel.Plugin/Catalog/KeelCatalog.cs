@@ -356,7 +356,7 @@ namespace ExtraPotions.Keel.Runtime
         /// <summary>The ship's name as the game shows its piece; empty when this ship is not named.</summary>
         internal static string ShipName(Ship ship)
         {
-            if (ship == null || !Active || Plugin.Settings == null) return "";
+            if (ship == null || ship.gameObject == null || !Active || Plugin.Settings == null) return "";
             var keel = byPrefab.ContainsKey(Utils.GetPrefabName(ship.gameObject));
             if (!keel && !Plugin.Settings.Get(KeelSettings.Display.NameVanillaShips)) return "";
             var piece = ship.GetComponent<Piece>();
@@ -365,6 +365,7 @@ namespace ExtraPotions.Keel.Runtime
 
         private static void Name(Container container, Ship ship)
         {
+            if (container == null || ship == null || ship.gameObject == null) return;
             var name = ShipName(ship);
             // Unnamed (for example Name Vanilla Ships turned off): the hold keeps or gets back the game's own name.
             var text = name.Length == 0 ? ZNetScene.instance?.GetPrefab(Utils.GetPrefabName(ship.gameObject))?.GetComponentInChildren<Container>(true)?.m_name : KeelText.Format(KeelTextKeys.StorageName, name);
@@ -379,6 +380,7 @@ namespace ExtraPotions.Keel.Runtime
         {
             foreach (var ship in UnityEngine.Object.FindObjectsByType<Ship>(FindObjectsSortMode.None))
             {
+                if (ship == null || ship.gameObject == null) continue;
                 var container = ship.GetComponentInChildren<Container>();
                 if (container != null) Name(container, ship);
             }

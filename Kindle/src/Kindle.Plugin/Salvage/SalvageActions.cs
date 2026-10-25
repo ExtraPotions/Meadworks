@@ -95,8 +95,11 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         /// <summary>"Salvaged Iron sword ×2: 6 Iron, 2 Wood" with $tokens left for the message to localize.</summary>
         public static string Summary(ItemDrop.ItemData item, List<SalvageReturn> returns)
         {
+            if (item == null) return string.Empty;
+            string name = item.m_shared?.m_name ?? item.m_dropPrefab?.name;
+            if (string.IsNullOrEmpty(name)) return string.Empty;
             StringBuilder text = new StringBuilder();
-            text.Append(SalvageWords.Done).Append(' ').Append(item.m_shared.m_name);
+            text.Append(SalvageWords.Done).Append(' ').Append(name);
             if (item.m_stack > 1)
                 text.Append(" ×").Append(item.m_stack);
             text.Append(": ").Append(ReturnList(returns));

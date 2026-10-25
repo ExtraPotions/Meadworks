@@ -74,9 +74,24 @@ namespace ExtraPotions.Ember.Runtime
             ReadList();
             // Destroyed pieces compare equal to null in Unity; drop them and their saved fuel flag.
             fireplaces.RemoveWhere(f => f == null);
-            foreach (var dead in originalInfiniteFuel.Keys.Where(f => f == null).ToList()) originalInfiniteFuel.Remove(dead);
+            List<Fireplace> deadList = null;
+            foreach (var f in originalInfiniteFuel.Keys)
+            {
+                if (f == null)
+                {
+                    deadList = deadList ?? new List<Fireplace>();
+                    deadList.Add(f);
+                }
+            }
+            if (deadList != null)
+            {
+                foreach (var dead in deadList) originalInfiniteFuel.Remove(dead);
+            }
             foreach (var fire in fireplaces)
             {
+                if (!fire || fire.gameObject.layer == Piece.s_ghostLayer) continue;
+                var view = fire.GetComponent<ZNetView>();
+                if (!view || !view.IsValid() || view.GetZDO() == null) continue;
                 var isListed = listed.Contains(Utils.GetPrefabName(fire.gameObject));
                 SetArea(fire.gameObject, TorchFire.PieceIsFire(active && warmthReady,
                     EmberSeasons.Heat(isListed) && Utils.GetPrefabName(fire.gameObject) != "fire_pit", fire.IsBurning()));
@@ -219,7 +234,7 @@ namespace ExtraPotions.Ember.Runtime
         /// <summary>T3 to T5, Endless Torches: scales the drain step of a held torch; the item's shared data is untouched.</summary>
         internal static void ScaleDrain(Humanoid humanoid, ItemDrop.ItemData item, ref float dt)
         {
-            if (!Active || item == null || item.m_dropPrefab == null || item.m_dropPrefab.name != TorchPrefab || Plugin.Settings == null) return;
+            if (!Active || item == null || item.m_shared == null || item.m_dropPrefab == null || item.m_dropPrefab.name != TorchPrefab || Plugin.Settings == null) return;
             var s = Plugin.Settings;
             if (s.Get(EmberSettings.Torches.FuelFreeFires)) { dt = 0f; return; }
             var vanilla = item.m_shared.m_durabilityDrain;

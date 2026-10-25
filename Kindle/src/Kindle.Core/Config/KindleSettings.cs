@@ -143,7 +143,7 @@ namespace ExtraPotions.Kindle.Config
 
             public static readonly KindleSetting<bool> Enabled = KindleSetting.Toggle(Section, "Virtual Workbench", false, ServerAuthoritative,
                 "Host setting, off by default. Lets players reopen the crafting station they used last from anywhere it is still loaded, with Virtual Workbench Key. That station's own level, extensions, roof and fire rules apply, and crafting uses only carried materials, as at the station.");
-            public static readonly KindleSetting<string> Key = KindleSetting.Text(Section, "Virtual Workbench Key", "J", Local,
+            public static readonly KindleSetting<string> Key = KindleSetting.Text(Section, "Virtual Workbench Key", "", Local,
                 "Your own key that reopens the crafting station you used last, when the host allows Virtual Workbench. Empty: no key.", Shortcut);
         }
 

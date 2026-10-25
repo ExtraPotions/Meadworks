@@ -19,3 +19,8 @@ The map-marker feature selectively adapts Homestead BedPins.cs, BedPinsPatch.cs 
 
 
 The optional torch schedule selectively adapts OpenKeep TorchSwitch.cs, TorchNight.cs, TorchKeep.cs and TorchHoverPatch.cs at the same 684671f98de54db6ea6652092ec041f44016c37d pin, GPL-3.0-or-later. The full retained OpenKeep notice also covers these files. Fuel-free/smokeless fire comfort and the authenticated keep command transport are MeadWorks implementations; TorchesAreFires remains a behavior-only reference with no copied code. Existing MIT source records and license notices remain unchanged.
+
+
+## Corresponding source for Ember 0.5.9
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

@@ -107,8 +107,9 @@ namespace ExtraPotions.Kindle.Runtime
         static RecipeFacts Facts(InventoryGui.RecipeDataPair pair)
         {
             var recipe=pair.Recipe;if(!recipe || !recipe.m_item)return null;
-            var materials=recipe.m_resources.Where(r=>r.m_resItem).Select(r=>new RecipeMaterial(Localize(r.m_resItem.m_itemData.m_shared.m_name),r.m_resItem.gameObject.name,r.GetAmount(Quality(pair.ItemData)),r.m_upgraderResource)).ToArray();
-            return new RecipeFacts(Key(recipe),Localize(recipe.m_item.m_itemData.m_shared.m_name),recipe.m_item.gameObject.name,materials,pair.CanCraft,recipe.m_listSortWeight,pair.ItemData?.m_quality??0,CategoryOf(recipe.m_item.m_itemData));
+            var materials=recipe.m_resources.Where(r=>r.m_resItem).Select(r=>new RecipeMaterial(Localize(r.m_resItem.m_itemData?.m_shared?.m_name ?? r.m_resItem.gameObject.name),r.m_resItem.gameObject.name,r.GetAmount(Quality(pair.ItemData)),r.m_upgraderResource)).ToArray();
+            string title = Localize(recipe.m_item.m_itemData?.m_shared?.m_name ?? recipe.m_item.gameObject.name);
+            return new RecipeFacts(Key(recipe),title,recipe.m_item.gameObject.name,materials,pair.CanCraft,recipe.m_listSortWeight,pair.ItemData?.m_quality??0,CategoryOf(recipe.m_item.m_itemData));
         }
         static string Localize(string text)=>Localization.instance!=null?Localization.instance.Localize(text):text;
         internal static void Apply(InventoryGui gui)

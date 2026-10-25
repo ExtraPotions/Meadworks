@@ -1,6 +1,11 @@
+## Changes in 0.5.13
+
+- Keep landing and map input safe when the teleport service is unavailable.
+- Send notices to the log when the native message HUD is unavailable.
+
 # Wayfarer
 
-Version 0.5.12. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.13. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Teleport from the world map: Back to Bed for everyone, plus travel cheats the server switches on, usable by admins unless the server allows others.
 
@@ -18,7 +23,7 @@ Teleport from the world map: Back to Bed for everyone, plus travel cheats the se
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 

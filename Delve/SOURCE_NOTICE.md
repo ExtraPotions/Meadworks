@@ -7,3 +7,8 @@ Delve.Core.dll and Delve.dll contain logic adapted from RestockRegen 0.19.0 by l
 Behavior references credited without code: Max_Dungeon_Rooms (Digitalroot), MoreDungeonResets (Loathe), Valheim_Admin_Tool (QoLTeam).
 
 The Corresponding Source for this version is at https://github.com/ExtraPotions/Meadworks/tree/main/Delve. No copyright transfer is inferred. Original upstream copyright and license notices remain intact.
+
+
+## Corresponding source for Delve 0.1.15
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

@@ -12,7 +12,7 @@ namespace Burrow.Core
         {
             mainWidth = mainRows = blockedCells = 0;
             if (player == null || player != Player.m_localPlayer || !Burrow.Plugin.IsReady
-                || Burrow.Resources.NativeChestIdentity.World == 0 || !PackPanelLink.LaysOutInventory
+                || !PackPanelLink.LaysOutInventory
                 || PackPanelLink.Ambiguous) return false;
             int w, rows, blocked;
             if (PackPanelLink.OwnerLaysOut)

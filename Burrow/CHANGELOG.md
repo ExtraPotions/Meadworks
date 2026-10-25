@@ -1,3 +1,11 @@
+## 0.3.28
+
+- Preserve legal inventory cells during layout transitions.
+- Keep stack capacity accounting separated by quality and world level.
+- Refresh a viewed container when newer network inventory data is available.
+- Reuse favourite overlays safely across refreshed or destroyed inventory cells.
+- Ignore malformed fuel and unavailable inventory or world data during station refilling.
+
 # Changelog
 
 ## 0.3.27 (2026-10-24)

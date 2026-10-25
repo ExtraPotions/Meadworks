@@ -25,7 +25,7 @@ namespace ExtraPotions.Kindle.Runtime
     {
         public const string Guid = "com.meadworks.kindle";
         public const string Name = "Kindle";
-        public const string Version = "0.1.23";
+        public const string Version = "0.1.24";
         public const string Family = "Forge";
 
         private ProductRegistration? registration;

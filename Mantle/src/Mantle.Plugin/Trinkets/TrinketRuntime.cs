@@ -185,7 +185,7 @@ namespace Mantle.Trinkets
             if (player == null || player.GetInventory() == null) return false;
             foreach (ItemDrop.ItemData item in player.GetInventory().GetAllItems())
             {
-                if (!item.m_equipped || item.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Trinket) continue;
+                if (item == null || !item.m_equipped || item.m_shared == null || item.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Trinket) continue;
                 // Multiple trinkets or a third-party identity are outside option A.
                 if (source != null || item.m_dropPrefab == null || !sources.TryGetValue(item.m_dropPrefab.name, out NativeSource found)) return false;
                 if (!ReferenceEquals(item.m_shared.m_fullAdrenalineSE, found.Effect) || item.m_shared.m_maxAdrenaline != found.Row.Threshold) return false;
@@ -231,7 +231,7 @@ namespace Mantle.Trinkets
             {
                 GameObject prefab = db.GetItemPrefab(id);
                 ItemDrop drop = prefab == null ? null : prefab.GetComponent<ItemDrop>();
-                if (drop == null) { FallbackReason = "native-data-pending"; return; }
+                if (drop == null || drop.m_itemData == null || drop.m_itemData.m_shared == null) { FallbackReason = "native-data-pending"; return; }
                 ItemDrop.ItemData item = drop.m_itemData;
                 var effect = item.m_shared.m_fullAdrenalineSE as SE_Stats;
                 if (item.m_shared.m_itemType != ItemDrop.ItemData.ItemType.Trinket || effect == null ||

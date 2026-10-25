@@ -182,6 +182,7 @@ namespace ExtraPotions.Kindle.Runtime
         }
         static void AddRow(ItemDrop.ItemData item,string blocked,Container chest)
         {
+            if (item?.m_shared == null) return;
             // Gear with a recipe that cannot be salvaged now is listed dimmed with the reason, so it is never silently missing.
             if (blocked!=null && (blocked==SalvageWords.Off || blocked==SalvageWords.Cannot || blocked==SalvageWords.NoRecipe)) return;
             var row=Object.Instantiate(gui.m_recipeElementPrefab,gui.m_recipeListRoot);
@@ -191,9 +192,9 @@ namespace ExtraPotions.Kindle.Runtime
             var name=row.transform.Find("name")?.GetComponent<TMP_Text>();
             if (name != null) { name.text=ItemNames.DisplayName(item)+(item.m_stack>1?" ×"+item.m_stack:"")+ChestLabel(chest);name.color=blocked==null?Color.white:BlockedName; }
             var quality=row.transform.Find("QualityLevel")?.GetComponent<TMP_Text>();
-            if (quality != null) { quality.gameObject.SetActive(item.m_shared.m_maxQuality>1);quality.text=item.m_quality.ToString(); }
+            if (quality != null) { quality.gameObject.SetActive(item?.m_shared != null && item.m_shared.m_maxQuality>1);quality.text=item.m_quality.ToString(); }
             var bar=row.transform.Find("Durability")?.GetComponent<GuiBar>();
-            if (bar != null) { bool worn=item.m_shared.m_useDurability && item.m_durability<item.GetMaxDurability();bar.gameObject.SetActive(worn);if(worn)bar.SetValue(item.GetDurabilityPercentage()); }
+            if (bar != null) { bool worn=item?.m_shared != null && item.m_shared.m_useDurability && item.m_durability<item.GetMaxDurability();bar.gameObject.SetActive(worn);if(worn)bar.SetValue(item.GetDurabilityPercentage()); }
             var button=row.GetComponent<Button>();
             int index=rows.Count;
             if (button != null) { button.onClick=new Button.ButtonClickedEvent();button.onClick.AddListener(()=>Choose(index,false)); }

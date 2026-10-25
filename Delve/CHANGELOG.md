@@ -1,3 +1,7 @@
+## 0.1.15
+
+- Guard world object creation, removal and nearby queries when scene or world-object services are unavailable.
+
 # Changelog
 
 ## Unreleased

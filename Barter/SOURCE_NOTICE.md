@@ -17,3 +17,8 @@ Original Meadworks code, not adopted: the settings catalogue and scopes, server-
 Local delivery must include the matching source ZIP alongside the mod ZIP. `scripts/package.py` requires a clean source tree and packages the exact current Git HEAD source. No archives or download link exist yet; packaging waits for the in-game run. No publication or copyright transfer is inferred. Original upstream notices remain intact.
 
 The build-only BepInEx.AssemblyPublicizer 0.4.3 dependency keeps its MIT notice in THIRD_PARTY_NOTICES/BepInEx.AssemblyPublicizer-MIT.txt; its binary is not shipped. The icon is a candidate drawn for Barter (see docs/art-provenance.md).
+
+
+## Corresponding source for Barter 0.1.4
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

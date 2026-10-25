@@ -73,12 +73,36 @@ namespace Mantle.Layout
             return count;
         }
 
+        /// <summary>Calculates remaining stack room for an item matching name, quality, and world level.</summary>
+        public static int FreeStackSpace(Inventory inventory, ItemDrop.ItemData item)
+        {
+            if (inventory == null || item?.m_shared == null)
+                return 0;
+            int room = 0;
+            var items = inventory.GetAllItems();
+            for (int i = 0; i < items.Count; i++)
+            {
+                var existing = items[i];
+                if (existing != null && existing.m_shared != null &&
+                    existing.m_shared.m_name == item.m_shared.m_name &&
+                    existing.m_quality == item.m_quality &&
+                    existing.m_worldLevel == item.m_worldLevel &&
+                    existing.m_stack < existing.m_shared.m_maxStackSize)
+                {
+                    room += existing.m_shared.m_maxStackSize - existing.m_stack;
+                }
+            }
+            return room;
+        }
+
         /// <summary>The game's CanAddItem over the main grid: room on partial stacks plus whole free cells.</summary>
         public static bool CanAdd(Inventory inventory, InventoryLayout layout, ItemDrop.ItemData item, int stack)
         {
+            if (item == null)
+                return false;
             if (stack <= 0)
                 stack = item.m_stack;
-            int room = inventory.FindFreeStackSpace(item.m_shared.m_name, item.m_worldLevel);
+            int room = FreeStackSpace(inventory, item);
             return room + CountEmptyFor(inventory, layout, item) * item.m_shared.m_maxStackSize >= stack;
         }
 

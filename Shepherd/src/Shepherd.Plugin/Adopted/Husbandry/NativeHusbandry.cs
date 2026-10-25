@@ -78,7 +78,7 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
                 installed = true;
                 HusbandryCredit.Register();
                 YieldCatalog.Discover();
-                foreach (Tameable tameable in UnityEngine.Object.FindObjectsOfType<Tameable>())
+                foreach (Tameable tameable in UnityEngine.Object.FindObjectsByType<Tameable>(FindObjectsSortMode.InstanceID))
                     if (tameable.m_nview != null && tameable.m_nview.IsValid()) { Petting.RegisterOn(tameable.m_nview); HerdCallout.Register(tameable); }
             }
             catch
@@ -86,6 +86,7 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
                 harmony.UnpatchSelf();
                 installed = false;
                 ReleaseRpcs();
+                HerdCallout.Clear();
                 throw;
             }
         }

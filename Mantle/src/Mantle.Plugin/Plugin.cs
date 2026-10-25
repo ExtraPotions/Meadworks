@@ -33,7 +33,7 @@ namespace Mantle
     {
         public const string PluginGuid = "com.meadworks.mantle";
         public const string PluginName = "Mantle";
-        public const string PluginVersion = "0.1.27";
+        public const string PluginVersion = "0.1.28";
         public static Plugin Instance { get; private set; }
         public static ManualLogSource Log { get; private set; }
         public static SyncedConfiguration Synced { get; private set; }

@@ -15,3 +15,8 @@ The October 16 Top Up correction adapts TopUp.cs and ChestBatch.cs to carry an e
 The October 16 tall-container wheel correction adapts only GridScrolls and its wheel guard from OpenKeep Store/Cycling.cs at retained revision 9da28eb58adbe065be1e4baef779a448acd38e0f. The rest of Burrow Stow/Cycling.cs retains its existing adaptation. Existing GPL notices remain applicable.
 
 The companion tooltip-wheel guard adapts the retained newer Cycling tooltip ownership behavior and adds original generic ScrollRect overflow detection. It recognizes only active current tooltip scroll owners: overflowing enabled native ScrollRects or the actual visible Inscribe/EliteCrafting manual bars. No product assembly reference or new cross-product contract is added.
+
+
+## Corresponding source for Burrow 0.3.28
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

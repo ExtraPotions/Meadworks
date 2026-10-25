@@ -1,8 +1,14 @@
+## Changes in 0.1.24
+
+- Guard recipe, station and salvage paths when item or inventory data is unavailable.
+- Leave Virtual Workbench Key unbound for new entries while preserving saved keys.
+- Refresh tracker counts every 1.25 seconds while keeping explicit invalidation immediate.
+
 # Kindle
 
 Recipe search and sorting, favorites, batch crafting, a recipe tracker, salvage and an optional Cart Workbench.
 
-Version 0.1.23. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.24. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -18,7 +24,7 @@ Version 0.1.23. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [C
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 

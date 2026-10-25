@@ -32,6 +32,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Kraken
         public static List<Player> Crew(Ship ship)
         {
             crew.Clear();
+            if (ship == null || ship.transform == null) return crew;
             ShipHull hull = ShipHull.Of(ship);
             foreach (Player player in Player.GetAllPlayers())
             {
@@ -50,10 +51,14 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Kraken
             float bestDistance = range;
             foreach (IMonoUpdater updater in Ship.Instances)
             {
-                if (updater is Ship ship && ship != null && Level(ship.transform.position - from) < bestDistance && Crew(ship).Count > 0)
+                if (updater is Ship ship && ship != null && ship.transform != null)
                 {
-                    best = ship;
-                    bestDistance = Level(ship.transform.position - from);
+                    float distance = Level(ship.transform.position - from);
+                    if (distance < bestDistance && Crew(ship).Count > 0)
+                    {
+                        best = ship;
+                        bestDistance = distance;
+                    }
                 }
             }
             return best;
@@ -73,6 +78,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Kraken
         /// <summary>Where the sea's surface is in the ship's own space (its y), at the ship.</summary>
         public static float Waterline(Ship ship)
         {
+            if (ship == null || ship.transform == null) return 0f;
             Vector3 at = ship.transform.position;
             return ship.transform.InverseTransformPoint(new Vector3(at.x, Water(at), at.z)).y;
         }

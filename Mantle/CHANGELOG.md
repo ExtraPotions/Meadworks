@@ -1,3 +1,11 @@
+## 0.1.28
+
+- Preserve legal dedicated-slot routing and quality/world-level stack accounting for crafting and inventory transfers.
+- Reconcile trinket peers on a one-second cadence while handling roster identity changes and departures immediately.
+- Reuse back-gear clearance results only while item and parent identities match; restore and reapply after release.
+- Leave Food Key unbound for new entries while preserving saved key values.
+- Guard malformed trinket item records during equipment tuning.
+
 # Changelog
 
 ## 0.1.27 (2026-10-24)

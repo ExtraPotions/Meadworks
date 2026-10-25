@@ -1,3 +1,8 @@
+## 0.2.2
+
+- Reject missing item or shared records before camera pickup eligibility, ownership and inventory checks.
+- Recheck item records after loading them while preserving valid pickup rules.
+
 # Changelog
 
 ## 0.2.1 (2026-10-21)

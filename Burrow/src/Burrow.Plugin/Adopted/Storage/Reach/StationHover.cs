@@ -63,7 +63,7 @@ namespace Burrow.Reach
         [HarmonyPostfix]
         public static void Postfix(Fireplace __instance, ref string __result)
         {
-            if (!StationHover.Shows(__instance) || string.IsNullOrEmpty(__result) || !__instance.m_canRefill || __instance.m_infiniteFuel || __instance.m_fuelItem == null)
+            if (!StationHover.Shows(__instance) || string.IsNullOrEmpty(__result) || !__instance.m_canRefill || __instance.m_infiniteFuel || __instance.m_fuelItem == null || __instance.m_fuelItem.m_itemData?.m_shared == null)
                 return;
             __result += StationHover.Line(StationAccepts.Fuel(__instance, __instance.m_fuelItem));
         }

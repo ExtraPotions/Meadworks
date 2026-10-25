@@ -27,3 +27,8 @@ Touching-piece Area Repair adapts OpenKeep Homestead RepairPatch, RepairArea, Re
 ## Removed adopted code
 
 Code that was adopted only for a removed, permanently excluded feature family no longer ships. The notices above cover the adopted code that remains.
+
+
+## Corresponding source for Timber 0.2.2
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

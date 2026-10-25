@@ -15,3 +15,8 @@ The Corresponding Source for this version is at https://github.com/ExtraPotions/
 The build-only BepInEx.AssemblyPublicizer 0.4.3 dependency keeps its MIT notice in THIRD_PARTY_NOTICES/BepInEx.AssemblyPublicizer-MIT.txt; its binary is not shipped.
 
 Virtual Workbench (src/Kindle.Plugin/Carts/KindleVirtualStation.cs) follows the described behavior of QoLTeam Valheim_Admin_Tool 0.5.8 "Virtual workbenches" from its README; no Valheim_Admin_Tool code is copied, and Kindle reopens a real remembered station instead of a simulated one.
+
+
+## Corresponding source for Kindle 0.1.24
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

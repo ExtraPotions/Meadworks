@@ -1,3 +1,8 @@
+## 0.5.13
+
+- Keep landing and map input safe when the teleport service is unavailable.
+- Send notices to the log when the native message HUD is unavailable.
+
 # Changelog
 
 ## 0.5.12 (2026-10-21)

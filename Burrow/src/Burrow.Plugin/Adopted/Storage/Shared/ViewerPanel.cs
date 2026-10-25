@@ -67,6 +67,12 @@ namespace Burrow.Shared
         private static void ShowViewed(InventoryGui gui, Container container)
         {
             gui.m_container.gameObject.SetActive(true);
+            if (container != null && container.m_nview != null && container.m_nview.IsValid())
+            {
+                var zdo = container.m_nview.GetZDO();
+                if (zdo != null && zdo.DataRevision > container.m_lastRevision)
+                    container.Load();
+            }
             gui.m_containerGrid.UpdateInventory(container.GetInventory(), null, gui.m_dragItem);
             gui.m_containerName.text = SharedState.Title(container);
             if (gui.m_firstContainerUpdate)

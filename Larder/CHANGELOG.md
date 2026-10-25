@@ -1,3 +1,8 @@
+## 0.2.15
+
+- Guard cooking and station experience paths when item state is unavailable.
+- Cache made-dish lookups per player and refresh the cache when stored data changes or disappears.
+
 # Changelog
 
 ## 0.2.14 (2026-10-21)

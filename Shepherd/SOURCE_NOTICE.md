@@ -32,6 +32,7 @@ The build-only BepInEx.AssemblyPublicizer 0.4.3 dependency retains its MIT notic
 
 Honey production settings/rate/progress selectively adapt OpenKeep HiveSettings, HiveRate, HivePatch and HiveProgress at ValheimMods `3bb778330f23645ccddb42fbc0c6ffab72c842b6`, GPL-3.0-or-later. Existing ad278/9da source pins and every prior license notice remain unchanged; the new raw pinned LICENSE exactly matches the retained ValheimMods notice. The original Shepherd integration owns a separate production patch lifecycle and narrow OpenKeep source coexistence. The adapted hook keeps saved progress in native units between calls, uses the real native producer and its strict threshold/remainder semantics only while opted in, and adds no persistent protocol or second timer. Existing ExtraHoney remains the separate original harvest-phase adaptation.
 
-## Distribution version
 
-Package 0.1.19 contains the accepted 0.1.18 assemblies. This package-only version increment does not change the compiled assembly version or runtime source.
+## Corresponding source for Shepherd 0.1.20
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

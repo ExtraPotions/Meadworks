@@ -1,3 +1,8 @@
+## 0.1.15
+
+- Guard ship and container naming during object teardown.
+- Handle an unavailable ship crew list when resolving the helmsman.
+
 # Changelog
 
 ## 0.1.14 (2026-10-21)

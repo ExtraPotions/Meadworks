@@ -9,3 +9,8 @@ The Corresponding Source for this version is at https://github.com/ExtraPotions/
 CreatureManager 1.2.5 workshop code at 47e45a6e8c3b389a51e42fc7387d1a4fb90af473 (https://github.com/sighsorry1029/CreatureManager) is adopted with GPL-3.0-only notices. Original domain validation, clone dependency transactions, last-known-good snapshots, bounded/authenticated PNG transfers and reference algorithms are retained. C01 hidden carriers replace ServerSync; Bestiary owns native patches, files, command/RPC registrations and teardown. Workshop-disabled sessions register known custom clone identities passively without template/faction/appearance writes or texture transfers. The Compendium uses the pinned TextsDialog pattern with original seven-language content. No source plugin, ServerSync DLL, recolored sample texture or MonsterLabZ-dependent sample is deployed. The combined plugin is GPL-3.0-only.
 
 Adoption correction (2026-10-15): Triple Strike and its configuration were removed to match EliteCreaturesPack 0.11.0 commit 9866479d148af07d3bcd32a4fc0106d547ee5924. The current build contains no BearClaws runtime or flurry Harmony patches. Existing configuration files are not edited by this removal.
+
+
+## Corresponding source for Bestiary 0.1.19
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

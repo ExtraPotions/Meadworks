@@ -1,6 +1,14 @@
+## Changes in 0.3.28
+
+- Preserve legal inventory cells during layout transitions.
+- Keep stack capacity accounting separated by quality and world level.
+- Refresh a viewed container when newer network inventory data is available.
+- Reuse favourite overlays safely across refreshed or destroyed inventory cells.
+- Ignore malformed fuel and unavailable inventory or world data during station refilling.
+
 # Burrow
 
-Version 0.3.25. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.28. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Craft and build from nearby chests, preview chest contents, bigger chests, sorting, quick stacking and shared chests.
 
@@ -34,7 +42,7 @@ Craft and build from nearby chests, preview chest contents, bigger chests, sorti
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.27 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 

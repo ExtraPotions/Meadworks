@@ -1,3 +1,9 @@
+## 0.1.24
+
+- Guard recipe, station and salvage paths when item or inventory data is unavailable.
+- Leave Virtual Workbench Key unbound for new entries while preserving saved keys.
+- Refresh tracker counts every 1.25 seconds while keeping explicit invalidation immediate.
+
 # Changelog
 
 ## 0.1.23 (2026-10-21)

@@ -10,3 +10,8 @@ Deck pen geometry and gate admission are original clean-room integrations of the
 TheGreatestShips configuration mappings use only the exact names and units documented in the pinned README. Unknown ship prefab aliases remain unresolved; no binary or implementation inspection is used.
 
 The package icon.png is approved original Meadworks Keel artwork under CC-BY-NC-SA-4.0. The GPL Sailing runtime icon retains its separate upstream licence.
+
+
+## Corresponding source for Keel 0.1.15
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

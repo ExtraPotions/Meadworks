@@ -67,20 +67,20 @@ namespace Wayfarer {
    try {
     State.ChangeWorld(World);State.SetAdvanced(CanAdvanced);State.SetEnabled(CanTeleport);
     if(State.Armed&&!CanUse(Category.Map))State.Close();
-    Teleports.UpdateLanding();integration?.Update();
+    Teleports?.UpdateLanding();integration?.Update();
     if(Time.unscaledTime>=nextScan){Catalog.Observe();nextScan=Time.unscaledTime+2;}
     Ui?.Refresh();
    }catch(Exception error){if(Time.unscaledTime>=nextError){LogError(error);nextError=Time.unscaledTime+10;}}
   }
   /// <summary>A player notice through the Crucible channel (C10): the HUD on a graphical client, otherwise the log.</summary>
-  internal void Report(string key) {if(!Options.ShowMessages.Value)return;var text=T(key);if(MeadworksHeadless.Channel==NoticeChannel.Hud)MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,text);else InfoMessage(text);}
+  internal void Report(string key) {if(!Options.ShowMessages.Value)return;var text=T(key);if(MeadworksHeadless.Channel==NoticeChannel.Hud&&MessageHud.instance!=null)MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft,text);else InfoMessage(text);}
   internal void Error(Exception error) {LogError(error);Report("error");}
   void OnDestroy(){Teleports?.Dispose();Ui?.Destroy();harmony?.UnpatchSelf();integration?.Dispose();registration?.Dispose();if(Instance==this)Instance=null;}
  }
  [HarmonyPatch(typeof(Minimap),"OnMapLeftClick")]
  internal static class MapPatches {
   static bool Prefix(Minimap __instance) {
-   var p=Plugin.Instance;if(p==null || !p.Options.Enabled.Value || !p.State.Armed || MapUi.PortalPickerOpen(__instance))return true;
+   var p=Plugin.Instance;if(p==null || !p.Options.Enabled.Value || !p.State.Armed || MapUi.PortalPickerOpen(__instance) || p.Teleports == null)return true;
    try {
     var method=AccessTools.Method(typeof(Minimap),"ScreenToWorldPoint");if(method==null){p.Report("unavailable");return false;}
     var input=AccessTools.TypeByName("ZInput");var pointer=input==null?null:AccessTools.Property(input,"pointerPosition")?.GetValue(null);

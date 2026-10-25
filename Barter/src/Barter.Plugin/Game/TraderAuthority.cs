@@ -17,14 +17,19 @@ namespace ExtraPotions.Barter.Runtime
             var prefab = zdo == null ? null : ZNetScene.instance?.GetPrefab(zdo.GetPrefab());
             return zdo != null && zdo.Persistent && prefab != null && prefab.GetComponent<Trader>() != null;
         }
-        private static bool Allowed(ZDO zdo) => HasTrader(zdo) && Purses.HasPurse(TraderNames.Normalize(ZNetScene.instance.GetPrefab(zdo.GetPrefab()).name));
+        private static bool Allowed(ZDO zdo)
+        {
+            if (!HasTrader(zdo) || zdo == null) return false;
+            var prefab = ZNetScene.instance?.GetPrefab(zdo.GetPrefab());
+            return prefab != null && Purses.HasPurse(TraderNames.Normalize(prefab.name));
+        }
 
         internal static void CaptureWorld()
         {
             anchors.Clear(); manager = ZDOMan.instance;
-            if (ZNet.instance == null || !ZNet.instance.IsServer() || manager == null) return;
+            if (ZNet.instance == null || !ZNet.instance.IsServer() || manager == null || manager.m_objectsByID == null) return;
             foreach (ZDO zdo in manager.m_objectsByID.Values)
-                if (HasTrader(zdo)) Remember(zdo);
+                if (zdo != null && HasTrader(zdo)) Remember(zdo);
             Plugin.Log?.Verbose("Trader authority captured " + anchors.Count + " saved-world instances. Remote distance checks follow the peer's character ZDO, not independently verified player movement.");
         }
 
@@ -38,6 +43,7 @@ namespace ExtraPotions.Barter.Runtime
 
         private static void Remember(ZDO zdo)
         {
+            if (zdo == null) return;
             if (!anchors.ContainsKey(zdo.m_uid)) anchors.Add(zdo.m_uid, new Anchor { Prefab = zdo.GetPrefab(), Position = zdo.GetPosition() });
             if (Allowed(zdo)) zdo.SetOwner(ZDOMan.GetSessionID());
         }

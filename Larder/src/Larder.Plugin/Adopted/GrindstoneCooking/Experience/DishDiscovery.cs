@@ -7,6 +7,8 @@
 // native reference interaction, item, food, experience-scope and presentation algorithms retained.
 // SPDX-License-Identifier: GPL-3.0-or-later
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
 {
@@ -18,13 +20,34 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
     public static class DishDiscovery
     {
         private const char Separator = ',';
+        private sealed class DiscoveryCache
+        {
+            internal string Raw;
+            internal readonly HashSet<string> Dishes = new HashSet<string>(StringComparer.Ordinal);
+        }
+        private static readonly ConditionalWeakTable<Player, DiscoveryCache> caches = new ConditionalWeakTable<Player, DiscoveryCache>();
+
+        private static DiscoveryCache CacheFor(Player player, string made)
+        {
+            DiscoveryCache cache = caches.GetValue(player, _ => new DiscoveryCache());
+            string raw = made ?? "";
+            if (cache.Raw != raw)
+            {
+                cache.Raw = raw;
+                cache.Dishes.Clear();
+                foreach (string dish in raw.Split(Separator))
+                    if (!string.IsNullOrEmpty(dish)) cache.Dishes.Add(dish);
+            }
+            return cache;
+        }
 
         /// <summary>Whether the character has made this dish before.</summary>
         public static bool HasMade(Player player, string dishPrefab)
         {
-            if (player == null || string.IsNullOrEmpty(dishPrefab) || !Read(player, out string made))
+            if (player == null || string.IsNullOrEmpty(dishPrefab))
                 return false;
-            return Array.IndexOf((made ?? "").Split(Separator), dishPrefab) >= 0;
+            Read(player, out string made);
+            return CacheFor(player, made).Dishes.Contains(dishPrefab);
         }
 
         /// <summary>Records the dish as made. True when this was the character's first time.</summary>
@@ -33,7 +56,11 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             if (player == null || string.IsNullOrEmpty(dishPrefab) || dishPrefab.IndexOf(Separator) >= 0 || HasMade(player, dishPrefab))
                 return false;
             Read(player, out string made);
-            player.m_customData[Keys.MadeDishes] = string.IsNullOrEmpty(made) ? dishPrefab : made + Separator + dishPrefab;
+            DiscoveryCache cache = CacheFor(player, made);
+            var updated = string.IsNullOrEmpty(made) ? dishPrefab : made + Separator + dishPrefab;
+            player.m_customData[Keys.MadeDishes] = updated;
+            cache.Raw = updated;
+            cache.Dishes.Add(dishPrefab);
             return true;
         }
         private static bool Read(Player player, out string made) =>

@@ -34,7 +34,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         {
             __state = null;
             ZNetView nview = __instance.m_nview;
-            if (!Kitchen.IsKitchen(__instance) || nview == null || !nview.IsOwner() || !WillCook(__instance))
+            if (!Kitchen.IsKitchen(__instance) || nview == null || !nview.IsValid() || !nview.IsOwner() || nview.GetZDO() == null || !WillCook(__instance))
                 return;
             float elapsed = PendingDelta(nview.GetZDO());
             if (elapsed <= 0f)

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 namespace Wayfarer.Core {
-    public static class WayfarerIdentity { public const string Version="0.5.12",Family="Mischief"; }
+    public static class WayfarerIdentity { public const string Version="0.5.13",Family="Mischief"; }
     public static class ConfigurationKeys {public const string Enabled="Enabled",Language="Language",CloseMap="CloseMap",Messages="ShowMessages",TombstoneHints="TombstoneHints";}
     /// <summary>Server-authoritative switches: the master switch and Bed travel, which is a feature, not a cheat.</summary>
     public static class ServerConfigurationKeys {public const string Section="Server",AllowTeleport="AllowTeleport",AllowBed="AllowBed";}

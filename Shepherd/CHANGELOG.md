@@ -1,3 +1,8 @@
+## 0.1.20
+
+- Use the modern native tameable discovery API while preserving InstanceID seed order.
+- Preserve husbandry registration ownership and activation-failure rollback.
+
 # Changelog
 
 ## Unreleased

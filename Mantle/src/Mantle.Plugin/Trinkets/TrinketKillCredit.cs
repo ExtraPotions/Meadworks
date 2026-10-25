@@ -27,6 +27,7 @@ internal static class TrinketKillCredit
     private static Harmony edgeHarmony;
     private static MethodInfo edgeMethod;
     private static bool granting;
+    private static float nextPeerCheck;
     internal static bool TuningSupported { get; private set; }
 
     internal static void Tick()
@@ -37,21 +38,29 @@ internal static class TrinketKillCredit
             session = ZNet.instance;
         }
         if (!session || !Plugin.WorldReady) { TuningSupported = false; return; }
-        var current = session.GetPeers();
-        departed.Clear();
-        foreach (var peer in peers.Keys)
-            if (!current.Contains(peer)) departed.Add(peer);
-        foreach (var gone in departed) { Unregister(gone); peers.Remove(gone); }
-        departed.Clear();
-        foreach (var peer in current)
+        List<ZNetPeer> current = session.GetPeers();
+        bool rosterChanged = current.Count != peers.Count;
+        if (!rosterChanged)
+            foreach (var peer in current)
+                if (!peers.ContainsKey(peer)) { rosterChanged = true; break; }
+        if (rosterChanged || Time.unscaledTime >= nextPeerCheck)
         {
-            if (peers.ContainsKey(peer)) continue;
-            peers.Add(peer, new PeerState());
-            peer.m_rpc.Register<int>(Hello, OnHello);
-            peer.m_rpc.Register<int>(Ack, OnAck);
-            peer.m_rpc.Register<bool>(Gate, OnGate);
-            peer.m_rpc.Register<ZPackage>(Death, OnDeathReport);
-            peer.m_rpc.Register<ZPackage>(Award, OnAward);
+            nextPeerCheck = Time.unscaledTime + 1.0f;
+            departed.Clear();
+            foreach (var peer in peers.Keys)
+                if (!current.Contains(peer)) departed.Add(peer);
+            foreach (var gone in departed) { Unregister(gone); peers.Remove(gone); }
+            departed.Clear();
+            foreach (var peer in current)
+            {
+                if (peers.ContainsKey(peer)) continue;
+                peers.Add(peer, new PeerState());
+                peer.m_rpc.Register<int>(Hello, OnHello);
+                peer.m_rpc.Register<int>(Ack, OnAck);
+                peer.m_rpc.Register<bool>(Gate, OnGate);
+                peer.m_rpc.Register<ZPackage>(Death, OnDeathReport);
+                peer.m_rpc.Register<ZPackage>(Award, OnAward);
+            }
         }
         foreach (var pair in peers)
         {
@@ -74,11 +83,10 @@ internal static class TrinketKillCredit
             supported = server != null && peers.TryGetValue(server, out var state) && state.Supported && serverGate;
         }
         TuningSupported = supported;
-        if (session.IsServer() && (supported != previousGate || current.Count != 0))
+        if (session.IsServer() && supported != previousGate)
         {
-            // Send only on transitions or a new handshake, not every frame.
-            if (supported != previousGate)
-                foreach (var peer in current) if (peers[peer].Supported) peer.m_rpc.Invoke(Gate, supported);
+            // Send only on transitions, not every frame.
+            foreach (var peer in current) if (peers.TryGetValue(peer, out var st) && st.Supported) peer.m_rpc.Invoke(Gate, supported);
             previousGate = supported;
         }
         EnsureEdgeBoundary();
@@ -259,6 +267,7 @@ internal static class TrinketKillCredit
         foreach (var peer in peers.Keys) Unregister(peer);
         peers.Clear(); departed.Clear(); serverCredits.Clear(); receivedCredits.Clear(); pending.Clear();
         serverGate = previousGate = TuningSupported = false;
+        nextPeerCheck = 0f;
     }
     internal static void Dispose()
     {

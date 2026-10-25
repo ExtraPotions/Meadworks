@@ -1,6 +1,10 @@
+## Changes in 0.1.19
+
+- Ignore missing or destroyed ship transforms in Kraken crew, nearest-ship and waterline queries.
+
 # Bestiary
 
-Version 0.1.18. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.19. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 New creatures with fights of their own, the bone arsenal you craft from them, and a creature workshop for server owners.
 
@@ -17,7 +21,7 @@ New creatures with fights of their own, the bone arsenal you craft from them, an
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.28 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 - Wildblood 0.5.5 or later
 
 ## Installation

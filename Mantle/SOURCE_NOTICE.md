@@ -20,3 +20,8 @@ The item comparison cards and every file derived from HoverCompare 0.5.0 (its ad
 ## Ring and belt slots (2026-10-09)
 
 The Ring and Belt slot kinds, the accessory registry (`src/Mantle.Core/Accessories`, `src/Mantle.Plugin/Accessories`, `Mantle.Accessories.yml`) and their tests are independently implemented by expDARE: PackPanel 0.12.0 only lists "create ring slot" and "create belt item" as plans and ships no code for them, and no other reference was read for them. Where the work touches adopted PackPanel files (slot kinds and rules, layout, panel layout, words, settings, key-on-death groups), the change is made as a modification of the adopted file, which keeps its PackPanel notice. The coin purse, key ring and tacklebox are adopted PackPanel 0.7.0 code that had been switched off by overrides; enabling them adds no new source. The tackleboxes and the new rings and belts use native development visuals cloned at runtime, as the backpacks do; `Mantle.Tackleboxes.yml` is the adopted upstream config.
+
+
+## Corresponding source for Mantle 0.1.28
+
+This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.

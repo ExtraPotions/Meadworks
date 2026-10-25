@@ -1,3 +1,7 @@
+## 0.1.23
+
+- Guard pause handling when the settings window or game instance is unavailable.
+
 # Changelog
 
 ## Unreleased

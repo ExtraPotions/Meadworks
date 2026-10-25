@@ -127,7 +127,7 @@ namespace Burrow.Shared
         {
             Player player = Player.m_localPlayer;
             if (player == null || inventory != player.GetInventory()) return true;
-            if (!Plugin.IsReady || Burrow.Resources.NativeChestIdentity.World == 0) return false;
+            if (!Plugin.IsReady) return false;
             if (!Burrow.Core.PackPanelLink.LaysOutInventory) return true;
             if (!Burrow.Core.PackPanelGrid.TryRead(player, out int width, out int rows, out int blocked)) return false;
             return slot.x < width && slot.y < rows && (slot.y != rows - 1 || slot.x < width - blocked);

@@ -45,6 +45,7 @@ namespace ExtraPotions.Delve.Runtime
         /// </summary>
         public static ZDO? Create(int prefabHash, Vector3 position, Vector3 eulerRotation)
         {
+            if (ZNetScene.instance == null || ZDOMan.instance == null) return null;
             GameObject prefab = ZNetScene.instance.GetPrefab(prefabHash);
             ZNetView view = prefab != null ? prefab.GetComponent<ZNetView>() : null;
             if (view == null) return null;
@@ -60,7 +61,7 @@ namespace ExtraPotions.Delve.Runtime
         /// <summary>ZDOMan.DestroyZDO only acts for the owner; the authority takes ownership first. Every client is told.</summary>
         public static void Remove(ZDO zdo)
         {
-            if (zdo == null) return;
+            if (zdo == null || ZDOMan.instance == null) return;
             zdo.SetOwner(ZDOMan.GetSessionID());
             ZDOMan.instance.DestroyZDO(zdo);
         }
@@ -108,6 +109,7 @@ namespace ExtraPotions.Delve.Runtime
         public static List<ZDO> ObjectsNear(Vector3 spot, float radius)
         {
             nearby.Clear();
+            if (ZDOMan.instance == null) return new List<ZDO>();
             int reach = Mathf.Max(1, Mathf.CeilToInt(radius / ZoneSystem.c_ZoneSize));
             ZDOMan.instance.FindSectorObjects(ZoneSystem.GetZone(spot), new SimulationDistance(reach, 0, true), nearby);
             return new List<ZDO>(nearby);

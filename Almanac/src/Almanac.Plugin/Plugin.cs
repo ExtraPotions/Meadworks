@@ -161,10 +161,11 @@ namespace ExtraPotions.Almanac.Runtime
         /// <summary>Pause-while-open and kit dialog captions.</summary>
         private void TickParity()
         {
-            bool open=window!.IsOpen||tools?.IsOpen==true;
+            if (window == null) return;
+            bool open=window.IsOpen||tools?.IsOpen==true;
             try
             {
-                bool wanted=open&&preferences?.PauseGame.Value==true&&Player.m_localPlayer!=null;
+                bool wanted=open&&preferences?.PauseGame.Value==true&&Player.m_localPlayer!=null&&Game.instance!=null;
                 Apply(pause.Tick(wanted,Game.m_pause,Menu.IsVisible()));
             }
             catch(Exception error){log?.Warning("Almanac pause handling failed: "+error.GetBaseException().Message);}

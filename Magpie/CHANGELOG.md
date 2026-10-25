@@ -1,3 +1,7 @@
+## 0.1.15
+
+- Guard automatic pickup planning when player or item data is unavailable.
+
 # Changelog
 
 ## Unreleased

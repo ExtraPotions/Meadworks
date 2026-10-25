@@ -28,8 +28,8 @@ namespace Burrow.Reach
         /// <summary>The fuel of a smelter, cooking station or fireplace: the same shared name.</summary>
         public static Func<ItemDrop.ItemData, bool> Fuel(Component station, ItemDrop fuel)
         {
-            string name = fuel != null ? fuel.m_itemData.m_shared.m_name : null;
-            return Filtered(station, item => name != null && item != null && item.m_shared.m_name == name);
+            string name = fuel != null && fuel.m_itemData != null && fuel.m_itemData.m_shared != null ? fuel.m_itemData.m_shared.m_name : null;
+            return Filtered(station, item => name != null && item != null && item.m_shared != null && item.m_shared.m_name == name);
         }
 
         private static Func<ItemDrop.ItemData, bool> Filtered(Component station, Func<ItemDrop.ItemData, bool> accepts)

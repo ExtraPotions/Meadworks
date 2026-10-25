@@ -1,8 +1,15 @@
+## Changes in 0.5.9
+
+- Keep automatic door checks at 0.05 seconds while reusing scan collections and handling callback mutation and shutdown safely.
+- Avoid an intermediate dead-fireplace cleanup list when no tracked entries have died.
+- Guard torch keep, schedule and hover paths when network state is unavailable.
+- Reject missing torch shared data before durability calculations.
+
 # Ember
 
 Faster nights when some players sleep, torches that warm you like a campfire, and doors that open as you walk up.
 
-Version 0.5.8. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.9. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -25,7 +32,7 @@ Version 0.5.8. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CH
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.28 or a later 0.3.x, which includes Crucible.UI 0.3.20 (the shared Meadworks interface kit)
+- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
 
 ## Installation
 

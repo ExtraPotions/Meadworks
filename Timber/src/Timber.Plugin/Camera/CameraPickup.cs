@@ -79,14 +79,17 @@ namespace Timber.Camera
 
         private static bool Wanted(Player player, ItemDrop item)
         {
+            if (item == null || player == null || item.m_itemData?.m_shared == null) return false;
             ZNetView view = item.GetComponent<ZNetView>();
+            var sharedName = item.m_itemData?.m_shared?.m_name;
             return item.m_autoPickup && !item.IsPiece() && view != null && view.IsValid()
-                && !player.HaveUniqueKey(item.m_itemData.m_shared.m_name);
+                && (sharedName == null || !player.HaveUniqueKey(sharedName));
         }
 
         /// <summary>One step of the game's pickup: own it, check room and weight, take it when close, else pull it in.</summary>
         private static void Pull(Player player, ItemDrop item, FloatingTerrainDummy dummy, float dt, MagpiePickup magpie)
         {
+            if (player == null || item == null || item.m_itemData?.m_shared == null) return;
             if (magpie != null && !magpie.Wanted(item)) return;
             if (!WardAccess.Check(player.GetPlayerID(), item.transform.position) || magpie != null && !magpie.Current) return;
             if (!item.CanPickup())
@@ -117,8 +120,11 @@ namespace Timber.Camera
 
         private static bool Fits(Player player, ItemDrop item)
         {
+            if (player == null || item == null || item.m_itemData?.m_shared == null) return false;
             item.Load();
+            if (item.m_itemData?.m_shared == null) return false;
             Inventory inventory = player.GetInventory();
+            if (inventory == null) return false;
             return inventory.CanAddItem(item.m_itemData)
                 && item.m_itemData.GetWeight() + inventory.GetTotalWeight() <= player.GetMaxCarryWeight();
         }
