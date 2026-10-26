@@ -54,10 +54,10 @@ Release8.9 updates ten packages and carries seventeen packages forward byte-for-
 
 ## Changes in 8.9
 
-- Burrow0.3.29 reuses stable container snapshots and guards storage hotkeys during keyboard focus or IME composition, with headless-safe focus checks.
+- Burrow0.3.29 reuses stable container snapshots and guards storage hotkeys during keyboard focus or IME composition, with headless-safe focus checks and a targeted YamlFileWatcher shutdown ThreadAbort catch that preserves ordinary error reporting.
 - Kindle0.1.25 avoids redundant Repair All tooltip writes and refreshes affected data when locale/catalog inputs change. Its crafting/refund safeguards shipped earlier.
 - Ember0.5.10 and Saga0.1.17 add Essential tier resources limited to twelve entries and version metadata; their existing domain preset logic is unchanged.
 - Solstice0.1.5 adds a twelve-setting Essential list. Almanac0.1.24 supplies the central catalog and season presentation bundles for existing settings, without new Solstice gameplay runtime.
-- Crucible0.3.33/UI0.3.22 supplies shared preset APIs, native notice wrapping and a targeted shutdown ThreadAbort catch that preserves ordinary error reporting. Thing0.1.14 adds selected-player identity to both Sub-Admin confirmations in all seven languages.
+- Crucible0.3.33/UI0.3.22 supplies shared preset APIs, native notice wrapping and registered local-clause preset lookup. Thing0.1.14 adds selected-player identity to both Sub-Admin confirmations in all seven languages.
 
 The release notes separate already-shipped8.8 behavior from new8.9 changes. Actual100-key/34local/six host checks, nine cold and nine update scenarios passed, with strict mod/unknown-console findings zero. One existing profile/60DLLs and all27source inventories were verified after backup/update, preserving personal settings, saves, enabled states and unrelated mods. Final installer/source artifact readback passed. Coverage remains focused; full physical multiplayer and arbitrary-mod compatibility are not claimed.
