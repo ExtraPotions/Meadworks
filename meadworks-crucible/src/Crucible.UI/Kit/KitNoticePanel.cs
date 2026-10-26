@@ -83,8 +83,9 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         {
             if (notice == null || StackedNotices == null || !StackedNotices.Value || KitCanvas.Front == null) return false;
             if (notice.Kind != KitNoticeKind.TopLeft && notice.Kind != KitNoticeKind.Center) return false;
-            int id = stack.Push(notice.Kind, notice.RawText, notice.Title, notice.Amount, notice.Icon != null, Duration, Maximum, notice.ShowWhenHidden);
-            if (notice.Icon != null) icons[id] = notice.Icon;
+            Sprite icon = notice.Icon != null ? notice.Icon : KitNoticeIcons.Find(notice.RawText);
+            int id = stack.Push(notice.Kind, notice.RawText, notice.Title, notice.Amount, icon != null, Duration, Maximum, notice.ShowWhenHidden);
+            if (icon != null) icons[id] = icon;
             layoutDirty = true;
             return true;
         }

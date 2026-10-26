@@ -28,6 +28,7 @@ internal static class FamilyRpc
 		public float NextRetry;
 		public float Deadline;
 		public bool SlowLogged;
+		public int LastQueued = -1;
 	}
 
 	private static readonly Dictionary<ZNetPeer, Waiting> awaiting = new();
@@ -64,6 +65,7 @@ internal static class FamilyRpc
 		SendFamily(peer);
 		if (!answered.TryGetValue(peer, out _))
 		{
+			if (awaiting.ContainsKey(peer)) return;
 			awaiting[peer] = new Waiting { Greeted = now, NextRetry = now + RetryInterval, Deadline = now + SlowJoinWait.QuietSeconds };
 		}
 	}
@@ -121,12 +123,13 @@ internal static class FamilyRpc
 		}
 		waiting.NextRetry = now + RetryInterval;
 		int queued = peer.m_socket != null ? peer.m_socket.GetSendQueueSize() : 0;
-		SlowJoinWait.Step step = SlowJoinWait.Advance(waiting.Greeted, waiting.Deadline, now, queued, waiting.SlowLogged);
+		SlowJoinWait.Step step = SlowJoinWait.Advance(waiting.Greeted, waiting.Deadline, now, queued, waiting.SlowLogged, waiting.LastQueued);
+		waiting.LastQueued = queued;
 		waiting.Deadline = step.Deadline;
 		if (step.LogSlow)
 		{
 			waiting.SlowLogged = true;
-			Journal?.Warning($"{Side.NameOf(peer)} is still joining after {SlowJoinWait.FormerTimeoutSeconds:0} s because the send queue has not drained.");
+			Journal?.Warning($"{Side.NameOf(peer)} is still joining after {SlowJoinWait.FormerTimeoutSeconds:0} s while the send queue is draining.");
 		}
 		if (step.Holding)
 		{

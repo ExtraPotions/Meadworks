@@ -213,6 +213,9 @@ namespace ExtraPotions.Cairn.Hud
             }
             if (float.IsNaN(windMin) || float.IsInfinity(windMin)) windMin = 0f;
             if (float.IsNaN(windMax) || float.IsInfinity(windMax)) windMax = windMin;
+            // EnvMan uses Mathf.Lerp, which clamps the combined octave value before interpolation.
+            if (intensity < 0f) intensity = 0f;
+            if (intensity > 1f) intensity = 1f;
             intensity = windMin + (windMax - windMin) * intensity;
             if (intensity < 0.05f) intensity = 0.05f;
             if (intensity > 1f) intensity = 1f;

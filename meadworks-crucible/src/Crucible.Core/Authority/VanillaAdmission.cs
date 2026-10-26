@@ -128,7 +128,7 @@ namespace ExtraPotions.Meadworks.Crucible {
 
     /// <summary>
     /// Server-side record of which connected peers run Crucible, from the join greeting: a greeted peer is pending until
-    /// it answers (Crucible) or its quiet wait passes (vanilla). A busy send queue restarts that wait
+    /// it answers (Crucible) or its quiet wait passes (vanilla). A draining send queue restarts that wait
     /// (<see cref="Extend"/>), and the wait never runs past <see cref="CeilingSeconds"/> from the greeting.
     /// A late answer never upgrades a vanilla verdict. Main thread only.
     /// </summary>
@@ -137,7 +137,7 @@ namespace ExtraPotions.Meadworks.Crucible {
         public const double DefaultCeilingSeconds=300;
         /// <summary>Above this many unsent bytes the greeting may still be queued, so the quiet wait has not started.</summary>
         public const int SendBacklogBytes=64*1024;
-        sealed class Entry { internal PeerKind Kind; internal double Due; internal double Greeted; internal bool SlowNoted; }
+        sealed class Entry { internal PeerKind Kind; internal double Due; internal double Greeted; internal bool SlowNoted; internal int LastQueued=-1; }
         readonly Dictionary<long,Entry> peers=new Dictionary<long,Entry>();
         public double AnswerTimeoutSeconds { get; }
         public double CeilingSeconds { get; }
@@ -150,8 +150,15 @@ namespace ExtraPotions.Meadworks.Crucible {
         /// <summary>The send queue is still busy, so the quiet wait starts again from <paramref name="now"/> unless the ceiling has been reached.</summary>
         public bool Extend(long peerId,double now){
             if(!peers.TryGetValue(peerId,out var e)||e.Kind!=PeerKind.Pending||now>=e.Greeted+CeilingSeconds)return false;
-            var due=Math.Max(e.Due,now+AnswerTimeoutSeconds);if(due==e.Due)return false;
+            var due=Math.Min(e.Greeted+CeilingSeconds,Math.Max(e.Due,now+AnswerTimeoutSeconds));if(due==e.Due)return false;
             e.Due=due;return true;
+        }
+        /// <summary>Only a measured decrease in a previously backlogged queue renews the quiet wait.</summary>
+        public bool ObserveQueue(long peerId,double now,int queuedBytes){
+            if(queuedBytes<0||!peers.TryGetValue(peerId,out var e)||e.Kind!=PeerKind.Pending)return false;
+            int previous=e.LastQueued;e.LastQueued=queuedBytes;
+            if(now>=e.Due||now>=e.Greeted+CeilingSeconds||previous<=SendBacklogBytes||queuedBytes>=previous)return false;
+            return Extend(peerId,now);
         }
         /// <summary>True once, the first time a pending peer has waited longer than <paramref name="formerTimeoutSeconds"/>.</summary>
         public bool NoteSlow(long peerId,double now,double formerTimeoutSeconds){

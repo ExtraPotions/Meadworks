@@ -7,7 +7,7 @@ namespace Mantle.Compatibility
 {
     /// <summary>
     /// How long a join waits for the other side's mod list. While the send queue is still above
-    /// <see cref="BacklogBytes"/> the quiet wait has not started, so it restarts. The wait never runs past
+    /// <see cref="BacklogBytes"/> the quiet wait has not started, so measured draining restarts it. The wait never runs past
     /// <see cref="CeilingSeconds"/> from the greeting. A peer that never answers is still given up.
     /// </summary>
     public static class SlowJoinWait
@@ -36,15 +36,17 @@ namespace Mantle.Compatibility
         }
 
         public static Step Advance(float greeted, float deadline, float now, int queuedBytes, bool slowLogged)
+            => Advance(greeted, deadline, now, queuedBytes, slowLogged, -1);
+
+        public static Step Advance(float greeted, float deadline, float now, int queuedBytes, bool slowLogged, int previousQueuedBytes)
         {
-            if (queuedBytes > BacklogBytes && now < greeted + CeilingSeconds)
-            {
-                float next = Math.Max(deadline, now + QuietSeconds);
-                bool log = !slowLogged && now - greeted > FormerTimeoutSeconds;
-                return new Step(next, true, false, log);
-            }
-            bool giveUp = now >= deadline || now >= greeted + CeilingSeconds;
-            return new Step(deadline, false, giveUp, false);
+            float ceiling = greeted + CeilingSeconds;
+            bool expired = now >= deadline || now >= ceiling;
+            bool progress = !expired && previousQueuedBytes > BacklogBytes && queuedBytes >= 0 && queuedBytes < previousQueuedBytes;
+            float next = progress ? Math.Min(ceiling, Math.Max(deadline, now + QuietSeconds)) : deadline;
+            bool giveUp = now >= next || now >= ceiling;
+            bool holding = !giveUp && queuedBytes > BacklogBytes;
+            return new Step(next, holding, giveUp, progress && !slowLogged && now - greeted > FormerTimeoutSeconds);
         }
 
         /// <summary>The refusal lines for a player that never answered, one line per language, in the suite's language order.</summary>

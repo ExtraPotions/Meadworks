@@ -10,3 +10,6 @@ Cairn also adapts NoFogBruh's post-processing command-buffer remove/execute help
 native fog and ambient occlusion generic executions, keeps instruction labels/branches and falls back to unchanged
 native rendering if the expected pair of calls changes. The HUD runtime is independently implemented from documented
 TimeWeatherHud behavior using the existing Meadworks UI kit; no TimeWeatherHud code or art is adopted.
+
+
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.19/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory; a newer runtime provider does not replace those inputs. No new Git commit or broader native acceptance is asserted.

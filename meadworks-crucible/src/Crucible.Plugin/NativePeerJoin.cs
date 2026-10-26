@@ -177,8 +177,8 @@ namespace ExtraPotions.Meadworks.Crucible {
 
         /// <summary>
         /// Server, once a second: peers that neither answered the greeting nor sent any Crucible frame before their
-        /// quiet wait ends are vanilla. The quiet wait does not run while the peer's send queue is above
-        /// <see cref="PeerPresenceTracker.SendBacklogBytes"/>, and it never runs past the ceiling measured from the
+        /// quiet wait ends are vanilla. Observed draining of a backlogged send queue renews the quiet wait,
+        /// and it never runs past the ceiling measured from the
         /// greeting. They are refused with a native center message and the native version error, then disconnected
         /// after the grace second. Installed (with the greeting) only while the handshake flag is on.
         /// </summary>
@@ -208,10 +208,9 @@ namespace ExtraPotions.Meadworks.Crucible {
                 int queued;
                 try{queued=peer.m_socket!=null?peer.m_socket.GetSendQueueSize():0;}
                 catch(Exception e){Log.Warning("Reading the send queue for peer "+peer.m_uid.ToString(CultureInfo.InvariantCulture)+" failed: "+e.GetType().Name);continue;}
-                if(queued<=PeerPresenceTracker.SendBacklogBytes)continue;
-                peers.Extend(peer.m_uid,now);
+                if(!peers.ObserveQueue(peer.m_uid,now,queued))continue;
                 if(!peers.NoteSlow(peer.m_uid,now,MeadworksAdmission.FormerAnswerTimeoutSeconds))continue;
-                Log.Warning("Peer "+peer.m_uid.ToString(CultureInfo.InvariantCulture)+" is still joining after "+MeadworksAdmission.FormerAnswerTimeoutSeconds.ToString("0",CultureInfo.InvariantCulture)+" s because "+queued.ToString(CultureInfo.InvariantCulture)+" bytes are still queued. The wait continues until the queue drains or "+peers.CeilingSeconds.ToString("0",CultureInfo.InvariantCulture)+" s.");
+                Log.Warning("Peer "+peer.m_uid.ToString(CultureInfo.InvariantCulture)+" is still joining after "+MeadworksAdmission.FormerAnswerTimeoutSeconds.ToString("0",CultureInfo.InvariantCulture)+" s because "+queued.ToString(CultureInfo.InvariantCulture)+" bytes remain in a draining queue. The wait continues while progress is observed, up to "+peers.CeilingSeconds.ToString("0",CultureInfo.InvariantCulture)+" s.");
             }
         }
 
