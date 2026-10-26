@@ -1,3 +1,7 @@
+## 0.1.25
+
+- Refresh Repair All tooltips when counts, eligibility, ownership or translations change.
+
 ## 0.1.24
 
 - Guard recipe, station and salvage paths when item or inventory data is unavailable.

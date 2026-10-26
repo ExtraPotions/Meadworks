@@ -20,6 +20,7 @@ namespace Burrow.Core
     {
         private const string PrivateChestPrefab = "piece_chest_private";
         private static readonly HashSet<Container> loaded = new HashSet<Container>();
+        private static IReadOnlyCollection<Container> snapshot;
 
         /// <summary>Every usable container within range of a position, nearest first. Never throws.</summary>
         public static List<Container> Nearby(Vector3 position, float range, ContainerUse use)
@@ -107,11 +108,11 @@ namespace Burrow.Core
             return view.GetZDO().GetInt(ZDOVars.s_inUse) == 1;
         }
 
-        /// <summary>Every loaded container, no usability filter. A fresh list each call.</summary>
+        /// <summary>Every loaded container, no usability filter. The snapshot remains stable during callbacks.</summary>
         public static IReadOnlyCollection<Container> All()
         {
-            loaded.RemoveWhere(container => container == null);
-            return new List<Container>(loaded);
+            if (loaded.RemoveWhere(container => container == null) != 0) snapshot = null;
+            return snapshot ?? (snapshot = new List<Container>(loaded).AsReadOnly());
         }
 
         internal static bool AnyTracked<T>(T state, Func<Container, T, bool> matches)
@@ -191,8 +192,8 @@ namespace Burrow.Core
 
         internal static void Track(Container container)
         {
-            if (container != null && container.m_inventory != null)
-                loaded.Add(container);
+            if (container != null && container.m_inventory != null && loaded.Add(container))
+                snapshot = null;
         }
 
         /// <summary>Inventory created, net view valid, inventory read from the ZDO at least once.</summary>

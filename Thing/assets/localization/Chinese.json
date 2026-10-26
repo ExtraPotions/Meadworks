@@ -399,8 +399,8 @@
     "cfg_general__allow_sub_admin_delegation_help": "允许服务器房主或当前管理员向在线玩家授予非破宭性副管理员权限。",
     "ui_grant_subadmin": "副管理员（非破宭性）",
     "ui_help_grant_subadmin": "授予所有非破宭性权限（作为副管理员）。需要进行两次确认。",
-    "ui_subadmin_confirm_1": "是否向此玩家授予非破宭性副管理员权限？",
-    "ui_subadmin_confirm_2": "二次确认：确定要向该玩家授予副管理员权限吗？",
+    "ui_subadmin_confirm_1": "是否向 {0} 授予非破坏性副管理员权限？",
+    "ui_subadmin_confirm_2": "再次确认：是否向 {0} 授予副管理员权限？",
     "ui_subadmin_revoke_self": "放梃副管理员权限",
     "ui_subadmin_revoke_self_hint": "放梃自己的副管理员权限。",
     "ui_subadmin_revoke_self_confirm": "确定要放梃自己的副管理员权限吗？"

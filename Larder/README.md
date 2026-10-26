@@ -1,11 +1,10 @@
-## Changes in 0.2.15
+## Changes in 0.2.16
 
-- Guard cooking and station experience paths when item state is unavailable.
-- Cache made-dish lookups per player and refresh the cache when stored data changes or disappears.
+- Clear pending food requests on session changes or local-player destruction while preserving duplicate-request and eating guards.
 
 # Larder
 
-Version 0.2.15. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.16. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Food and mead values, eating, regeneration, stamina costs, kitchen stations and Cooking skill perks.
 

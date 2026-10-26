@@ -128,6 +128,8 @@ namespace ExtraPotions.Kindle.Runtime
 
         static GameObject tipOwner;
         static int tipShown;
+        static string tipLanguage;
+        static long tipRevision = -1;
 
         /// <summary>After the game set Repair up this frame: its tooltip and enabled state.</summary>
         internal static void AfterRepair(InventoryGui gui)
@@ -138,7 +140,6 @@ namespace ExtraPotions.Kindle.Runtime
             {
                 nextCount = Time.unscaledTime + 0.25f;
                 repairable = Repairable(player).Count;
-                tipOwner = null;
             }
             var repair = gui.m_repairButton;
             var station = player.GetCurrentCraftingStation();
@@ -152,14 +153,16 @@ namespace ExtraPotions.Kindle.Runtime
                 bool ready = canRepair && repairable > 0;
                 repair.interactable = ready;
                 if (gui.m_repairButtonGlow) gui.m_repairButtonGlow.gameObject.SetActive(ready);
-                // Set again with the repairable count (four times a second) or when the text changes, not every frame.
+                // Refresh when the count, owner or localized text changes.
                 int tipKey = canRepair ? repairable : -1;
-                if (tipOwner != repair.gameObject || tipKey != tipShown)
+                string language = Localization.instance != null ? Localization.instance.GetSelectedLanguage() : "English";
+                long revision = KindleText.Revision;
+                if (tipOwner != repair.gameObject || tipKey != tipShown || language != tipLanguage || revision != tipRevision)
                 {
                     string tip = !canRepair ? KindleText.Text("station_needed")
                         : repairable == 0 ? KindleText.Text("repair_all_tip_none") : repairable == 1 ? KindleText.Text("repair_all_tip_one") : KindleText.Format("repair_all_tip", repairable);
                     KitTooltip.Set(repair.gameObject, KindleText.Text("repair_all"), tip);
-                    tipOwner = repair.gameObject; tipShown = tipKey;
+                    tipOwner = repair.gameObject; tipShown = tipKey; tipLanguage = language; tipRevision = revision;
                 }
             }
             Back(gui);

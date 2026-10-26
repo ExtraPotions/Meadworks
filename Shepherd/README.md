@@ -1,11 +1,10 @@
-## Changes in 0.1.20
+## Changes in 0.1.21
 
-- Use the modern native tameable discovery API while preserving InstanceID seed order.
-- Preserve husbandry registration ownership and activation-failure rollback.
+- Skip malformed feeding items and cancel unavailable cached food or storage targets.
 
 # Shepherd
 
-Version 0.1.20. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.21. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 The ECR breeding refresh and its adoption boundaries are recorded in [docs/ecr-breeding-refresh.md](docs/ecr-breeding-refresh.md).
 

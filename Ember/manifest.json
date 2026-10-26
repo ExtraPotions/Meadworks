@@ -1,6 +1,6 @@
 {
   "name": "Ember",
-  "version_number": "0.5.9",
+  "version_number": "0.5.10",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Ember",
   "description": "Meadworks home comforts: faster nights when some players sleep, torches that warm like a campfire, doors that open as you walk up. Required on all peers.",
   "dependencies": [

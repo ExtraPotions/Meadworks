@@ -1,6 +1,0 @@
-{
-  "guard_source": "C:\\mw\\validation\\yesterday-code-release-20261025\\release-build-1\\source\\Ember\\src\\Ember.Plugin\\Torches\\TorchRuntime.cs",
-  "guard_sha256": "41C959559048898466C9462E557DB1AA2E2337178CF3D5A088D9F51101CE9751",
-  "output_sha256": "58927A60DAEF73BE9810B9E37A07C0005E99503F7EA5A08809D8AB88DC6708BC",
-  "change": "Only exact cleanup statement replaced; guards and every other byte preserved"
-}

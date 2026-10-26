@@ -1,4 +1,5 @@
 using System.Linq;
+using ExtraPotions.Meadworks.Crucible;
 using BepInEx.Configuration;
 using TMPro;
 using UnityEngine;
@@ -70,7 +71,7 @@ namespace Burrow.Core
 
         public static bool InventoryOpen => InventoryGui.IsVisible();
 
-        public static bool TextInputActive => ChatFocused || Console.IsVisible() || TextInput.IsVisible() || InputFieldSelected || YamlEditorOpen;
+        public static bool TextInputActive => !MeadworksHeadless.AllowsInput || GUIUtility.keyboardControl != 0 || !string.IsNullOrEmpty(Input.compositionString) || ChatFocused || Console.IsVisible() || TextInput.IsVisible() || InputFieldSelected || YamlEditorOpen;
 
         private static bool ChatFocused => Chat.instance != null && Chat.instance.HasFocus();
 

@@ -18,7 +18,9 @@ namespace ExtraPotions.Larder.Runtime
         internal static ConfigEntry<bool> AutoFromSlots;
         static float nextAuto;
         static Harmony patches;
-        static Player actor, lastSpawn;
+        static Player actor, lastSpawn, sessionPlayer;
+        static ZNet sessionNet;
+        static long sessionGeneration = -1;
         static long world, playerId;
         static float deadline, nextCheck;
         static bool pending, eating;
@@ -37,18 +39,24 @@ namespace ExtraPotions.Larder.Runtime
             source.AddCapability<Action<long,long,string>>(RetrievalCapability,new System.Version(1,0),Retrieved);
             patches = new Harmony(Plugin.Guid + ".foodtopup");
             patches.CreateClassProcessor(typeof(SpawnPatch)).Patch();
+            patches.CreateClassProcessor(typeof(DestroyPatch)).Patch();
             patches.CreateClassProcessor(typeof(FoodRetrieval.TakeAllPatch)).Patch();
             patches.CreateClassProcessor(typeof(FoodRetrieval.TransferPatch)).Patch();
         }
 
         static bool Scope(Player player)
         {
-            if (!player || player != Player.m_localPlayer || !ZNet.instance || ZNet.instance.GetWorld()==null) return false;
+            if (player && player != Player.m_localPlayer) return false;
+            if (!player || !ZNet.instance || ZNet.instance.GetWorld()==null)
+            { ClearSession(); return false; }
             long currentWorld=ZNet.instance.GetWorldUID(), currentPlayer=player.GetPlayerID();
-            if (currentWorld==0 || currentPlayer==0) return false;
-            if (world!=currentWorld || playerId!=currentPlayer)
+            if (currentWorld==0 || currentPlayer==0) { ClearSession(); return false; }
+            long generation=CruciblePlugin.Session.Generation;
+            if (!ReferenceEquals(sessionPlayer,player) || !ReferenceEquals(sessionNet,ZNet.instance)
+                || sessionGeneration!=generation || world!=currentWorld || playerId!=currentPlayer)
             {
-                pending=false;actor=null;lastSpawn=null;graves.Clear();world=currentWorld;playerId=currentPlayer;
+                ClearSession();sessionPlayer=player;sessionNet=ZNet.instance;sessionGeneration=generation;
+                world=currentWorld;playerId=currentPlayer;
             }
             return true;
         }
@@ -96,8 +104,15 @@ namespace ExtraPotions.Larder.Runtime
             }
         }
 
+        static void ClearSession()
+        {
+            pending=false;actor=lastSpawn=sessionPlayer=null;sessionNet=null;sessionGeneration=-1;
+            world=playerId=0;graves.Clear();deadline=nextCheck=nextAuto=0f;
+        }
+
         internal static void Tick()
         {
+            if (eating || !Scope(Player.m_localPlayer)) return;
             if (!pending) AutoCheck();
             if (!pending) return;
             if (!FoodTopUpRules.Allowed(requestReason,enabled?.Value==true,AutoFromSlots?.Value==true)
@@ -120,7 +135,7 @@ namespace ExtraPotions.Larder.Runtime
             {
                 foreach(var cell in cells)
                 {
-                    if(actor!=Player.m_localPlayer || actor.IsDead() || !ReferenceEquals(inventory,actor.GetInventory()))break;
+                    if(!actor || actor!=Player.m_localPlayer || actor.IsDead() || !ReferenceEquals(inventory,actor.GetInventory()))break;
                     var item=inventory.GetItemAt(cell.Item1,cell.Item2);
                     if(item?.m_shared==null || item.m_stack<=0 || item.m_shared.m_itemType!=ItemDrop.ItemData.ItemType.Consumable
                         || !(item.m_shared.m_food>0f || item.m_shared.m_foodStamina>0f || item.m_shared.m_foodEitr>0f)
@@ -139,7 +154,14 @@ namespace ExtraPotions.Larder.Runtime
         internal static void Shutdown()
         {
             patches?.UnpatchSelf();patches=null;enabled=null;AutoFromSlots=null;nextAuto=0;pending=eating=false;actor=lastSpawn=null;
-            world=playerId=0;graves.Clear();deadline=nextCheck=0;attempts=consumed=0;lastResult="idle";
+            ClearSession();attempts=consumed=0;lastResult="idle";
+        }
+
+        [HarmonyPatch(typeof(Player),nameof(Player.OnDestroy))]
+        static class DestroyPatch
+        {
+            [HarmonyPrefix] static void Before(Player __instance)
+            { if(ReferenceEquals(__instance,sessionPlayer)) ClearSession(); }
         }
 
         [HarmonyPatch(typeof(Player),nameof(Player.OnSpawned))]

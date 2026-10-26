@@ -1,6 +1,6 @@
 # Saga
 
-Version 0.1.16. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.17. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Boss kills turn the Forsaken powers into permanent passives, and Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks as they level.
 

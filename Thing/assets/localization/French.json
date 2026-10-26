@@ -399,8 +399,8 @@
     "cfg_general__allow_sub_admin_delegation_help": "Permet a l'hote ou a l'administrateur d'accorder des permissions non destructives de sous-administrateur aux joueurs en ligne.",
     "ui_grant_subadmin": "Sous-administrateur (non destructif)",
     "ui_help_grant_subadmin": "Accorde toutes les permissions non destructives en tant que sous-administrateur. Necessite deux confirmations.",
-    "ui_subadmin_confirm_1": "Accorder a ce joueur des permissions de sous-administrateur non destructives ?",
-    "ui_subadmin_confirm_2": "Deuxieme confirmation : voulez-vous vraiment accorder les permissions de sous-administrateur ?",
+    "ui_subadmin_confirm_1": "Accorder des permissions non destructives de sous-administrateur à {0} ?",
+    "ui_subadmin_confirm_2": "Deuxième confirmation : accorder les permissions de sous-administrateur à {0} ?",
     "ui_subadmin_revoke_self": "Revoquer sous-administrateur",
     "ui_subadmin_revoke_self_hint": "Revoquer vos propres permissions de sous-administrateur.",
     "ui_subadmin_revoke_self_confirm": "Voulez-vous vraiment revoquer vos permissions de sous-administrateur ?"

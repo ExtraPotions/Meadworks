@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "product": "Solstice",
+  "default": "Advanced",
+  "settings": {
+    "General/Enabled": "Essential",
+    "Protection/Crops Perish": "Essential",
+    "Protection/Heat Protects Crops": "Essential",
+    "Protection/Shield Generator Protects": "Essential",
+    "Notices/Season Message": "Essential",
+    "Visuals/World Tint": "Essential",
+    "Visuals/Snow Cover": "Essential",
+    "Visuals/Frozen Water": "Essential",
+    "Visuals/Minimap Tint": "Essential",
+    "Visuals/Season Indicator": "Essential",
+    "Visuals/Heat Meter": "Essential",
+    "Music/Seasonal Music": "Essential"
+  }
+}

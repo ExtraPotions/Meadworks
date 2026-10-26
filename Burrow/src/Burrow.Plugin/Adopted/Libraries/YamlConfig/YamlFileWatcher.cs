@@ -66,6 +66,10 @@ internal sealed class YamlFileWatcher
 				}
 			}
 		}
+		catch (ThreadAbortException)
+		{
+			throw;
+		}
 		catch (Exception e)
 		{
 			log.LogError($"{modName}: watching YAML files failed: {e.Message}");

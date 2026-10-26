@@ -1,6 +1,6 @@
 # Thing
 
-Version 0.1.13. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.14 source candidate. Targets Crucible 0.3.33 / Crucible.UI 0.3.22; the final provider binaries are pinned and Thing builds remain pending. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Server administration and moderation from inside the game, checked against the server's own admin list.
 
@@ -21,9 +21,13 @@ Server administration and moderation from inside the game, checked against the s
 - Console commands for the same actions, for example `thing say`, `thing terrain`, `thing drops`, `thing ward` and `thing seed`.
 - Every action is checked on the server against its own `adminlist.txt` by platform ID, never by display name, and refusal reasons reach the player in their language.
 
-## Qualification for 0.1.13
+## Qualification and source provenance
 
-Focused dedicated-server checks passed recovery scheduling without a local player and the tested permission boundaries. A separate two-host check passed actual requests from a non-admin client: Save while Sub-Admin was granted, refusal of shutdown and another player's grant, self-revocation retaining Freeze, and refusal of Save after revocation. Both checks used this package's exact Thing and Thing.Core binaries.
+The 0.1.14 source adds the selected player name and platform ID to both Sub-Admin confirmations in all seven languages. It starts from the exact released 8.8 Thing 0.1.13 source archive (SHA256 `4959D919E32D6B030CC93D5944DBC1D05E35376EEC8C4B67FE8221B670A08EC0`). The 0.1.14 binaries were built from the frozen source and read back as local matching candidate archives. Exact source/runtime identities and scoped build evidence are recorded in `SOURCE-SNAPSHOT.json`. Native confirmation acceptance remains tracked separately; no installation or public release is claimed.
+
+### Historical 0.1.13 qualification
+
+Focused dedicated-server checks passed recovery scheduling without a local player and the tested permission boundaries. A separate two-host check passed actual requests from a non-admin client: Save while Sub-Admin was granted, refusal of shutdown and another player's grant, self-revocation retaining Freeze, and refusal of Save after revocation. Both checks used the released 0.1.13 binaries. Their authorization and server-maintenance source remains unchanged here; they are not new 0.1.14 binary receipts.
 
 These checks do not establish full other-player Take/Delete durability, lost-reply recovery, item accounting, disconnect/rejoin or cold/crash recovery. Those existing inventory features retain their unverified limits. No whole-suite, every-tool, physical-input or arbitrary-mod compatibility claim is made. This code-only release does not include the new art or material candidates.
 
@@ -31,7 +35,7 @@ These checks do not establish full other-player Take/Delete durability, lost-rep
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later compatible 0.3.x, with Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.33 or a later compatible 0.3.x, with Crucible.UI 0.3.22 (the shared Meadworks interface kit)
 
 ## Installation
 

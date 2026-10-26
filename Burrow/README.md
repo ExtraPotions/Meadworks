@@ -1,14 +1,11 @@
-## Changes in 0.3.28
+## Changes in 0.3.29
 
-- Preserve legal inventory cells during layout transitions.
-- Keep stack capacity accounting separated by quality and world level.
-- Refresh a viewed container when newer network inventory data is available.
-- Reuse favourite overlays safely across refreshed or destroyed inventory cells.
-- Ignore malformed fuel and unavailable inventory or world data during station refilling.
+- Reuse stable loaded-container snapshots until membership changes.
+- Ignore storage hotkeys while keyboard focus or IME composition is active.
 
 # Burrow
 
-Version 0.3.28. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.29. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Craft and build from nearby chests, preview chest contents, bigger chests, sorting, quick stacking and shared chests.
 

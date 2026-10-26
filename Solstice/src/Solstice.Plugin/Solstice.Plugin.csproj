@@ -20,5 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Solstice.localization.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="settings-tiers.json" LogicalName="Solstice.settings-tiers.json"/>
   </ItemGroup>
 </Project>

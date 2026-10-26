@@ -9,7 +9,7 @@
 
 Faster nights when some players sleep, torches that warm you like a campfire, and doors that open as you walk up.
 
-Version 0.5.9. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.10. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

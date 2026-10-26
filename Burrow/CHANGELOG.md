@@ -1,3 +1,11 @@
+## 0.3.29
+
+- Propagate timer cancellation without a false YAML IO error.
+- Block headless hotkeys before client GUI or IME access while retaining graphical text-input suppression.
+
+- Reuse stable loaded-container snapshots until membership changes.
+- Ignore storage hotkeys while keyboard focus or IME composition is active.
+
 ## 0.3.28
 
 - Preserve legal inventory cells during layout transitions.

@@ -1,6 +1,6 @@
 {
   "name": "Larder",
-  "version_number": "0.2.15",
+  "version_number": "0.2.16",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Larder",
   "description": "Meadworks food and kitchen: food and mead values, eating, regeneration, stamina costs, kitchen stations and Cooking perks. Required on all peers.",
   "dependencies": [

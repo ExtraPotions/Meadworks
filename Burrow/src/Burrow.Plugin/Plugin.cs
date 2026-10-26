@@ -20,10 +20,10 @@ using CrucibleUiPlugin = ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin;
 namespace Burrow
 {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
-    [BepInDependency(CruciblePlugin.Guid, CruciblePlugin.Version)]
+    [BepInDependency(CruciblePlugin.Guid, "0.3.32")]
     // The Crucible.UI kit is the standard Meadworks UI (mandatory; idle on a headless server). The button row keeps its own
     // gamepad-preserving copy of the kit look (Look/ButtonLook.cs).
-    [BepInDependency(CrucibleUiPlugin.Guid, CrucibleUiPlugin.Version)]
+    [BepInDependency(CrucibleUiPlugin.Guid, "0.3.21")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [BepInIncompatibility("milkyteam.openkeep")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
@@ -31,7 +31,7 @@ namespace Burrow
     {
         public const string PluginGuid = "com.meadworks.burrow";
         public const string PluginName = "Burrow";
-        public const string PluginVersion = "0.3.28";
+        public const string PluginVersion = "0.3.29";
         public static ManualLogSource Log { get; private set; }
         public static SyncedConfiguration Synced { get; private set; }
         public static ConfigEntry<bool> LockConfiguration { get; private set; }

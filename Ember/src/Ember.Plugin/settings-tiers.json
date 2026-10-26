@@ -13,7 +13,7 @@
     "Torches/Enabled": "Essential",
     "Torches/Torches Night Only": "Essential",
     "Torches/Torch Switch Key": "Essential",
-    "Seasons/Night Length": "Essential",
+    "Seasons/Night Length": "Advanced",
     "Seasons/Fuel Burn": "Essential",
     "Seasons/Torch Heat": "Essential",
     "Doors/Enable Auto Door": "Essential",

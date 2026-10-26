@@ -28,3 +28,6 @@ Rested acquisition delay selectively adapts OpenKeep Homestead RestPatch, RestDe
 ## Corresponding source for Larder 0.2.15
 
 This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.
+
+
+Successor corresponding source: this package uses the exact member map and build receipts in SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.16/BUILD.json. The matching accepted provider-source supplements remain part of the release source inventory. No new Git commit is asserted.

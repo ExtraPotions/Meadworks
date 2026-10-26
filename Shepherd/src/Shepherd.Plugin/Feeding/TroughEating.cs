@@ -218,7 +218,8 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
             var names = new List<string>();
             foreach (ItemDrop item in ai.m_consumeItems)
             {
-                if (item == null || byName.ContainsKey(item.gameObject.name)) continue;
+                if (item == null || item.gameObject == null || item.m_itemData?.m_shared == null
+                    || string.IsNullOrEmpty(item.m_itemData.m_shared.m_name) || byName.ContainsKey(item.gameObject.name)) continue;
                 byName[item.gameObject.name] = item;
                 names.Add(item.gameObject.name);
             }
@@ -270,7 +271,9 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
 
         private static bool Approach(MonsterAI ai, Meal meal, float dt)
         {
-            if (FeedMath.GaveUp(meal.Since, Time.time, ShepherdSettings.GiveUp.Value)
+            if (meal.Source == null || meal.Food == null || meal.Food.m_itemData?.m_shared == null
+                || string.IsNullOrEmpty(meal.Food.m_itemData.m_shared.m_name)
+                || FeedMath.GaveUp(meal.Since, Time.time, ShepherdSettings.GiveUp.Value)
                 || !FeedSources.Holds(meal.Source, meal.Food.m_itemData.m_shared.m_name))
             {
                 Meals.Remove(ai);

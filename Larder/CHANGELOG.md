@@ -1,3 +1,7 @@
+## 0.2.16
+
+- Clear pending food requests on session changes or local-player destruction while preserving duplicate-request and eating guards.
+
 ## 0.2.15
 
 - Guard cooking and station experience paths when item state is unavailable.

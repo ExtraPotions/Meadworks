@@ -399,8 +399,8 @@
     "cfg_general__allow_sub_admin_delegation_help": "Erlaubt dem Server-Host oder aktuellen Admin, zerstoerungsfreie Unter-Admin-Berechtigungen an Online-Spieler zu vergeben.",
     "ui_grant_subadmin": "Unter-Admin (Zerstoerungsfrei)",
     "ui_help_grant_subadmin": "Vergibt alle zerstoerungsfreien Rechte wie ein Unter-Admin. Erfordert zwei Bestaetigungen.",
-    "ui_subadmin_confirm_1": "Diesem Spieler zerstoerungsfreie Unter-Admin-Rechte gewaehren?",
-    "ui_subadmin_confirm_2": "Zweite Bestaetigung: Dem Spieler wirklich Unter-Admin-Rechte gewaehren?",
+    "ui_subadmin_confirm_1": "{0} nicht destruktive Sub-Admin-Rechte gewähren?",
+    "ui_subadmin_confirm_2": "Zweite Bestätigung: {0} Sub-Admin-Rechte gewähren?",
     "ui_subadmin_revoke_self": "Unter-Admin entziehen",
     "ui_subadmin_revoke_self_hint": "Entziehe dir selbst deine Unter-Admin-Berechtigung.",
     "ui_subadmin_revoke_self_confirm": "Moechtest du dir die Unter-Admin-Rechte wirklich selbst entziehen?"

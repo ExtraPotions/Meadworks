@@ -15,6 +15,7 @@
     <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
     <ProjectReference Include="../Almanac.Core/Almanac.Core.csproj"/>
     <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Almanac.localization.%(Filename)%(Extension)"/>
+    <EmbeddedResource Include="settings-tiers.json" LogicalName="Almanac.settings-tiers.json"/>
     <!-- Development pin: crucible-foundations (build/crucible-foundations). Repoint to the shared checkout once foundations merge to main. -->
     <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
     <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false"/>

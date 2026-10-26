@@ -6,7 +6,7 @@
     <Nullable>annotations</Nullable>
   </PropertyGroup>
   <!-- BepInEx, Jotunn, Harmony, Unity and game references, shared with Crucible. -->
-  <Import Project="$(CrucibleRoot)/RuntimeReferences.props"/>
+  <Import Project="$(FrozenProviderSourceRoot)/RuntimeReferences.props"/>
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all"/>
     <Reference Include="assembly_valheim" Publicize="true" HintPath="$(ValheimManagedDir)/assembly_valheim.dll" Private="false"/>
@@ -15,10 +15,10 @@
     <Reference Include="Unity.TextMeshPro" HintPath="$(ValheimManagedDir)/Unity.TextMeshPro.dll" Private="false"/>
     <Reference Include="gui_framework" HintPath="$(ValheimManagedDir)/gui_framework.dll" Private="false"/>
     <ProjectReference Include="../Thing.Core/Thing.Core.csproj"/>
-    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Plugin/Crucible.Plugin.csproj" Private="false"/>
-    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Core/Crucible.Core.csproj" Private="false"/>
-    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.UI/Crucible.UI.csproj" Private="false"/>
-    <ProjectReference Include="$(CrucibleRoot)/src/Crucible.Contracts/Crucible.Contracts.csproj" Private="false"/>
+    <Reference Include="Crucible" HintPath="$(FrozenProviderDir)/Crucible.dll" Private="false"/>
+    <Reference Include="Crucible.Core" HintPath="$(FrozenProviderDir)/Crucible.Core.dll" Private="false"/>
+    <Reference Include="Crucible.UI" HintPath="$(FrozenProviderDir)/Crucible.UI.dll" Private="false"/>
+    <Reference Include="Crucible.Contracts" HintPath="$(FrozenProviderDir)/Crucible.Contracts.dll" Private="false"/>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="../../assets/localization/*.json" LogicalName="Thing.localization.%(Filename)%(Extension)"/>

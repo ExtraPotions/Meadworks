@@ -2,7 +2,7 @@
 
 Four seasons for Valheim: spring, summer, fall and winter follow the world calendar and change how the world works.
 
-Version 0.1.4. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.5. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

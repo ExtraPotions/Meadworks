@@ -1,14 +1,12 @@
-## Changes in 0.1.24
+## Changes in 0.1.25
 
-- Guard recipe, station and salvage paths when item or inventory data is unavailable.
-- Leave Virtual Workbench Key unbound for new entries while preserving saved keys.
-- Refresh tracker counts every 1.25 seconds while keeping explicit invalidation immediate.
+- Refresh Repair All tooltips when counts, eligibility, ownership or translations change.
 
 # Kindle
 
 Recipe search and sorting, favorites, batch crafting, a recipe tracker, salvage and an optional Cart Workbench.
 
-Version 0.1.24. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.25. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

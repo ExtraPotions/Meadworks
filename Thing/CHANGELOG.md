@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.14 (prepared; not released)
+
+- Both Sub-Admin confirmations identify the selected player by name and platform ID.
+- Includes the confirmation identity placeholder and matching argument count in all seven languages.
+- Targets Crucible 0.3.33 / Crucible.UI 0.3.22; final Thing builds against the frozen providers and qualification remain pending.
+
 ## 0.1.13 (2026-10-25)
 
 - Requires Crucible 0.3.32 / Crucible.UI 0.3.21, matching the compiled dependency minimums.

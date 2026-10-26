@@ -1,3 +1,7 @@
+## 0.1.21
+
+- Skip malformed feeding items and cancel unavailable cached food or storage targets.
+
 ## 0.1.20
 
 - Use the modern native tameable discovery API while preserving InstanceID seed order.

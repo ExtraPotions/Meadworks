@@ -9,7 +9,7 @@ namespace ExtraPotions.Solstice
         /// <summary>The plugin GUID before 0.1.3. Its settings file and import marker are carried over once; other MeadWorks products accept either GUID for one release.</summary>
         public const string LegacyPluginGuid = "com.extrapotions.solstice";
         public const string ProductName = "Solstice";
-        public const string ProductVersion = "0.1.4";
+        public const string ProductVersion = "0.1.5";
         public const string Family = "Runestone";
 
         /// <summary>Localisation namespace: tokens <c>$meadworks_solstice_&lt;key&gt;</c>.</summary>

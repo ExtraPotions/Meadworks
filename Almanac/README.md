@@ -6,7 +6,7 @@
 
 One in-game settings book for every installed mod's configuration, aware of server locks.
 
-Version 0.1.23. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.24. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "product": "Almanac",
+  "default": "Advanced",
+  "settings": {
+    "General/Toggle Key": "Essential",
+    "General/Menu Buttons": "Essential",
+    "General/Remember Window": "Essential",
+    "Display/Highlight Changes": "Essential",
+    "Display/Syntax Highlighting": "Essential",
+    "Changes/Watch Files On Disk": "Essential",
+    "Window/Drawer Width": "Essential",
+    "Window/Pause Game": "Essential",
+    "Window/Window Opacity": "Essential",
+    "Window/Window Scale": "Essential",
+    "Compatibility/Coexistence": "Essential"
+  }
+}

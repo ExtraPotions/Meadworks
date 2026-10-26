@@ -40,7 +40,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
 
         /// <summary>The right-hand rows as last drawn: kind, group-free key and title, for native checks.</summary>
         public IReadOnlyList<string> VisibleRows()=>shownRows.Select(row=>
-            (row.Action.Length>0?row.Action:row.FeatureId.Length>0?"feature":row.Header||row.WorldHeading?"heading":row.World!=null?"world":row.Native!=null?(row.ServerSet?"server-row":row.FileOnly?"file-only":"setting"):"info")
+            (row.Preset!=null?"preset":row.Action.Length>0?row.Action:row.FeatureId.Length>0?"feature":row.Header||row.WorldHeading?"heading":row.World!=null?"world":row.Native!=null?(row.ServerSet?"server-row":row.FileOnly?"file-only":"setting"):"info")
             +"|"+(row.Native!=null?row.Native.Entry.Definition.Section+"/"+row.Native.Entry.Definition.Key:row.Key)+"|"+row.Title).ToArray();
 
         /// <summary>Bound "Set by the server" rows as "key|usable control names" (empty when read-only), for native checks.</summary>
@@ -50,7 +50,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
         string TierFingerprint()
         {
             var session=CruciblePlugin.IsReady?CruciblePlugin.Session:null;
-            return essentialView+"|"+string.Join(",",serverExpanded.OrderBy(key=>key,StringComparer.Ordinal))+"|"+session?.Role+"|"+session?.IsAdmin;
+            return essentialView+"|"+string.Join(",",serverExpanded.OrderBy(key=>key,StringComparer.Ordinal))+"|"+session?.Role+"|"+session?.IsAdmin+"|"+session?.AuthorityReady+"|"+session?.Generation;
         }
 
         bool InProductScope(IndexGroup group)=>productFilter.Length==0||group.Key==productFilter||SettingTierRules.Companion(productFilter,group.Key);

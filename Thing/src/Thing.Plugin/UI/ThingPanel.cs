@@ -482,8 +482,9 @@ namespace ExtraPotions.Thing.Runtime
                 }
                 else
                 {
-                    var confirm1 = string.Format(Ui("subadmin_confirm_1"), target.Caption);
-                    var confirm2 = string.Format(Ui("subadmin_confirm_2"), target.Caption);
+                    var identity = target.Caption + "\n" + id;
+                    var confirm1 = string.Format(Ui("subadmin_confirm_1"), identity);
+                    var confirm2 = string.Format(Ui("subadmin_confirm_2"), identity);
                     ThingPanelForms.Confirm(window!, confirm1, () =>
                     {
                         ThingPanelForms.Confirm(window!, confirm2, () =>

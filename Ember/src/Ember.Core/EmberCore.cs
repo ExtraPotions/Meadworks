@@ -6,7 +6,7 @@ namespace ExtraPotions.Ember
     {
         public const string PluginGuid = "com.meadworks.ember";
         public const string ProductName = "Ember";
-        public const string ProductVersion = "0.5.9";
+        public const string ProductVersion = "0.5.10";
         public const string Family = "Hearth";
 
         /// <summary>Localization token prefix (design section 11).</summary>

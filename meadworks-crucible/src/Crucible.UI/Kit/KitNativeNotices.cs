@@ -20,6 +20,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         }
 
         static readonly List<Surface> surfaces = new List<Surface>();
+        static readonly List<NoticeWrapping> wrapping = new List<NoticeWrapping>();
         static MessageHud host;
         static bool initialized, dirty;
 
@@ -44,11 +45,14 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 Clear(); host = next;
                 if (host != null)
                 {
+                    if (host.m_messageText != null) wrapping.Add(new NoticeWrapping(host.m_messageText, false));
+                    if (host.m_messageCenterText != null) wrapping.Add(new NoticeWrapping(host.m_messageCenterText, true));
                     Add(host.m_messageText, null, null);
                     Add(host.m_messageCenterText, null, null);
                 }
             }
             if (host == null) return;
+            for (int i = 0; i < wrapping.Count; i++) wrapping[i].Refresh();
             List<GameObject> unlocks = Native.Unlocks(host);
             for (int i = 0; i < unlocks.Count; i++)
             {
@@ -128,6 +132,8 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         {
             for (int i = 0; i < surfaces.Count; i++) surfaces[i].Dispose();
             surfaces.Clear();
+            for (int i = 0; i < wrapping.Count; i++) wrapping[i].Restore();
+            wrapping.Clear();
         }
 
         public static void Shutdown()
@@ -135,6 +141,65 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             KitAppearance.Changed -= Changed;
             SceneManager.activeSceneChanged -= SceneChanged;
             Clear(); host = null; initialized = dirty = false;
+        }
+
+        sealed class NoticeWrapping
+        {
+            readonly TMP_Text text;
+            readonly bool center;
+            readonly TextWrappingModes originalWrapping;
+            readonly float originalWidthDelta;
+            float appliedWidthDelta;
+            bool ownsWrapping = true, ownsWidth = true;
+
+            internal NoticeWrapping(TMP_Text text, bool center)
+            {
+                this.text = text; this.center = center;
+                originalWrapping = text.textWrappingMode;
+                originalWidthDelta = appliedWidthDelta = text.rectTransform.sizeDelta.x;
+                text.textWrappingMode = TextWrappingModes.Normal;
+            }
+
+            internal void Refresh()
+            {
+                if (text == null) return;
+                // A later writer owns its changes; do not fight or restore over another mod.
+                if (text.textWrappingMode != TextWrappingModes.Normal) ownsWrapping = false;
+                var rect = text.rectTransform;
+                if (rect.sizeDelta.x != appliedWidthDelta) ownsWidth = false;
+                if (!ownsWidth || !ownsWrapping || Screen.width <= 0) return;
+                var canvas = text.canvas;
+                if (canvas == null || canvas.renderMode == RenderMode.WorldSpace) return;
+                Camera camera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+                if (canvas.renderMode != RenderMode.ScreenSpaceOverlay && camera == null) return;
+                Rect safe = Screen.safeArea;
+                if (safe.width <= 32f) return;
+                Vector2 pivotScreen = RectTransformUtility.WorldToScreenPoint(camera, rect.position);
+                if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, new Vector2(safe.xMin + 16f, pivotScreen.y), camera, out Vector2 left)
+                    || !RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, new Vector2(safe.xMax - 16f, pivotScreen.y), camera, out Vector2 right)) return;
+                float span = right.x - left.x;
+                if (span <= 0f || left.x >= 0f || right.x <= 0f) return;
+                float maxPixels = center ? Mathf.Min(Screen.width * .8f, 960f) : Mathf.Min(Screen.width * .45f, 520f);
+                float width = maxPixels * span / (safe.width - 32f);
+                if (rect.pivot.x > 0f) width = Mathf.Min(width, -left.x / rect.pivot.x);
+                if (rect.pivot.x < 1f) width = Mathf.Min(width, right.x / (1f - rect.pivot.x));
+                // The native center label is narrow because NoWrap ignored its rect. Let long center text use the cap.
+                // The top-left label retains the existing icon/text column width.
+                float nativeWidth = rect.rect.width + originalWidthDelta - appliedWidthDelta;
+                if (nativeWidth > 0f) width = Mathf.Min(width, center ? Mathf.Max(nativeWidth, text.preferredWidth) : nativeWidth);
+                if (width <= 0f || Mathf.Approximately(width, rect.rect.width)) return;
+                rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+                appliedWidthDelta = rect.sizeDelta.x;
+            }
+
+            internal void Restore()
+            {
+                if (text == null) return;
+                if (ownsWrapping && text.textWrappingMode == TextWrappingModes.Normal) text.textWrappingMode = originalWrapping;
+                var rect = text.rectTransform;
+                if (ownsWidth && rect.sizeDelta.x == appliedWidthDelta)
+                    rect.sizeDelta = new Vector2(originalWidthDelta, rect.sizeDelta.y);
+            }
         }
 
         sealed class Label

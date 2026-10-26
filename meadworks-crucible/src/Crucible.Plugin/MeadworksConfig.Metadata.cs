@@ -47,10 +47,16 @@ namespace ExtraPotions.Meadworks.Crucible {
             if(!data.Bound){managedEntries.Remove(entry);return;}
             data.Tracked=false;data.Product=data.BoundProduct;data.Scope=data.BoundScope;data.ServerLocked=true;
         }
-        /// <summary>Only exact entries registered by this runtime's Bind or active Track are managed.</summary>
+        /// <summary>Exact Bind/Track entries and active first-party local Charter clauses are managed. Server Charter clauses retain their own amendment protocol.</summary>
         public static bool TryGetMetadata(ConfigEntryBase entry,out ConfigEntryMetadata metadata){
             if(entry!=null&&managedEntries.TryGetValue(entry,out var data)&&!string.IsNullOrWhiteSpace(data.Product)){
                 metadata=new ConfigEntryMetadata(data.Product,data.Scope,data.Safe,data.ServerLocked,data.Visibility);return true;
+            }
+            if(TryGetRegisteredClause(entry,out var clause)&&clause.Scope==ConfigScope.Local){
+                var visibility=ConfigVisibility.Shown;
+                try{foreach(var tag in entry.Description.Tags)if(tag!=null&&ClauseMember(tag,"Browsable") is bool browsable&&!browsable)visibility=ConfigVisibility.Hidden;}
+                catch{metadata=null!;return false;}
+                metadata=new ConfigEntryMetadata(clause.ProductId,ConfigScope.Local,entry.DefaultValue,true,visibility);return true;
             }
             metadata=null!;return false;
         }

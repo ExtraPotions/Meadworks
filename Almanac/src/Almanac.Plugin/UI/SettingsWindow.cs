@@ -237,6 +237,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
                 var rows=new List<RowModel>();var folded=new List<RowModel>();
                 if(essentialView&&group.Key==productFilter)rows.Add(AllSettingsRow(group));
                 AddFeatureRows(group,rows,fingerprint);
+                AddPresetRows(group,rows,fingerprint);
                 int serverAt=rows.Count; // The "Set by the server" line sits above the settings, where it is seen without scrolling.
                 foreach(var file in group.Files)
                 {
@@ -358,6 +359,12 @@ namespace ExtraPotions.Almanac.Runtime.UI
             }
             foreach(var row in displayRows)
             {
+                if(row.Preset!=null)
+                {
+                    row.Index=right.Count;
+                    right.Add(new KitVirtualRow(row.Key,76,rect=>BindPreset(rect,row),UnbindFeature));
+                    continue;
+                }
                 if(row.Action.Length>0)
                 {
                     row.Index=right.Count;
@@ -523,7 +530,7 @@ namespace ExtraPotions.Almanac.Runtime.UI
         }
         sealed class WriteState{internal string Before="",Requested="",Message="",MessageKey="";internal bool Pending,Error;internal Func<bool>? Confirmed;internal float Submitted;}
         sealed class RowModel
-        {internal string Key="",Title="",Info="",Reason="",Section="",ShownSection="",CodecError="",NativeConflict="",FeatureId="",Action="";internal int Index;internal float DescriptionExtra;internal bool Header,WorldHeading,FileOnly,ServerSet;internal NativeEntry? Native;internal EntryAttributes? Attributes;internal IndexedFile? File;internal WorldSettingMetadata? World;}
+        {internal string Key="",Title="",Info="",Reason="",Section="",ShownSection="",CodecError="",NativeConflict="",FeatureId="",Action="";internal int Index;internal float DescriptionExtra;internal bool Header,WorldHeading,FileOnly,ServerSet;internal NativeEntry? Native;internal EntryAttributes? Attributes;internal IndexedFile? File;internal WorldSettingMetadata? World;internal AlmanacPresetChoice? Preset;}
         sealed partial class RowView : IDisposable
         {
             readonly SettingsWindow owner;readonly RectTransform rect;
