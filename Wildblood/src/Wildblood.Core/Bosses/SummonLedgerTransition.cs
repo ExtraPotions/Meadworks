@@ -34,7 +34,7 @@ namespace ExtraPotions.Wildblood.Bosses
                 throw new InvalidDataException("Summon transition changed its recorded cost or history.");
             if (previous != null && next.Revision != 0)
             {
-                bool allowed = previous.Stage == SummonStage.Pending && next.Stage == SummonStage.Alive
+                bool allowed = previous.Stage == SummonStage.Pending && (next.Stage == SummonStage.Alive || next.Stage == SummonStage.Cancelled)
                     || previous.Stage == SummonStage.Alive && (next.Stage == SummonStage.Alive || next.Stage == SummonStage.Killed || next.Stage == SummonStage.RefundDecided)
                     || previous.Stage == SummonStage.RefundDecided && next.Stage == SummonStage.RefundDelivered;
                 if (!allowed || previous.Stage != SummonStage.Pending && !previous.BossIds.SequenceEqual(next.BossIds)

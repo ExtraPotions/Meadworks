@@ -329,6 +329,7 @@
         "cfg_5_bosses__abandon_range_help": "호스트 또는 서버 설정: 기록된 소환 보스로부터의 거리(미터)입니다. 플레이어가 이 범위 안에 들어오면 방치 타이머가 초기화됩니다. 버려진 보스가 켜져 있을 때 적용됩니다.",
         "boss_summon_blocked": "이 제단에서 소환한 보스가 아직 살아 있습니다. 다음 제물을 바치기 전에 보스를 처치하세요.",
         "boss_summon_recovery_pending": "이 제단에서 이전 소환 또는 제물 기록을 복구하고 있습니다. 다음 소환을 시도하기 전에 기다리세요.",
+        "boss_summon_offering_cancelled": "제단이 제물을 받을 수 없었습니다. 아무것도 소모되지 않았으며 보스가 소환되지 않았습니다.",
         "cfg_5_bosses__block_spawns_near_boss_name": "보스 근처 생성 차단",
         "cfg_5_bosses__block_spawns_near_boss_help": "활성 보스 근처에서는 자연 생성이 일어나지 않습니다.",
         "cfg_6_loot_heading": "6 - 전리품",

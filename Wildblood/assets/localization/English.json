@@ -329,6 +329,7 @@
         "cfg_5_bosses__abandon_range_help": "Host or server: distance from a recorded summoned boss in meters within which any player resets its abandonment timer. Used while Abandoned Bosses is on.",
         "boss_summon_blocked": "This altar already has a living summoned boss. Defeat it before making another offering.",
         "boss_summon_recovery_pending": "This altar is recovering its previous summon or offering. Wait before trying another summon.",
+        "boss_summon_offering_cancelled": "The altar could not take your offering. Nothing was taken and no boss was summoned.",
         "cfg_5_bosses__block_spawns_near_boss_name": "Block Spawns Near Boss",
         "cfg_5_bosses__block_spawns_near_boss_help": "No natural spawns near an active boss.",
         "cfg_6_loot_heading": "6 - Loot",

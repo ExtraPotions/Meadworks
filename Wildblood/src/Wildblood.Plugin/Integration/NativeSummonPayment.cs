@@ -23,6 +23,8 @@ internal static class NativeSummonPayment
     static bool paying;
     static object? scannedContext;
     static float nextRecovery;
+    static readonly Dictionary<string, float> warned = new(StringComparer.Ordinal);
+    static readonly HashSet<string> declined = new(StringComparer.Ordinal);
 
     internal static void Tick()
     {
@@ -63,7 +65,7 @@ internal static class NativeSummonPayment
             heldInventory = null; heldPlayer = null; heldWorld = 0; heldSource = "";
             scannedContext = NativeSummonReceipts.Context;
         }
-        catch (Exception error) { Plugin.NativeLogger?.LogWarning("Wildblood summon payment recovery held: " + error.GetType().Name); }
+        catch (Exception error) { Warn("recovery", error.GetType().Name + error.Message, "Wildblood summon payment recovery held: " + error.GetType().Name + ": " + error.Message); }
     }
 
     internal static bool Held(Inventory inventory) => inventory != null && ReferenceEquals(inventory, heldInventory)
@@ -102,7 +104,7 @@ internal static class NativeSummonPayment
         packet.Write(2); packet.Write(source); packet.Write(NativeBossAbandon.Id(altar)); packet.Write(prefab); packet.Write(amount);
         byte[] metadata = packet.GetArray();
         string path = Path.Combine(Paths.BepInExRootPath, "Wildblood.boss-offerings", worldText, actor, summon + ".wal");
-        bool recorded = false;
+        bool recorded = false, imaging = false;
         paying = true;
         try
         {
@@ -118,6 +120,8 @@ internal static class NativeSummonPayment
             if (record == null)
             {
                 if (journal.Snapshot().Count != 0 || !journal.CanAdmit || receiptExists) return false;
+                imaging = true;
+                SettleDurability(inventory);
                 byte[] before = NativeTheftInventory.Bytes(inventory);
                 var shadow = NativeTheftInventory.Read(before);
                 int remaining = amount;
@@ -134,6 +138,7 @@ internal static class NativeSummonPayment
                 }
                 if (remaining != 0 || !NativeTheftInventory.Bytes(inventory).SequenceEqual(before)) return false;
                 byte[] after = NativeTheftInventory.Bytes(shadow);
+                imaging = false;
                 Hold(player, inventory, world, source);
                 record = journal.Prepare(summon, source, Fingerprint(metadata, before, after), 0, before, after, metadata);
             }
@@ -151,11 +156,64 @@ internal static class NativeSummonPayment
         }
         catch (Exception error)
         {
+            // Imaging only reads: no record was prepared and nothing was debited. The same inventory fails the same way
+            // every time, so the payer declines and the server cancels the summon instead of offering it again.
+            if (imaging && !recorded && error is InvalidDataException
+                && !player.m_customData.ContainsKey(NativeTheftInventory.ReceiptKey(source)) && DiscardEmpty(path))
+            {
+                Release(inventory, source);
+                declined.Add(summon);
+                Warn(summon, "declined", "Wildblood summon payment declined, nothing taken: " + error.Message);
+                return false;
+            }
             if (recorded || File.Exists(path)) Hold(player, inventory, world, source);
-            Plugin.NativeLogger?.LogWarning("Wildblood summon payment held: " + error.GetType().Name);
+            Warn(summon, error.GetType().Name + error.Message, "Wildblood summon payment held: " + error.GetType().Name + ": " + error.Message);
             return false;
         }
         finally { paying = false; }
+    }
+
+    internal static bool TakeDeclined(string summon) => declined.Remove(summon);
+
+    // Only the empty journal this payment created may go; a journal with any bytes stays for recovery.
+    static bool DiscardEmpty(string path)
+    {
+        try
+        {
+            var file = new FileInfo(path);
+            if (!file.Exists) return true;
+            if (file.Length != 0) return false;
+            file.Delete();
+            return true;
+        }
+        catch (IOException) { return false; }
+        catch (UnauthorizedAccessException) { return false; }
+    }
+
+    static void Warn(string summon, string reason, string text)
+    {
+        string key = summon + "\n" + reason;
+        if (warned.TryGetValue(key, out float until) && Time.unscaledTime < until) return;
+        if (warned.Count >= 256) warned.Clear();
+        warned[key] = Time.unscaledTime + 60f;
+        Plugin.NativeLogger?.LogWarning(text);
+    }
+
+    // A native save stores durability as whole hundredths and a load multiplies them by 0.01f, so a worn item can
+    // come back one hundredth lower and its image never round-trips. Apply that same save/load step now; the item
+    // keeps the value its next character save and load would give it, and the exact round-trip check stays strict.
+    static void SettleDurability(Inventory inventory)
+    {
+        foreach (var item in inventory.GetAllItems())
+        {
+            if (float.IsNaN(item.m_durability) || float.IsInfinity(item.m_durability)) continue;
+            for (int step = 0; step < 16; step++)
+            {
+                int previous = BitConverter.SingleToInt32Bits(item.m_durability);
+                item.m_durability = (int)(item.m_durability * 100f) * 0.01f;
+                if (BitConverter.SingleToInt32Bits(item.m_durability) == previous) break;
+            }
+        }
     }
 
     static bool Matches(byte[] metadata, string source, ZDOID altar, string prefab, int amount)

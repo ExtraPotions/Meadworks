@@ -329,6 +329,7 @@
         "cfg_5_bosses__abandon_range_help": "Host oder Server: Entfernung in Metern um einen erfassten beschworenen Boss, innerhalb derer jeder Spieler seinen Aufgabe-Timer zurücksetzt. Gilt bei aktivierter Option Verlassene Bosse.",
         "boss_summon_blocked": "Ein an diesem Altar beschworener Boss lebt noch. Besiege ihn, bevor du eine weitere Opfergabe darbringst.",
         "boss_summon_recovery_pending": "Dieser Altar stellt seine vorherige Beschwörung oder Opfergabe wieder her. Warte, bevor du eine weitere Beschwörung versuchst.",
+        "boss_summon_offering_cancelled": "Der Altar konnte deine Opfergabe nicht annehmen. Es wurde nichts entnommen und kein Boss beschworen.",
         "cfg_5_bosses__block_spawns_near_boss_name": "Spawns nahe Bossen blockieren",
         "cfg_5_bosses__block_spawns_near_boss_help": "Keine natürlichen Spawns in der Nähe eines aktiven Bosses.",
         "cfg_6_loot_heading": "6 - Beute",

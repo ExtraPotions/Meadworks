@@ -329,6 +329,7 @@
         "cfg_5_bosses__abandon_range_help": "由主机或服务器控制：以米为单位，任何玩家进入记录中的召唤首领周围此范围时都会重置遗弃计时。仅在开启遗弃的首领时生效。",
         "boss_summon_blocked": "此祭坛召唤的首领仍然存活。请先击败它，再献上祭品。",
         "boss_summon_recovery_pending": "此祭坛正在恢复上一次召唤或祭品记录。请等待后再尝试召唤。",
+        "boss_summon_offering_cancelled": "祭坛无法接受你的祭品。没有扣除任何物品，也没有召唤首领。",
         "cfg_5_bosses__block_spawns_near_boss_name": "首领附近禁止生成",
         "cfg_5_bosses__block_spawns_near_boss_help": "活跃的首领附近不会自然生成生物。",
         "cfg_6_loot_heading": "6 - 掉落",

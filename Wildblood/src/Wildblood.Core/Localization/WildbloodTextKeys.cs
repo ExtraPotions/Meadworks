@@ -66,6 +66,7 @@ namespace ExtraPotions.Wildblood.Localization
             new TextKey("boss_defeated_cap", 1),
             new TextKey("boss_summon_blocked", 0),
             new TextKey("boss_summon_recovery_pending", 0),
+            new TextKey("boss_summon_offering_cancelled", 0),
             new TextKey(WorldTierLabel, 1),
             new TextKey(ImportDone, 2),
             new TextKey(CheatDropMultipliers, 0),

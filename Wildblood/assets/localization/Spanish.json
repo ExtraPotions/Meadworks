@@ -329,6 +329,7 @@
         "cfg_5_bosses__abandon_range_help": "Anfitrión o servidor: distancia en metros desde un jefe invocado registrado dentro de la que cualquier jugador reinicia su contador de abandono. Se usa con Jefes abandonados activado.",
         "boss_summon_blocked": "Este altar ya tiene un jefe invocado vivo. Derrótalo antes de realizar otra ofrenda.",
         "boss_summon_recovery_pending": "Este altar está recuperando su invocación u ofrenda anterior. Espera antes de intentar otra invocación.",
+        "boss_summon_offering_cancelled": "El altar no pudo aceptar tu ofrenda. No se ha retirado nada y no se ha invocado ningún jefe.",
         "cfg_5_bosses__block_spawns_near_boss_name": "Bloquear apariciones cerca de jefes",
         "cfg_5_bosses__block_spawns_near_boss_help": "Sin apariciones naturales cerca de un jefe activo.",
         "cfg_6_loot_heading": "6 - Botín",

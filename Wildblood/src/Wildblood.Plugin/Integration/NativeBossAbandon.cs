@@ -35,7 +35,7 @@ internal static class NativeBossAbandon
         SummonIdKey = "wildblood.summon.id", PrimaryBornKey = "wildblood.summon.primary-born";
     internal const string PhantomIdentityKey = "wildblood.summon.phantom-parent";
     const string RequestRpc = "Wildblood.Summon.Request", NoticeRpc = "Wildblood.Summon.Notice", DeathRpc = "Wildblood.Summon.Death",
-        OfferRpc = "Wildblood.Summon.Offer", PaidRpc = "Wildblood.Summon.Paid",
+        OfferRpc = "Wildblood.Summon.Offer", PaidRpc = "Wildblood.Summon.Paid", DeclinedRpc = "Wildblood.Summon.Declined",
         PaidKey = "wildblood.summon.paid", PayerKey = "wildblood.summon.payer", InventoryKey = "wildblood.summon.inventory";
     const string SpawnPointKey = "wildblood.summon.spawn-point";
     static readonly Dictionary<string, NativeSummonStore> stores = new(StringComparer.Ordinal);
@@ -80,17 +80,19 @@ internal static class NativeBossAbandon
             bus.Register<ZDOID, bool>(RequestRpc, Request);
             bus.Register<string>(NoticeRpc, (sender, key) =>
             {
-                if (sender == ZRoutedRpc.instance.GetServerPeerID() && (key == "boss_summon_blocked" || key == "boss_summon_recovery_pending"))
+                if (sender == ZRoutedRpc.instance.GetServerPeerID() && (key == "boss_summon_blocked" || key == "boss_summon_recovery_pending" || key == "boss_summon_offering_cancelled"))
                     WildbloodText.TopLeft(WildbloodText.Text(key));
             });
             bus.Register<ZDOID>(DeathRpc, Death);
             bus.Register<ZDOID, string, string, int>(OfferRpc, (sender, altar, summon, prefab, amount) =>
             {
-                if (sender == ZRoutedRpc.instance.GetServerPeerID() && NativeSummonPayment.Pay(altar, summon, prefab, amount))
-                    ZRoutedRpc.instance.InvokeRoutedRPC(sender, PaidRpc, altar, summon);
+                if (sender != ZRoutedRpc.instance.GetServerPeerID()) return;
+                if (NativeSummonPayment.Pay(altar, summon, prefab, amount)) ZRoutedRpc.instance.InvokeRoutedRPC(sender, PaidRpc, altar, summon);
+                else if (NativeSummonPayment.TakeDeclined(summon)) ZRoutedRpc.instance.InvokeRoutedRPC(sender, DeclinedRpc, altar, summon);
             });
             bus.Register<ZDOID, string>(PaidRpc, Paid);
-        }, () => { }, RequestRpc, NoticeRpc, DeathRpc, OfferRpc, PaidRpc);
+            bus.Register<ZDOID, string>(DeclinedRpc, Declined);
+        }, () => { }, RequestRpc, NoticeRpc, DeathRpc, OfferRpc, PaidRpc, DeclinedRpc);
     }
     internal static bool Initiate(OfferingBowl bowl, bool inventory)
     {
@@ -205,7 +207,7 @@ internal static class NativeBossAbandon
     static void Offer(NativeSummonStore store, long peer)
     {
         var state = store.State;
-        if (state == null || state.Offerings.Count != 1) return;
+        if (state == null || state.Stage != SummonStage.Pending || state.Offerings.Count != 1) return;
         var cost = state.Offerings[0];
         var altar = Find(state.AltarId);
         if (altar != null) ZRoutedRpc.instance.InvokeRoutedRPC(peer, OfferRpc, altar.m_uid, state.SummonId, cost.Prefab, cost.Amount);
@@ -217,6 +219,29 @@ internal static class NativeBossAbandon
         if (altar == null || altar.GetLong(PayerKey, 0) != Actor(sender) || !altar.GetBool(InventoryKey)) return;
         altar.SetOwner(ZDOMan.GetSessionID()); altar.Set(PaidKey, summon);
         Schedule(store);
+    }
+    // The payer took nothing for this summon, so it ends without a boss and the altar is free again.
+    static void Declined(long sender, ZDOID altarId, string summon)
+    {
+        if (!Authority || !stores.TryGetValue(Id(altarId), out var store) || !store.Ready) return;
+        var state = store.State;
+        if (state?.Stage != SummonStage.Pending || state.SummonId != summon) return;
+        var altar = ZDOMan.instance.GetZDO(altarId);
+        if (altar == null || !altar.GetBool(InventoryKey) || altar.GetLong(PayerKey, 0) == 0 || altar.GetLong(PayerKey, 0) != Actor(sender)
+            || altar.GetString(PaidKey) == summon || altar.GetString(PrimaryIdentityKey).Length != 0 || altar.GetZDOID(PrimaryKey) != ZDOID.None) return;
+        var instance = ZNetScene.instance.FindInstance(altarId);
+        var bowl = instance ? instance.GetComponentInChildren<OfferingBowl>() : null;
+        if (bowl && bowl.IsBossSpawnQueued()) return;
+        try
+        {
+            altar.SetOwner(ZDOMan.GetSessionID());
+            store.Change(state.Cancel());
+            if (store.State?.Stage != SummonStage.Cancelled) return;
+            altar.Set(PayerKey, 0L); altar.Set(PaidKey, ""); altar.Set(PendingIdKey, "");
+            ZNet.instance.Save(false);
+            Notice(sender, "boss_summon_offering_cancelled");
+        }
+        catch (Exception error) { Plugin.NativeLogger?.LogWarning("Wildblood summon cancel held: " + error.GetType().Name + ": " + error.Message); }
     }
     static void Schedule(NativeSummonStore store)
     {
@@ -421,7 +446,7 @@ internal static class NativeBossAbandon
                 if (state.Stage == SummonStage.RefundDecided) { store.Change(state.DeliverRefund()); continue; }
                 var altar = Find(state.AltarId);
                 bool paid = altar != null && altar.GetString(PaidKey) == state.SummonId;
-                if (!paid && altar != null && altar.GetBool(InventoryKey))
+                if (!paid && state.Stage == SummonStage.Pending && altar != null && altar.GetBool(InventoryKey))
                 {
                     long actor = altar.GetLong(PayerKey, 0);
                     if (actor != 0)
@@ -461,7 +486,7 @@ internal static class NativeBossAbandon
     static void RestoreContext(NativeSummonStore store)
     {
         var state = store.State;
-        if (state == null || state.Context.Length == 0) return;
+        if (state == null || state.Context.Length == 0 || state.Stage == SummonStage.Cancelled) return;
         var altar = Find(state.AltarId); if (altar == null) return;
         if (altar.GetString(PendingIdKey) == state.SummonId && altar.GetLong(PayerKey, 0) != 0) return;
         var packet = new ZPackage(Convert.FromBase64String(state.Context));

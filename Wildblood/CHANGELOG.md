@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.9 (2026-10-26)
+
+- Version 0.5.9. Requires Crucible 0.3.33.
+- Boss altars take inventory offerings again when the player carries worn gear. The payment check compared the inventory with a saved copy of itself, and a worn item's durability could come back one hundredth lower, so every offering was refused and the boss never came. Durability now gets the same rounding a character save gives it before the offering is taken.
+- If an altar still cannot take an offering, the summon is cancelled: nothing is taken, no boss appears, and the altar is free for a new offering. The player sees a message in all seven languages. Previously the offering was asked for again every second, without end.
+- The log names the reason a summon payment was held, at most once a minute per summon.
+
 ## Unreleased
 
 - Version 0.5.7. Requires Crucible 0.3.29 / Crucible.UI 0.3.21.

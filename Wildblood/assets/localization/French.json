@@ -329,6 +329,7 @@
         "cfg_5_bosses__abandon_range_help": "Hôte ou serveur : distance en mètres autour d’un boss invoqué enregistré dans laquelle tout joueur remet son compteur d’abandon à zéro. Utilisé si Boss abandonnés est activé.",
         "boss_summon_blocked": "Un boss invoqué depuis cet autel est encore en vie. Vainquez-le avant de faire une autre offrande.",
         "boss_summon_recovery_pending": "Cet autel récupère son invocation ou son offrande précédente. Patientez avant de tenter une autre invocation.",
+        "boss_summon_offering_cancelled": "L'autel n'a pas pu accepter votre offrande. Rien n'a été retiré et aucun boss n'a été invoqué.",
         "cfg_5_bosses__block_spawns_near_boss_name": "Bloquer les apparitions près d'un boss",
         "cfg_5_bosses__block_spawns_near_boss_help": "Aucune apparition naturelle près d'un boss actif.",
         "cfg_6_loot_heading": "6 - Butin",

@@ -2,7 +2,7 @@
 
 Creature stars that grow with the world, mutations, boss aspects, loot rules and bad-luck protection.
 
-Version 0.5.7 (unreleased). Requires Crucible 0.3.29 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.9. Requires Crucible 0.3.33. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

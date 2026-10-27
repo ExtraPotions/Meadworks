@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ExtraPotions.Wildblood.Bosses
 {
-    public enum SummonStage : byte { Pending = 1, Alive = 2, Killed = 3, RefundDecided = 4, RefundDelivered = 5 }
+    public enum SummonStage : byte { Pending = 1, Alive = 2, Killed = 3, RefundDecided = 4, RefundDelivered = 5, Cancelled = 6 }
 
     public sealed class SummonOffering
     {
@@ -45,7 +45,7 @@ namespace ExtraPotions.Wildblood.Bosses
             RequireText(altarId); RequireText(summonId);
             if (context == null || context.Length > 2048) throw new InvalidDataException("Summon context exceeds bounds.");
             var bosses = bossIds.ToArray(); var killed = killedBossIds.ToArray(); var costs = offerings.ToArray();
-            if (worldUid == 0 || revision < 0 || stage < SummonStage.Pending || stage > SummonStage.RefundDelivered
+            if (worldUid == 0 || revision < 0 || stage < SummonStage.Pending || stage > SummonStage.Cancelled
                 || !Finite(absentSince) || absentSince < -1 || (absentSince < 0 && absentSince != -1)
                 || bosses.Length > 16 || killed.Length > 16 || costs.Length > 32
                 || bosses.Distinct(StringComparer.Ordinal).Count() != bosses.Length
@@ -53,10 +53,10 @@ namespace ExtraPotions.Wildblood.Bosses
                 || killed.Any(id => !bosses.Contains(id, StringComparer.Ordinal)) || costs.Any(cost => cost == null))
                 throw new InvalidDataException("Invalid summoned-boss ledger facts.");
             foreach (var id in bosses) RequireText(id);
-            if (stage == SummonStage.Pending ? bosses.Length != 0 || killed.Length != 0 : bosses.Length == 0)
+            if (stage == SummonStage.Pending || stage == SummonStage.Cancelled ? bosses.Length != 0 || killed.Length != 0 : bosses.Length == 0)
                 throw new InvalidDataException("Invalid summoned-boss membership.");
             if (stage == SummonStage.Killed ? killed.Length != bosses.Length || refundAllowed
-                : stage != SummonStage.Pending && killed.Length == bosses.Length)
+                : stage != SummonStage.Pending && stage != SummonStage.Cancelled && killed.Length == bosses.Length)
                 throw new InvalidDataException("Invalid summoned-boss kill state.");
             if (killed.Length != 0 && refundAllowed || (stage == SummonStage.RefundDecided || stage == SummonStage.RefundDelivered) && !refundAllowed
                 || stage != SummonStage.Alive && absentSince != -1)
@@ -101,6 +101,14 @@ namespace ExtraPotions.Wildblood.Bosses
             // A restored world may predate the durable timer. Start again instead of counting future time.
             if (AbsentSince < 0 || now < AbsentSince) return Next(Stage, absentSince: now);
             return now - AbsentSince >= timeoutSeconds ? Next(SummonStage.RefundDecided) : this;
+        }
+
+        /// <summary>Settles an unpaid summon whose payer took nothing; no boss exists and nothing is refunded.</summary>
+        public SummonLedgerSnapshot Cancel()
+        {
+            if (Stage == SummonStage.Cancelled) return this;
+            if (Stage != SummonStage.Pending) throw new InvalidOperationException("Only an unpaid pending summon can be cancelled.");
+            return Next(SummonStage.Cancelled);
         }
 
         public SummonLedgerSnapshot DeliverRefund()
