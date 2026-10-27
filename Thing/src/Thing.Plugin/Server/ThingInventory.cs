@@ -47,6 +47,10 @@ namespace ExtraPotions.Thing.Runtime
             generation = CruciblePlugin.Session.Generation;
         }
 
+        static readonly HashSet<string> retainedWarned = new HashSet<string>(StringComparer.Ordinal);
+        const float SealScanSeconds = 60;
+        static readonly Dictionary<string, float> sealAbsentAt = new Dictionary<string, float>(StringComparer.Ordinal);
+
         internal static void Tick()
         {
             ThingInventoryDelivery.Tick();
@@ -54,7 +58,7 @@ namespace ExtraPotions.Thing.Runtime
             if (generation != current)
             {
                 // Pending source removals survive here in the flushed journal; never guess a refund.
-                ledger.Clear(); reserved.Clear(); armedDeletes.Clear(); recovering.Clear(); recoveryWorld = 0;
+                ledger.Clear(); reserved.Clear(); armedDeletes.Clear(); recovering.Clear(); recoveryWorld = 0; retainedWarned.Clear(); sealAbsentAt.Clear();
                 generation = current;
             }
             if (ZNet.instance == null || !ZNet.instance.IsServer() || !ThingServer.Active || !CruciblePlugin.Session.AuthorityReady) return;
@@ -65,6 +69,7 @@ namespace ExtraPotions.Thing.Runtime
             {
                 try
                 {
+                    sealAbsentAt.Clear();
                     foreach (var record in journal.LoadAll(world))
                         recovering[record.Token] = Recovery(record);
                     recoveryWorld = world; recoveryBlocked = false;
@@ -80,14 +85,18 @@ namespace ExtraPotions.Thing.Runtime
             {
                 if (Time.unscaledTime < work.ResumeAt || work.Task != null && !work.Task.IsCompleted) continue;
                 try { Recover(work); }
-                catch (Exception error) { log?.Warning("Thing inventory escrow " + work.Token + " retained: " + error.GetType().Name); }
+                catch (Exception error)
+                {
+                    if (retainedWarned.Add(work.Token + ":" + error.GetType().Name))
+                        log?.Warning("Thing inventory escrow " + work.Token + " retained: " + error.GetType().Name);
+                }
             }
         }
 
         internal static void Shutdown()
         {
             operation?.Dispose(); owner?.Dispose(); operation = owner = null;
-            ledger.Clear(); reserved.Clear(); armedDeletes.Clear(); recovering.Clear(); recoveryWorld = 0; generation = -1;
+            ledger.Clear(); reserved.Clear(); armedDeletes.Clear(); recovering.Clear(); recoveryWorld = 0; generation = -1; retainedWarned.Clear(); sealAbsentAt.Clear();
             // A sealed native pickup remains sealed across unload; its journal is required to release it.
             ThingInventoryDelivery.Shutdown(); ThingInventoryPickup.Shutdown(); log = null;
         }
@@ -500,6 +509,7 @@ namespace ExtraPotions.Thing.Runtime
 
         static ItemDrop Stage(ItemDrop.ItemData item, long receiver, string token)
         {
+            sealAbsentAt.Remove(token ?? "");
             var character = ReceiverZdo(receiver);
             if (character == null) throw new InvalidOperationException("Receiver unavailable");
             ItemDrop drop = null;
@@ -547,7 +557,19 @@ namespace ExtraPotions.Thing.Runtime
                 if (found != null) return found;
             }
             // A crash between native creation and journal binding can leave only the sealed token.
-            return ZDOMan.instance?.m_objectsByID.Values.FirstOrDefault(z => z.GetString(Seal) == record.Token || z.GetString(Seal) == "available:" + record.Token);
+            var token = record.Token ?? "";
+            if (sealAbsentAt.TryGetValue(token, out var scanned) && Time.unscaledTime >= scanned && Time.unscaledTime - scanned < SealScanSeconds) return null;
+            var zdos = ZDOMan.instance;
+            if (zdos == null) return null;
+            string available = "available:" + token;
+            foreach (var z in zdos.m_objectsByID.Values)
+            {
+                var seal = z.GetString(Seal);
+                if (seal.Length != 0 && (seal == token || seal == available)) { sealAbsentAt.Remove(token); return z; }
+            }
+            if (sealAbsentAt.Count >= 1024) sealAbsentAt.Clear();
+            sealAbsentAt[token] = Time.unscaledTime;
+            return null;
         }
         static void DestroyPickup(ZDO zdo)
         {

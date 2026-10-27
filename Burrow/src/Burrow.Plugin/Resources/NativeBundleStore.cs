@@ -19,8 +19,14 @@ namespace Burrow.Resources {
         readonly HashSet<string> unsavedPlayerReceipts=new HashSet<string>(StringComparer.Ordinal);
         readonly long world;readonly string actor;readonly bool rebaseUnpaid;
         internal Action<string,Inventory,IReadOnlyList<ItemDrop.ItemData>> BeforeChanged;
-        double nextDiagnostic;
-        public void RecoveryRequired(string code){if(UnityEngine.Time.realtimeSinceStartupAsDouble<nextDiagnostic)return;nextDiagnostic=UnityEngine.Time.realtimeSinceStartupAsDouble+10;Plugin.Log.LogWarning("Burrow native inventory recovery: "+code);}
+        double nextDiagnostic;string lastDiagnostic;int repeatedDiagnostics;
+        // A waiting record repeats the same code until its chest loads; report a new code at once and a repeat every five minutes.
+        public void RecoveryRequired(string code){
+            double now=UnityEngine.Time.realtimeSinceStartupAsDouble;
+            if(code==lastDiagnostic&&now<nextDiagnostic){repeatedDiagnostics++;return;}
+            Plugin.Log.LogWarning("Burrow native inventory recovery: "+code+(code==lastDiagnostic&&repeatedDiagnostics>0?" (repeated "+repeatedDiagnostics+" times)":""));
+            lastDiagnostic=code;repeatedDiagnostics=0;nextDiagnostic=now+300;
+        }
         /// <param name="rebaseUnpaid">Shared Materials payments: a source that changed only outside the paid stacks still pays.</param>
         internal NativeBundleStore(InventoryDecisionJournal journal,long world,string actor,bool rebaseUnpaid=false){this.world=world;this.actor=actor;this.rebaseUnpaid=rebaseUnpaid;foreach(var record in journal.Snapshot()){Bind(record.Source,record.Before,record.After);if(record.State==InventoryDecision.Decided)unsavedPlayerReceipts.Add(record.Source);}}
         internal static byte[] Bytes(Inventory inventory){var packet=new ZPackage();inventory.Save(packet);return packet.GetArray();}
@@ -38,6 +44,11 @@ namespace Burrow.Resources {
             if(NativeChestIdentity.World!=world||!bindings.TryGetValue(source,out var pair)||pair.Before.Any(e=>e.Id.StartsWith("player:",StringComparison.Ordinal))&&!Actor)return false;
             foreach(var image in pair.Before){if(EntryConfirmed(source,image))continue;var inventory=Inventory(image);if(inventory==null||inventory.GetWidth()!=image.Width||inventory.GetHeight()!=image.Height)return false;if(image.Id.StartsWith("chest:",StringComparison.Ordinal)){var chest=Chest(image.Id);if(!chest.m_nview.IsOwner())return false;}}
             return true;
+        }
+        /// <summary>The loaded chests of a payment whose part is not yet confirmed: the ones recovery may need to own.</summary>
+        internal IEnumerable<Container> RecoveryChests(string source){
+            if(!bindings.TryGetValue(source,out var pair))yield break;
+            foreach(var image in pair.Before){if(!image.Id.StartsWith("chest:",StringComparison.Ordinal)||EntryConfirmed(source,image))continue;var chest=Chest(image.Id);if(chest&&chest.m_nview&&chest.m_nview.IsValid())yield return chest;}
         }
         internal bool Contains(string source,Inventory inventory)=>bindings.TryGetValue(source,out var pair)&&pair.Before.Any(e=>ReferenceEquals(Inventory(e),inventory));
         internal IEnumerable<Inventory> Inventories(string source)=>bindings.TryGetValue(source,out var pair)?pair.Before.Where(e=>!EntryConfirmed(source,e)).Select(Inventory):Enumerable.Empty<Inventory>();

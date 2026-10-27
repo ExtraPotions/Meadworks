@@ -127,7 +127,8 @@ namespace ExtraPotions.Kindle.Runtime
             if(panel==null)return;
             bool free=ZCursor.LockState!=CursorLockMode.Locked && ZCursor.IsVisible;
             panel.Update(show,free);if(!show)return;
-            if(builtVersion!=version){panel.Rebuild(entries);builtVersion=version;nextCount=0;}
+            // Marked built first: a rebuild that throws (a modded item without an icon) is not retried, rows torn down and remade, every frame.
+            if(builtVersion!=version){builtVersion=version;nextCount=0;try{panel.Rebuild(entries);}catch(Exception error){log?.Warning("Tracker rebuild refused: "+error.GetType().Name);}}
             if(Time.unscaledTime<nextCount)return;
             nextCount=Time.unscaledTime+1.25f;
             try

@@ -15,14 +15,20 @@ namespace ExtraPotions.Cairn.Runtime
     /// <summary>Local presentation only. Never changes pin data, checked state, ownership, map fog or saved names.</summary>
     public static class CairnTidyPins
     {
-        // Reuse the storage each frame. Restore before the game updates its pins so size/alpha never compound.
-        private static readonly List<VisualState> written = new List<VisualState>();
+        // What Cairn last wrote per pin. A value still equal to it means the game has not refreshed that pin since, so the
+        // native value captured then is reused: size/alpha never compound, and unchanged pins are not written at all.
+        // (Restoring and re-applying every pin each frame re-enabled hidden names and dirtied every pin graphic per frame.)
+        private static readonly Dictionary<Minimap.PinData, VisualState> written = new Dictionary<Minimap.PinData, VisualState>();
+        private static readonly HashSet<Minimap.PinData> seen = new HashSet<Minimap.PinData>();
+        private static readonly List<Minimap.PinData> gone = new List<Minimap.PinData>();
+        private static readonly Dictionary<Minimap.PinType, string> typeNames = new Dictionary<Minimap.PinType, string>();
 
         private struct VisualState
         {
             public RectTransform Rect;
             public Vector3 BeforeScale, AppliedScale;
             public Graphic Icon, Check;
+            public GameObject CheckSource;
             public Color BeforeIcon, AppliedIcon, BeforeCheck, AppliedCheck;
             public GameObject Name;
             public bool BeforeName, AppliedName;
@@ -40,16 +46,19 @@ namespace ExtraPotions.Cairn.Runtime
         /// <summary>Restores only the last values this feature still owns, including when disabled or unloaded.</summary>
         public static void Reset()
         {
-            for (var i = 0; i < written.Count; i++) written[i].Restore();
+            foreach (var state in written.Values) state.Restore();
             written.Clear();
         }
 
         /// <summary>Run after Minimap.Update, whose native pin refresh may run less frequently than cursor movement.</summary>
         public static void Apply(Minimap map)
         {
-            Reset();
             var settings = Plugin.Settings;
-            if (!Plugin.Ready || !Plugin.AllowsUi || settings == null || !settings.Get(CairnSettings.Map.TidyPins) || map == null) return;
+            if (!Plugin.Ready || !Plugin.AllowsUi || settings == null || !settings.Get(CairnSettings.Map.TidyPins) || map == null)
+            {
+                if (written.Count > 0) Reset();
+                return;
+            }
 
             // Native pad pin interactions use the center reticle; mouse interactions use the game pointer.
             var cursor = ZInput.IsGamepadActive()
@@ -77,42 +86,52 @@ namespace ExtraPotions.Cairn.Runtime
             var showAll = large && MeadworksInput.Held(settings.ShortcutEntry(CairnSettings.Map.ShowAllNamesKey), InputContext.Window);
             var hoverScale = settings.Get(CairnSettings.Map.HoverScale);
 
+            seen.Clear();
             foreach (var pin in map.m_pins)
             {
                 var rect = pin.m_uiElement;
                 if (rect == null || !rect.gameObject.activeInHierarchy || pin.m_worldSize > 0f) continue;
+                var had = written.TryGetValue(pin, out var prior);
                 var icon = pin.m_iconElement;
-                var check = pin.m_checkedElement != null ? pin.m_checkedElement.GetComponent<Graphic>() : null;
+                var checkSource = pin.m_checkedElement;
+                var check = had && prior.CheckSource == checkSource ? prior.Check
+                    : checkSource != null ? checkSource.GetComponent<Graphic>() : null;
                 var name = pin.m_NamePinData?.PinNameGameObject;
-                var type = pin.m_type.ToString();
+                if (!typeNames.TryGetValue(pin.m_type, out var type)) typeNames[pin.m_type] = type = pin.m_type.ToString();
                 var isHovered = ReferenceEquals(pin, hovered);
                 var state = new VisualState
                 {
-                    Rect = rect, BeforeScale = rect.localScale, AppliedScale = rect.localScale * TidyPinRules.Scale(type, isHovered, hoverScale),
-                    Icon = icon, BeforeIcon = icon != null ? icon.color : Color.white,
-                    Check = check, BeforeCheck = check != null ? check.color : Color.white,
-                    Name = name, BeforeName = name != null && name.activeSelf,
+                    Rect = rect, Icon = icon, Check = check, CheckSource = checkSource, Name = name,
+                    BeforeScale = had && prior.Rect == rect && rect.localScale == prior.AppliedScale ? prior.BeforeScale : rect.localScale,
+                    BeforeIcon = icon == null ? Color.white : had && prior.Icon == icon && icon.color == prior.AppliedIcon ? prior.BeforeIcon : icon.color,
+                    BeforeCheck = check == null ? Color.white : had && prior.Check == check && check.color == prior.AppliedCheck ? prior.BeforeCheck : check.color,
+                    BeforeName = name != null && (had && prior.Name == name && name.activeSelf == prior.AppliedName ? prior.BeforeName : name.activeSelf),
                     AppliedName = TidyPinRules.ShowsName(large, isHovered, showAll, pin.m_name),
                 };
+                state.AppliedScale = state.BeforeScale * TidyPinRules.Scale(type, isHovered, hoverScale);
                 state.AppliedIcon = state.BeforeIcon;
                 state.AppliedCheck = state.BeforeCheck;
                 var alpha = TidyPinRules.Alpha(type, pin.m_checked);
                 state.AppliedIcon.a *= alpha;
                 state.AppliedCheck.a *= alpha;
-                written.Add(state);
-                rect.localScale = state.AppliedScale;
-                if (icon != null) icon.color = state.AppliedIcon;
-                if (check != null) check.color = state.AppliedCheck;
-                if (name != null) name.SetActive(state.AppliedName);
+                written[pin] = state;
+                seen.Add(pin);
+                if (rect.localScale != state.AppliedScale) rect.localScale = state.AppliedScale;
+                if (icon != null && icon.color != state.AppliedIcon) icon.color = state.AppliedIcon;
+                if (check != null && check.color != state.AppliedCheck) check.color = state.AppliedCheck;
+                if (name != null && name.activeSelf != state.AppliedName) name.SetActive(state.AppliedName);
             }
+            // Pins removed, hidden or turned into areas since the last frame get their native look back.
+            if (written.Count == seen.Count) return;
+            gone.Clear();
+            foreach (var pin in written.Keys) if (!seen.Contains(pin)) gone.Add(pin);
+            foreach (var pin in gone) { written[pin].Restore(); written.Remove(pin); }
+            gone.Clear();
         }
 
         [HarmonyPatch(typeof(Minimap), "Update")]
         internal static class Patches
         {
-            [HarmonyPrefix, HarmonyPriority(Priority.First)]
-            private static void Prefix() => Reset();
-
             [HarmonyPostfix, HarmonyPriority(Priority.Last)]
             private static void Postfix(Minimap __instance) => Apply(__instance);
         }

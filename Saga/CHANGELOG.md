@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.18 (2026-10-26)
+
+- The "Vanished" text shown when you vanish from sight is translated into all seven supported languages.
+- The guardian power tooltip is rebuilt at most twice a second, or at once when the power changes, instead of every frame.
+- A repeating hook failure is logged once, then at most once a minute with a count of the lines held back.
+
 ## 0.1.16 (2026-10-21)
 
 - Thunderstore republish of the release 8 build; no code changes.

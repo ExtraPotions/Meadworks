@@ -1,3 +1,9 @@
+## 0.1.32 (2026-10-26)
+
+- Tacklebox and pop-up counts are written only when they change.
+- Requirement spacing does no work while the inventory is hidden.
+- When another mod leaves the trinket data invalid, the warning appears once per item database and the check retries every 30 seconds instead of every quarter second.
+
 ## 0.1.28
 
 - Preserve legal dedicated-slot routing and quality/world-level stack accounting for crafting and inventory transfers.

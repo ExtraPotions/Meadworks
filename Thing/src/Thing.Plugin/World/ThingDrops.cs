@@ -88,8 +88,16 @@ namespace ExtraPotions.Thing.Runtime
         static bool Eligible(ItemDrop item, Vector3 center, int radius)
         {
             if (!item || item.m_itemData == null || item.m_itemData.m_pickedUp || item.m_pickupRequester != null || item.transform.parent != null) return false;
+            if (Escrowed(item)) return false;
             var kind = Kind(item);
             return DropRules.Removes(kind, Vector3.Distance(center, item.transform.position), radius);
+        }
+
+        /// <summary>A pickup sealed by inventory escrow belongs to a pending transfer; its journal releases or reclaims it.</summary>
+        static bool Escrowed(ItemDrop item)
+        {
+            var view = item.GetComponent<ZNetView>();
+            return view && view.IsValid() && !string.IsNullOrEmpty(view.GetZDO().GetString(ThingInventory.Seal));
         }
 
         static DropKind Kind(ItemDrop item)

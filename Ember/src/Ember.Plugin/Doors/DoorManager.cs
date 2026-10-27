@@ -75,7 +75,8 @@ namespace ExtraPotions.Ember.Runtime
         /// <summary>D8, D10: registers a placed door (never a ghost, never on a headless process).</summary>
         internal static void Register(Door door)
         {
-            if (door == null || !MeadworksHeadless.AllowsUi || door.gameObject.layer == Piece.s_ghostLayer || doors.ContainsKey(door)) return;
+            if (door == null || !MeadworksHeadless.AllowsUi || door.gameObject.layer == Piece.s_ghostLayer
+                || door.m_nview == null || door.m_nview.GetZDO() == null || doors.ContainsKey(door)) return;
             doors[door] = new Tracked
             {
                 Colliders = door.GetComponentsInChildren<Collider>(true),

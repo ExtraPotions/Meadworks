@@ -1,3 +1,11 @@
+## 0.3.31 (2026-10-26)
+
+- A payment waiting on a chest that is not loaded or not owned is retried with a backoff up to five seconds instead of every frame, and right away when a chest loads. The warning repeats at most every five minutes.
+- A waiting payment can take over an idle chest nobody has open, then completes once. An open chest or one held by another payment is left alone.
+- Finished Shared Materials and chest-salvage payments are archived once per game run, after a verified backup of the journal, so they no longer count toward the 4096-record limit. A completed payment is archived only after its receipt is seen again after a reload, so a lost world save can still apply it again. Nothing is deleted.
+- Shared transfers back off up to five seconds while waiting instead of running every frame, and a journal that cannot open is retried from five seconds up to a minute.
+- Reach counts are cached for the frame while staying live for payments, and a chest slot from the network outside the chest is ignored.
+
 ## 0.3.29
 
 - Propagate timer cancellation without a false YAML IO error.

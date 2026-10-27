@@ -1,3 +1,7 @@
+## 0.1.16 (2026-10-26)
+
+- Floating items no longer allocate a name every physics step, and destroyed items are dropped from the floating list once a minute.
+
 ## 0.1.15
 
 - Guard automatic pickup planning when player or item data is unavailable.

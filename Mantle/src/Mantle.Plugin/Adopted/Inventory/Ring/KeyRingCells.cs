@@ -62,9 +62,14 @@ namespace Mantle.Ring
             return element != null && element.gameObject.activeInHierarchy;
         }
 
-        /// <summary>Every frame the ring shows: a key's count alone ("3"), only above one.</summary>
+        /// <summary>
+        /// Every frame the ring shows: a key's count alone ("3"), only above one. Carried by the game's own writes in
+        /// <c>InventoryGrid.UpdateGui</c> (<see cref="Panels.SlotElements.PurseAmount"/>), one text and one state per frame.
+        /// </summary>
         public static void Refresh(Inventory inventory)
         {
+            if (Panels.SlotElements.PurseAmount.AmountRoutes != 0)
+                return;
             foreach (InventoryElement element in elements)
             {
                 if (element == null || !element.m_used || !element.gameObject.activeSelf)
@@ -72,8 +77,28 @@ namespace Mantle.Ring
                 ItemDrop.ItemData key = inventory.GetItemAt(element.Position.x, element.Position.y);
                 element.m_amount.enabled = key != null && key.m_stack > 1;
                 if (element.m_amount.enabled)
-                    element.m_amount.text = key.m_stack.ToString();
+                    element.m_amount.text = Mantle.Tackle.StackCounts.Of(key.m_stack);
             }
+        }
+
+        /// <summary>When <paramref name="label"/> is a used ring cell's count: whether it shows, and its text.</summary>
+        public static bool Amount(TMPro.TMP_Text label, Inventory inventory, out bool show, out string text)
+        {
+            show = false;
+            text = null;
+            for (int i = 0; i < elements.Count; i++)
+            {
+                InventoryElement element = elements[i];
+                if (element == null || !ReferenceEquals(element.m_amount, label))
+                    continue;
+                if (!element.m_used)
+                    return true;
+                ItemDrop.ItemData key = inventory.GetItemAt(element.Position.x, element.Position.y);
+                show = key != null && key.m_stack > 1;
+                text = show ? Mantle.Tackle.StackCounts.Of(key.m_stack) : null;
+                return true;
+            }
+            return false;
         }
     }
 }

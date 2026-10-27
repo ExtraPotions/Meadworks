@@ -35,6 +35,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         static string product = "";
         static int listed;
         static float nextCheck, nextFingerprint;
+        static readonly HashSet<Selectable> navigationVisited = new HashSet<Selectable>();
         static string drawnProduct = "";
         static int drawnWidth, drawnHeight;
         static readonly Dictionary<Selectable, Navigation> links = new Dictionary<Selectable, Navigation>();
@@ -339,7 +340,8 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 anchor = owner.m_logoutButton;
             if (anchor == null)
                 return;
-            HashSet<Selectable> visited = new HashSet<Selectable>();
+            HashSet<Selectable> visited = navigationVisited;
+            visited.Clear();
             Selectable cursor = anchor.navigation.selectOnDown;
             for (int i = 0; cursor != null && i < 256; i++)
             {

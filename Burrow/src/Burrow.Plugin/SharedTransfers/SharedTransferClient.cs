@@ -42,6 +42,8 @@ namespace Burrow.SharedTransfers {
         string pendingRoot="";
         bool disposed,opening,fault,held=true,evaluated;
         readonly TransferRetry retry=new TransferRetry();
+        readonly TransferPassGate passes=new TransferPassGate();
+        long seenGeneration=-1;
         long retrySession=-1;
         double nextWarning,callbackAt;
 
@@ -107,7 +109,7 @@ namespace Burrow.SharedTransfers {
                 var escrow=SharedTransferItems.Escrow(request,original,player);
                 var destination=targetSlot??ChestOps.NoSlot;
                 SharedTransferItems.CheckTakeCapacity(request,container.GetInventory(),original,player,destination);
-                writingIntent=true;
+                writingIntent=true;passes.Wake();
                 ledger.Admit(request,NativeBundleStore.Encode(new[]{original}),NativeBundleStore.Encode(new[]{escrow}),destination.x,destination.y);
                 held=true;callbackRoot=request.Root;granted=onGranted;refused=onRefused;callbackAt=Time.realtimeSinceStartupAsDouble;retry.Reset();
                 // The durable intent now owns the operation. Debit, save and send
@@ -136,6 +138,17 @@ namespace Burrow.SharedTransfers {
             AssertThread();if(disposed)return;
             if(!Player.m_localPlayer||!ZNet.instance||ZNet.instance.GetWorld()==null){Close();return;}
             if(!Open())return;
+            double now=Time.realtimeSinceStartupAsDouble;
+            bool signal=pending!=null&&pending.IsCompleted;
+            long generation=CruciblePlugin.Session.Generation;if(generation!=seenGeneration){seenGeneration=generation;signal=true;}
+            if(!passes.Due(now,signal))return;
+            int verifiedBefore=verified.Count,incompleteBefore=ledger.Incomplete.Count;
+            Pass();
+            if(ledger==null)return;
+            if(!held||pending!=null||callbackRoot.Length>0||verified.Count!=verifiedBefore||ledger.Incomplete.Count!=incompleteBefore)passes.Working(now);
+            else passes.Stalled(now,retry.NextAt);
+        }
+        void Pass(){
             try{
                 evaluated=true;held=false;
                 var history=ledger.All;
@@ -212,7 +225,7 @@ namespace Burrow.SharedTransfers {
             callback?.Invoke(reason);
         }
         void Warn(Exception error){if(Time.realtimeSinceStartupAsDouble<nextWarning)return;nextWarning=Time.realtimeSinceStartupAsDouble+10;Plugin.Log?.LogWarning("Burrow shared transfer retained for recovery: "+error.GetType().Name);}
-        void Close(){ledger?.Dispose();ledger=null;stores.Clear();bound.Clear();verified.Clear();player=null;world=0;actor="";pending=null;pendingRoot="";callbackRoot="";granted=null;refused=null;fault=false;held=true;evaluated=false;retry.Reset();retrySession=-1;}
+        void Close(){ledger?.Dispose();ledger=null;stores.Clear();bound.Clear();verified.Clear();player=null;world=0;actor="";pending=null;pendingRoot="";callbackRoot="";granted=null;refused=null;fault=false;held=true;evaluated=false;retry.Reset();retrySession=-1;passes.Wake();seenGeneration=-1;}
         public void Dispose(){disposed=true;Close();}
     }
 

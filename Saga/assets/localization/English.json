@@ -560,6 +560,7 @@
     "crafting_journeyman_locked": "Journeyman unlocks at Crafting 75",
     "sneak_vanish": "Vanish: crouching quietly for 3 s without nearby foes breaks pursuit",
     "sneak_vanish_locked": "Vanish unlocks at Sneak 75",
+    "sneak_vanished": "Vanished",
     "angler_close_help": "Close the Angler Log and return to the game.",
     "angler_fish_help": "Select this fish to view your saved catch levels and best catch record.",
     "cfg_1_general_heading": "1 - General",

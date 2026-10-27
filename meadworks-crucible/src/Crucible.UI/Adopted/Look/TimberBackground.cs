@@ -169,13 +169,16 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         {
             mesh.Clear();
             RectTransform root = Root;
-            if (source == null || root == null)
+            if (root == null)
+                return;
+            // Recorded before the early returns: otherwise LateUpdate sees a stale pose and rebuilds an empty mesh every frame.
+            lastMatrix = root.worldToLocalMatrix * rectTransform.localToWorldMatrix;
+            lastCanvas = root.rect;
+            if (source == null)
                 return;
             Rect rect = rectTransform.rect;
             if (rect.width <= 0f || rect.height <= 0f)
                 return;
-            lastMatrix = root.worldToLocalMatrix * rectTransform.localToWorldMatrix;
-            lastCanvas = root.rect;
             Vector4 border = source.border;
             Rect area = source.rect;
             Rect wood = Rect.MinMaxRect(area.xMin + border.x, area.yMin + border.y,

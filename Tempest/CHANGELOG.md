@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.16 (2026-10-26)
+
+- Blizzard warning sounds and meteor impact effects are made locally on each peer, so other players no longer see duplicate copies.
+- Storm hazards check nearby objects at most five times a second instead of every frame.
+
 ## 0.1.15 (2026-10-22)
 
 - Requires Crucible 0.3.30 / Crucible.UI 0.3.21.

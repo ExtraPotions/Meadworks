@@ -10,13 +10,16 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
     {
         static Harmony? harmony;
         static bool installed;
+        // A failed install waits for the module to be switched off and on (or a restart) instead of re-patching every frame.
+        static bool installFailed;
         static bool Active => harmony != null && Plugin.Ready && MeadworksAuthority.ProductActive(Plugin.Guid, out _)
             && ShepherdSettings.Enabled.Value;
         public static void Initialize() { Shutdown(); harmony = new Harmony(Plugin.Guid + ".cheats"); }
         public static void Tick()
         {
             bool wanted = Active;
-            if (wanted == installed || harmony == null) return;
+            if (!wanted) installFailed = false;
+            if (wanted == installed || harmony == null || (wanted && installFailed)) return;
             if (!wanted) { harmony.UnpatchSelf(); installed = false; return; }
             try
             {
@@ -24,9 +27,9 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
                 harmony.CreateClassProcessor(typeof(Hunger)).Patch();
                 installed = true;
             }
-            catch { harmony.UnpatchSelf(); installed = false; throw; }
+            catch { harmony.UnpatchSelf(); installed = false; installFailed = true; throw; }
         }
-        public static void Shutdown() { harmony?.UnpatchSelf(); harmony = null; installed = false; }
+        public static void Shutdown() { harmony?.UnpatchSelf(); harmony = null; installed = installFailed = false; }
 
         [HarmonyPatch(typeof(Tameable), nameof(Tameable.OnConsumedItem))]
         static class Meal

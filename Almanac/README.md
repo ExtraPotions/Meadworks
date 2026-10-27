@@ -1,12 +1,12 @@
-## Changes in 0.1.23
+## Changes in 0.1.25
 
-- Guard pause handling when the settings window or game instance is unavailable.
+- The "did not retain the requested serialized value" warning now names the config file, section, key, write route and the requested and kept values, so the setting involved can be identified. Text values are left out of the log.
 
 # Almanac
 
 One in-game settings book for every installed mod's configuration, aware of server locks.
 
-Version 0.1.24. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.25. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

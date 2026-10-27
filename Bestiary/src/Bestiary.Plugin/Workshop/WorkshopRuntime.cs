@@ -135,7 +135,8 @@ internal static class WorkshopRuntime
     private static void Failed(string operation, Exception error)
     {
         Failures++; LastError = operation + ": " + error.Message;
-        WorkshopHost.Log.LogError("Bestiary workshop " + LastError);
+        if (Native.Adapters.Guard.Admit("workshop|" + operation + "|" + error.GetType().FullName, out int suppressed))
+            WorkshopHost.Log.LogError("Bestiary workshop " + LastError + (suppressed > 0 ? " (" + suppressed + " more in the last minute)" : ""));
     }
     internal static void Shutdown()
     {

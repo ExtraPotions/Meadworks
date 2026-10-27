@@ -40,15 +40,19 @@ namespace ExtraPotions.Burrow {
         public bool IsHeld(string source)=>journal.Snapshot().Any(r=>r.Source==source&&(r.State==InventoryDecision.Prepared||r.State==InventoryDecision.Decided||r.State==InventoryDecision.Committed&&store is IInventoryCheckpointStore checkpoint&&!checkpoint.ReceiptConfirmed(source)));
         public InventoryDecision Prepare(string id,string source,string fingerprint,byte[] before,byte[] after,byte[]? metadata=null,double holdSeconds=HoldSeconds){
             Expire();var old=journal.Find(id);
+            // An archived finished record answers a replay of the same request with its final state; anything else under its id is refused.
+            if(old==null&&journal.TryGetSettled(id,out var settledFingerprint,out var settledState))return settledFingerprint==fingerprint?settledState:InventoryDecision.Rejected;
             if(old!=null)return old.Source==source&&old.Fingerprint==fingerprint&&old.Before.SequenceEqual(before)&&old.After.SequenceEqual(after)&&old.Metadata.SequenceEqual(metadata??Array.Empty<byte>())?Result(old):InventoryDecision.Rejected;
             if(!journal.CanAdmit||IsHeld(source)||!store.IsBound(source)||!store.Capture(source).SequenceEqual(before))return InventoryDecision.Rejected;
             if(double.IsNaN(holdSeconds)||holdSeconds<=0||holdSeconds>MaxHoldSeconds)return InventoryDecision.Rejected;
             try{journal.Prepare(id,source,fingerprint,clock()+holdSeconds,before,after,metadata);return InventoryDecision.Prepared;}catch{return InventoryDecision.Rejected;}
         }
-        public InventoryDecision Status(string id){Expire();var record=journal.Find(id);return record==null?InventoryDecision.Rejected:Result(record);}
+        public InventoryDecision Status(string id){Expire();var record=journal.Find(id);return record==null?Settled(id):Result(record);}
+        /// <summary>The final state of an archived finished record, or Rejected for an unknown id.</summary>
+        InventoryDecision Settled(string id)=>journal.TryGetSettled(id,out _,out var state)?state:InventoryDecision.Rejected;
         InventoryDecision Result(InventoryDecisionRecord record)=>record.State==InventoryDecision.Decided||record.State==InventoryDecision.Committed&&store is IInventoryCheckpointStore checkpoint&&!checkpoint.ReceiptConfirmed(record.Source)?InventoryDecision.RecoveryRequired:record.State;
         public InventoryDecision Commit(string id){
-            Expire();var record=journal.Find(id);if(record==null)return InventoryDecision.Rejected;
+            Expire();var record=journal.Find(id);if(record==null)return Settled(id);
             if(record.State==InventoryDecision.Aborted||record.State==InventoryDecision.Committed&&Result(record)==InventoryDecision.Committed)return record.State;
             try{
                 if(record.State==InventoryDecision.Prepared){
@@ -71,7 +75,7 @@ namespace ExtraPotions.Burrow {
             }catch(Exception error){return Recovery("Persistence"+error.GetType().Name);}
         }
         InventoryDecision Recovery(string code){(store as IInventoryRecoveryDiagnostics)?.RecoveryRequired(code);return InventoryDecision.RecoveryRequired;}
-        public InventoryDecision Rollback(string id){var record=journal.Find(id);if(record==null)return InventoryDecision.Rejected;if(record.State==InventoryDecision.Prepared){try{journal.Transition(record,InventoryDecision.Aborted);}catch{return InventoryDecision.RecoveryRequired;}}return Result(record);}
+        public InventoryDecision Rollback(string id){var record=journal.Find(id);if(record==null)return Settled(id);if(record.State==InventoryDecision.Prepared){try{journal.Transition(record,InventoryDecision.Aborted);}catch{return InventoryDecision.RecoveryRequired;}}return Result(record);}
         /// <summary>How long an undecided hold lasts by default, and the longest one may last.</summary>
         public const double HoldSeconds=10,MaxHoldSeconds=60;
         /// <summary>A payment of many units is usually staged piece by piece (a planting grid places one cell per unit) before

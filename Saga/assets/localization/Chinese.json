@@ -560,6 +560,7 @@
     "crafting_journeyman_locked": "熟练工在制作等级 75 解锁",
     "sneak_vanish": "隐匿消失：在附近无敌人处保持蹲伏 3 秒可解除追击",
     "sneak_vanish_locked": "隐匿消失在潜行等级 75 解锁",
+    "sneak_vanished": "隐匿消失",
     "angler_close_help": "关闭钓鱼日志并返回游戏。",
     "angler_fish_help": "选择此鱼以查看已保存的捕获等级和最佳捕获纪录。",
     "cfg_1_general_heading": "1 - 常规",

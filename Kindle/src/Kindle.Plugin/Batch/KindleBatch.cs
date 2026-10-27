@@ -25,6 +25,12 @@ namespace ExtraPotions.Kindle.Runtime
         static Vector2 originalMin,originalMax;
         static float trim;
         static bool laidOut;
+        // The Craft caption: the game writes "Craft x N" in UpdateRecipe whenever the batch amount is above one, and the
+        // postfix wrote "Craft" back, so the label changed twice a frame and its mesh and canvas were rebuilt every frame.
+        // The game's own write now gets the plain caption while the stepper shows (KindleBatchPatches.RecipeText).
+        static TMP_Text craftLabel;
+        static bool plainCraft;
+        static string craftCaption,captionLanguage;
         /// <summary>The row is as high as the Craft caption plus this padding, never below <see cref="MinRowHeight"/> or above the game's button.</summary>
         const float CaptionPadding=12f,MinRowHeight=30f;
         public static bool Active => Config!=null && Plugin.GameplayAvailable && Plugin.AllowsUi && Player.m_localPlayer && ZNet.instance;
@@ -41,19 +47,45 @@ namespace ExtraPotions.Kindle.Runtime
         }
         internal static void Guard(Action action)
         {
-            try{action();}catch(Exception error){log?.Warning("Batch crafting: "+error.GetType().Name+": "+error.Message);}
+            try{action();}
+            catch(Exception error)
+            {
+                // Guarded hooks run every UpdateRecipe frame: the same failure is reported once a minute, not every frame.
+                string message="Batch crafting: "+error.GetType().Name+": "+error.Message;
+                if(message==lastWarning && Time.unscaledTime<nextWarning)return;
+                lastWarning=message;nextWarning=Time.unscaledTime+60f;log?.Warning(message);
+            }
         }
+        static string lastWarning;static float nextWarning;
         internal static void Remember(InventoryGui gui)
         {
             ClearUi();owner=gui;BatchDrive.Remember(gui);CraftSpeed.Remember(gui);BatchAmount.Reset();
         }
         internal static void BeforeRecipe(InventoryGui gui,Player player)
         {
+            plainCraft=false;
             if(owner!=gui)Remember(gui);
             if(!Active){BatchDrive.Release(gui);CraftSpeed.ApplySafe(gui);return;}
             CraftSpeed.Apply(gui);
             if(!BatchAmount.Applies(gui,player)){BatchDrive.Release(gui);return;}
             BatchAmount.Follow(player,gui.m_selectedRecipe.Recipe);BatchDrive.Drive(gui,BatchAmount.Value);
+            if(craftLabel==null && gui.m_craftButton)craftLabel=gui.m_craftButton.GetComponentInChildren<TMP_Text>(true);
+            plainCraft=gui.m_craftTimer<0f && gui.m_selectedRecipe.Recipe && craftLabel!=null;
+        }
+        /// <summary>Stands in for each <c>label.text = text</c> in the game's <c>InventoryGui.UpdateRecipe</c>.</summary>
+        public static void RecipeText(TMP_Text label,string text)
+        {
+            if(plainCraft && ReferenceEquals(label,craftLabel) && CraftCaption() is string caption)
+                text=caption;
+            label.text=text;
+        }
+        /// <summary>The plain Craft caption, localized once per language.</summary>
+        static string CraftCaption()
+        {
+            if(Localization.instance==null)return null;
+            string language=Localization.instance.GetSelectedLanguage();
+            if(craftCaption==null || language!=captionLanguage){craftCaption=Localization.instance.Localize("$inventory_craftbutton");captionLanguage=language;}
+            return craftCaption;
         }
         internal static void Refresh(InventoryGui gui,Player player)
         {
@@ -76,8 +108,10 @@ namespace ExtraPotions.Kindle.Runtime
             stepper.More.interactable=selected && BatchAmount.CanStepUp(player);
             stepper.Field.SetUsable(selected);
             stepper.PadSteps=ZInput.IsGamepadActive() && gui.m_activeGroup==3;
-            if(selected && gui.m_craftButton.GetComponentInChildren<TMP_Text>(true) is TMP_Text label)
-                label.text=Localization.instance.Localize("$inventory_craftbutton");
+            // Normally the game's own write already holds the caption (RecipeText) and this compare writes nothing. It still
+            // corrects the frame a craft finishes and the case where the UpdateRecipe transpiler could not apply.
+            if(selected && craftLabel!=null && CraftCaption() is string caption && craftLabel.text!=caption)
+                craftLabel.text=caption;
         }
         /// <summary>
         /// The amount row (-, amount, + and Craft) fits its text: Craft keeps its place and width but is trimmed to the
@@ -114,7 +148,7 @@ namespace ExtraPotions.Kindle.Runtime
             if(!Active){RestoreCraft();return;}
             if(owner!=InventoryGui.instance && InventoryGui.instance)Guard(()=>Remember(InventoryGui.instance));
         }
-        static void ClearUi(){RestoreCraft();stepper?.Destroy();stepper=null;craft=null;trim=0f;}
+        static void ClearUi(){RestoreCraft();stepper?.Destroy();stepper=null;craft=null;trim=0f;craftLabel=null;plainCraft=false;}
         public static void Shutdown()
         {
             if(owner){BatchDrive.Release(owner);CraftSpeed.ApplySafe(owner);}
@@ -131,6 +165,46 @@ namespace ExtraPotions.Kindle.Runtime
         static void BeforeRecipe(InventoryGui __instance,Player player)=>KindleBatch.Guard(()=>KindleBatch.BeforeRecipe(__instance,player));
         [HarmonyPatch(typeof(InventoryGui),nameof(InventoryGui.UpdateRecipe)),HarmonyPostfix]
         static void AfterRecipe(InventoryGui __instance,Player player)=>KindleBatch.Guard(()=>KindleBatch.Refresh(__instance,player));
+        static readonly System.Reflection.MethodInfo setText=AccessTools.PropertySetter(typeof(TMP_Text),nameof(TMP_Text.text));
+        static readonly System.Reflection.MethodInfo recipeText=AccessTools.Method(typeof(KindleBatch),nameof(KindleBatch.RecipeText));
+        [HarmonyPatch(typeof(InventoryGui),nameof(InventoryGui.UpdateRecipe)),HarmonyTranspiler]
+        static System.Collections.Generic.IEnumerable<CodeInstruction> RecipeTexts(System.Collections.Generic.IEnumerable<CodeInstruction> instructions)
+        {
+            var code=new System.Collections.Generic.List<CodeInstruction>(instructions);
+            // Only the Craft button's caption is taken over: the local the game fills from m_craftButton.GetComponentInChildren<TMP_Text>().
+            // The other labels' writes stay the game's calls, so another mod's transpiler still finds them.
+            var button=AccessTools.Field(typeof(InventoryGui),nameof(InventoryGui.m_craftButton));
+            int label=-1;
+            for(int i=0;i+2<code.Count && label<0;i++)
+                if(code[i].LoadsField(button) && code[i+1].operand is System.Reflection.MethodInfo find && find.Name=="GetComponentInChildren" && find.ReturnType==typeof(TMP_Text) && Stores(code[i+2]))
+                    label=LocalIndex(code[i+2]);
+            if(label<0 || setText==null || recipeText==null)return code;
+            for(int i=0;i<code.Count;i++)
+            {
+                if(!code[i].Calls(setText))continue;
+                // The receiver is the nearest label load before the write: this local, or one of the window's own text fields.
+                for(int j=i-1;j>=0;j--)
+                {
+                    if(Loads(code[j]) && LocalIndex(code[j])==label){code[i].opcode=System.Reflection.Emit.OpCodes.Call;code[i].operand=recipeText;break;}
+                    if(code[j].operand is System.Reflection.FieldInfo field && typeof(TMP_Text).IsAssignableFrom(field.FieldType))break;
+                }
+            }
+            return code;
+        }
+        static bool Stores(CodeInstruction instruction){var op=instruction.opcode;return op==System.Reflection.Emit.OpCodes.Stloc||op==System.Reflection.Emit.OpCodes.Stloc_S||op==System.Reflection.Emit.OpCodes.Stloc_0||op==System.Reflection.Emit.OpCodes.Stloc_1||op==System.Reflection.Emit.OpCodes.Stloc_2||op==System.Reflection.Emit.OpCodes.Stloc_3;}
+        static bool Loads(CodeInstruction instruction){var op=instruction.opcode;return op==System.Reflection.Emit.OpCodes.Ldloc||op==System.Reflection.Emit.OpCodes.Ldloc_S||op==System.Reflection.Emit.OpCodes.Ldloc_0||op==System.Reflection.Emit.OpCodes.Ldloc_1||op==System.Reflection.Emit.OpCodes.Ldloc_2||op==System.Reflection.Emit.OpCodes.Ldloc_3;}
+        static int LocalIndex(CodeInstruction instruction)
+        {
+            if(instruction.operand is System.Reflection.LocalVariableInfo local)return local.LocalIndex;
+            if(instruction.operand is int index)return index;
+            if(instruction.operand is byte small)return small;
+            var op=instruction.opcode;
+            if(op==System.Reflection.Emit.OpCodes.Ldloc_0||op==System.Reflection.Emit.OpCodes.Stloc_0)return 0;
+            if(op==System.Reflection.Emit.OpCodes.Ldloc_1||op==System.Reflection.Emit.OpCodes.Stloc_1)return 1;
+            if(op==System.Reflection.Emit.OpCodes.Ldloc_2||op==System.Reflection.Emit.OpCodes.Stloc_2)return 2;
+            if(op==System.Reflection.Emit.OpCodes.Ldloc_3||op==System.Reflection.Emit.OpCodes.Stloc_3)return 3;
+            return -1;
+        }
         [HarmonyPatch(typeof(InventoryGui),nameof(InventoryGui.OnCraftPressed)),HarmonyPrefix]
         static void BeforePressed(InventoryGui __instance,out int __state)
         {

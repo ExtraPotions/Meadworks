@@ -1,3 +1,9 @@
+## 0.1.22 (2026-10-26)
+
+- BogHook, Javelineer, Slag and Marrow templates are replaced instead of piling up each time a world loads.
+- A repeating fault is logged in full the first time, then at most once a minute per source with a count of the lines held back.
+- A fault in Bestiary's scene-teardown hook can no longer skip the game's own teardown.
+
 ## 0.1.19
 
 - Ignore missing or destroyed ship transforms in Kraken crew, nearest-ship and waterline queries.

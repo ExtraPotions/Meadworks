@@ -2,7 +2,7 @@
 
 See more of the world: an exploration radius that grows on high ground and at sea and shrinks in forest, at night and in fog; an Exploration skill; per-effect fog controls; a time, weather and compass HUD; and tidy map pins.
 
-Version 0.1.17. Requires Crucible 0.3.27 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.20. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

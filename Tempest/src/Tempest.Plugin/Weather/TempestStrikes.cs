@@ -306,7 +306,7 @@ namespace ExtraPotions.Tempest.Runtime
             foreach (var light in strike.GetComponentsInChildren<Light>(true)) light.enabled = false;
             foreach (var sound in strike.GetComponentsInChildren<ZSFX>(true)) sound.enabled = false;
             foreach (var audio in strike.GetComponentsInChildren<AudioSource>(true)) { audio.Stop(); audio.enabled = false; }
-            var shown = UnityEngine.Object.Instantiate(impact, strike.transform.position, Quaternion.identity);
+            var shown = TempestEffects.InstantiateLocal(impact, strike.transform.position);
             TempestEffects.Track(shown, activeOnly: false);
         }
 

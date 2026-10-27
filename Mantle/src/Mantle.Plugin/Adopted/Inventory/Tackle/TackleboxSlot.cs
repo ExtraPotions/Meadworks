@@ -25,7 +25,9 @@ namespace Mantle.Tackle
             // Indexed, every frame the grid is drawn: a foreach over the list boxes its enumerator.
             for (int i = 0; i < cells.Count; i++)
                 used += inventory.GetItemAt(cells[i].x, cells[i].y) != null ? 1 : 0;
-            element.m_amount.enabled = true;
+            // Shown by the game's own write (SlotElements.PurseAmount.Enable); setting it here toggled it every frame.
+            if (Panels.SlotElements.PurseAmount.AmountRoutes == 0)
+                element.m_amount.enabled = true;
             if (element == shownOn && used == shownUsed && cells.Count == shownCells)
                 return;
             element.m_amount.text = used + "/" + cells.Count;

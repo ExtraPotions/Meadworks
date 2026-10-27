@@ -24,7 +24,7 @@ internal static class EdgeNativeDefinitions
     internal static System.Collections.Generic.IReadOnlyDictionary<string, SecondaryAttackDefinition> Candidates => Applied;
 
     internal static void Initialize() => HunterLegacyCompat.Initialize();
-    private static string? previousLifetime;
+    private static (int Seconds, float Multiplier)? previousLifetime;
     internal static void Tick(bool force = false)
     {
         var settings = Plugin.Settings;
@@ -49,7 +49,8 @@ internal static class EdgeNativeDefinitions
             { SecondaryAttacksCharacterRpc.EnsureCharacters(); charactersDueFrame = -1; }
             SubSummonSystem.RegisterRpc(ZRoutedRpc.instance);
             // Lifetime settings also apply to summons that already exist, without re-applying the presets.
-            var lifetime = settings.Get(EdgeSettings.BloodMagic.SummonLifetimeSeconds) + "/" + settings.Get(EdgeSettings.BloodMagic.LifetimeMultiplierAtSkill100);
+            // Compared as values: this path runs every frame, twice (plugin and Player.Update), and a string key allocated each time.
+            (int Seconds, float Multiplier)? lifetime = (settings.Get(EdgeSettings.BloodMagic.SummonLifetimeSeconds), settings.Get(EdgeSettings.BloodMagic.LifetimeMultiplierAtSkill100));
             if (lifetime != previousLifetime) { previousLifetime = lifetime; MagicSummonQualityPresetSystem.RefreshLoadedSummonLifetimeState(); }
             return;
         }
@@ -67,7 +68,7 @@ internal static class EdgeNativeDefinitions
             charactersDueFrame = UnityEngine.Time.frameCount;
             SubSummonSystem.RegisterRpc(ZRoutedRpc.instance);
             MagicSummonQualityPresetSystem.RefreshLoadedSummonLifetimeState();
-            previousLifetime = settings.Get(EdgeSettings.BloodMagic.SummonLifetimeSeconds) + "/" + settings.Get(EdgeSettings.BloodMagic.LifetimeMultiplierAtSkill100);
+            previousLifetime = (settings.Get(EdgeSettings.BloodMagic.SummonLifetimeSeconds), settings.Get(EdgeSettings.BloodMagic.LifetimeMultiplierAtSkill100));
         }
         catch (Exception error)
         {

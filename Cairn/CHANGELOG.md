@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.20 (2026-10-26)
+
+- The HUD compass no longer hides and re-shows every tick, mark and marker on each redraw, which caused stutter while turning the camera.
+- Tidy map pins update a pin only when its look changes, instead of restoring and re-applying every pin every frame.
+
 ## Unreleased
 
 - Hide the retired Show Radius Inputs setting from settings menus. Its boolean key, local scope, saved value and Pathfinder import remain intact; it does not change the HUD or enable diagnostic logging.

@@ -1,3 +1,9 @@
+## 0.1.5 (2026-10-26)
+
+- A host world saved before Barter was added gets a new authority key automatically when its Barter folder is empty, with one warning in the log. Any leftover authority file still requires the explicit reset and is never replaced.
+- The trader store no longer fails every frame when the authority state cannot be read; the sell button is disabled and one warning is logged.
+- The host checks the trader purse for the sell button five times a second instead of reading and verifying it from disk every frame. Selling still checks the purse first.
+
 ## 0.1.4
 
 - Restore native currency when a trader currency prefab is unavailable.

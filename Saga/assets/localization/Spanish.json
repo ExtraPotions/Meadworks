@@ -560,6 +560,7 @@
     "crafting_journeyman_locked": "Oficial se desbloquea con Fabricación 75",
     "sneak_vanish": "Desvanecerse: agacharse en silencio durante 3 s sin enemigos cerca detiene la persecución",
     "sneak_vanish_locked": "Desvanecerse se desbloquea con Sigilo 75",
+    "sneak_vanished": "Desvanecido",
     "angler_close_help": "Cierra el registro de pesca y vuelve al juego.",
     "angler_fish_help": "Selecciona este pez para ver tus niveles de captura guardados y tu mejor captura.",
     "cfg_1_general_heading": "1 - General",

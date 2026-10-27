@@ -71,7 +71,7 @@ namespace ExtraPotions.Saga.Runtime {
                     if(told>0){
                         vanishReadyAt=Time.time+VanishCooldown;
                         vanishQuiet=0f;
-                        FloatingText.Show(__instance.GetTopPoint(),"Vanished");
+                        FloatingText.Show(__instance.GetTopPoint(),SagaText.Text("sneak_vanished"));
                     }
                 }
             }

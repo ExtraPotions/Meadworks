@@ -15,22 +15,37 @@ namespace ExtraPotions.Magpie.Runtime.Adopted.FloatingItems
     /// </summary>
     internal static class FloatLive
     {
-        private static readonly HashSet<Floating> Added = new HashSet<Floating>();
+        // Each float Magpie added, with its prefab name read once: the physics-step gate below must not allocate a name per item.
+        private static readonly Dictionary<Floating, string> Added = new Dictionary<Floating, string>();
+        private static readonly List<Floating> Gone = new List<Floating>();
+        private static float nextPrune;
         private static readonly AccessTools.FieldRef<ItemDrop, Floating> CachedFloat = AccessTools.FieldRefAccess<ItemDrop, Floating>("m_floating");
         private static readonly List<ItemDrop> Instances = (List<ItemDrop>)AccessTools.Field(typeof(ItemDrop), "s_instances").GetValue(null);
         private static bool seen;
         private static bool lastOn;
         private static string? lastExcluded;
 
-        internal static void Track(Floating floating) { if (floating != null) Added.Add(floating); }
+        internal static void Track(Floating floating) { if (floating != null) Added[floating] = Utils.GetPrefabName(floating.gameObject); }
 
-        internal static bool Allows(GameObject item) =>
-            MagpieRuntime.ModuleOn(MagpieModule.Float) && !MagpieRuntime.Settings!.List(MagpieSettings.ExcludedItems).Contains(Utils.GetPrefabName(item));
+        internal static bool Allows(GameObject item) => Allows(Utils.GetPrefabName(item));
+
+        private static bool Allows(string prefab) =>
+            MagpieRuntime.ModuleOn(MagpieModule.Float) && !MagpieRuntime.Settings!.List(MagpieSettings.ExcludedItems).Contains(prefab);
+
+        // Destroyed items leave their entries behind; drop them once a minute and on every settings change.
+        private static void Prune()
+        {
+            nextPrune = Time.unscaledTime + 60f;
+            foreach (var floating in Added.Keys) if (floating == null) Gone.Add(floating);
+            foreach (var floating in Gone) Added.Remove(floating);
+            Gone.Clear();
+        }
 
         /// <summary>From Plugin.Update: adds floats to existing items when floating turns on or an exclusion is removed.</summary>
         internal static void Tick()
         {
             if (MagpieRuntime.Settings == null) return;
+            if (Time.unscaledTime >= nextPrune) Prune();
             bool on = MagpieRuntime.ModuleOn(MagpieModule.Float);
             string excluded = MagpieRuntime.Settings.Get<string>(MagpieSettings.ExcludedItems);
             if (seen && on == lastOn && excluded == lastExcluded) return;
@@ -38,7 +53,7 @@ namespace ExtraPotions.Magpie.Runtime.Adopted.FloatingItems
             seen = true;
             lastOn = on;
             lastExcluded = excluded;
-            Added.RemoveWhere(f => f == null);
+            Prune();
             if (first || !on || Instances == null) return;
             foreach (var drop in Instances)
             {
@@ -52,7 +67,7 @@ namespace ExtraPotions.Magpie.Runtime.Adopted.FloatingItems
         private static class Gate
         {
             [HarmonyPrefix]
-            private static bool Prefix(Floating __instance) => !Added.Contains(__instance) || Allows(__instance.gameObject);
+            private static bool Prefix(Floating __instance) => !Added.TryGetValue(__instance, out var prefab) || Allows(prefab);
         }
     }
 }

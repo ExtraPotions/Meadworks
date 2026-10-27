@@ -4,7 +4,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>Crucible.UI</AssemblyName>
-    <Version>0.3.23</Version>
+    <Version>0.3.24</Version>
     <RootNamespace>ExtraPotions.Meadworks.Crucible.UI</RootNamespace>
     <!-- Adopted PackPanel code is written without nullable flow analysis; annotations stay legal. -->
     <Nullable>annotations</Nullable>

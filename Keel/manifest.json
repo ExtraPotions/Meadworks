@@ -1,6 +1,6 @@
 {
   "name": "Keel",
-  "version_number": "0.1.15",
+  "version_number": "0.1.16",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Keel",
   "description": "Meadworks ships: tune every ship, grow a Sailing skill with Wind Call and Lookout, and build fast, cargo and livestock ships from vanilla hulls. Required on all peers.",
   "dependencies": [

@@ -599,11 +599,10 @@ namespace ExtraPotions.Cairn.Runtime
             if (key == compassDrawn && pinsSame) return;
             compassDrawn = key;
             if (!pinsSame) { drawnPins.Clear(); foreach (var p in selected) drawnPins.Add((p.m_pos.x, p.m_pos.z, p.m_icon, p.m_icon != null, p.m_type)); }
-            foreach (var tick in ticks) tick.gameObject.SetActive(false);
-            foreach (var mark in marks) mark.gameObject.SetActive(false);
-            foreach (var marker in markers) { marker.Icon.gameObject.SetActive(false); marker.Distance.gameObject.SetActive(false); }
+            // Toggling every label off and on re-enables each TMP text and Image, which rebuilds their meshes every redraw
+            // (every frame while the camera turns). Reused elements stay active; only the ones left over are hidden.
             pointer!.gameObject.SetActive(show);
-            if (!show) return;
+            if (!show) { HideTicks(0); HideMarks(0); HideMarkers(0); return; }
             var top = HudLayout.Top(rows, HudRow.Compass);
             var centre = panelWidth * .5f;
             var degrees = settings.Get(CairnSettings.Hud.StripDegrees);
@@ -621,13 +620,14 @@ namespace ExtraPotions.Cairn.Runtime
                 image.gameObject.SetActive(true);
                 Place(image.rectTransform, centre + mark.Offset - .5f, top + 3f, 1f, high);
             }
+            HideMarks(i);
             // Pins first, so the numbers can step aside for a pin's distance.
             pinOffsets.Clear();
             var pinsShown = false;
-            if (markersOn)
+            var m = 0;
+            if (markersOn && selected.Count > 0)
             {
                 var pins = selected.Select((p, index) => new MarkerPin(index.ToString(), p.m_pos.x, p.m_pos.z));
-                var m = 0;
                 foreach (var pin in Compass.Nearest(pins, at.x, at.z, settings.Get(CairnSettings.Hud.MaxMarkers), settings.Get(CairnSettings.Hud.MaxDistance)))
                 {
                     if (m == markers.Count)
@@ -654,6 +654,7 @@ namespace ExtraPotions.Cairn.Runtime
                     pinsShown = true;
                 }
             }
+            HideMarkers(m);
             i = 0;
             foreach (var tick in Compass.Ticks(heading, degrees, width))
             {
@@ -675,6 +676,14 @@ namespace ExtraPotions.Cairn.Runtime
                 label.fontSize = tick.Major ? 10 : 8;
                 Place(label.rectTransform, centre + tick.Offset - 14, top + HudLayout.TickLabelTop, 28, HudLayout.TickLabelHeight);
             }
+            HideTicks(i);
+        }
+
+        static void HideTicks(int from) { for (var k = from; k < ticks.Count; k++) ticks[k].gameObject.SetActive(false); }
+        static void HideMarks(int from) { for (var k = from; k < marks.Count; k++) marks[k].gameObject.SetActive(false); }
+        static void HideMarkers(int from)
+        {
+            for (var k = from; k < markers.Count; k++) { markers[k].Icon.gameObject.SetActive(false); markers[k].Distance.gameObject.SetActive(false); }
         }
 
         static bool SameList(List<Minimap.PinData> a, List<Minimap.PinData> b)

@@ -35,6 +35,8 @@ namespace ExtraPotions.Keel.Runtime
         private Harmony? harmony;
         private bool started;
         private readonly bool[] displayFailed = new bool[6];
+        // A failed part rests five seconds before its next try, so a lasting fault does not build and dispose its HUD every frame.
+        private readonly float[] displayRetryAt = new float[6];
 
         /// <summary>Registered with Crucible and running.</summary>
         public static bool Ready { get; private set; }
@@ -114,11 +116,13 @@ namespace ExtraPotions.Keel.Runtime
 
         private void Guarded(int part, string name, Action tick, Action? undo)
         {
+            if (displayFailed[part] && UnityEngine.Time.unscaledTime < displayRetryAt[part]) return;
             try { tick(); }
             catch (Exception error)
             {
                 if (!displayFailed[part]) log?.Warning(name + ": " + error);
                 displayFailed[part] = true;
+                displayRetryAt[part] = UnityEngine.Time.unscaledTime + 5f;
                 try { undo?.Invoke(); } catch (Exception cleanup) { log?.Warning(name + " cleanup: " + cleanup.GetType().Name); }
             }
         }

@@ -1,3 +1,8 @@
+## 0.1.23 (2026-10-26)
+
+- Husbandry, breeding, cheats, follow commands and feeding no longer retry a failed patch install every frame.
+- An invalid land pen recipe is not re-read every frame. After the recipe is corrected, the pen appears on the hammer without logging out.
+
 ## 0.1.21
 
 - Skip malformed feeding items and cancel unavailable cached food or storage targets.

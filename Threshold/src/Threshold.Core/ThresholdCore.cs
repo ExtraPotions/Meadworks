@@ -6,7 +6,7 @@ namespace ExtraPotions.Threshold
     {
         public const string PluginGuid = "com.meadworks.threshold";
         public const string ProductName = "Threshold";
-        public const string ProductVersion = "0.3.10";
+        public const string ProductVersion = "0.3.11";
         public const string Family = "Waystone";
 
         /// <summary>Localization namespace (design section 11): tokens <c>$meadworks_threshold_&lt;key&gt;</c>.</summary>

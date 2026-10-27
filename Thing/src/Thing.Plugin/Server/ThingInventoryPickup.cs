@@ -27,6 +27,9 @@ namespace ExtraPotions.Thing.Runtime
                 harmony = next;
             }
             catch { next.UnpatchSelf(); throw; }
+            // Despawn exemption is separate: without it the game's hour-long despawn still applies and recovery restages.
+            var despawn = AccessTools.Method(typeof(ItemDrop), "TimedDestruction");
+            if (despawn != null) harmony.Patch(despawn, prefix: Method(nameof(KeepEscrow)));
         }
 
         static HarmonyMethod Method(string name) => new HarmonyMethod(typeof(ThingInventoryPickup), name);
@@ -44,6 +47,8 @@ namespace ExtraPotions.Thing.Runtime
         }
         static bool RequestOwn(ItemDrop __instance) => !Sealed(__instance);
         static bool AutoStack(ItemDrop __instance) => !IsDistinct(__instance);
+        // A sealed pickup is an unclaimed escrow transfer (claiming destroys it), so the game's dropped-item despawn skips it.
+        static bool KeepEscrow(ItemDrop __instance) => !Sealed(__instance);
         static bool KeepServerOwner(ZDO __instance, ref long __0)
         {
             if (string.IsNullOrEmpty(__instance.GetString(ThingInventory.Seal))) return true;

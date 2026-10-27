@@ -47,6 +47,9 @@ namespace Mantle.Trinkets
         private static bool ticking;
         private static ObjectDB database;
         private static float nextCheck;
+        // Native trinket data another mod made invalid stays invalid: capture it again every 30 s, not every refresh, and warn once per database.
+        private static ObjectDB rejectedDatabase;
+        private static float retryRejectedAt;
         private static bool foreignOwner;
         private static Player lastPlayer;
         private static float lastMaximum;
@@ -103,7 +106,7 @@ namespace Mantle.Trinkets
                 sources.Clear();
                 database = ObjectDB.instance;
             }
-            if (!BaselineReady && database != null) CaptureNative(database);
+            if (!BaselineReady && database != null && (database != rejectedDatabase || Time.unscaledTime >= retryRejectedAt)) CaptureNative(database);
             if (BaselineReady) FallbackReason = "";
             foreignOwner = HasForeignOwner();
             Player player = Player.m_localPlayer;
@@ -247,7 +250,9 @@ namespace Mantle.Trinkets
             if (!TrinketTable.TryCreateNative(rows, out TrinketTable table, out string error))
             {
                 FallbackReason = "native-table-invalid";
-                Plugin.Log?.LogWarning("Mantle trinket native data rejected: " + error);
+                if (rejectedDatabase != db) Plugin.Log?.LogWarning("Mantle trinket native data rejected: " + error);
+                rejectedDatabase = db;
+                retryRejectedAt = Time.unscaledTime + 30f;
                 return;
             }
             foreach (var pair in captured) sources.Add(pair.Key, pair.Value);

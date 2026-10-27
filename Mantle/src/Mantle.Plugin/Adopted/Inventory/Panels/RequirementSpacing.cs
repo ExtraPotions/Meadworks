@@ -18,7 +18,8 @@ namespace Mantle.Panels
         [HarmonyPostfix, HarmonyPriority(Priority.Last)]
         public static void Postfix(InventoryGui __instance)
         {
-            if (!InventoryState.Active || requirements == null) return;
+            // InventoryGui.Update runs every frame in a world; the bar is only seen while the inventory is open.
+            if (!InventoryState.Active || requirements == null || !InventoryGui.IsVisible()) return;
             var slots = requirements.GetValue(__instance) as GameObject[];
             if (slots == null || slots.Length == 0 || slots[0] == null) return;
             var parent = slots[0].transform.parent as RectTransform;

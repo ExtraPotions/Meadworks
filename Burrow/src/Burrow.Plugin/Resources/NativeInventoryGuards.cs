@@ -62,7 +62,7 @@ namespace Burrow.Resources {
             return true;
         }
         static readonly HashSet<Player> deferredDeaths=new HashSet<Player>();
-        internal static void DrainDeaths(){foreach(var player in deferredDeaths.ToArray()){if(!player||player!=Player.m_localPlayer){deferredDeaths.Remove(player);continue;}if(Held(player.GetInventory()))continue;deferredDeaths.Remove(player);if(!player.IsDead()&&player.GetHealth()<=0)player.OnDeath();}}
+        internal static void DrainDeaths(){if(deferredDeaths.Count==0)return;foreach(var player in deferredDeaths.ToArray()){if(!player||player!=Player.m_localPlayer){deferredDeaths.Remove(player);continue;}if(Held(player.GetInventory()))continue;deferredDeaths.Remove(player);if(!player.IsDead()&&player.GetHealth()<=0)player.OnDeath();}}
         [HarmonyPatch(typeof(Player),nameof(Player.OnDeath))]
         internal static class Death {
             [HarmonyPriority(Priority.First)]

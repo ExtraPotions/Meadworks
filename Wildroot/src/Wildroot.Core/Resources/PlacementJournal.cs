@@ -88,13 +88,44 @@ namespace ExtraPotions.Wildroot {
         }
         /// <summary>Moves one record that recovery cannot use out of the active journal. True when it moved.</summary>
         public bool Retire(PlacementJournalRecord record)=>record!=null&&RetireFile(Path.Combine(directory,record.Key+".json"));
-        bool RetireFile(string path){
+        bool RetireFile(string path)=>MoveFile(path,RetiredDirectory);
+        static bool MoveFile(string path,string folder){
             try{
-                if(!File.Exists(path))return false;Directory.CreateDirectory(RetiredDirectory);
-                string target=Path.Combine(RetiredDirectory,Path.GetFileName(path));
-                if(File.Exists(target))target=Path.Combine(RetiredDirectory,Path.GetFileNameWithoutExtension(path)+"."+DateTime.UtcNow.Ticks.ToString(System.Globalization.CultureInfo.InvariantCulture)+".json");
+                if(!File.Exists(path))return false;Directory.CreateDirectory(folder);
+                string target=Path.Combine(folder,Path.GetFileName(path));
+                if(File.Exists(target))target=Path.Combine(folder,Path.GetFileNameWithoutExtension(path)+"."+DateTime.UtcNow.Ticks.ToString(System.Globalization.CultureInfo.InvariantCulture)+".json");
                 File.Move(path,target);return true;
             }catch(Exception error)when(error is IOException||error is UnauthorizedAccessException){return false;}
+        }
+        /// <summary>Folder that keeps finished records. A Completed record has a terminal outcome, so recovery never reads it again.</summary>
+        public string ArchiveDirectory=>Path.Combine(directory,"archive");
+        /// <summary>Written once the pre-archive backup of the legacy journal exists.</summary>
+        public string MigrationMarker=>Path.Combine(directory,"archive-migration-1.done");
+        public string BackupRoot=>Path.Combine(directory,"backups");
+        /// <summary>Like <see cref="LoadRecoverable"/>, but returns only unfinished records. Completed records are moved to
+        /// <see cref="ArchiveDirectory"/> (never deleted). The first run copies every record to a timestamped folder under
+        /// <see cref="BackupRoot"/> and writes <see cref="MigrationMarker"/>; if that backup fails, nothing is archived this time.</summary>
+        public IReadOnlyList<PlacementJournalRecord> LoadActive(out IReadOnlyList<string> retired,out IReadOnlyList<string> archived,out string? backup){
+            var moved=new List<string>();archived=moved;backup=null;
+            if(!Directory.Exists(directory)){retired=Array.Empty<string>();return Array.Empty<PlacementJournalRecord>();}
+            bool migrated=File.Exists(MigrationMarker);
+            if(!migrated){
+                try{
+                    var files=Directory.GetFiles(directory,"*.json");
+                    if(files.Length>0){
+                        string stamp=DateTime.UtcNow.ToString("yyyyMMdd-HHmmss",System.Globalization.CultureInfo.InvariantCulture),target=Path.Combine(BackupRoot,stamp);
+                        for(int n=1;Directory.Exists(target);n++)target=Path.Combine(BackupRoot,stamp+"-"+n.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                        Directory.CreateDirectory(target);foreach(var file in files)File.Copy(file,Path.Combine(target,Path.GetFileName(file)),false);backup=target;
+                    }
+                    File.WriteAllText(MigrationMarker,DateTime.UtcNow.ToString("o",System.Globalization.CultureInfo.InvariantCulture)+"\n"+files.Length.ToString(System.Globalization.CultureInfo.InvariantCulture)+" record(s) backed up"+(backup==null?"":" to "+backup)+"\n");migrated=true;
+                }catch(Exception error)when(error is IOException||error is UnauthorizedAccessException){backup=null;}
+            }
+            var active=new List<PlacementJournalRecord>();
+            foreach(var record in LoadRecoverable(out retired)){
+                if(!record.Completed){active.Add(record);continue;}
+                if(migrated&&MoveFile(Path.Combine(directory,record.Key+".json"),ArchiveDirectory))moved.Add(record.Key+".json");
+            }
+            return active.AsReadOnly();
         }
     }
 }

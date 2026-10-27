@@ -22,7 +22,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
     {
         public const string Guid = "com.meadworks.crucible.ui";
         public const string Name = "ExtraPotions Meadworks: Crucible UI";
-        public const string Version = "0.3.23";
+        public const string Version = "0.3.24";
         public const string Product = KitText.Product;
 
         internal static MeadworksLog Log { get; private set; }

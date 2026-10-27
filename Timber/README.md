@@ -1,11 +1,11 @@
-## Changes in 0.2.2
+## Changes in 0.2.3
 
-- Reject missing item or shared records before camera pickup eligibility, ownership and inventory checks.
-- Recheck item records after loading them while preserving valid pickup rules.
+- Circlet light search runs twice a second instead of every frame when no lit circlet is worn.
+- Removing a floor or roof piece skips the collider walk when no tag changed.
 
 # Timber
 
-Version 0.2.2. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.3. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Building tools: a build camera, flooring options, area repair and server-controlled building cheats.
 

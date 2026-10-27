@@ -44,7 +44,7 @@ namespace ExtraPotions.Meadworks.Crucible {
 
         static readonly string[] KeyOrder={Close,BlockedTopic,RefusalTitle,RefusalIntro,RefusalInstall,RefusalUpdate,RefusalInstallOrAsk,RefusalVersions,RefusalNotInstalled,RefusalFooter,TipOther,TipNothing,Search,KeyboardUnavailable,KeyCapture,EditText,On,Off};
         /// <summary>Every kit key, the MeadWorks menu tips (<see cref="MeadworksMenuTips"/>) included.</summary>
-        public static IReadOnlyList<string> Keys { get; }=KeyOrder.Concat(new[]{MenuSettings,MenuBack}).Concat(MeadworksMenuTips.Keys).ToArray();
+        public static IReadOnlyList<string> Keys { get; }=KeyOrder.Concat(new[]{MenuSettings,MenuBack}).Concat(MeadworksMenuTips.Keys).Concat(HudLayoutText.Keys).ToArray();
 
         static readonly Dictionary<string,string[]> MenuRows=new Dictionary<string,string[]>{
             ["English"]=new[]{"Settings","Back"},["Korean"]=new[]{"설정","뒤로"},
@@ -351,6 +351,7 @@ namespace ExtraPotions.Meadworks.Crucible {
                 for(int i=0;i<KeyOrder.Length;i++)table.Add(KeyOrder[i],row.Value[i]);
                 table.Add(MenuSettings,MenuRows[row.Key][0]);table.Add(MenuBack,MenuRows[row.Key][1]);
                 MeadworksMenuTips.AddTo(row.Key,table);
+                HudLayoutText.AddTo(row.Key,table);
                 if(SettingRows.TryGetValue(row.Key,out var settings))foreach(var setting in settings)table.Add(setting.Key,setting.Value);
                 tables.Add(row.Key,table);
             }

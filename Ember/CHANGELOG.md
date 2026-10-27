@@ -1,3 +1,7 @@
+## 0.5.11 (2026-10-26)
+
+- Placement ghosts of fireplaces and doors are no longer tracked as real pieces.
+
 ## 0.5.9
 
 - Keep automatic door checks at 0.05 seconds while reusing scan collections and handling callback mutation and shutdown safely.

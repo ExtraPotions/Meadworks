@@ -33,6 +33,8 @@ namespace ExtraPotions.Barter.Runtime
                         candidate.ImportFrom(CruciblePlugin.Session.WorldId, new AuthenticatedStateStore(world.GetDBPath() + ".Barter.Authority",
                             world.m_fileSource == FileHelpers.FileSource.Cloud ? new WorldAuthorityStorage(world.m_fileSource) : null));
                     candidate.ImportLocal(CruciblePlugin.Session.WorldId, Path.Combine(BepInEx.Paths.ConfigPath, "Barter.Authority"));
+                    candidate.FreshKeyCreated += id => Plugin.Log?.Warning("Created a new Barter authority key for world " + id.ToString(CultureInfo.InvariantCulture)
+                        + ": its save predates Barter, so traders start with their starting balances.");
                     store = candidate; storedWorld = world; storedPath = path; storedSource = world.m_fileSource;
                 }
                 return store;

@@ -58,7 +58,9 @@ namespace ExtraPotions.Ember.Runtime
 
         internal static void Register(Fireplace fire)
         {
-            if (fire != null && fire.gameObject.layer != Piece.s_ghostLayer) fireplaces.Add(fire);
+            // A placement ghost is instantiated with ZNetView init disabled and gets the ghost layer only after Awake;
+            // like the game's own Fireplace.Awake, skip any instance without a ZDO.
+            if (fire != null && fire.gameObject.layer != Piece.s_ghostLayer && fire.m_nview != null && fire.m_nview.GetZDO() != null) fireplaces.Add(fire);
         }
 
         public static void Tick(float dt)
@@ -90,8 +92,9 @@ namespace ExtraPotions.Ember.Runtime
             foreach (var fire in fireplaces)
             {
                 if (!fire || fire.gameObject.layer == Piece.s_ghostLayer) continue;
-                var view = fire.GetComponent<ZNetView>();
-                if (!view || !view.IsValid() || view.GetZDO() == null) continue;
+                // IsBurning reads m_nview.GetZDO(); guard the same reference.
+                var view = fire.m_nview;
+                if (!view || !view.IsValid()) continue;
                 var isListed = listed.Contains(Utils.GetPrefabName(fire.gameObject));
                 SetArea(fire.gameObject, TorchFire.PieceIsFire(active && warmthReady,
                     EmberSeasons.Heat(isListed) && Utils.GetPrefabName(fire.gameObject) != "fire_pit", fire.IsBurning()));

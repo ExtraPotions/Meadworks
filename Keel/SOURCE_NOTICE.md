@@ -12,6 +12,8 @@ TheGreatestShips configuration mappings use only the exact names and units docum
 The package icon.png is approved original Meadworks Keel artwork under CC-BY-NC-SA-4.0. The GPL Sailing runtime icon retains its separate upstream licence.
 
 
-## Corresponding source for Keel 0.1.15
+## Corresponding source for Keel 0.1.16
 
 This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.
+
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.16/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.

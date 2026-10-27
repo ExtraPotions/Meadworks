@@ -1,6 +1,6 @@
 {
   "name": "Saga",
-  "version_number": "0.1.17",
+  "version_number": "0.1.18",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Saga",
   "description": "Meadworks progression: boss kills turn the Forsaken powers into permanent passives, Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks, and one skill book shows every skill. Required on all peers.",
   "dependencies": [

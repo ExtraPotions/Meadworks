@@ -560,6 +560,7 @@
     "crafting_journeyman_locked": "Compagnon se débloque à Fabrication 75",
     "sneak_vanish": "Disparition : s’accroupir 3 s sans ennemis proches rompt la poursuite",
     "sneak_vanish_locked": "Disparition se débloque à Discrétion 75",
+    "sneak_vanished": "Disparu",
     "angler_close_help": "Fermer le journal de pêche et revenir au jeu.",
     "angler_fish_help": "Sélectionnez ce poisson pour voir vos niveaux de prise enregistrés et votre meilleure prise.",
     "cfg_4_power_8_kall_fimbulbringer_heading": "4 - Pouvoir 8 - Kall Mandefimbul",

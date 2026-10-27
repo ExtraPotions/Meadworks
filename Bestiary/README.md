@@ -1,10 +1,12 @@
-## Changes in 0.1.19
+## Changes in 0.1.22
 
-- Ignore missing or destroyed ship transforms in Kraken crew, nearest-ship and waterline queries.
+- BogHook, Javelineer, Slag and Marrow templates are replaced instead of piling up each time a world loads.
+- A repeating fault is logged in full the first time, then at most once a minute per source with a count of the lines held back.
+- A fault in Bestiary's scene-teardown hook can no longer skip the game's own teardown.
 
 # Bestiary
 
-Version 0.1.19. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.22. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 New creatures with fights of their own, the bone arsenal you craft from them, and a creature workshop for server owners.
 

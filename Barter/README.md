@@ -1,13 +1,14 @@
-## Changes in 0.1.4
+## Changes in 0.1.5
 
-- Restore native currency when a trader currency prefab is unavailable.
-- Guard trader world snapshots during scene teardown.
+- A host world saved before Barter was added gets a new authority key automatically when its Barter folder is empty, with one warning in the log. Any leftover authority file still requires the explicit reset and is never replaced.
+- The trader store no longer fails every frame when the authority state cannot be read; the sell button is disabled and one warning is logged.
+- The host checks the trader purse for the sell button five times a second instead of reading and verifying it from disk every frame. Selling still checks the purse first.
 
 # Barter
 
 Traders you can shape: per-trader buy and sell lists, custom currencies, prices that follow the trader's purse, and a sell list built on the Meadworks interface kit.
 
-Version 0.1.4. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.5. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

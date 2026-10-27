@@ -29,6 +29,8 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
 
         private static Harmony? pieces, feeding;
         private static bool installed;
+        // A failed install waits for the module to be switched off and on (or a restart) instead of re-patching every frame.
+        private static bool installFailed;
         private static MeadworksLog? log;
         private static string disallowFeedText = "\u0000", disallowAnimalsText = "\u0000";
         private static IReadOnlyCollection<string> disallowFeed = Array.Empty<string>(), disallowAnimals = Array.Empty<string>();
@@ -79,7 +81,8 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
                 TroughPieces.ApplyRecipes();
             }
             bool wanted = ProductActive;
-            if (wanted != installed)
+            if (!wanted) installFailed = false;
+            if (wanted != installed && !(wanted && installFailed))
             {
                 if (!wanted)
                 {
@@ -104,6 +107,7 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
                 {
                     feeding.UnpatchSelf();
                     installed = false;
+                    installFailed = true;
                     TakeTransport.Release();
                     throw;
                 }
@@ -128,7 +132,7 @@ namespace ExtraPotions.Shepherd.Runtime.Feeding
             feeding?.UnpatchSelf();
             pieces?.UnpatchSelf();
             feeding = pieces = null;
-            installed = false;
+            installed = installFailed = false;
             TakeTransport.Release();
             TroughFoodVisuals.Clear();
             log = null;

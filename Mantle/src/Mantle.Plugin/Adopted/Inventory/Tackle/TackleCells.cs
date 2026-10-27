@@ -64,9 +64,15 @@ namespace Mantle.Tackle
             return element != null && element.gameObject.activeInHierarchy;
         }
 
-        /// <summary>Every frame the pop-up shows: a stack's count alone ("37"), only above one.</summary>
+        /// <summary>
+        /// Every frame the pop-up shows: a stack's count alone ("37"), only above one. The game's own writes in
+        /// <c>InventoryGrid.UpdateGui</c> carry this (<see cref="Panels.SlotElements.PurseAmount"/>), so the label gets one
+        /// text and one state per frame instead of the game's "37/100" and then Mantle's "37".
+        /// </summary>
         public static void Refresh(Inventory inventory)
         {
+            if (Panels.SlotElements.PurseAmount.AmountRoutes != 0)
+                return;
             foreach (InventoryElement element in elements)
             {
                 if (element == null || !element.m_used)
@@ -74,8 +80,41 @@ namespace Mantle.Tackle
                 ItemDrop.ItemData item = inventory.GetItemAt(element.Position.x, element.Position.y);
                 element.m_amount.enabled = item != null && item.m_stack > 1;
                 if (element.m_amount.enabled)
-                    element.m_amount.text = item.m_stack.ToString();
+                    element.m_amount.text = StackCounts.Of(item.m_stack);
             }
+        }
+
+        /// <summary>When <paramref name="label"/> is a used tackle cell's count: whether it shows, and its text.</summary>
+        public static bool Amount(TMPro.TMP_Text label, Inventory inventory, out bool show, out string text)
+        {
+            show = false;
+            text = null;
+            for (int i = 0; i < elements.Count; i++)
+            {
+                InventoryElement element = elements[i];
+                if (element == null || !ReferenceEquals(element.m_amount, label))
+                    continue;
+                if (!element.m_used)
+                    return true;
+                ItemDrop.ItemData item = inventory.GetItemAt(element.Position.x, element.Position.y);
+                show = item != null && item.m_stack > 1;
+                text = show ? StackCounts.Of(item.m_stack) : null;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /// <summary>Stack counts as text, made once per number (the pop-ups write them every frame).</summary>
+    internal static class StackCounts
+    {
+        private static readonly string[] made = new string[1000];
+
+        public static string Of(int count)
+        {
+            if (count < 0 || count >= made.Length)
+                return count.ToString();
+            return made[count] ?? (made[count] = count.ToString());
         }
     }
 }

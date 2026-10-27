@@ -1,10 +1,11 @@
-## Changes in 0.1.21
+## Changes in 0.1.23
 
-- Skip malformed feeding items and cancel unavailable cached food or storage targets.
+- Husbandry, breeding, cheats, follow commands and feeding no longer retry a failed patch install every frame.
+- An invalid land pen recipe is not re-read every frame. After the recipe is corrected, the pen appears on the hammer without logging out.
 
 # Shepherd
 
-Version 0.1.21. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.23. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 The ECR breeding refresh and its adoption boundaries are recorded in [docs/ecr-breeding-refresh.md](docs/ecr-breeding-refresh.md).
 

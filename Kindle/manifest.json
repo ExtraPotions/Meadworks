@@ -1,6 +1,6 @@
 {
   "name": "Kindle",
-  "version_number": "0.1.25",
+  "version_number": "0.1.26",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Kindle",
   "description": "Meadworks crafting: recipe search, sorting, favorites, list/grid views, batch crafting, recipe tracking, salvage and Cart Workbench. Client-optional.",
   "dependencies": [

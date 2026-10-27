@@ -32,7 +32,7 @@ namespace ExtraPotions.Barter.Runtime
     {
         public const string Guid = BarterCore.ProductId;
         public const string Name = "Barter";
-        public const string Version = "0.1.4";
+        public const string Version = "0.1.5";
         public const string Family = "Hoard";
 
         internal const string SourceModGuid = "shudnal.TradersExtended";

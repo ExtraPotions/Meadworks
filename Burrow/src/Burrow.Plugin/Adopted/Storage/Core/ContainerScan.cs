@@ -190,10 +190,16 @@ namespace Burrow.Core
 
         public static bool IsPrivateChest(Container c) => string.Equals(PrefabName(c), PrivateChestPrefab, StringComparison.OrdinalIgnoreCase);
 
+        /// <summary>Changes each time a container starts being tracked; pending payment recovery retries when a chest loads.</summary>
+        internal static int LoadedVersion;
+
         internal static void Track(Container container)
         {
             if (container != null && container.m_inventory != null && loaded.Add(container))
+            {
                 snapshot = null;
+                LoadedVersion++;
+            }
         }
 
         /// <summary>Inventory created, net view valid, inventory read from the ZDO at least once.</summary>

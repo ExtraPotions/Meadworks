@@ -21,6 +21,24 @@ namespace Burrow.Core
             view.ClaimOwnership();
             return view.IsOwner();
         }
+        /// <summary>
+        /// Recovery of a payment already decided: the chest is requested through the game's normal ownership path (an idle
+        /// unowned chest is claimed, an owned one is asked to hand over its latest data) only while nobody has it open, it is
+        /// not another client's cart or ship, and no hold is on it other than this payment's own. Usage rules are not asked
+        /// again: the payment was permitted when it was decided. True once the local client owns the chest.
+        /// </summary>
+        internal static bool ClaimForRecovery(Container container, string ownHold)
+        {
+            ZNetView view = container != null ? container.m_nview : null;
+            if (view == null || !view.IsValid() || container.m_inventory == null) return false;
+            if (view.IsOwner()) return true;
+            if (ContainerScan.InUseByAnother(container) || IsVehicle(container)) return false;
+            if (NativeInventoryGuards.ForeignInventoryHeld(container.GetInventory())) return false;
+            if (NativeInventoryGuards.ForeignHold(view) && view.GetZDO().GetString(NativeBundleStore.HoldKey) != ownHold) return false;
+            if (!TakeFree(container, view, HandOver.ActionSeconds)) return false;
+            container.Load();
+            return true;
+        }
         public static bool CanClaimNow(Container container)
         {
             ZNetView view = container != null ? container.m_nview : null;

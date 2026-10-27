@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.15 (2026-10-26)
+
+- A dedicated server now registers the freeze acknowledgement, so freezes and unfreezes are no longer recorded as timed out.
+- Unclaimed escrow pickups are never removed by drop cleanup or the game's one-hour despawn.
+- An escrow record that cannot be recovered yet warns once instead of every two seconds, and a pickup that was not found is searched for again after 60 seconds instead of on every pass.
+
 ## 0.1.14 (prepared; not released)
 
 - Both Sub-Admin confirmations identify the selected player by name and platform ID.

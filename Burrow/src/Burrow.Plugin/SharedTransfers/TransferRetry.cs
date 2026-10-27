@@ -24,5 +24,23 @@ namespace Burrow.SharedTransfers {
         }
         internal void Rearm(double now){failures=0;retryAt=now;}
         internal void Reset(){failures=0;retryAt=0;}
+        /// <summary>When the next automatic resend may go out; infinity once the round is used up.</summary>
+        internal double NextAt=>Exhausted?double.PositiveInfinity:retryAt;
+    }
+
+    // When the requester walks its ledger. An unresolved transfer used to be reconciled every frame, including one whose
+    // resends were used up or whose chest was unavailable. A pass now runs at once on an event (a reply arrived, a new
+    // transfer, a new authority session), every Busy seconds while a reply is awaited or something changed, and otherwise
+    // backs off to MaxStalled seconds, never later than the next resend. Timing only: what a pass decides is unchanged.
+    internal sealed class TransferPassGate {
+        internal const double Busy=0.25,MaxStalled=5;
+        double nextAt,delay;
+        internal bool Due(double now,bool signal)=>signal||now>=nextAt;
+        internal void Wake(){nextAt=0;delay=0;}
+        internal void Working(double now){delay=0;nextAt=now+Busy;}
+        internal void Stalled(double now,double resendAt){
+            delay=Math.Min(MaxStalled,Math.Max(Busy,delay*2));
+            nextAt=Math.Min(now+delay,Math.Max(now,resendAt));
+        }
     }
 }

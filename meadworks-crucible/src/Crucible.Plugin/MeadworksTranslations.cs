@@ -100,10 +100,17 @@ namespace ExtraPotions.Meadworks.Crucible {
             }
             return changed;
         }
+        readonly Dictionary<int,string> readProblems=new Dictionary<int,string>();
         void Apply(Scan scan){
             var language=MeadworksLanguages.Supported[scan.Index];
-            if(scan.Error is UnauthorizedAccessException){log?.LogWarning("[Meadworks:"+translations.Product+"] translation override access denied: "+language);return;}
-            if(scan.Error!=null){log?.LogWarning("[Meadworks:"+translations.Product+"] translation override could not be read: "+language);return;}
+            // A file that stays unreadable is rescanned every poll; it is reported once until it reads again.
+            if(scan.Error!=null){
+                var problem=scan.Error is UnauthorizedAccessException?"access denied":"could not be read";
+                if(readProblems.TryGetValue(scan.Index,out var known)&&known==problem)return;
+                readProblems[scan.Index]=problem;
+                log?.LogWarning("[Meadworks:"+translations.Product+"] translation override "+problem+": "+language);return;
+            }
+            readProblems.Remove(scan.Index);
             var bytes=scan.Bytes;
             var result=watcher.Observe(language,scan.Exists,scan.Length,()=>bytes??Array.Empty<byte>());
             if(result.Outcome==OverrideOutcome.Rejected||result.Outcome==OverrideOutcome.TooLarge)log?.LogWarning("[Meadworks:"+translations.Product+"] translation override "+language+": "+result.Error);

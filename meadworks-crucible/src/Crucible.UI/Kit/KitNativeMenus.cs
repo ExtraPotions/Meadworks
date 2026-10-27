@@ -157,6 +157,17 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             foreach (var surface in surfaces.Values) surface.Dispose();
             surfaces.Clear(); hosts.Clear(); owned.Clear(); initialized = dirty = false; discovered = -1;
         }
+        static readonly List<MonoBehaviour> nativeComponents = new List<MonoBehaviour>();
+        static readonly Dictionary<Assembly, bool> nativeAssemblies = new Dictionary<Assembly, bool>();
+        static bool NativeAssembly(Assembly assembly)
+        {
+            if (nativeAssemblies.TryGetValue(assembly, out var known)) return known;
+            string name = assembly.GetName().Name;
+            known = assembly == typeof(Menu).Assembly || name.StartsWith("Unity", StringComparison.Ordinal)
+                || name == "gui_framework" || name == "assembly_utils" || name == "assembly_guiutils";
+            nativeAssemblies[assembly] = known;
+            return known;
+        }
         static bool Native(Transform transform, GameObject root)
         {
             if (transform == null || root == null) return false;
@@ -166,14 +177,15 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 if (at != root.transform)
                     foreach (var host in hosts.Values) if (host != null && host != root && at == host.transform) return false;
                 if (at.name.StartsWith("Crucible_", StringComparison.Ordinal) || at.name.StartsWith("Meadworks_", StringComparison.Ordinal)) return false;
-                foreach (var component in at.GetComponents<MonoBehaviour>())
+                // Runs every frame for open surfaces: reuse one component list and judge each assembly once
+                // (Assembly.GetName allocates a new AssemblyName on every call).
+                at.GetComponents(nativeComponents);
+                foreach (var component in nativeComponents)
                 {
                     if (component == null) continue;
-                    var assembly = component.GetType().Assembly;
-                    string name = assembly.GetName().Name;
-                    if (assembly != typeof(Menu).Assembly && !name.StartsWith("Unity", StringComparison.Ordinal)
-                        && name != "gui_framework" && name != "assembly_utils" && name != "assembly_guiutils") return false;
+                    if (!NativeAssembly(component.GetType().Assembly)) { nativeComponents.Clear(); return false; }
                 }
+                nativeComponents.Clear();
                 if (at == root.transform) return true;
             }
             return false;

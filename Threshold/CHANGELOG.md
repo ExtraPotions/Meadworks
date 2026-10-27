@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.11 (2026-10-26)
+
+- If map pins fail to draw, they stay off until the large map is closed instead of retrying and logging every frame.
+
 ## 0.3.10 (2026-10-21)
 
 - Requires Crucible 0.3.26 / Crucible.UI 0.3.19.

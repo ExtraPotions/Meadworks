@@ -1,19 +1,49 @@
 using System;
 using System.Collections.Generic;
 using Burrow.Core;
+using HarmonyLib;
 using UnityEngine;
 
 namespace Burrow.Reach
 {
     /// <summary>
     /// The reachable containers of the local player and what they hold. The container list is found once per
-    /// frame (the panels ask for every row every frame); contents are always read live. Every count honours the
-    /// prefab's allow / deny lists per stack and the game's quality and world level filters.
+    /// frame (the panels ask for every row every frame). Whether a container may be counted (ownership, holds, use)
+    /// is checked live on every ask. What a ready container holds of a name is kept for the rest of the frame and
+    /// dropped at once when any inventory changes, so a pull or payment always counts again. Every count honours
+    /// the prefab's allow / deny lists per stack and the game's quality and world level filters.
     /// </summary>
     public static class ReachCount
     {
         private static int cachedFrame = -1;
         private static List<Container> cached = new List<Container>();
+
+        // The crafting panel asks for the same names from every requirement row, from HaveRequirementItems and, when
+        // the recipe list is rebuilt, once per known recipe; each ask used to read every stack of every chest again.
+        private static int storedFrame = -1;
+        private static int storedVersion = -1;
+        private static int version;
+        private static readonly Dictionary<(Container, string, int, bool), int> stored = new Dictionary<(Container, string, int, bool), int>();
+
+        /// <summary>An inventory changed somewhere: stored counts are read again.</summary>
+        internal static void Invalidate()
+        {
+            unchecked { version++; }
+        }
+
+        private static int Stored(Container container, string name, int quality, bool worldLevel)
+        {
+            if (Time.frameCount != storedFrame || version != storedVersion)
+            {
+                storedFrame = Time.frameCount;
+                storedVersion = version;
+                stored.Clear();
+            }
+            var key = (container, name, quality, worldLevel);
+            if (!stored.TryGetValue(key, out int sum))
+                stored[key] = sum = Holds(container, name, quality, worldLevel);
+            return sum;
+        }
 
         /// <summary>Every reachable container, nearest first: section 0 rules, the enabled table and the per prefab range.</summary>
         public static List<Container> Containers()
@@ -55,14 +85,21 @@ namespace Burrow.Reach
         {
             int sum = 0;
             foreach (Container container in Containers())
-                sum += CountIn(container, name, quality, worldLevel);
+            {
+                if (Ready(container))
+                    sum += Stored(container, name, quality, worldLevel);
+            }
             return sum;
         }
 
+        /// <summary>Read live: payments and pulls use this between their own changes.</summary>
         public static int CountIn(Container container, string name, int quality, bool worldLevel)
         {
-            if (!Ready(container))
-                return 0;
+            return Ready(container) ? Holds(container, name, quality, worldLevel) : 0;
+        }
+
+        private static int Holds(Container container, string name, int quality, bool worldLevel)
+        {
             // The same count as CountIn(container, item => Matches(...)) without a closure per call (every row, every frame).
             ContainerRule rule = ReachRules.RuleFor(container);
             int sum = 0;
@@ -131,5 +168,13 @@ namespace Burrow.Reach
             ContainerScan.Claim(container);
             return false;
         }
+    }
+
+    /// <summary>Any inventory change (a pull, a payment, a handover load) drops this frame's stored counts.</summary>
+    [HarmonyPatch(typeof(Inventory), "Changed")]
+    public static class ReachCountInvalidate
+    {
+        [HarmonyPostfix]
+        public static void Postfix() => ReachCount.Invalidate();
     }
 }

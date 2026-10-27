@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.13 (2026-10-26)
+
+- A sticky charge follows the creature or object it stuck to without being parented to it. When that target is destroyed first, the charge is removed through the game's network cleanup, which ends the NullReferenceException logged every frame afterwards.
+- A failing animation reference write is retried every 30 seconds instead of every frame.
+- Less per-frame work: the summon quality HUD stays idle while its module is off, and a settings check no longer builds a string on each call.
+
 ## 0.2.12 (2026-10-21)
 
 - Thunderstore republish of the release 8 build; no code changes.

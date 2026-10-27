@@ -15,6 +15,8 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
     {
         private static Harmony data;
         private static bool dataOn, uiOn;
+        // A failed patch set waits for Cooking to be switched off and on (or a restart) instead of re-patching every frame.
+        private static bool dataFailed;
         private static MeadworksLog log;
         private static IDisposable experience, page, icon;
         private static Sprite cookingIcon;
@@ -41,7 +43,8 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         {
             if (data == null) return;
             bool active = NativeCooking.Active;
-            Switch(data, ref dataOn, active, dataRoots);
+            if (!active) dataFailed = false;
+            if (!dataFailed) { Switch(data, ref dataOn, active, dataRoots); dataFailed = active && !dataOn; }
             uiOn = active && MeadworksHeadless.AllowsUi;
             if (uiOn && icon == null) icon = MeadworksSkills.RegisterIcon("com.meadworks.larder", CookLevel.Skill, Icon);
             if (!uiOn && icon != null) { icon.Dispose(); icon = null; }
@@ -88,7 +91,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         {
             data?.UnpatchSelf();
             data = null;
-            dataOn = uiOn = false;
+            dataOn = uiOn = dataFailed = false;
             experience?.Dispose(); page?.Dispose(); icon?.Dispose();
             experience = page = icon = null;
             XpScope.End(true);

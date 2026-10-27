@@ -29,6 +29,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         private static readonly HashSet<Image> newlyEnabled = new HashSet<Image>();
         private static readonly Dictionary<Sprite, bool> woodSprites = new Dictionary<Sprite, bool>();
         private static readonly Dictionary<Image, FallbackState> dressed = new Dictionary<Image, FallbackState>();
+        private static readonly List<Image> prune = new List<Image>();
 
         /// <summary>Theming is wanted now: Timber showing and the game's panels requested.</summary>
         public static bool On => KitLook.Timber && KitLook.ThemeGamePanels && KitArt.Panel != null;
@@ -60,6 +61,14 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 // Nothing was ever dressed: there is nothing to restore either, so the game's images are left unread.
                 if (everOn)
                 {
+                    // Panels destroyed since the last scan leave dead keys; drop them before rescanning.
+                    if (dressed.Count > 0)
+                    {
+                        prune.Clear();
+                        foreach (Image image in dressed.Keys) if (image == null) prune.Add(image);
+                        foreach (Image image in prune) dressed.Remove(image);
+                        prune.Clear();
+                    }
                     scan = Resources.FindObjectsOfTypeAll<Image>();
                     scanned = 0;
                 }

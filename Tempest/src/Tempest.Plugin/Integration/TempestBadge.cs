@@ -200,7 +200,7 @@ namespace ExtraPotions.Tempest.Runtime
                 warnedSound = true;
                 return;
             }
-            try { TempestEffects.Track(UnityEngine.Object.Instantiate(prefab, at, Quaternion.identity), activeOnly: false); }
+            try { TempestEffects.Track(TempestEffects.InstantiateLocal(prefab, at), activeOnly: false); }
             catch (Exception error) { log?.Warning("Warning sound failed: " + error.GetType().Name); }
         }
 

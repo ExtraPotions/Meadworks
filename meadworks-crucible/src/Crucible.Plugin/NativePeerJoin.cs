@@ -18,6 +18,7 @@ namespace ExtraPotions.Meadworks.Crucible {
         internal const string GreetRpc="ExtraPotions.Crucible.PeerClass",RefuseRpc="ExtraPotions.Crucible.PeerRefuse",HelloRpc="ExtraPotions.Crucible.Hello";
         const double Grace=1;
         static readonly Dictionary<ZRpc,PeerClassVerdict> verdicts=new Dictionary<ZRpc,PeerClassVerdict>();
+        static readonly List<ZRpc> disconnected=new List<ZRpc>();
         static readonly Dictionary<ZNetPeer,double> leaving=new Dictionary<ZNetPeer,double>();
         // Server: connections that delivered Jotunn's mod list before their peer info (ZRpc is per connection, so a
         // reconnect never inherits an earlier session's list; Jotunn's own cache is keyed by endpoint and never cleared).
@@ -133,7 +134,8 @@ namespace ExtraPotions.Meadworks.Crucible {
         }
 
         internal static void Update(){
-            if(verdicts.Count>0)foreach(var rpc in verdicts.Keys.Where(r=>!r.IsConnected()).ToArray())verdicts.Remove(rpc);
+            // Every frame for the whole session on a client: no LINQ or array per frame.
+            if(verdicts.Count>0){foreach(var rpc in verdicts.Keys)if(!rpc.IsConnected())disconnected.Add(rpc);if(disconnected.Count>0){foreach(var rpc in disconnected)verdicts.Remove(rpc);disconnected.Clear();}}
             if(modLists.Count>0)modLists.RemoveWhere(r=>r==null||!r.IsConnected());
             var now=clock.Elapsed.TotalSeconds;var net=ZNet.instance;
             if(now>=nextSilentCheck){nextSilentCheck=now+1;CheckSilentPeers(net,now);}

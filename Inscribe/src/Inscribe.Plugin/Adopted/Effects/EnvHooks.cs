@@ -67,7 +67,8 @@ namespace ExtraPotions.Inscribe.Adopted.Effects
         [HarmonyPatch(typeof(Player), nameof(Player.UpdateEnvStatusEffects))]
         private static void Begin(Player __instance) => EnvHooks.Begin(__instance);
 
-        [HarmonyPostfix]
+        // A finalizer, not a postfix: the window closes even when the method throws, so other characters' statuses are never filtered.
+        [HarmonyFinalizer]
         [HarmonyPatch(typeof(Player), nameof(Player.UpdateEnvStatusEffects))]
         private static void End() => EnvHooks.End();
 

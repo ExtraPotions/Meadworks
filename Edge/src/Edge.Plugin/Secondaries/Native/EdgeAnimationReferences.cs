@@ -25,6 +25,9 @@ internal static class EdgeAnimationReferences
     private static readonly List<string> PlayerAnimatorTriggers = new();
     private static Player? currentPlayer;
     private static long generation = -1;
+    // A failed write retries after a pause rather than on the next frame.
+    private const float RetrySeconds = 30f;
+    private static float retryAt;
     internal static void Tick()
     {
         var player = Player.m_localPlayer;
@@ -32,11 +35,12 @@ internal static class EdgeAnimationReferences
         { Reset(); return; }
         if (currentPlayer != player || generation != CruciblePlugin.Session.Generation)
         { Reset(); currentPlayer = player; generation = CruciblePlugin.Session.Generation; }
+        if (Time.unscaledTime < retryAt) return;
         DumpPlayerAnimatorReferences(player);
         if (_animatorDumpWritten) DumpCustomAnimationReferences(player);
     }
     internal static void Reset()
-    { currentPlayer = null; generation = -1; _animatorDumpWritten = _customAnimationDumpWritten = false; PlayerAnimatorTriggers.Clear(); }
+    { currentPlayer = null; generation = -1; retryAt = 0f; _animatorDumpWritten = _customAnimationDumpWritten = false; PlayerAnimatorTriggers.Clear(); }
 
     public static void DumpPlayerAnimatorReferences(Player player)
     {
@@ -74,6 +78,7 @@ internal static class EdgeAnimationReferences
         }
         catch (Exception exception)
         {
+            retryAt = Time.unscaledTime + RetrySeconds;
             SecondaryAttackWarningLog.WarnOnce("animation-reference", $"Failed to write {EdgeDataFiles.AnimationReferences}: {exception.Message}");
         }
     }
@@ -92,6 +97,7 @@ internal static class EdgeAnimationReferences
         }
         catch (Exception exception)
         {
+            retryAt = Time.unscaledTime + RetrySeconds;
             SecondaryAttackWarningLog.WarnOnce("animation-reference", $"Failed to write {EdgeDataFiles.AnimationReferences}: {exception.Message}");
         }
     }

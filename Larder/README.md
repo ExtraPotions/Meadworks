@@ -1,10 +1,10 @@
-## Changes in 0.2.16
+## Changes in 0.2.18
 
-- Clear pending food requests on session changes or local-player destruction while preserving duplicate-request and eating guards.
+- If the cooking patches fail to install, they are not retried every frame. Switching Cooking off and on, or restarting, tries again.
 
 # Larder
 
-Version 0.2.16. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.18. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Food and mead values, eating, regeneration, stamina costs, kitchen stations and Cooking skill perks.
 

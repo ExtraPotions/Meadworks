@@ -1,6 +1,6 @@
 # Thing
 
-Version 0.1.14 source candidate. Targets Crucible 0.3.33 / Crucible.UI 0.3.22; the final provider binaries are pinned and Thing builds remain pending. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.15. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Server administration and moderation from inside the game, checked against the server's own admin list.
 

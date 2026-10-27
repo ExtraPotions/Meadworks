@@ -63,7 +63,7 @@ namespace ExtraPotions.Almanac.Runtime.Editing
         {
             if(entry==null)throw new ArgumentNullException(nameof(entry));
             if(Thread.CurrentThread.ManagedThreadId!=thread)return new NativeWriteResult(null,false,false,false,"Config editing must remain on its owning thread.");
-            object? previous=null;string? before=null;NativeWriteFacts? facts=null;WriteDecision? decision=null;
+            object? previous=null;string? before=null;NativeWriteFacts? facts=null;WriteDecision? decision=null;string detail="";
             bool originalSave=entry.ConfigFile.SaveOnConfigSet,assigned=false;
             try
             {
@@ -102,7 +102,13 @@ namespace ExtraPotions.Almanac.Runtime.Editing
                     }
                     else entry.BoxedValue=parsed.Value;
                     if(errors.Error!=null)throw new InvalidOperationException("The mod rejected this value.",errors.Error);
-                    if(!string.Equals(native.RawSerialized(),parsed.Serialized,StringComparison.Ordinal))throw new InvalidOperationException("The mod did not retain the requested serialized value.");
+                    string retained=native.RawSerialized();
+                    if(!string.Equals(retained,parsed.Serialized,StringComparison.Ordinal))
+                    {
+                        // Log-only detail: which route wrote and what the entry kept. String values are omitted; they may hold secrets.
+                        detail=" Route "+(ownerRoute?"OwnerAmend":"NativeAssignment")+(entry.SettingType==typeof(string)?"":", requested "+parsed.Serialized+", kept "+retained)+".";
+                        throw new InvalidOperationException("The mod did not retain the requested serialized value.");
+                    }
                 }
                 // Registered owner amendments already validate and publish their own value.
                 bool ownerPersisted=ownerRoute&&MeadworksConfig.TryGetMetadata(entry,out _);
@@ -130,7 +136,8 @@ namespace ExtraPotions.Almanac.Runtime.Editing
                     catch(Exception restore){message+=" Previous value restoration failed: "+restore.GetBaseException().Message;}
                 }
                 string key=entry.ConfigFile.ConfigFilePath+"|"+entry.Definition+"|"+message;
-                if(warned.Add(key))warning?.Invoke(message);
+                // Name the entry in the log; the returned Error stays the plain message the window shows.
+                if(warned.Add(key))warning?.Invoke(System.IO.Path.GetFileName(entry.ConfigFile.ConfigFilePath)+" ["+entry.Definition.Section+"] "+entry.Definition.Key+": "+message+detail);
                 return new NativeWriteResult(decision,false,false,assigned,message);
             }
             finally{entry.ConfigFile.SaveOnConfigSet=originalSave;}

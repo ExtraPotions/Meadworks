@@ -37,10 +37,18 @@ namespace Burrow.SharedTransfers {
         bool Open(long requestedWorld){
             if(disposed||requestedWorld==0||NativeChestIdentity.World!=requestedWorld)return false;
             if(journal!=null&&world==requestedWorld)return !fault;
+            // A journal that cannot open (corrupt frame, file held by another game instance) was opened, parsed and logged again every frame.
+            double now=Time.realtimeSinceStartupAsDouble;
+            if(requestedWorld==failedWorld&&now<nextOpen)return false;
             Close();world=requestedWorld;fault=false;
-            try{journal=new InventoryDecisionJournal(Path.Combine(Paths.BepInExRootPath,"Burrow.shared-owner",TransferWire.Hash(world.ToString(CultureInfo.InvariantCulture))+".bin"));native=new NativeBundleStore(journal,world,"shared-owner");store=new OwnerStore(this,native);participant=new DurableInventoryParticipant(journal,store,()=>Time.realtimeSinceStartupAsDouble);RefreshLocks();return true;}
-            catch(Exception error){fault=true;Plugin.Log.LogError("Burrow shared chest journal unavailable: "+error.GetType().Name);return false;}
+            try{journal=new InventoryDecisionJournal(Path.Combine(Paths.BepInExRootPath,"Burrow.shared-owner",TransferWire.Hash(world.ToString(CultureInfo.InvariantCulture))+".bin"));native=new NativeBundleStore(journal,world,"shared-owner");store=new OwnerStore(this,native);participant=new DurableInventoryParticipant(journal,store,()=>Time.realtimeSinceStartupAsDouble);RefreshLocks();failedWorld=0;openDelay=0;return true;}
+            catch(Exception error){
+                fault=true;journal?.Dispose();journal=null;
+                openDelay=requestedWorld==failedWorld?Math.Min(60,openDelay*2):5;failedWorld=requestedWorld;nextOpen=now+openDelay;
+                Plugin.Log.LogError("Burrow shared chest journal unavailable: "+error.GetType().Name+"; next attempt in "+openDelay.ToString(CultureInfo.InvariantCulture)+" s");return false;
+            }
         }
+        long failedWorld;double nextOpen,openDelay;
         static Container Chest(string id)=>NativeChestIdentity.Container(id);
         static bool Owns(Container chest)=>chest&&chest.m_nview&&chest.m_nview.IsValid()&&chest.m_nview.IsOwner()&&chest.m_nview.GetZDO().GetOwner()==ZNet.GetUID();
         static TransferReceipt Recovery(TransferRequest request)=>new TransferReceipt{Root=request.Root,Actor=request.Actor,World=request.World,Chest=request.Chest,Kind=request.Kind,Disposition=TransferDisposition.Recovery,Reason="recovery",Payload=Array.Empty<byte>()};

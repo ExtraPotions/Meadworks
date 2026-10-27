@@ -28,7 +28,8 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             {
                 if (achievements.Revision != achievementRevision) achievements.Rows(achievementRevision);
                 if (achievements.DetailRevision != achievementDetailRevision) achievements.Details(achievementDetailRevision);
-                achievements.Apply(On);
+                // The surface outlives the panel; while it is closed there is nothing to keep in step.
+                if (host != null && host.gameObject.activeInHierarchy) achievements.Apply(On);
             }
         }
         static void ShutdownAchievements() { achievements?.Dispose(); achievements = null; }

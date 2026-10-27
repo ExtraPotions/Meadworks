@@ -28,6 +28,8 @@ namespace ExtraPotions.Barter.Trading
         private readonly string directory;
         private readonly IAuthorityStorage files;
         private readonly bool requireExistingKey;
+        /// <summary>Raised with the world UID when a world whose save predates Barter gets its first authority key.</summary>
+        public event Action<long>? FreshKeyCreated;
         public AuthenticatedStateStore(string directory, IAuthorityStorage? storage = null, bool requireExistingKey = false)
         {
             this.directory = storage == null ? Path.GetFullPath(directory) : directory;
@@ -74,12 +76,17 @@ namespace ExtraPotions.Barter.Trading
             if (files.Files(folder, "*.state*").Any()) throw new InvalidDataException("Authority key missing for existing state");
             string reset = Path.Combine(folder, "allow-new-authority-key");
             bool explicitReset = files.Exists(reset) && Encoding.UTF8.GetString(files.Read(reset, 64)).Trim() == world.ToString(CultureInfo.InvariantCulture);
-            if (requireExistingKey && !explicitReset)
+            // A world saved before Barter ran on it has no authority folder content at all: it starts with a fresh key and the
+            // starting balances (user decision 2026-10-27). Any file left there (a key backup, quarantined or rolled-back
+            // state, a reset marker) still needs the explicit reset, so an existing or rolled-back key is never replaced.
+            bool fresh = requireExistingKey && !explicitReset && !files.Files(folder, "*").Any();
+            if (requireExistingKey && !explicitReset && !fresh)
                 throw new InvalidDataException("Existing world is missing Barter authority state. Restore Barter.Authority or create allow-new-authority-key containing the world UID to authorize its initial balance.");
             if (!create) return Array.Empty<byte>();
             key = new byte[32]; using (var random = RandomNumberGenerator.Create()) random.GetBytes(key);
             AtomicWrite(path, key); AtomicWrite(path + ".backup", key);
             if (explicitReset) files.Delete(reset);
+            if (fresh) FreshKeyCreated?.Invoke(world);
             return key;
         }
         private sealed class Record { internal string Object = "", Field = "", Value = ""; }

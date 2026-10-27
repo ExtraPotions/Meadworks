@@ -369,8 +369,10 @@ internal static class StickyDetonatorSystem
             attachment.gameObject != projectile.gameObject &&
             !attachment.gameObject.isStatic)
         {
-            projectile.transform.SetParent(attachment, worldPositionStays: true);
-            state.AttachTo(attachment);
+            // The charge follows its target instead of becoming its child: a networked projectile parented to a creature
+            // or object is destroyed with it outside ZNetScene.Destroy, which leaves a dead entry in the scene that
+            // throws in ZNetScene.RemoveObjects every frame.
+            state.AttachTo(attachment, projectile.transform);
         }
 
         StickyChargeController controller = projectile.GetComponent<StickyChargeController>() ??
@@ -620,12 +622,40 @@ internal static class StickyDetonatorSystem
 
         private Vector3 LocalImpactForward { get; set; } = Vector3.forward;
 
-        public void AttachTo(Transform attachment)
+        private bool Attached { get; set; }
+
+        private Vector3 LocalChargePosition { get; set; }
+
+        private Quaternion LocalChargeRotation { get; set; } = Quaternion.identity;
+
+        public void AttachTo(Transform attachment, Transform charge)
         {
             Attachment = attachment;
+            Attached = true;
+            LocalChargePosition = attachment.InverseTransformPoint(charge.position);
+            LocalChargeRotation = Quaternion.Inverse(attachment.rotation) * charge.rotation;
             LocalHitPoint = attachment.InverseTransformPoint(HitPoint);
             LocalHitNormal = attachment.InverseTransformDirection(HitNormal).normalized;
             LocalImpactForward = attachment.InverseTransformDirection(ImpactForward).normalized;
+        }
+
+        // False once the target the charge was stuck to is gone.
+        public bool Follow(Transform charge)
+        {
+            if (!Attached)
+            {
+                return true;
+            }
+
+            if (Attachment == null)
+            {
+                return false;
+            }
+
+            charge.SetPositionAndRotation(
+                Attachment.TransformPoint(LocalChargePosition),
+                Attachment.rotation * LocalChargeRotation);
+            return true;
         }
 
         public void RefreshAttachedPose()
@@ -691,6 +721,14 @@ internal static class StickyDetonatorSystem
             }
 
             if (State.Owner == null || State.Owner.IsDead() || Time.time >= State.ExpiresAt)
+            {
+                Expire();
+            }
+        }
+
+        private void LateUpdate()
+        {
+            if (!_finished && State != null && !State.Follow(transform))
             {
                 Expire();
             }

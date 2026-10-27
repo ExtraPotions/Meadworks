@@ -25,8 +25,8 @@ namespace Timber.Camera
 
         public static Light Find(Player player)
         {
-            if (found != null && Lit(found) && Time.time < nextLookup)
-                return found;
+            if (Time.time < nextLookup)
+                return found != null && Lit(found) ? found : null;
             nextLookup = Time.time + LookupSeconds;
             Transform head = Head(player);
             found = head != null ? Strongest(head) : null;

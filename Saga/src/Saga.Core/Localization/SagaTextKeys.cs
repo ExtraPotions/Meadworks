@@ -56,7 +56,7 @@ namespace ExtraPotions.Saga.Localization
             new TextKey("ranged_eitr_regen", 1), new TextKey("ranged_blood_cost", 1), new TextKey("ranged_shield_xp", 0),
             new TextKey("crafting_makers_mark", 1), new TextKey("crafting_sturdy_build", 1), new TextKey("crafting_thrifty", 1),
             new TextKey("crafting_journeyman", 0), new TextKey("crafting_journeyman_locked", 0),
-            new TextKey("sneak_vanish", 0), new TextKey("sneak_vanish_locked", 0),
+            new TextKey("sneak_vanish", 0), new TextKey("sneak_vanish_locked", 0), new TextKey("sneak_vanished", 0),
             new TextKey("angler_close_help", 0), new TextKey("angler_fish_help", 0),
         };
 

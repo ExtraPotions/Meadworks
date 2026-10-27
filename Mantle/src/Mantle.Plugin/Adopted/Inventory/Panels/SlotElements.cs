@@ -118,17 +118,40 @@ namespace Mantle.Panels
         {
             private static readonly System.Reflection.MethodInfo setText = AccessTools.PropertySetter(typeof(TMPro.TMP_Text), nameof(TMPro.TMP_Text.text));
             private static readonly System.Reflection.MethodInfo written = AccessTools.Method(typeof(PurseAmount), nameof(Write));
+            private static readonly System.Reflection.MethodInfo setEnabled = AccessTools.PropertySetter(typeof(Behaviour), nameof(Behaviour.enabled));
+            private static readonly System.Reflection.MethodInfo enabled = AccessTools.Method(typeof(PurseAmount), nameof(Enable));
+            private static readonly System.Reflection.FieldInfo amount = AccessTools.Field(typeof(InventoryElement), nameof(InventoryElement.m_amount));
+
+            /// <summary>How many of the game's count-label <c>enabled</c> writes Mantle carries; 0 leaves the old per-frame writes in place.</summary>
+            internal static int AmountRoutes { get; private set; }
 
             [HarmonyTranspiler]
             public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
             {
+                AmountRoutes = 0;
+                bool amountTarget = false;
                 foreach (CodeInstruction instruction in instructions)
                 {
+                    // The last InventoryElement field loaded names the label the next write goes to.
+                    if (instruction.opcode == System.Reflection.Emit.OpCodes.Ldfld && instruction.operand is System.Reflection.FieldInfo field && field.DeclaringType == typeof(InventoryElement))
+                        amountTarget = amount != null && field == amount;
                     // label.text = value becomes Write(label, value): the same two values on the stack, labels kept.
                     if (setText != null && instruction.Calls(setText))
                     {
                         instruction.opcode = System.Reflection.Emit.OpCodes.Call;
                         instruction.operand = written;
+                        amountTarget = false;
+                    }
+                    else if (setEnabled != null && instruction.Calls(setEnabled))
+                    {
+                        // Only element.m_amount.enabled = value becomes Enable(label, value); every other enabled write stays the game's.
+                        if (amountTarget && enabled != null)
+                        {
+                            instruction.opcode = System.Reflection.Emit.OpCodes.Call;
+                            instruction.operand = enabled;
+                            AmountRoutes++;
+                        }
+                        amountTarget = false;
                     }
                     yield return instruction;
                 }
@@ -137,10 +160,43 @@ namespace Mantle.Panels
             /// <summary>Stands in for the game's <c>label.text = text</c> in <c>InventoryGrid.UpdateGui</c>.</summary>
             public static void Write(TMPro.TMP_Text label, string text)
             {
-                InventoryElement purse = ElementPlacer.PurseElement;
-                if (purse != null && ReferenceEquals(label, purse.m_amount) && InventoryState.Active)
-                    text = CoinsText(purse) ?? text;
+                if (InventoryState.Active)
+                {
+                    InventoryElement purse = ElementPlacer.PurseElement;
+                    if (purse != null && ReferenceEquals(label, purse.m_amount))
+                        text = CoinsText(purse) ?? text;
+                    else if (PopupAmount(label, out _, out string count) && count != null)
+                        text = count;
+                }
                 label.text = text;
+            }
+
+            /// <summary>
+            /// Stands in for the game's <c>element.m_amount.enabled = value</c> in <c>InventoryGrid.UpdateGui</c>. The game hides the count of
+            /// a one-stack item and of every empty cell; the postfix used to show the tacklebox's "3/6" and hide pop-up counts
+            /// of one after that, so those labels were disabled and enabled again every frame and the inventory's canvas was
+            /// rebuilt each frame. Here the game's own write gets Mantle's state, so it holds between frames.
+            /// </summary>
+            public static void Enable(Behaviour target, bool value)
+            {
+                if (InventoryState.Active && target is TMPro.TMP_Text label)
+                {
+                    InventoryElement box = ElementPlacer.TackleboxElement;
+                    if (box != null && ReferenceEquals(label, box.m_amount))
+                        value = box.m_used && Tacklebox.Active;
+                    else if (PopupAmount(label, out bool show, out _))
+                        value = show;
+                }
+                target.enabled = value;
+            }
+
+            private static bool PopupAmount(TMPro.TMP_Text label, out bool show, out string text)
+            {
+                Inventory inventory = InventoryState.Player != null ? InventoryState.Player.GetInventory() : null;
+                show = false;
+                text = null;
+                return inventory != null && (TackleCells.Amount(label, inventory, out show, out text)
+                    || KeyRingCells.Amount(label, inventory, out show, out text));
             }
         }
 

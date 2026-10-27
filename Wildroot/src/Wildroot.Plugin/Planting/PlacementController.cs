@@ -145,9 +145,12 @@ namespace ExtraPotions.Wildroot.Runtime {
    if(recoverySession!=session||recoveryActor!=actorId||recoveryWorld!=world){
     recoverySession=session;recoveryActor=actorId;recoveryWorld=world;nextBind=0;
     try{
-     var records=journal.LoadRecoverable(out var unreadable);
+     var records=journal.LoadActive(out var unreadable,out var archived,out var backup);
+     if(backup!=null)log.LogInfo("Wildroot backed up its planting records to "+backup+" before archiving finished ones.");
      if(unreadable.Count>0)log.LogWarning("Wildroot moved "+unreadable.Count+" unreadable planting record(s) to "+journal.RetiredDirectory+"; they are kept there and no longer replayed.");
-     foreach(var record in records.Where(r=>r.ActorId==actorId&&r.WorldId==world&&(!r.Completed||r.Payment==AsyncReservationState.Committed))){
+     if(archived.Count>0)log.LogInfo("Wildroot archived "+archived.Count+" finished planting record(s) to "+journal.ArchiveDirectory+"; they are kept there and no longer replayed.");
+     // Only unfinished work is recovered. A Completed record is terminal, including a paid one.
+     foreach(var record in records.Where(r=>r.ActorId==actorId&&r.WorldId==world&&!r.Completed)){
      try{var backends=record.Cells.Select(c=>(IPlacementBackend)PlacementBackend.Restore(actor,c.RecoveryData,record.SessionId)).ToArray();var operations=record.Cells.Select(c=>new PlacementOperation(new ResourceContext(record.ActorId,record.WorldId.ToString(CultureInfo.InvariantCulture),c.RequestId),c.Costs,()=>false)).ToArray();providerIds.Add(record.ProviderId);var job=asynchronous.Restore(record,operations,backends,currentId==record.ProviderId?shared:null,record.ProviderId);if(!recovering.Contains(job))recovering.Add(job);}
      // A record that can no longer be replayed (its plant is gone from the catalog, or its plan no longer matches) is moved aside once, not retried every login.
      catch(IOException error){log.LogWarning("Wildroot kept planting record "+record.RequestId+" for the next load: "+error.Message);}

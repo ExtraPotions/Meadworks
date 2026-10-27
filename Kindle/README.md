@@ -1,12 +1,14 @@
-## Changes in 0.1.25
+## Changes in 0.1.26
 
-- Refresh Repair All tooltips when counts, eligibility, ownership or translations change.
+- The Craft button caption is written only when it changes.
+- A tracker panel that fails to rebuild no longer throws every frame, and a Salvage tab that cannot be made is not retried every frame.
+- Repeating craft-hook warnings appear at most once a minute, and the cart crafting-station warning appears once.
 
 # Kindle
 
 Recipe search and sorting, favorites, batch crafting, a recipe tracker, salvage and an optional Cart Workbench.
 
-Version 0.1.25. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.26. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

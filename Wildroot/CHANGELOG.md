@@ -1,3 +1,9 @@
+## 0.1.22 (2026-10-26)
+
+- Finished plantings are no longer reopened on every world load. That ends the "saved unfinished plantings" warning at each exit, and a finished paid plant is never replanted for free.
+- Finished planting records move to placements/archive when a world loads. The first time, every record is copied to placements/backups first; nothing is deleted, and nothing moves if the backup fails.
+- The grid preview rebuilds its ghosts after logging out and back in, which ends the NullReferenceException when the same seed is selected again.
+
 ## 0.1.21 - Local candidate
 
 - Hide retired Farm Toggle Key from settings and key-conflict lists while preserving its saved chord and existing migration.

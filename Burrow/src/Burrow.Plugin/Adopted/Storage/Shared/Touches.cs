@@ -34,6 +34,11 @@ namespace Burrow.Shared
             string name = pkg.ReadString();
             bool on = pkg.ReadBool();
             bool forwarded = pkg.ReadBool();
+            // A slot from the network outside the chest: the game's GetElement checks only the upper bound, so a negative
+            // slot would throw in the grid's every-frame draw, and one past the width would tint another cell.
+            Inventory inventory = container != null ? container.GetInventory() : null;
+            if (inventory == null || slot.x < 0 || slot.y < 0 || slot.x >= inventory.GetWidth() || slot.y >= inventory.GetHeight())
+                return;
             if (!forwarded)
             {
                 if (container.m_nview.IsOwner())

@@ -23,6 +23,8 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
         static NativeConfiguration? configuration;
         static MeadworksLog? log;
         static bool installed, sourceEnabled;
+        // A failed install waits for the module to be switched off and on (or a restart) instead of re-patching every frame.
+        static bool installFailed;
         static float nextSourceCheck;
         static readonly StepAsideNotices notices = new StepAsideNotices();
         static readonly List<RpcLease> rpcs = new List<RpcLease>();
@@ -59,7 +61,8 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
                 if (notices.ShouldShow(decision)) log?.Warning(decision.Notice);
             }
             bool wanted = Active;
-            if (wanted == installed) return;
+            if (!wanted) installFailed = false;
+            if (wanted == installed || (wanted && installFailed)) return;
             if (!wanted)
             {
                 harmony.UnpatchSelf();
@@ -87,6 +90,7 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
                 installed = false;
                 ReleaseRpcs();
                 HerdCallout.Clear();
+                installFailed = true;
                 throw;
             }
         }
@@ -163,7 +167,7 @@ namespace ExtraPotions.Shepherd.Runtime.Adopted.Husbandry
             HoneyProduction.Shutdown();
             harmony?.UnpatchSelf();
             harmony = null;
-            installed = sourceEnabled = false;
+            installed = sourceEnabled = installFailed = false;
             ReleaseRpcs();
             LoreHover.Clear();
             HerdCallout.Clear();

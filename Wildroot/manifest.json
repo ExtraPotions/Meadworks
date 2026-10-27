@@ -1,6 +1,6 @@
 {
   "name": "Wildroot",
-  "version_number": "0.1.21",
+  "version_number": "0.1.22",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Wildroot",
   "description": "Meadworks gardening: grid planting, snapping, bulk harvest, replanting, a Farming skill with perks, seed crafting and more plantable flora. Required on all peers.",
   "dependencies": [

@@ -63,6 +63,8 @@ namespace ExtraPotions.Threshold.Runtime.Map
         /// <summary>The pins are on the open large map now (the server is asked for the list every 5 s meanwhile).</summary>
         public static bool Showing { get; private set; }
 
+        static bool drawFailed;
+
         /// <summary>Pins drawn this frame (inside the map's view).</summary>
         public static int Drawn { get; private set; }
 
@@ -89,12 +91,15 @@ namespace ExtraPotions.Threshold.Runtime.Map
                     minimap.m_mode == Minimap.MapMode.Large, ThresholdTravel.InSession);
             if (!show)
             {
+                drawFailed = false;
                 Hide();
                 return;
             }
+            if (drawFailed) return;
             try { Draw(minimap!, settings!); }
             catch (Exception e)
             {
+                drawFailed = true;
                 Plugin.Log?.Error("Threshold: map pins failed; they stay off until the map opens again: " + e);
                 Hide();
             }
@@ -357,6 +362,7 @@ namespace ExtraPotions.Threshold.Runtime.Map
         public static void Shutdown()
         {
             Showing = false;
+            drawFailed = false;
             Drawn = 0;
             pins = Array.Empty<MapPinSpec>();
             glyph = null;

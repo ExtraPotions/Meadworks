@@ -27,6 +27,9 @@ namespace ExtraPotions.Tempest.Runtime
         static readonly List<ZDO> Nearby = new List<ZDO>();
         static float radius = -1;
         static double last = -1;
+        // The sector scan in Standing runs at most this often while a storm is live.
+        const double CheckSeconds = 0.2;
+        static double checkedAt = -1;
         static int shockedSerial;
         static int burnedSerial;
         static int ashBurnedSerial;
@@ -79,6 +82,8 @@ namespace ExtraPotions.Tempest.Runtime
             }
             if (!stormOn || !StormHazards.Affects(enabled, player.IsDead(), player.InGodMode(), player.InGhostMode())) return;
             if (!StormHazards.Due(last, now)) return;
+            if (checkedAt >= 0 && now >= checkedAt && now - checkedAt < CheckSeconds) return;
+            checkedAt = now;
             var at = player.transform.position;
             if (!Standing(at, current!, now)) return;
             last = now;

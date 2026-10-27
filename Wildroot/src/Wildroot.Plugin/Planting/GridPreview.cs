@@ -101,6 +101,7 @@ namespace ExtraPotions.Wildroot.Runtime {
    return clone;
   }
   void EnsurePool(GameObject source,int count){
+   for(int i=0;i<ghosts.Count;i++)if(!ghosts[i]){DestroyPool();break;}
    var name=NativePlanting.BasePrefabName(source);if(poolSource!=name){DestroyPool();poolSource=name;}
    while(ghosts.Count<count){
     var clone=CloneGhost(source);

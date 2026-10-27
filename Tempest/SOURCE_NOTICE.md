@@ -7,3 +7,5 @@ Tempest.Core.dll and Tempest.dll contain logic adapted from NoFogBruh 2.1.2 (pin
 The Corresponding Source for this version is at https://github.com/ExtraPotions/Meadworks/tree/main/Tempest. No copyright transfer is inferred. Original upstream copyright and license notices remain intact.
 
 The approved original Meadworks Tempest icon is included under CC-BY-NC-SA-4.0. Retained MIT notices are included; no game assets are redistributed.
+
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.16/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.

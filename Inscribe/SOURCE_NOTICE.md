@@ -9,3 +9,5 @@ YamlDotNet 13.7.1 (MIT) is internalized into Inscribe.dll to prevent a public pa
 The Corresponding Source for this version is at https://github.com/ExtraPotions/Meadworks/tree/main/Inscribe. No copyright transfer is inferred. Original upstream copyright and license notices remain intact.
 
 The tall-tooltip feature adopts Display/Tooltips/TooltipScroll.cs from the existing EliteCrafting 0.7.0 pin. It keeps the native tooltip panel, fonts and border, with a clipped body and scroll-position bar only when needed. Inscribe adds display/headless admission, existing-scroll-owner refusal, scale/topic fit invalidation and current-owned-tooltip cleanup. No additional art or source family is imported.
+
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.8/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.

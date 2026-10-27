@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.8 (2026-10-26)
+
+- The Wet, Cold and Freezing filter for the local player now always switches off, even if the game's status update fails partway, so it cannot stay on for other characters.
+
 ## Unreleased
 
 - The Rune Table can focus one new Recasting inscription on Offense, Defense or Utility, with a choice of prefix or suffix. Other inscriptions roll normally at the same rune cost. Any category keeps the unrestricted roll; an impossible result spends nothing.

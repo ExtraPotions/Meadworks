@@ -85,7 +85,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         static void TryBind(Record record)
         {
             try { Bind(record); }
-            catch (Exception error) { Unbind(record); record.Entry = null; message = "HUD layout storage unavailable: " + error.Message; }
+            catch (Exception error) { Unbind(record); record.Entry = null; message = F(HudLayoutText.StorageFailed, error.Message); }
         }
 
         static void Read(Record record)
@@ -93,7 +93,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             if (ReferenceEquals(dragRecord, record)) CancelDrag();
             record.Readable = HudLayoutRules.TryDecode(record.Entry.Value, out var state);
             record.State = state;
-            if (!record.Readable) message = "Saved layout is unsupported; automatic layout is used. Reset explicitly to replace it.";
+            if (!record.Readable) message = T(HudLayoutText.Unsupported);
             Apply(record.Panel);
         }
 
@@ -212,18 +212,18 @@ namespace ExtraPotions.Meadworks.Crucible.UI
 
         static bool Commit(Record record, HudLayoutState state, bool remember = true)
         {
-            if (record.Entry == null || !HudLayoutRules.Valid(state)) { message = "Layout storage is unavailable."; return false; }
+            if (record.Entry == null || !HudLayoutRules.Valid(state)) { message = T(HudLayoutText.StorageUnavailable); return false; }
             var before = record.State.Copy();
             try
             {
                 var result = MeadworksConfig.Amend(record.Entry, CrucibleUiPlugin.Guid, ConfigScope.Local, HudLayoutRules.Encode(state));
-                if (!result.Applied) { message = "Layout was not saved: " + result.Decision; record.State = before; return false; }
+                if (!result.Applied) { message = F(HudLayoutText.NotSaved, result.Decision.ToString()); record.State = before; return false; }
                 record.State = state.Copy();
                 if (remember) Remember(record, before);
-                message = "Saved locally.";
+                message = T(HudLayoutText.Saved);
                 return true;
             }
-            catch (Exception error) { record.State = before; message = "Layout save failed: " + error.Message; return false; }
+            catch (Exception error) { record.State = before; message = F(HudLayoutText.SaveFailed, error.Message); return false; }
             finally { Apply(record.Panel); }
         }
 

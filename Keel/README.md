@@ -1,11 +1,10 @@
-## Changes in 0.1.15
+## Changes in 0.1.16
 
-- Guard ship and container naming during object teardown.
-- Handle an unavailable ship crew list when resolving the helmsman.
+- A HUD part that keeps failing waits five seconds before its next try instead of being rebuilt and removed every frame. The first failure is still logged in full.
 
 # Keel
 
-Version 0.1.15. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Tune every ship, level a Sailing skill, and build eight new ships from the vanilla hulls.
 

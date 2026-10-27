@@ -64,7 +64,10 @@ namespace Burrow.Resources {
                 +" deadline="+wait.Deadline.ToString("F2",CultureInfo.InvariantCulture)+" admission="+(journal?.CanAdmit==true?"open":"closed")+" sources="+sources
                 +" eligible="+(readiness?.Eligible??0)+" remote="+(readiness?.Remote??0)+" unloaded="+(readiness?.Unloaded??0)+" held="+(readiness?.Held??0)+" in_use="+(readiness?.InUse??0)+" unresolved="+wait.Awaiting.Count);
         }
-        void Remember(string id){if(journal?.Find(id)!=null)recorded[id]=0;}
+        void Remember(string id){if(journal!=null&&(journal.Find(id)!=null||journal.TryGetSettled(id,out _,out _)))recorded[id]=0;}
+        /// <summary>Journals whose finished records were already archived by this game run. Archiving runs once per journal per
+        /// run, at its first open, so a reservation object still held in this run keeps reading its record from the journal.</summary>
+        internal static readonly HashSet<string> ArchivedThisRun=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         static string Key(AsyncResourceContext context)=>Hash(Encoding.UTF8.GetBytes(context.ActorId+"\n"+context.WorldId+"\n"+context.SessionId+"\n"+context.RequestId));
         internal static string Hash(byte[] bytes){using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-","").ToLowerInvariant();}
         bool Open(){
@@ -73,11 +76,26 @@ namespace Burrow.Resources {
             Close();world=CruciblePlugin.Session.WorldId;actor=Actor;sessionFault=false;
             try{
                 string name=Hash(Encoding.UTF8.GetBytes(world.ToString(CultureInfo.InvariantCulture)+"\n"+actor));
-                journal=new InventoryDecisionJournal(Path.Combine(Paths.BepInExRootPath,"Burrow.transactions",name+".bin"));
+                string path=Path.Combine(Paths.BepInExRootPath,"Burrow.transactions",name+".bin");
+                // Finished payments were never removed, so after 4096 the journal refused every new one. They move to the
+                // archive (backed up once, never deleted); a failed archive leaves the journal as it was.
+                // A committed payment moves only once its receipt was seen again after a reload (the durable list); until then
+                // a lost world save can still roll the chest back, and recovery applies the payment again from this journal.
+                journalPath=path;durableReceipts=new HashSet<string>(StringComparer.Ordinal);
+                try{durableReceipts=InventoryDecisionJournal.ReadDurable(path);}catch(Exception error){Plugin.Log.LogWarning("Burrow durable receipt list unreadable: "+error.GetType().Name);}
+                if(ArchivedThisRun.Add(path)){
+                    var durable=durableReceipts;
+                    try{int moved=InventoryDecisionJournal.ArchiveSettled(path,null,id=>durable.Contains(id));if(moved>0)Plugin.Log.LogInfo("Burrow archived "+moved+" finished shared material payments.");}
+                    catch(Exception error){Plugin.Log.LogWarning("Burrow payment archive skipped: "+error.GetType().Name);}
+                }
+                journal=new InventoryDecisionJournal(path);
+                // Committed before this run: a receipt seen now has survived a reload.
+                committedAtOpen=new HashSet<string>(journal.Snapshot().Where(r=>r.State==InventoryDecision.Committed).Select(r=>r.Id),StringComparer.Ordinal);
                 store=new NativeBundleStore(journal,world,actor,rebaseUnpaid:true);
                 participant=new DurableInventoryParticipant(journal,store,()=>Time.realtimeSinceStartupAsDouble);
                 RefreshLocks();
                 foreach(var record in journal.Snapshot())recorded[record.Id]=0;
+                foreach(var id in journal.SettledIds)recorded[id]=0;
                 ledgerOpen=true;
                 return true;
             }catch(Exception error){sessionFault=true;Plugin.Log.LogError("Burrow resource recovery is unavailable: "+error.GetType().Name);return false;}
@@ -124,6 +142,8 @@ namespace Burrow.Resources {
             string fingerprint=Hash(Encoding.UTF8.GetBytes(string.Join("\n",normalized.Select(c=>c.ItemId+"="+c.Amount))));string id=Key(context);
             var old=journal.Find(id);
             if(old!=null){recorded[id]=0;if(old.Fingerprint!=fingerprint){Diagnose(wait,"fingerprint_mismatch");return new ResourceReservationResult(AsyncReservationState.Failed,null);}return Result(context,id,participant.Status(id));}
+            // A replay of a payment archived as finished answers its final state, never a second charge.
+            if(journal.TryGetSettled(id,out var settledFingerprint,out var settledState)){recorded[id]=0;if(settledFingerprint!=fingerprint){Diagnose(wait,"fingerprint_mismatch");return new ResourceReservationResult(AsyncReservationState.Failed,null);}return Result(context,id,settledState);}
             // A cancelled replay must still report an existing hold or durable commit under its original identity.
             if(cancellation.IsCancellationRequested){Diagnose(wait,"cancelled");return new ResourceReservationResult(AsyncReservationState.Failed,null);}
             if(enabled.Value&&context.SessionId==CruciblePlugin.Session.SessionId&&Busy)return Defer(wait,"actor_busy");
@@ -262,6 +282,7 @@ namespace Burrow.Resources {
                 store.Hold(id,true);
             }
             var state=operation==1?participant.Commit(id):operation==2?participant.Rollback(id):participant.Status(id);
+            if(operation==1)committedAtOpen.Remove(id);
             if(state==InventoryDecision.Committed||state==InventoryDecision.Aborted)store.Release(id);
             RefreshLocks();
             return Map(state);
@@ -273,20 +294,44 @@ namespace Burrow.Resources {
             int budget=Math.Min(8,work.Count);for(int i=0;i<budget&&work.TryDequeue(out var action);i++)action();
             if(journal==null||store==null||sessionFault)return;
             if(!Player.m_localPlayer||Actor!=actor||CruciblePlugin.Session.WorldId!=world){Close();return;}
+            // A record whose chest is unloaded or owned by another peer cannot finish yet. Retrying it every frame resolved
+            // the chest identity each time, which rebuilds the whole-world ZDO index twice a second. Sweep on a short
+            // interval, back off while records stay unresolved, and sweep at once when another container loads.
+            double now=Time.realtimeSinceStartupAsDouble;
+            if(now<recoveryAt&&ContainerScan.LoadedVersion==recoveryLoaded)return;
+            if(ContainerScan.LoadedVersion!=recoveryLoaded)recoveryDelay=0;
+            recoveryLoaded=ContainerScan.LoadedVersion;
             try{
-                participant.Expire();
+                participant.Expire();bool unresolved=false;List<string> durableNow=null;
                 foreach(var record in journal.Snapshot()){
                     if(record.State==InventoryDecision.Aborted)store.Release(record.Source);
-                    else if(record.State==InventoryDecision.Decided||record.State==InventoryDecision.Committed&&!store.ReceiptConfirmed(record.Source)){
+                    else if(record.State==InventoryDecision.Committed&&store.ReceiptConfirmed(record.Source)){
+                        if(committedAtOpen.Contains(record.Id)&&!durableReceipts.Contains(record.Id))(durableNow??=new List<string>()).Add(record.Id);
+                    }
+                    else if(record.State==InventoryDecision.Decided||record.State==InventoryDecision.Committed){
+                        // A chest of this payment that another peer owns, or nobody owns, is asked for through the game's
+                        // ownership request when nobody has it open and nothing else holds it. Commit then still applies only
+                        // the recorded image to an inventory that exactly matches the recorded before or after image.
+                        if(!Busy)foreach(var chest in store.RecoveryChests(record.Source))if(!chest.m_nview.IsOwner())ContainerClaim.ClaimForRecovery(chest,record.Source);
                         store.Hold(record.Source,true);
                         var state=participant.Commit(record.Id);
-                        if(state==InventoryDecision.Committed)store.Release(record.Source);
+                        // Committed here means this run saved the receipt again, so it has not yet survived a reload.
+                        if(state==InventoryDecision.Committed){store.Release(record.Source);committedAtOpen.Remove(record.Id);}else unresolved=true;
                         if(salvageRecovery.Waiting(record.Id))try{salvageRecovery.Pay(participant,record.Id,state,null);}catch(Exception error){Plugin.Log.LogWarning("Burrow chest salvage delivery: "+error.GetType().Name);}
                     }
                 }
+                if(durableNow!=null){
+                    try{InventoryDecisionJournal.AppendDurable(journalPath,durableNow);foreach(var id in durableNow)durableReceipts.Add(id);}
+                    catch(Exception error){Plugin.Log.LogWarning("Burrow durable receipt list not written: "+error.GetType().Name);}
+                }
                 RefreshLocks();
+                recoveryDelay=unresolved?Math.Min(RecoveryMaxDelay,Math.Max(RecoverySweep,recoveryDelay*2)):0;
+                recoveryAt=now+(unresolved?recoveryDelay:RecoverySweep);
             }catch(Exception error){sessionFault=true;Plugin.Log.LogError("Burrow retained unresolved resource state: "+error.GetType().Name);}
         }
+        const double RecoverySweep=0.25,RecoveryMaxDelay=5;
+        double recoveryAt,recoveryDelay;int recoveryLoaded=-1;
+        string journalPath="";HashSet<string> committedAtOpen=new HashSet<string>(StringComparer.Ordinal),durableReceipts=new HashSet<string>(StringComparer.Ordinal);
         List<NativeSource> Sources(bool claim){
             var result=new List<NativeSource>();var player=Player.m_localPlayer;
             if(includePlayer.Value&&!NativeInventoryGuards.Held(player.GetInventory(),true))result.Add(new NativeSource(player));
@@ -300,7 +345,7 @@ namespace Burrow.Resources {
         }
         void RefreshLocks(){heldInventories.Clear();if(journal==null||store==null)return;foreach(var record in journal.Snapshot().Where(r=>r.State==InventoryDecision.Prepared||r.State==InventoryDecision.Decided||r.State==InventoryDecision.Committed&&!store.ReceiptConfirmed(r.Source)))foreach(var inventory in store.Inventories(record.Source))if(inventory!=null)heldInventories.Add(inventory);}
         public bool IsLocked(Inventory inventory)=>heldInventories.Contains(inventory);
-        void Close(){salvageRecovery.Clear();ledgerOpen=false;journal?.Dispose();journal=null;store=null;participant=null;heldInventories.Clear();recorded.Clear();}
+        void Close(){recoveryAt=0;recoveryDelay=0;recoveryLoaded=-1;salvageRecovery.Clear();ledgerOpen=false;journal?.Dispose();journal=null;store=null;participant=null;heldInventories.Clear();recorded.Clear();}
         public void Dispose(){disposed=true;while(work.TryDequeue(out var action))action();Close();}
         sealed class Reservation:IAsyncResourceReservation {
             readonly NativeResourceProvider owner;readonly string id;bool disposed;

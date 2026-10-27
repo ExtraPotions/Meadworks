@@ -51,7 +51,12 @@ internal static class SummonQualityHudSystem
 
     internal static void Update(EnemyHud enemyHud)
     {
-        if (!Plugin.AllowsUi || !EdgeModules.Active(EdgeModule.Secondaries)) { Dispose(); return; }
+        if (!Plugin.AllowsUi || !EdgeModules.Active(EdgeModule.Secondaries))
+        {
+            // Called every frame while switched off: only tear down when something is still held.
+            if (ActiveGroups.Count > 0 || ActiveLifetimeTexts.Count > 0 || TagCache.Count > 0) Dispose();
+            return;
+        }
         if (enemyHud?.m_huds == null)
         {
             HideAllOwnedGroups();

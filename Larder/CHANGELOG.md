@@ -1,3 +1,7 @@
+## 0.2.18 (2026-10-26)
+
+- If the cooking patches fail to install, they are not retried every frame. Switching Cooking off and on, or restarting, tries again.
+
 ## 0.2.16
 
 - Clear pending food requests on session changes or local-player destruction while preserving duplicate-request and eating guards.

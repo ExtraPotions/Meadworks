@@ -16,6 +16,8 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         static Func<bool> active;
         static Harmony harmony;
         static bool installed;
+        // A failed install waits for Cooking to be switched off and on (or a restart) instead of re-patching every frame.
+        static bool installFailed;
         static readonly List<RpcLease> rpcs = new List<RpcLease>();
         public static MeadworksLog Log { get; private set; }
         public static bool Active => active != null && active();
@@ -37,7 +39,8 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             if (harmony == null) return;
             StationAddTransactions.Tick();
             bool wanted = Active;
-            if (wanted != installed)
+            if (!wanted) installFailed = false;
+            if (wanted != installed && !(wanted && installFailed))
             {
                 if (wanted)
                 {
@@ -56,6 +59,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                     {
                         harmony.UnpatchSelf();
                         installed = false;
+                        installFailed = true;
                         throw;
                     }
                 }
@@ -108,6 +112,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             harmony?.UnpatchSelf();
             harmony = null;
             installed = false;
+            installFailed = false;
             foreach (var rpc in rpcs)
                 if (rpc.View.TryGetTarget(out var view) && view != null && view.m_functions.TryGetValue(rpc.Hash, out var handler)
                     && rpc.Handler.TryGetTarget(out var owned) && ReferenceEquals(handler, owned)) view.m_functions.Remove(rpc.Hash);

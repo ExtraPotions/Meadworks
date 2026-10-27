@@ -5,7 +5,7 @@ using System.Linq;
 namespace ExtraPotions.Meadworks.Crucible {
     internal sealed class NativeRequestTransport:IDisposable {
         const string RpcName="ExtraPotions.Crucible.Protocol1";
-        sealed class Connection {internal PeerHandshake Handshake=new PeerHandshake(System.Guid.NewGuid().ToString("N"));internal double NextProbe;internal double Window;internal int Received;internal string Sender="";}
+        sealed class Connection {internal PeerHandshake Handshake=new PeerHandshake(System.Guid.NewGuid().ToString("N"));internal double NextProbe;internal int Probes;internal double Window;internal int Received;internal string Sender="";}
         readonly ProductRegistry services;readonly NativeSessionAdapter sessions;readonly RequestDispatcher dispatcher;readonly Dictionary<ZRpc,Connection> connections=new Dictionary<ZRpc,Connection>();readonly System.Diagnostics.Stopwatch clock=System.Diagnostics.Stopwatch.StartNew();
         // Reused every frame by Update (no per-frame peer arrays).
         readonly List<ZRpc> live=new List<ZRpc>(),stale=new List<ZRpc>();
@@ -21,6 +21,9 @@ namespace ExtraPotions.Meadworks.Crucible {
         MeadworksLog Log=>log??=MeadworksLog.For(Plugin.Log??BepInEx.Logging.Logger.CreateLogSource("Crucible"),"Crucible");
         internal event Action<ProtocolFrame>? OnReply;
         internal NativeRequestTransport(ProductRegistry services,NativeSessionAdapter sessions,RequestDispatcher dispatcher,ServerPresenceTimer presence){this.services=services;this.sessions=sessions;this.dispatcher=dispatcher;this.presence=presence;}
+        // Once a second through the presence window, then backing off to every 30 s: a server without Crucible never answers,
+        // and each unanswered probe can be logged there as an unknown RPC.
+        static double ProbeDelay(int sent)=>sent<15?1:Math.Min(30,Math.Pow(2,sent-14));
         internal void Update(){
             var net=ZNet.instance;live.Clear();if(net!=null)foreach(var peer in net.GetPeers()){var rpc=peer.m_rpc;if(rpc!=null&&rpc.IsConnected())live.Add(rpc);}
             if(connections.Count>0){
@@ -30,7 +33,7 @@ namespace ExtraPotions.Meadworks.Crucible {
             }
             foreach(var rpc in live)if(!connections.ContainsKey(rpc)){connections.Add(rpc,new Connection());rpc.Register<ZPackage>(RpcName,Receive);}
             TrackPresence(net);
-            if(net!=null&&!net.IsServer()){var rpc=net.GetServerRPC();if(rpc!=null&&connections.TryGetValue(rpc,out var state)&&state.Handshake.Epoch.Length==0&&clock.Elapsed.TotalSeconds>=state.NextProbe){state.NextProbe=clock.Elapsed.TotalSeconds+1;Send(rpc,new ProtocolFrame(FrameKind.Probe,0,"",state.Handshake.Challenge,"",Array.Empty<byte>()));}}
+            if(net!=null&&!net.IsServer()){var rpc=net.GetServerRPC();if(rpc!=null&&connections.TryGetValue(rpc,out var state)&&state.Handshake.Epoch.Length==0&&clock.Elapsed.TotalSeconds>=state.NextProbe){state.NextProbe=clock.Elapsed.TotalSeconds+ProbeDelay(state.Probes++);Send(rpc,new ProtocolFrame(FrameKind.Probe,0,"",state.Handshake.Challenge,"",Array.Empty<byte>()));}}
         }
         /// <summary>
         /// C02 vanilla-server timeout: the wait starts once this client is in a world on a server connection (role

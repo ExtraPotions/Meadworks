@@ -1,6 +1,6 @@
 {
   "name": "Timber",
-  "version_number": "0.2.2",
+  "version_number": "0.2.3",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Timber",
   "description": "Meadworks building: build camera, flooring options and area repair, with server-controlled cheats. Required on all peers.",
   "dependencies": [

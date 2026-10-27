@@ -233,7 +233,8 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             if (showAt >= 0 && Time.unscaledTime < showAt) return;
             ((RectTransform)transform).GetWorldCorners(targetCorners);
             bool moved = screenWidth != Screen.width || screenHeight != Screen.height;
-            for (int i = 0; i < targetCorners.Length; i++) moved |= targetCorners[i] != shownCorners[i];
+            // Half a unit of drift (sub-pixel on the overlay canvas) does not rebuild the box and its layout.
+            for (int i = 0; i < targetCorners.Length; i++) moved |= (targetCorners[i] - shownCorners[i]).sqrMagnitude > 0.25f;
             if (box != null && !moved && source.m_topic == shownTopic && source.m_text == shownText && source.m_tooltipPrefab == shownPrefab && StructuredKey == shownStructured) return;
             if (box != null) Destroy(box);
             box = StructuredBox() ?? TipBox.Show(source.m_tooltipPrefab, (RectTransform)transform, source.m_topic, source.m_text);

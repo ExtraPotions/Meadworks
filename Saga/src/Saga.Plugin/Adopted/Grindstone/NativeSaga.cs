@@ -41,7 +41,19 @@ namespace ExtraPotions.Saga.Runtime.Adopted.Grindstone {
         public static bool KeepCrouching=>SneakEffectsActive&&Plugin.Settings!.Get(SagaSettings.Sneak.KeepCrouching);
         public static float BackstabExperience=>SneakEffectsActive?Plugin.Settings!.Get(SagaSettings.Sneak.BackstabExperience):0f;
         public static bool TryView(Player player,out ZNetView? view){view=player?.m_nview;return view!=null&&view.IsValid();}
-        public static void Report(Exception error,string context){runtimeFailures++;Log.LogWarning("Saga "+context+": "+error.GetType().Name+": "+error.Message);}
+        // Per-frame hooks report through here: each context logs its first failure, then at most once a minute with the suppressed count.
+        static readonly Dictionary<string,(double next,int suppressed)> reported=new Dictionary<string,(double,int)>(StringComparer.Ordinal);
+        static readonly System.Diagnostics.Stopwatch reportClock=System.Diagnostics.Stopwatch.StartNew();
+        public static void Report(Exception error,string context){
+            runtimeFailures++;string line;context??="";
+            lock(reported){
+                double now=reportClock.Elapsed.TotalSeconds;
+                if(reported.TryGetValue(context,out var gate)&&now<gate.next){reported[context]=(gate.next,gate.suppressed+1);return;}
+                reported[context]=(now+60f,0);
+                line="Saga "+context+": "+error.GetType().Name+": "+error.Message+(gate.suppressed>0?" ("+gate.suppressed+" more in the last minute)":"");
+            }
+            Log.LogWarning(line);
+        }
         public static void Initialize(ManualLogSource log) {
             Log=log;
             SagaText.Initialize(log);

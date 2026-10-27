@@ -104,6 +104,7 @@ namespace Timber.Flooring
             [HarmonyPrefix]
             static void Prefix(Piece __instance)
             {
+                if (originals.Count == 0) return;
                 foreach (var collider in __instance.GetComponentsInChildren<Collider>(true))
                     if (collider != null) originals.Remove(collider.gameObject);
             }

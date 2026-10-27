@@ -1,6 +1,6 @@
 # Edge
 
-Version 0.2.12. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.13. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Combat additions: a secondary attack for every weapon family, a quickstep, swings that hit on slopes, and weapons back in hand after a swim.
 

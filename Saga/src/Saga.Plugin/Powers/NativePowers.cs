@@ -23,6 +23,8 @@ namespace ExtraPotions.Saga.Runtime {
         static Player? current;static float next;static readonly HashSet<ZDOID> credited=new HashSet<ZDOID>();
         static KitHudPanel? hud;static string hudLayout="";static bool foldNativeName;
         static UITooltip? nativeTooltip;static bool ownsNativeTooltip;static string oldTopic="",oldText="",appliedTopic="",appliedText="";
+        // Hud.UpdateGuardianPower runs every frame: the native tooltip text is rebuilt at most twice a second or when the shown power changes.
+        static float tooltipNext;static Boss tooltipBoss;
         static readonly List<HudRow> hudRows=new List<HudRow>();
         sealed class HudRow {public Boss Boss;public GameObject Root=null!;public TMP_Text Title=null!;public TMP_Text? Details;public Image Icon=null!;public bool IconOnly;}
         public static PowerRequirements Requirements=PowerRequirements.Defaults;
@@ -93,7 +95,7 @@ namespace ExtraPotions.Saga.Runtime {
         static void Place(RectTransform rect,Vector2 at,Vector2 size){rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);rect.anchoredPosition=new Vector2(at.x,-at.y);rect.sizeDelta=size;}
         static void DestroyHud(){hud?.Dispose();hud=null;hudRows.Clear();hudLayout="";NativeNameVisible(true);}
         static void RestoreNativeTooltip(){if(nativeTooltip!=null){if(ownsNativeTooltip)UnityEngine.Object.Destroy(nativeTooltip);else if(nativeTooltip.m_topic==appliedTopic&&nativeTooltip.m_text==appliedText)nativeTooltip.Set(oldTopic,oldText);}nativeTooltip=null;ownsNativeTooltip=false;oldTopic=oldText=appliedTopic=appliedText="";}
-        static void NativeTooltip(Hud gameHud,Player player,Boss boss){if(gameHud.m_gpIcon==null)return;var control=gameHud.m_gpIcon.gameObject;if(nativeTooltip==null||nativeTooltip.gameObject!=control){RestoreNativeTooltip();nativeTooltip=control.GetComponent<UITooltip>();ownsNativeTooltip=nativeTooltip==null;if(nativeTooltip==null)nativeTooltip=KitTooltip.Attach(control);if(nativeTooltip==null)return;oldTopic=nativeTooltip.m_topic;oldText=nativeTooltip.m_text;}appliedTopic=BossLabel(boss);appliedText=Tooltip(player,boss)+(player.m_guardianPowerCooldown>0?"\n"+RechargeText(player):"");nativeTooltip.Set(appliedTopic,appliedText);}
+        static void NativeTooltip(Hud gameHud,Player player,Boss boss){if(gameHud.m_gpIcon==null)return;var control=gameHud.m_gpIcon.gameObject;bool fresh=nativeTooltip==null||nativeTooltip.gameObject!=control;if(!fresh&&boss==tooltipBoss&&Time.unscaledTime<tooltipNext)return;if(fresh){RestoreNativeTooltip();nativeTooltip=control.GetComponent<UITooltip>();ownsNativeTooltip=nativeTooltip==null;if(nativeTooltip==null)nativeTooltip=KitTooltip.Attach(control);if(nativeTooltip==null)return;oldTopic=nativeTooltip.m_topic;oldText=nativeTooltip.m_text;}appliedTopic=BossLabel(boss);appliedText=Tooltip(player,boss)+(player.m_guardianPowerCooldown>0?"\n"+RechargeText(player):"");nativeTooltip.Set(appliedTopic,appliedText);tooltipBoss=boss;tooltipNext=Time.unscaledTime+.5f;}
         [HarmonyPatch(typeof(Player),nameof(Player.GetGuardianPowerHUD))]static class GuardianHud {
             static bool Prefix(Player __instance,ref StatusEffect se,ref float cooldown){if(__instance!=Player.m_localPlayer||!NativeSaga.Active("powers"))return true;var state=Attuned(__instance);cooldown=__instance.m_guardianPowerCooldown;se=state.Attuned.Count==0?null!:__instance.GetSEMan().GetStatusEffect(PowerHash(state.Attuned.Last()))??PowerSource(state.Attuned.Last())!;return false;}
         }

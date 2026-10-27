@@ -119,9 +119,10 @@ namespace ExtraPotions.Thing.Runtime
             ThingTeleportCommands.Tick();
             ThingInventory.Tick();
             ThingWard.Tick();
+            // Registers the freeze and acknowledgement RPCs; a dedicated server has no local player but receives the acks.
+            ThingPlayerFreeze.Tick();
             if (Player.m_localPlayer != null)
             {
-                ThingPlayerFreeze.Tick();
                 ThingTime.Tick();
                 ThingTerrainCommands.Tick();
                 ThingDropCommands.Tick();

@@ -21,7 +21,7 @@ namespace ExtraPotions.Kindle.Runtime
         private static MeadworksLog? log;
         private static Harmony? patches;
         private static float nextScan;
-        private static bool previousEnabled;
+        private static bool previousEnabled,warnedTemplate;
         private static float previousRange;
         internal static bool Enabled => Plugin.Ready && settings!=null && settings.Get(KindleSettings.Cart.CartWorkbench);
 
@@ -76,7 +76,7 @@ namespace ExtraPotions.Kindle.Runtime
             }
             var workbench=ZNetScene.instance ? ZNetScene.instance.GetPrefab("piece_workbench") : null;
             var template=workbench ? workbench.GetComponentInChildren<CraftingStation>(true) : null;
-            if(!template){log?.Warning("The workbench prefab has no crafting station; carts stay plain carts.");return;}
+            if(!template){if(!warnedTemplate)log?.Warning("The workbench prefab has no crafting station; carts stay plain carts.");warnedTemplate=true;return;}
             station=cart.gameObject.AddComponent<CraftingStation>();
             Copy(template,station,cart.transform);added.Add(station);
         }

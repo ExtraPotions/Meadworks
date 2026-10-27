@@ -1,6 +1,6 @@
 {
   "name": "Cairn",
-  "version_number": "0.1.19",
+  "version_number": "0.1.20",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Cairn",
   "description": "Meadworks exploration: exploration radius, Exploration skill, per-effect fog controls, time/weather/compass HUD, map marker choices and tidy pins. Imports Pathfinder, NoFogBruh, BetterFog and TimeWeatherHud settings. Client-optional.",
   "dependencies": [

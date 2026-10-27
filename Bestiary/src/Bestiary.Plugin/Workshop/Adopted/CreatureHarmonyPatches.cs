@@ -268,14 +268,12 @@ internal static class CreatureManagerZNetSceneOnDestroyPatch
     private static void Prefix()
     {
         if (!WorkshopRuntime.Initialized) return;
-        CreatureDomainManager.NotifyGameDataUnavailable();
-        CreatureAppearanceRuntime.Reset();
-
-
-
-
-
-
+        // A throw here would skip the game's own ZNetScene teardown on logout.
+        WorkshopRuntime.Run("scene teardown", () =>
+        {
+            CreatureDomainManager.NotifyGameDataUnavailable();
+            CreatureAppearanceRuntime.Reset();
+        });
     }
 }
 

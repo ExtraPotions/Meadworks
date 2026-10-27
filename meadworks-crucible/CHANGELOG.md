@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.35 (2026-10-26)
+
+- The HUD layout editor is translated into all seven supported languages: title, buttons, side names, status messages and help.
+- Fixes the pause menu stutter and other per-frame costs in shared menus: themed achievement and trophy panels pause while hidden, tooltips no longer rebuild on sub-pixel moves, and the Timber background stops redrawing every frame when its art is missing.
+- A client connected to a server without Crucible probes it once a second for 15 seconds, then backs off to at most every 30 seconds.
+- A settings tab that keeps failing, or an unreadable translation override file, is reported once instead of every frame or every two seconds.
+- Connected clients no longer copy the peer list every frame.
+
 ## Unreleased
 
 - Verify a saved setting with a targeted native-compatible readback instead of parsing every setting a second time. Initial disk parsing, unrelated saved values, forced flush, conflict detection and atomic publication remain unchanged.

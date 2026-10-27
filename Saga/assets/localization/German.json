@@ -560,6 +560,7 @@
     "crafting_journeyman_locked": "Geselle wird mit Handwerk 75 freigeschaltet",
     "sneak_vanish": "Verschwinden: 3 s stilles Schleichen ohne nahe Gegner bricht die Verfolgung ab",
     "sneak_vanish_locked": "Verschwinden wird mit Schleichen 75 freigeschaltet",
+    "sneak_vanished": "Verschwunden",
     "angler_close_help": "Schließe das Anglerbuch und kehre ins Spiel zurück.",
     "angler_fish_help": "Wähle diesen Fisch, um deine gespeicherten Fangstufen und deinen besten Fang zu sehen.",
     "cfg_1_general_heading": "1 - Allgemein",

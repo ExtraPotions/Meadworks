@@ -111,11 +111,16 @@ namespace ExtraPotions.Kindle.Runtime
         {
             if (!initialized || !Plugin.AllowsUi || Plugin.SteppedAside || instance == null || instance.m_tabUpgrade == null) return;
             if (gui == instance && tab != null && tab.Button != null) return;
+            // A tab that could not be made for this window (another UI mod moved the tabs) is not torn down and made again every frame.
+            if (failedGui == instance) return;
             Clear();layout?.Forget();tab?.Dispose();
             gui=instance;selected=null;selectedIndex=0;wasActive=false;
+            failedGui=instance;
             tab=KitTabs.Append(instance.m_tabUpgrade.transform.parent as RectTransform,instance.m_tabUpgrade,"Kindle_SalvageTab",SalvageWords.Salvage,()=>Select(instance));
             layout=KitTileList.For(instance.m_recipeListRoot,instance.m_recipeListSpace,instance.m_recipeListBaseSize);
+            if (tab != null && tab.Button != null) failedGui=null;
         }
+        static InventoryGui failedGui;
         static void Select(InventoryGui instance)
         {
             if (!Ready || !SalvageSettings.Enabled.Value || instance != gui || instance.m_craftTimer >= 0f) { tab?.Select(false);return; }

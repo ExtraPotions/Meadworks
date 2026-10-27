@@ -114,7 +114,9 @@ namespace ExtraPotions.Barter.Runtime
 
         private static void Postfix(StoreGui __instance)
         {
-            StoreUi.Tick(__instance);
+            // Purse reads throw while the host's authority state is unreadable; an escaping throw would repeat at every refresh.
+            try { StoreUi.Tick(__instance); }
+            catch (Exception error) { Plugin.Log?.Warning("Store refresh failed: " + error.GetType().Name + ": " + error.Message); }
         }
     }
 
@@ -237,15 +239,32 @@ namespace ExtraPotions.Barter.Runtime
     {
         internal static bool Takeover => Plugin.Active && TradeLists.Ready && StoreUi.SellPanelAllowed;
 
+        // On the host the check reads the trader's signed purse from disk, so it runs a few times a second rather than every
+        // frame. Selling checks again itself, so a button state up to one interval old never sells what it should not.
+        private const float CheckSeconds = 0.2f;
+        private static float nextCheck;
+        private static StoreGui checkedStore;
+        private static bool checkedTakeover;
+
         private static bool Prefix(StoreGui __instance)
         {
-            if (!Takeover)
+            if (!Plugin.Active) return true;
+            bool takeover = Takeover;
+            if (ReferenceEquals(checkedStore, __instance) && checkedTakeover == takeover && Time.unscaledTime < nextCheck) return false;
+            checkedStore = __instance; checkedTakeover = takeover; nextCheck = Time.unscaledTime + CheckSeconds;
+            // Runs from StoreGui.Update: a purse that cannot be read (for example missing host authority state) disables
+            // selling instead of throwing out of the game's store update.
+            try
             {
-                if (!Plugin.Active) return true;
-                __instance.m_sellButton.interactable = SellService.CanSellValuables(__instance, out _);
-                return false;
+                __instance.m_sellButton.interactable = takeover
+                    ? SellService.CanSell(__instance, out _)
+                    : SellService.CanSellValuables(__instance, out _);
             }
-            __instance.m_sellButton.interactable = SellService.CanSell(__instance, out _);
+            catch (Exception error)
+            {
+                __instance.m_sellButton.interactable = false;
+                Plugin.Log?.Warning("Sell check failed: " + error.GetType().Name + ": " + error.Message);
+            }
             return false;
         }
     }

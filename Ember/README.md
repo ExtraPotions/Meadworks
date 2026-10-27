@@ -1,15 +1,12 @@
-## Changes in 0.5.9
+## Changes in 0.5.11
 
-- Keep automatic door checks at 0.05 seconds while reusing scan collections and handling callback mutation and shutdown safely.
-- Avoid an intermediate dead-fireplace cleanup list when no tracked entries have died.
-- Guard torch keep, schedule and hover paths when network state is unavailable.
-- Reject missing torch shared data before durability calculations.
+- Placement ghosts of fireplaces and doors are no longer tracked as real pieces.
 
 # Ember
 
 Faster nights when some players sleep, torches that warm you like a campfire, and doors that open as you walk up.
 
-Version 0.5.10. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.11. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

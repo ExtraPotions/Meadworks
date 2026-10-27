@@ -1,3 +1,7 @@
+## 0.1.16 (2026-10-26)
+
+- A HUD part that keeps failing waits five seconds before its next try instead of being rebuilt and removed every frame. The first failure is still logged in full.
+
 ## 0.1.15
 
 - Guard ship and container naming during object teardown.

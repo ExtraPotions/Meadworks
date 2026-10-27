@@ -17,3 +17,5 @@ Approved artwork: icon.png is original product artwork authored by expDARE under
 Build instructions are in the repository's root `BUILDING.md`. The publicizer attribute shim is supplied by a restored MIT NuGet contentFiles entry and its complete notice is included. Binary packages contain only Edge.dll and Edge.Core.dll; shared runtime/game assemblies and YAML sidecars are not included.
 
 Keep Crossbow Loaded (src/Edge.Plugin/Equipment/LoadedWeapons.cs, LoadedWeaponPatch.cs) is adapted from EliteCreaturesReborn 3.21.0 (Gerald Glasgow) at 9da28eb58adbe065be1e4baef779a448acd38e0f in geraldjglasgow/ValheimMods, GPL-3.0-or-later; original copyright retained and license text, byte-identical to EliteCreaturesReborn/LICENSE at the pin, in THIRD_PARTY_NOTICES/EliteCreaturesReborn-GPL-3.0-or-later.txt.
+
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.13/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.

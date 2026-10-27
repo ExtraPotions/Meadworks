@@ -29,6 +29,8 @@ namespace ExtraPotions.Shepherd.Runtime.Companions
         private static readonly ConditionalWeakTable<Tameable, Flipped> flipped = new ConditionalWeakTable<Tameable, Flipped>();
         private static Harmony? harmony;
         private static bool installed;
+        // A failed install waits for the module to be switched off and on (or a restart) instead of re-patching every frame.
+        private static bool installFailed;
 
         private static bool Wanted => harmony != null && Plugin.Ready && MeadworksAuthority.ProductActive(Plugin.Guid, out _)
             && ShepherdSettings.Enabled.Value && HusbandrySettings.Enabled.Value;
@@ -47,10 +49,12 @@ namespace ExtraPotions.Shepherd.Runtime.Companions
         {
             if (harmony == null) return;
             bool wanted = Wanted;
-            if (wanted == installed) return;
+            if (!wanted) installFailed = false;
+            if (wanted == installed || (wanted && installFailed)) return;
             if (wanted)
             {
-                harmony.CreateClassProcessor(typeof(Awake)).Patch();
+                try { harmony.CreateClassProcessor(typeof(Awake)).Patch(); }
+                catch { harmony.UnpatchSelf(); installFailed = true; throw; }
                 installed = true;
             }
             else
@@ -65,6 +69,7 @@ namespace ExtraPotions.Shepherd.Runtime.Companions
         {
             harmony?.UnpatchSelf();
             harmony = null;
+            installFailed = false;
             if (installed)
             {
                 installed = false;

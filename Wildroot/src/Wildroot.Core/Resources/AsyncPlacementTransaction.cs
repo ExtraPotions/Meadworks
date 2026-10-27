@@ -52,7 +52,9 @@ namespace ExtraPotions.Wildroot {
         static bool Same(AsyncResourceContext a,AsyncResourceContext b)=>a.ActorId==b.ActorId&&a.WorldId==b.WorldId&&a.SessionId==b.SessionId&&a.RequestId==b.RequestId;
         public AsyncPlacementJob Restore(PlacementJournalRecord record,IReadOnlyList<PlacementOperation> operations,IReadOnlyList<IPlacementBackend> backends,IAsyncResourceProvider? provider,string providerId){
             if(retiring)throw new InvalidOperationException("Placement transaction is retiring.");
-            record.Validate();if(record.ProviderId!=providerId||record.Cells.Count!=operations.Count||operations.Count!=backends.Count||record.Cells.Where((c,i)=>c.RequestId!=operations[i].Context.RequestId||c.RecoveryData!=(backends[i] as IDurablePlacementBackend)?.RecoveryData).Any()||Fingerprint(record.Costs)!=Fingerprint(operations.SelectMany(o=>o.Costs)))throw new ArgumentException("Recovery plan does not match original intent.");
+            // A Completed record reached a terminal outcome; reopening it re-probes finished, paid cells every load.
+            if(record!=null&&record.Completed)throw new ArgumentException("Completed placement record cannot be restored.");
+            record!.Validate();if(record.ProviderId!=providerId||record.Cells.Count!=operations.Count||operations.Count!=backends.Count||record.Cells.Where((c,i)=>c.RequestId!=operations[i].Context.RequestId||c.RecoveryData!=(backends[i] as IDurablePlacementBackend)?.RecoveryData).Any()||Fingerprint(record.Costs)!=Fingerprint(operations.SelectMany(o=>o.Costs)))throw new ArgumentException("Recovery plan does not match original intent.");
             if(jobs.TryGetValue(record.Key,out var old)){
                 if(!SamePlan(old.Record,record))throw new ArgumentException("Recovery identity collision.");
                 for(int i=0;i<operations.Count;i++){old.Operations[i]=operations[i];old.Backends[i]=backends[i];old.Placed[i]=null;old.Record.Cells[i].Settled=false;}
@@ -62,7 +64,8 @@ namespace ExtraPotions.Wildroot {
             }
             if(settled.TryGetValue(record.Key,out var receipt)){
                 if(!SamePlan(receipt.Record,record))throw new ArgumentException("Recovery identity collision.");
-                record=receipt.Record;settled.Remove(record.Key);
+                // This process already settled the record; an older loaded snapshot cannot reopen it.
+                return new AsyncPlacementJob(receipt.Record,operations.ToArray(),backends.ToArray(),null){Result=receipt.Result};
             }
             foreach(var cell in record.Cells)cell.Settled=false;
             var job=new AsyncPlacementJob(record,operations.ToArray(),backends.ToArray(),provider){Restored=true,IntentSaved=true,NeedsRecovery=true};jobs.Add(record.Key,job);
@@ -154,6 +157,8 @@ namespace ExtraPotions.Wildroot {
             job.NeedsRecovery=false;
             for(int i=0;i<job.Record.Cells.Count&&budget>0;i++){
                 var cell=job.Record.Cells[i];if(cell.Settled)continue;
+                // Completion (even one not yet flushed) means every cell already settled: never probe, re-create, confirm or compensate again.
+                if(job.Record.Completed){cell.Settled=true;Save(job);continue;}
                 if(cell.Retired){cell.Settled=true;Save(job);continue;}
                 var probe=job.Backends[i] is IDurablePlacementBackend||job.Restored||job.Placed[i]==null?Probe(job,i):new PlacementProbe(PlacementPresence.Present,job.Placed[i]);
                 if(probe.Presence==PlacementPresence.Unavailable||probe.Presence==PlacementPresence.Ambiguous&&(paid||cell.Created)){job.NeedsRecovery=true;return;}

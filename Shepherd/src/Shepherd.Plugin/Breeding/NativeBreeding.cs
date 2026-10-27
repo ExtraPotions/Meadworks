@@ -22,6 +22,8 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
 
         private static Harmony? harmony;
         private static bool installed;
+        // A failed install waits for the module to be switched off and on (or a restart) instead of re-patching every frame.
+        private static bool installFailed;
         private static MeadworksLog? log;
 
         /// <summary>The Breeding module runs: inheritance, twins, pace, claims, carries and lineage.</summary>
@@ -59,7 +61,8 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
         {
             if (harmony == null) return;
             bool wanted = Wanted;
-            if (wanted == installed) return;
+            if (!wanted) installFailed = false;
+            if (wanted == installed || (wanted && installFailed)) return;
             if (!wanted)
             {
                 harmony.UnpatchSelf();
@@ -78,6 +81,7 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
             {
                 harmony.UnpatchSelf();
                 installed = false;
+                installFailed = true;
                 throw;
             }
         }
@@ -93,7 +97,7 @@ namespace ExtraPotions.Shepherd.Runtime.Breeding
         {
             harmony?.UnpatchSelf();
             harmony = null;
-            installed = false;
+            installed = installFailed = false;
             BreedingHooks.Clear();
             HerdHooks.Clear();
             log = null;

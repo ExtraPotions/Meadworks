@@ -560,6 +560,7 @@
     "crafting_journeyman_locked": "숙련공은 제작 75에 해제",
     "sneak_vanish": "소멸: 근처에 적이 없는 상태에서 3초 동안 웅크리면 추적 해제",
     "sneak_vanish_locked": "소멸은 은신 75에 해제",
+    "sneak_vanished": "소멸",
     "angler_close_help": "낚시 일지를 닫고 게임으로 돌아갑니다.",
     "angler_fish_help": "이 물고기를 선택하면 저장된 어획 레벨과 최고 기록을 봅니다.",
     "cfg_1_general_heading": "1 - 일반",

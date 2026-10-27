@@ -1,6 +1,6 @@
 {
   "name": "Mantle",
-  "version_number": "0.1.29",
+  "version_number": "0.1.32",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Mantle",
   "description": "Meadworks inventory and equipment: configurable grid, gear, ring and belt slots, backpacks, key ring, tacklebox and a Swap loadout button. Required on all peers (same version).",
   "dependencies": [

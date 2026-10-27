@@ -1,6 +1,6 @@
 {
   "name": "Thing",
-  "version_number": "0.1.14",
+  "version_number": "0.1.15",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Thing",
   "description": "Meadworks server administration: moderation, messages, world tools and in-game server config editing, checked against the server's admin list. Required on all peers.",
   "dependencies": [

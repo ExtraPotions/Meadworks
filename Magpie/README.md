@@ -1,10 +1,10 @@
-## Changes in 0.1.15
+## Changes in 0.1.16
 
-- Guard automatic pickup planning when player or item data is unavailable.
+- Floating items no longer allocate a name every physics step, and destroyed items are dropped from the floating list once a minute.
 
 # Magpie
 
-Version 0.1.15. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Items within range glide to you and are picked up, nearby ground stacks merge, and drops float; an optional loot multiplier is a server-controlled cheat.
 

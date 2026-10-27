@@ -20,6 +20,9 @@ namespace ExtraPotions.Shepherd.Runtime.Pens
         static Harmony? harmony;
         static GameObject? holder, prefab;
         static string appliedRecipe = "";
+        // A recipe text without native materials is parsed once; it is retried only after the text changes.
+        static string rejectedRecipe = "";
+        static ObjectDB? hammerDatabase;
         static bool failed;
         static double retryAt;
         public static bool Active => harmony != null && Plugin.Ready && NativeFeeding.ProductActive;
@@ -43,13 +46,13 @@ namespace ExtraPotions.Shepherd.Runtime.Pens
             {
                 if (prefab == null && Time.realtimeSinceStartupAsDouble >= retryAt)
                 { retryAt = Time.realtimeSinceStartupAsDouble + 1; Install(); }
-                if (prefab != null) { prefab.GetComponent<Piece>().m_enabled = Active; ApplyRecipe(); }
+                if (prefab != null) { prefab.GetComponent<Piece>().m_enabled = Active; if (ApplyRecipe()) AddToHammer(); }
             }
             catch (Exception error) { if (!failed) Warn("land pen refresh", error); failed = true; }
         }
         public static void Shutdown()
         {
-            LandPenRegistration.Clear(); harmony?.UnpatchSelf(); harmony = null; capacity = null; recipe = null;
+            LandPenRegistration.Clear(); harmony?.UnpatchSelf(); harmony = null; capacity = null; recipe = null; rejectedRecipe = ""; hammerDatabase = null;
             if (prefab != null) prefab.GetComponent<Piece>().m_enabled = false;
         }
         public static void Install()
@@ -65,10 +68,9 @@ namespace ExtraPotions.Shepherd.Runtime.Pens
                 if (!scene.m_prefabs.Contains(prefab)) scene.m_prefabs.Add(prefab);
                 scene.m_namedPrefabs[hash] = prefab;
                 if (ObjectDB.instance == null) return;
-                ApplyRecipe();
-                var hammer = ObjectDB.instance.GetItemPrefab(TroughPieces.HammerItem)?.GetComponent<ItemDrop>();
-                var table = hammer != null ? hammer.m_itemData.m_shared.m_buildPieces : null;
-                if (table != null && !table.m_pieces.Contains(prefab)) table.m_pieces.Add(prefab);
+                if (!ApplyRecipe()) return;
+                hammerDatabase = null;
+                AddToHammer();
                 failed = false;
             }
             catch (Exception error) { if (!failed) Warn("land pen installation", error); failed = true; }
@@ -152,16 +154,28 @@ namespace ExtraPotions.Shepherd.Runtime.Pens
             block.transform.localPosition = center;
             block.AddComponent<BoxCollider>().size = alongZ ? new Vector3(0.14f, height, length) : new Vector3(length, height, 0.14f);
         }
-        static void ApplyRecipe()
+        // The hammer gets the pen once per ObjectDB, after a recipe with native materials applied; a corrected recipe adds it without a relog.
+        static void AddToHammer()
         {
-            if (prefab == null || ObjectDB.instance == null) return;
+            if (prefab == null || ObjectDB.instance == null || hammerDatabase == ObjectDB.instance) return;
+            var hammer = ObjectDB.instance.GetItemPrefab(TroughPieces.HammerItem)?.GetComponent<ItemDrop>();
+            var table = hammer != null ? hammer.m_itemData.m_shared.m_buildPieces : null;
+            if (table == null) return;
+            if (!table.m_pieces.Contains(prefab)) table.m_pieces.Add(prefab);
+            hammerDatabase = ObjectDB.instance;
+        }
+        static bool ApplyRecipe()
+        {
+            if (prefab == null || ObjectDB.instance == null) return false;
             string text = recipe?.Invoke() ?? LandPenDefinition.DefaultRecipe;
-            if (appliedRecipe == text && prefab.GetComponent<Piece>().m_resources.Length > 0) return;
+            if (appliedRecipe == text && prefab.GetComponent<Piece>().m_resources.Length > 0) return true;
+            if (rejectedRecipe == text) return false;
             ItemDrop? Item(string name) => ObjectDB.instance.GetItemPrefab(name)?.GetComponent<ItemDrop>();
             var entries = TroughRecipe.Parse(text, name => Item(name) != null);
             var resources = entries.Where(e => Item(e.Item) != null).Select(e => new Piece.Requirement { m_resItem = Item(e.Item)!, m_amount = e.Amount, m_recover = true }).ToArray();
-            if (resources.Length == 0) throw new InvalidOperationException("land pen recipe has no native materials");
-            prefab.GetComponent<Piece>().m_resources = resources; appliedRecipe = text;
+            if (resources.Length == 0) { rejectedRecipe = text; throw new InvalidOperationException("land pen recipe has no native materials"); }
+            prefab.GetComponent<Piece>().m_resources = resources; appliedRecipe = text; rejectedRecipe = "";
+            return true;
         }
         internal static void Warn(string context, Exception error) => NativeFeeding.Warn(context + ": " + error.GetType().Name + ": " + error.Message);
         [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]

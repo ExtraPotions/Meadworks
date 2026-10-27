@@ -30,7 +30,8 @@ namespace ExtraPotions.Meadworks.Crucible.UI
             if (trophies != null)
             {
                 if (trophies.Revision != trophyRevision) trophies.Rows(trophyRows?.GetValue(gui) as List<GameObject>, trophyRevision);
-                trophies.Apply(On);
+                // The surface outlives the panel; while it is closed there is nothing to keep in step.
+                if (root.activeInHierarchy) trophies.Apply(On);
             }
         }
         static void ShutdownTrophies() { trophies?.Dispose(); trophies = null; }

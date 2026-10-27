@@ -80,6 +80,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         private bool disposed;
         private bool viewFailed;
         private bool tableFailed;
+        private bool tickFailed;
         private KitBuildFolders folders;
 
         public KitBuildFolders AttachFolders()
@@ -292,10 +293,15 @@ namespace ExtraPotions.Meadworks.Crucible.UI
                 try
                 {
                     tab.Tick();
+                    tab.tickFailed = false;
                 }
                 catch (Exception e)
                 {
-                    CrucibleUiPlugin.Log?.Error($"Crucible.UI: build tab {tab.Owner} tick failed: {e}");
+                    // A tab that keeps throwing is reported once, not formatted again every frame; it is reported
+                    // again only after a tick succeeds.
+                    if (!tab.tickFailed)
+                        CrucibleUiPlugin.Log?.Error($"Crucible.UI: build tab {tab.Owner} tick failed: {e}");
+                    tab.tickFailed = true;
                 }
             }
         }

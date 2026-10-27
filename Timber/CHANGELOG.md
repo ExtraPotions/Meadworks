@@ -1,3 +1,8 @@
+## 0.2.3 (2026-10-26)
+
+- Circlet light search runs twice a second instead of every frame when no lit circlet is worn.
+- Removing a floor or roof piece skips the collider walk when no tag changed.
+
 ## 0.2.2
 
 - Reject missing item or shared records before camera pickup eligibility, ownership and inventory checks.

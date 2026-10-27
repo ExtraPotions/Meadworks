@@ -1,14 +1,12 @@
-## Changes in 0.1.28
+## Changes in 0.1.32
 
-- Preserve legal dedicated-slot routing and quality/world-level stack accounting for crafting and inventory transfers.
-- Reconcile trinket peers on a one-second cadence while handling roster identity changes and departures immediately.
-- Reuse back-gear clearance results only while item and parent identities match; restore and reapply after release.
-- Leave Food Key unbound for new entries while preserving saved key values.
-- Guard malformed trinket item records during equipment tuning.
+- Tacklebox and pop-up counts are written only when they change.
+- Requirement spacing does no work while the inventory is hidden.
+- When another mod leaves the trinket data invalid, the warning appears once per item database and the check retries every 30 seconds instead of every quarter second.
 
 # Mantle
 
-Version 0.1.28. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.32. Requires Crucible 0.3.34 / Crucible.UI 0.3.23. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 A configurable inventory grid, dedicated gear slots, and wearable backpacks.
 

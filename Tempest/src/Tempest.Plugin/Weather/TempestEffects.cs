@@ -15,6 +15,19 @@ namespace ExtraPotions.Tempest.Runtime
             if (root != null && current != null) Owned.Add((root, current.Serial, activeOnly));
         }
 
+        /// <summary>
+        /// A copy of a game effect for this peer only. Every peer plays these itself, so a networked prefab
+        /// (sfx_Frost_Start, the meteor hits) is made the way the game makes local copies, with its ZNetView disabled;
+        /// otherwise each peer's copy becomes a network object that every other peer also draws.
+        /// </summary>
+        internal static GameObject InstantiateLocal(GameObject prefab, Vector3 at)
+        {
+            var was = ZNetView.m_forceDisableInit;
+            ZNetView.m_forceDisableInit = true;
+            try { return Object.Instantiate(prefab, at, Quaternion.identity); }
+            finally { ZNetView.m_forceDisableInit = was; }
+        }
+
         internal static void Tick()
         {
             var current = TempestWorld.Current;

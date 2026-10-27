@@ -27,6 +27,9 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
         private static void Build(ZNetScene scene)
         {
             EnsureRpc();
+            // Every world load builds fresh copies from that load's settings. The last load's copies sit inactive on the
+            // bench (never instantiated, so no scene instance or ZDO refers to them) and would otherwise pile up.
+            Release(BogHook); Release(Javelineer); Release(Slag); Release(Marrow);
             BogHook = BuildOne(scene, KitCreatures.BogHook);
             Javelineer = BuildOne(scene, KitCreatures.Javelineer);
             Slag = BuildOne(scene, KitCreatures.SlagCharred);
@@ -35,6 +38,11 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Adapters.Kit
             if (Javelineer != null) StandIns.Add(Javelineer, KitCreatures.Fuling);
             if (Marrow != null) StandIns.Add(Marrow, KitCreatures.DeepNorthSkeleton);
             KitSpawns.Refresh();
+        }
+
+        private static void Release(GameObject? copy)
+        {
+            if (copy != null) UnityEngine.Object.Destroy(copy);
         }
 
         private static void EnsureRpc()
