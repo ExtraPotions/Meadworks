@@ -208,6 +208,7 @@ internal static partial class CreatureModifierManager
     private const float BlinkDefaultCooldown = 6f;
     private const float BlinkDefaultMaxRange = 16f;
     private const string BlinkDefaultStartEffect = "fx_Adrenaline1";
+    private const float LocalEffectLife = 10f;
     private const float KnockbackDefaultPower = 150f;
     private const float KnockbackDefaultCooldown = 5f;
     private const float BlamerDefaultKarmaPerSecond = 1f;
@@ -4759,7 +4760,7 @@ internal static partial class CreatureModifierManager
             GameObject prefab = ZNetScene.instance.GetPrefab(prefabName);
             if (prefab != null)
             {
-                GameObject effect = UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
+                GameObject effect = SpawnLocalEffect(prefab, position, Quaternion.identity);
                 if (parent != null)
                 {
                     effect.transform.SetParent(parent, true);
@@ -4804,7 +4805,7 @@ internal static partial class CreatureModifierManager
             GameObject prefab = ZNetScene.instance.GetPrefab(prefabName);
             if (prefab != null)
             {
-                UnityEngine.Object.Instantiate(prefab, position, rotation);
+                SpawnLocalEffect(prefab, position, rotation);
             }
         }
     }
@@ -4819,7 +4820,7 @@ internal static partial class CreatureModifierManager
         GameObject prefab = ZNetScene.instance.GetPrefab(prefabName);
         if (prefab != null)
         {
-            UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
+            SpawnLocalEffect(prefab, position, Quaternion.identity);
         }
     }
 
@@ -4896,6 +4897,43 @@ internal static partial class CreatureModifierManager
         }
     }
 
+    // Every peer in range plays these effects itself (a broadcast RPC), so each copy is local-only, made the way the game
+    // makes its own local copies: with network views disabled. The prefabs are networked (ZNetView, TimedDestruction). A
+    // registered copy would make a ZDO that every other peer also draws, and the Vortex copy, parented to its target,
+    // would be destroyed with the target while its view stayed in ZNetScene, which then throws in RemoveObjects every
+    // frame. fx_StaffShield_Hit and fx_StaffShield_Break wait for a status effect to start their timer, so it is started
+    // here; anything without a timer goes after LocalEffectLife.
+    private static GameObject SpawnLocalEffect(GameObject prefab, Vector3 position, Quaternion rotation)
+    {
+        GameObject effect;
+        bool was = ZNetView.m_forceDisableInit;
+        ZNetView.m_forceDisableInit = true;
+        try
+        {
+            effect = UnityEngine.Object.Instantiate(prefab, position, rotation);
+        }
+        finally
+        {
+            ZNetView.m_forceDisableInit = was;
+        }
+
+        TimedDestruction[] timers = effect.GetComponentsInChildren<TimedDestruction>(true);
+        foreach (TimedDestruction timer in timers)
+        {
+            if (!timer.m_triggerOnAwake)
+            {
+                timer.Trigger();
+            }
+        }
+
+        if (effect.GetComponent<TimedDestruction>() == null)
+        {
+            UnityEngine.Object.Destroy(effect, LocalEffectLife);
+        }
+
+        return effect;
+    }
+
     private static void PlayConfiguredEffectsLocal(
         Vector3 position,
         string prefabNames,
@@ -4924,7 +4962,7 @@ internal static partial class CreatureModifierManager
             GameObject prefab = ZNetScene.instance.GetPrefab(prefabName);
             if (prefab != null)
             {
-                UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
+                SpawnLocalEffect(prefab, position, Quaternion.identity);
                 continue;
             }
 

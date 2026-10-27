@@ -84,7 +84,10 @@ namespace ExtraPotions.Wildblood.Runtime {
             var old=journal.Find(plan.EventRoot);
             if(old!=null)return old.Metadata.SequenceEqual(plan.Encode())?participant.Status(plan.EventRoot):InventoryDecision.Rejected;
             if(journal.Snapshot().Any(r=>participant.IsHeld(r.Source)))return InventoryDecision.Rejected;
-            var before=NativeTheftInventory.Bytes(chest.GetInventory());var shadow=NativeTheftInventory.Read(before);
+            if(NativeTheftInventory.SettleDurability(chest.GetInventory()))chest.Save();
+            var before=NativeTheftInventory.Bytes(chest.GetInventory());Inventory shadow;
+            try{shadow=NativeTheftInventory.Read(before);}
+            catch(InvalidDataException error){Plugin.NativeLogger?.LogWarning("Wildblood raid stake refused, nothing reserved: "+error.Message);return InventoryDecision.Rejected;}
             int remaining=plan.Stake;
             foreach(var item in shadow.GetAllItems().Where(i=>i.m_dropPrefab&&i.m_dropPrefab.name=="Coins").OrderBy(i=>i.m_gridPos.y).ThenBy(i=>i.m_gridPos.x).ToList()){
                 if(item.m_stack<1)throw new InvalidDataException("Invalid coin stack.");

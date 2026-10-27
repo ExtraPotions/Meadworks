@@ -390,6 +390,7 @@ internal static class NativeSummonDelivery
                 var prefab = ZNetScene.instance.GetPrefab(claim.Prefab);
                 var itemDrop = prefab ? prefab.GetComponent<ItemDrop>() : null;
                 if (!itemDrop) return;
+                NativeTheftInventory.SettleDurability(inventory);
                 byte[] before = NativeTheftInventory.Bytes(inventory);
                 var shadow = NativeTheftInventory.Read(before);
                 var item = itemDrop.m_itemData.Clone(); item.m_dropPrefab = prefab; item.m_stack = claim.Amount; item.m_worldLevel = claim.WorldLevel;
@@ -434,6 +435,7 @@ internal static class NativeSummonDelivery
                 if (NativeSummonPayment.Held(inventory) || NativeRaidChest.Held(inventory) || TheftTransfers.RawHeld(inventory)
                     || TheftInventoryGuards.ForeignHeld(inventory, true)) return;
                 var item = ReadOffering(drop.m_nview.GetZDO(), out _);
+                NativeTheftInventory.SettleDurability(inventory);
                 byte[] before = NativeTheftInventory.Bytes(inventory);
                 var shadow = NativeTheftInventory.Read(before);
                 if (!AddComplete(Player.m_localPlayer, inventory, shadow, item)

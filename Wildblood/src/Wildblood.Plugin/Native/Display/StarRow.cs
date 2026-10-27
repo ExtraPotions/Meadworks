@@ -67,7 +67,7 @@ namespace ExtraPotions.Wildblood.Adopted.Display
         }
 
         private void Start() => Guard.Run("StarRow.Start", Build);
-        private void Update() => Guard.Run("StarRow.Update", Build);
+        private void Update() => Guard.Run("StarRow.Update", static self => self.Build(), this);
         private void Clear()
         {
             foreach (GameObject glyph in _glyphs) if (glyph != null) { glyph.SetActive(false); Destroy(glyph); }

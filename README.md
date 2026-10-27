@@ -33,7 +33,7 @@ Crucible is the shared library every product requires. The Meadworks modpack dep
 | [Threshold](Threshold/) | 0.3.10 | Meadworks portals: pick any portal from a list and the map, named hubs, access modes, favorites, optional fuel, quick jumps and sea gates for ships (off by default). Required on all peers. |
 | [Timber](Timber/) | 0.2.2 | Meadworks building: build camera, flooring options and area repair, with server-controlled cheats. Required on all peers. |
 | [Wayfarer](Wayfarer/) | 0.5.13 | Meadworks map travel: Back to Bed for everyone, plus Stones, Anywhere, Boat, Grave and Player travel cheats the server switches on, usable by admins unless the server allows others. Required on all peers. |
-| [Wildblood](Wildblood/) | 0.5.9 | Meadworks wild creatures: difficulty and stars that grow with the world, mutations and modifiers, boss aspects, loot rules and bad-luck protection. Required on all peers. |
+| [Wildblood](Wildblood/) | 0.5.10 | Meadworks wild creatures: difficulty and stars that grow with the world, mutations and modifiers, boss aspects, loot rules and bad-luck protection. Required on all peers. |
 | [Wildroot](Wildroot/) | 0.1.21 | Meadworks gardening: grid planting, snapping, bulk harvest, replanting, a Farming skill with perks, seed crafting and more plantable flora. Required on all peers. |
 
 ## Building
@@ -47,10 +47,10 @@ states otherwise; original artwork and documentation are CC BY-NC-SA 4.0. Adapte
 in the folder's `THIRD_PARTY_NOTICES/`.
 
 
-<!-- release-8.11-artifacts:start -->
-## MeadWorks 8.11
+<!-- release-8.12-artifacts:start -->
+## MeadWorks 8.12
 
-[Release 8.11](https://github.com/ExtraPotions/Meadworks/releases/tag/release-8.11) · [Wildblood 0.5.9](https://github.com/ExtraPotions/Meadworks/releases/download/release-8.11/expDARE-Wildblood-0.5.9.zip) · [Wildblood 0.5.9 source](https://github.com/ExtraPotions/Meadworks/releases/download/release-8.11/expDARE-Wildblood-0.5.9-source.zip) · [SHA256 sums](https://github.com/ExtraPotions/Meadworks/releases/download/release-8.11/SHA256SUMS.txt)
+[Release 8.12](https://github.com/ExtraPotions/Meadworks/releases/tag/release-8.12) · [Wildblood 0.5.10](https://github.com/ExtraPotions/Meadworks/releases/download/release-8.12/expDARE-Wildblood-0.5.10.zip) · [Wildblood 0.5.10 source](https://github.com/ExtraPotions/Meadworks/releases/download/release-8.12/expDARE-Wildblood-0.5.10-source.zip) · [SHA256 sums](https://github.com/ExtraPotions/Meadworks/releases/download/release-8.12/SHA256SUMS.txt)
 
-Wildblood 0.5.9 hotfix: boss altars take offerings again when the player wears gear. Update the host and every client. The other 26 packages keep their exact 8.10 archives; the 8.10 installer remains the current full-suite installer until the 8.11 installer is attached.
-<!-- release-8.11-artifacts:end -->
+Wildblood 0.5.10 hotfix: a creature's theft no longer locks the inventory of a player wearing gear. Update the host and every client. The other 26 packages keep their exact 8.10 archives; the 8.10 installer remains the current full-suite installer until a newer installer is attached.
+<!-- release-8.12-artifacts:end -->

@@ -121,7 +121,7 @@ internal static class NativeSummonPayment
             {
                 if (journal.Snapshot().Count != 0 || !journal.CanAdmit || receiptExists) return false;
                 imaging = true;
-                SettleDurability(inventory);
+                NativeTheftInventory.SettleDurability(inventory);
                 byte[] before = NativeTheftInventory.Bytes(inventory);
                 var shadow = NativeTheftInventory.Read(before);
                 int remaining = amount;
@@ -197,23 +197,6 @@ internal static class NativeSummonPayment
         if (warned.Count >= 256) warned.Clear();
         warned[key] = Time.unscaledTime + 60f;
         Plugin.NativeLogger?.LogWarning(text);
-    }
-
-    // A native save stores durability as whole hundredths and a load multiplies them by 0.01f, so a worn item can
-    // come back one hundredth lower and its image never round-trips. Apply that same save/load step now; the item
-    // keeps the value its next character save and load would give it, and the exact round-trip check stays strict.
-    static void SettleDurability(Inventory inventory)
-    {
-        foreach (var item in inventory.GetAllItems())
-        {
-            if (float.IsNaN(item.m_durability) || float.IsInfinity(item.m_durability)) continue;
-            for (int step = 0; step < 16; step++)
-            {
-                int previous = BitConverter.SingleToInt32Bits(item.m_durability);
-                item.m_durability = (int)(item.m_durability * 100f) * 0.01f;
-                if (BitConverter.SingleToInt32Bits(item.m_durability) == previous) break;
-            }
-        }
     }
 
     static bool Matches(byte[] metadata, string source, ZDOID altar, string prefab, int amount)

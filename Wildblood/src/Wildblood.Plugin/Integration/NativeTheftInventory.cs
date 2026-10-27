@@ -24,6 +24,23 @@ namespace ExtraPotions.Wildblood.Runtime {
             &&player.m_nview&&player.m_nview.IsValid()&&player.m_nview.IsOwner()&&ZNet.instance&&ZNet.instance.GetWorldUID()==world;
         public bool IsBound(string source)=>Current&&bindings.ContainsKey(source)&&SameShape(Read(bindings[source].Before),player.GetInventory());
         internal static byte[] Bytes(Inventory inventory){var packet=new ZPackage();packet.Write(1);packet.Write(inventory.GetWidth());packet.Write(inventory.GetHeight());var body=new ZPackage();inventory.Save(body);packet.Write(body.GetArray());return packet.GetArray();}
+        // A native save stores durability as whole hundredths and a load multiplies them by 0.01f, so a worn item can
+        // come back one hundredth lower and its image never round-trips. Apply that same save/load step before imaging;
+        // the item keeps the value its next character save and load would give it, and the exact round-trip check stays strict.
+        internal static bool SettleDurability(Inventory inventory){
+            bool changed=false;
+            foreach(var item in inventory.GetAllItems()){
+                if(float.IsNaN(item.m_durability)||float.IsInfinity(item.m_durability))continue;
+                int original=BitConverter.SingleToInt32Bits(item.m_durability);
+                for(int step=0;step<16;step++){
+                    int previous=BitConverter.SingleToInt32Bits(item.m_durability);
+                    item.m_durability=(int)(item.m_durability*100f)*0.01f;
+                    if(BitConverter.SingleToInt32Bits(item.m_durability)==previous)break;
+                }
+                changed|=BitConverter.SingleToInt32Bits(item.m_durability)!=original;
+            }
+            return changed;
+        }
         internal static Inventory Read(byte[] bytes){
             if(bytes==null||bytes.Length>2096128)throw new InvalidDataException("Delivery inventory image bound.");
             var packet=new ZPackage(bytes);if(packet.ReadInt()!=1)throw new InvalidDataException("Delivery inventory version.");

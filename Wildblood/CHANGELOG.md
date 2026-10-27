@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.10 (2026-10-26)
+
+- Version 0.5.10. Requires Crucible 0.3.33.
+- A creature's theft no longer locks the player's inventory until logout when the player carries worn gear. The theft is skipped if the inventory still cannot be copied safely, and a refund that cannot be prepared yet is retried every few seconds instead of holding the inventory.
+- Boss refunds and raid chest stakes work with worn gear: durability is rounded the way a character save rounds it before the items are checked, and a raid chest that still cannot be staked is refused before anything is held.
+- Creature modifier effects are made locally on each peer, and the game recovers if an effect object was destroyed out of turn. This ends the NullReferenceException logged every frame and the lag it caused. Star rows and elite creatures no longer allocate every frame.
+- A creature is never slowed below its vanilla run speed; the run-speed cap applies only to speed Wildblood added. Creatures rolled where no terrain is loaded take their biome from world generation instead of keeping default Meadows rules.
+
 ## 0.5.9 (2026-10-26)
 
 - Version 0.5.9. Requires Crucible 0.3.33.

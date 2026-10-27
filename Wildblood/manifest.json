@@ -1,6 +1,6 @@
 {
   "name": "Wildblood",
-  "version_number": "0.5.9",
+  "version_number": "0.5.10",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Wildblood",
   "description": "Meadworks wild creatures: difficulty and stars that grow with the world, mutations and modifiers, boss aspects, loot rules and bad-luck protection. Required on all peers.",
   "dependencies": [

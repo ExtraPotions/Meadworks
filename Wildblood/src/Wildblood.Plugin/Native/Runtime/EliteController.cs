@@ -81,7 +81,7 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
         // It also runs while a disguised creature (a dormant Elite Creatures Pack mimic) waits to be dressed, and dresses it once it wakes.
         private void Update()
         {
-            Guard.Run("EliteController.Lifecycle", RefreshLifecycle);
+            Guard.Run("EliteController.Lifecycle", static self => self.RefreshLifecycle(), this);
             if (!RuntimeAvailable) return;
             if (_pending)
             {
@@ -90,7 +90,7 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
             else if (_dressPending && !Disguise.Holds(_character))
             {
                 _dressPending = false;
-                Guard.Run("EliteController.Dress", Dress);
+                Guard.Run("EliteController.Dress", static self => self.Dress(), this);
             }
         }
 
@@ -199,6 +199,8 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
         private void RollFresh(ZDO zdo)
         {
             Heightmap.Biome biome = _forced != null ? _forcedBiome : Heightmap.FindBiome(_character.transform.position);
+            if (_forced == null && biome == Heightmap.Biome.None && WorldGenerator.instance != null)
+                biome = WorldGenerator.instance.GetBiome(_character.transform.position);
             CreatureTraits fresh = _forced ?? RollFor(biome);
             // Only the two approved legacy merges survive a fresh ECR roll; birth blobs are already resolved and never enter here.
             int merged = ExtraPotions.Wildblood.Traits.Mutations.Bit(ExtraPotions.Wildblood.Traits.Mutation.Blinking)
@@ -358,12 +360,14 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
             if (ExtraPotions.Wildblood.Traits.SwiftMovement.NeedsReapply(_swiftBonus, current)) RefreshMovement(_devourBonus);
         }
 
-        /// <summary>No creature may outrun an unburdened player, however the multipliers land; clamp and log, not obey.</summary>
+        /// <summary>Wildblood's speed bonus never lets a creature outrun an unburdened player; a creature whose vanilla run
+        /// speed is already faster keeps it (the cap never slows it below vanilla). Clamp and log, not obey.</summary>
         private float ClampToPlayer(float factor)
         {
             float baseRun = _baseSpeeds.RunSpeed;
             float cap = PlayerSpeed.Reference();
-            if (baseRun <= 0f || baseRun * factor <= cap)
+            float capped = ExtraPotions.Wildblood.Traits.MovementCap.Factor(baseRun, factor, cap);
+            if (capped >= factor)
             {
                 return factor;
             }
@@ -372,7 +376,7 @@ namespace ExtraPotions.Wildblood.Adopted.Runtime
                 _movementClamped = true;
                 Log.Info($"{name}: run speed clamped to the player's ({cap:0.#}) so it stays outrunnable");
             }
-            return cap / baseRun;
+            return capped;
         }
 
         /// <summary>Re-derives maximum health from the current traits and accumulated Devouring, on the owner.</summary>

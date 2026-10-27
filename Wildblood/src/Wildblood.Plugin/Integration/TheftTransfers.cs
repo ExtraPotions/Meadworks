@@ -56,6 +56,8 @@ internal static partial class TheftTransfers
     static Player? player;
     static long world,actor;
     static bool held,fault,opening,waiting;
+    const double SettlementRetrySeconds=5;
+    static double settlementRetryAt;
     static double nextWarning,nextTick;
     static bool OwnerCurrent => Plugin.Ready && CruciblePlugin.Session.AuthorityReady && CruciblePlugin.Session.WorldId!=0
         && ZNet.instance!=null && ZNet.m_world!=null && ZNet.instance.GetWorldUID()==CruciblePlugin.Session.WorldId
@@ -118,7 +120,9 @@ internal static partial class TheftTransfers
             ||source.GetZDO().GetOwner()!=owner||owner==0||!ThievingRpc.CanSend(source)||!inventory.ContainsItem(item)) return 0;
         Tick(true);
         if(fault||held||ledger.Incomplete.Count!=0||ledger.All.Any(i=>!verified.Contains(i.Root))) return 0;
+        bool imaging=true;
         try {
+            NativeTheftInventory.SettleDurability(inventory);
             byte[] before=NativeTheftInventory.Bytes(inventory);
             var copy=NativeTheftInventory.Read(before);
             var stolen=copy.GetItemAt(item.m_gridPos.x,item.m_gridPos.y);
@@ -136,6 +140,7 @@ internal static partial class TheftTransfers
             // Last admission check precedes the durable intent; a changed native source is never overwritten.
             if(!OwnerCurrent||!WildbloodInventory.Current(player!,inventory)||TheftInventoryGuards.ForeignHeld(inventory,true)
                 ||!before.SequenceEqual(NativeTheftInventory.Bytes(inventory))||source.GetZDO().GetOwner()!=owner) return 0;
+            imaging=false;
             var intent=ledger.Admit(request,before,after);
             held=waiting=true;
             var state=ledger.CommitDebit(intent,Store);
@@ -147,7 +152,11 @@ internal static partial class TheftTransfers
                 Ask=TheftWire.EncodeAsk(request.Root,counter,request.Fingerprint,exactItem,sentAt)};
             return counter; // Native profile receipt has been saved before the existing ask is allowed.
         }
-        catch(Exception error){fault=true;Warn("Wildblood theft debit retained for recovery: "+error.GetType().Name);return 0;}
+        catch(Exception error){
+            // Imaging only reads: nothing was admitted or taken, so the theft is skipped and the inventory stays usable.
+            if(imaging&&error is InvalidDataException){Warn("Wildblood theft skipped, nothing taken: "+error.Message);return 0;}
+            fault=true;Warn("Wildblood theft debit retained for recovery: "+error.GetType().Name);return 0;
+        }
     }
     /// <summary>The v2 ask bytes for a held counter, or null when nothing may be sent.</summary>
     internal static byte[]? AskBytes(int counter)=>pending.TryGetValue(counter,out var request)?request.Ask:null;
@@ -288,6 +297,8 @@ internal static partial class TheftTransfers
     static bool PrepareSettlement(TheftIntent intent)
     {
         var inventory=player!.GetInventory();
+        if(UnityEngine.Time.realtimeSinceStartupAsDouble<settlementRetryAt)return false;
+        NativeTheftInventory.SettleDurability(inventory);
         byte[] before=NativeTheftInventory.Bytes(inventory),after=before;
         if(ledger!.Outcome(intent).Disposition==TheftDisposition.Denied) {
             var original=NativeTheftInventory.Read(intent.Record.Before);
@@ -297,7 +308,12 @@ internal static partial class TheftTransfers
             if(TheftMetadata.Hash(packet.GetArray())!=intent.Request.Fingerprint)throw new InvalidDataException("Original theft item changed.");
             if(!WildbloodInventory.TryProtected(player,inventory,out var protectedCells)
                 ||!PackPanelGrid.TryMainRows(player,out int mainRows))return false;
-            var copy=NativeTheftInventory.Read(before);
+            Inventory copy;
+            try{copy=NativeTheftInventory.Read(before);}
+            catch(InvalidDataException error){
+                settlementRetryAt=UnityEngine.Time.realtimeSinceStartupAsDouble+SettlementRetrySeconds;
+                Warn("Wildblood theft refund waits; the inventory image cannot round-trip: "+error.Message);return false;
+            }
             Vector2i target=new(intent.Request.X,intent.Request.Y);
             bool Free(Vector2i cell)=>cell.x>=0&&cell.x<copy.GetWidth()&&cell.y>=0&&cell.y<copy.GetHeight()
                 &&cell.y<mainRows&&!protectedCells.Contains(cell)&&copy.GetItemAt(cell.x,cell.y)==null;
@@ -337,6 +353,6 @@ internal static partial class TheftTransfers
     }
     internal static void Reset()
     {
-        ledger?.Dispose();ledger=null;stores.Clear();pending.Clear();verified.Clear();asked.Clear();nextProbe.Clear();player=null;world=actor=0;held=fault=opening=waiting=false;nextTick=0;
+        ledger?.Dispose();ledger=null;stores.Clear();pending.Clear();verified.Clear();asked.Clear();nextProbe.Clear();player=null;world=actor=0;held=fault=opening=waiting=false;nextTick=0;settlementRetryAt=0;
     }
 }
