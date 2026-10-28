@@ -1,6 +1,6 @@
 {
   "name": "Wayfarer",
-  "version_number": "0.5.13",
+  "version_number": "0.5.14",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Wayfarer",
   "description": "Meadworks map travel: Back to Bed for everyone, plus Stones, Anywhere, Boat, Grave and Player travel cheats the server switches on, usable by admins unless the server allows others. Required on all peers.",
   "dependencies": [

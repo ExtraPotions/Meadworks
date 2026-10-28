@@ -11,11 +11,16 @@ namespace ExtraPotions.Barter.Runtime
     internal static class SafeTradeInventory
     {
         private static readonly Dictionary<Inventory, List<Delta>> unresolved = new Dictionary<Inventory, List<Delta>>();
+        private static readonly HashSet<Inventory> recovering = new HashSet<Inventory>();
         private const int RecoveryLimit = 64;
         private static PendingAdd adding;
 
-        internal static bool IsBlocked(Inventory inventory) => inventory != null &&
-            (unresolved.ContainsKey(inventory) || unresolved.Count >= RecoveryLimit);
+        internal static bool IsBlocked(Inventory inventory)
+        {
+            if (inventory == null) return false;
+            Recover(inventory);
+            return unresolved.ContainsKey(inventory) || unresolved.Count >= RecoveryLimit;
+        }
 
         private sealed class PendingAdd
         {
@@ -42,6 +47,22 @@ namespace ExtraPotions.Barter.Runtime
             unresolved.TryGetValue(inventory, out var pending)
                 ? pending.Where(delta => !delta.Added && delta.Amount > 0).Select(delta => new Take(delta.Item, delta.Amount)).ToArray()
                 : Array.Empty<Take>();
+
+        internal static bool Recover(Inventory inventory)
+        {
+            if (inventory == null || !unresolved.TryGetValue(inventory, out var deltas)) return true;
+            if (!recovering.Add(inventory)) return false;
+            try
+            {
+                if (Restored(deltas) || Rollback(inventory, deltas) == ExchangeResult.RolledBack)
+                {
+                    unresolved.Remove(inventory);
+                    return true;
+                }
+                return false;
+            }
+            finally { recovering.Remove(inventory); }
+        }
 
         internal readonly struct Take
         {
@@ -217,6 +238,7 @@ namespace ExtraPotions.Barter.Runtime
                 }
                 foreach (var delta in deltas.Where(d => d.Added).Reverse())
                 {
+                    if (delta.Amount == 0) continue;
                     if (!inventory.ContainsItem(delta.Item) || delta.Item.m_stack < delta.Amount)
                         return KeepUnresolved(inventory, deltas);
                     delta.Item.m_stack -= delta.Amount;
@@ -225,6 +247,7 @@ namespace ExtraPotions.Barter.Runtime
                 }
                 foreach (var delta in deltas.Where(d => !d.Added).Reverse())
                 {
+                    if (delta.Amount == 0) continue;
                     if (inventory.ContainsItem(delta.Item)) delta.Item.m_stack += delta.Amount;
                     else
                     {
@@ -255,5 +278,8 @@ namespace ExtraPotions.Barter.Runtime
             unresolved[inventory] = deltas;
             return ExchangeResult.Unresolved;
         }
+
+        private static bool Restored(IEnumerable<Delta> deltas) =>
+            deltas.All(delta => !delta.Repaired && delta.Amount == 0);
     }
 }

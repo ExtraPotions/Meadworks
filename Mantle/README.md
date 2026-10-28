@@ -1,12 +1,12 @@
-## Changes in 0.1.32
+## Changes in 0.1.33
 
-- Tacklebox and pop-up counts are written only when they change.
-- Requirement spacing does no work while the inventory is hidden.
-- When another mod leaves the trinket data invalid, the warning appears once per item database and the check retries every 30 seconds instead of every quarter second.
+- Take All from a tombstone or another container moves only the amount that reached the destination, including partial stack space.
+- Backpacks and tackleboxes returning from a tombstone now leave the source copy in place unless the item reaches its reserved slot.
+- If Mantle adds items to your inventory but cannot remove the full amount from the tombstone or container, it removes only the extra items it just added and leaves other inventory changes alone.
 
 # Mantle
 
-Version 0.1.32. Requires Crucible 0.3.34 / Crucible.UI 0.3.23. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.33. Requires Crucible 0.3.34 / Crucible.UI 0.3.23. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 A configurable inventory grid, dedicated gear slots, and wearable backpacks.
 
@@ -48,7 +48,7 @@ A configurable inventory grid, dedicated gear slots, and wearable backpacks.
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.34 or a later 0.3.x, which includes Crucible.UI 0.3.23 (the shared Meadworks interface kit)
 
 ## Installation
 

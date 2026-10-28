@@ -1,6 +1,10 @@
+## Changes in 0.1.16
+
+- Ban, unban, temporary-ban and warning commands now report a ledger save failure instead of confirming success. The live server action may already have happened.
+
 # Thing
 
-Version 0.1.15. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Server administration and moderation from inside the game, checked against the server's own admin list.
 

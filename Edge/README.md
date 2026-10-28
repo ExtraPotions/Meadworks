@@ -1,12 +1,17 @@
+## Changes in 0.2.14
+
+- Edge starts with its built-in combat rules if it cannot create or read its rule folder.
+- If Edge cannot remove all extra ammunition for an overcharged bomb, it restores any ammunition already removed, cancels the attack and removes the projectiles it spawned.
+
 # Edge
 
-Version 0.2.13. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.14. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Combat additions: a secondary attack for every weapon family, a quickstep, swings that hit on slopes, and weapons back in hand after a swim.
 
 ## Features
 
-- Secondary attacks for every weapon family, such as barrages, sentinels, boomerang axes, spear rain and launch slams. Bows, crossbows, staves and bombs each have a preset setting; melee secondaries come from the melee rules file.
+- Secondary attacks for every weapon family, such as barrages, sentinels, boomerang axes, spear rain and launch slams. Bows, crossbows, staves and bombs each have a preset setting; melee secondaries come from the melee rules file. An overcharged bomb is canceled if its exact extra-ammunition cost cannot be confirmed.
 - Cooldown and charge HUD, secondary names in weapon tooltips and key hints for keyboard and gamepad.
 - A "Secondary Attacks" entry in the Compendium (Texts/Lore) lists every secondary attack with its description.
 - Quickstep: a short dash for knives and Unarmed-skill weapons.

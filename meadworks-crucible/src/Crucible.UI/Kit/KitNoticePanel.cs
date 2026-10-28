@@ -63,14 +63,14 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         {
             if (StackedNotices != null || config == null) return;
             StackedNotices = MeadworksConfig.Bind(config, "Notices", "Stacked Notices", true,
-                "Show MeadWorks notices in a stack. Off uses the game's own message. Local to this player, drawn by Crucible UI, and the server does not override it. Takes effect at once.");
+                "Show MeadWorks notices in a stack. Off uses the game's own message. Local to this player, drawn by Crucible UI, and the server does not override it. Takes effect at once. Crucible.UI owns this local player setting.");
             Position = MeadworksConfig.Bind(config, "Notices", "Position", KitNoticeCorner.TopLeft,
-                "Corner of the screen for the MeadWorks notice stack: TopLeft, TopRight, BottomLeft or BottomRight. The stack stays clear of the compass and the status effect row. Local to this player. Takes effect at once.");
+                "Corner of the screen for the MeadWorks notice stack: TopLeft, TopRight, BottomLeft or BottomRight. The stack stays clear of the compass and the Active effects row. Local to this player. Takes effect at once. Crucible.UI owns this local player setting.");
             DurationSetting = MeadworksConfig.Bind(config, "Notices", "Duration", KitNoticeStack.DefaultDuration,
-                new ConfigDescription("How long each MeadWorks notice stays, in seconds. The same notice again restarts this time and raises its count. Local to this player. Applies to the next notice.",
+                new ConfigDescription("How long each MeadWorks notice stays, in seconds. The same notice again restarts this time and raises its count. Local to this player. Applies to the next notice. Crucible.UI owns this local player setting.",
                     new AcceptableValueRange<float>(KitNoticeStack.MinDuration, KitNoticeStack.MaxDuration)));
             MaximumVisible = MeadworksConfig.Bind(config, "Notices", "Maximum Visible", KitNoticeStack.DefaultMaxVisible,
-                new ConfigDescription("How many MeadWorks notices show at once. The newest sits at the top. Further notices wait until a space opens. Local to this player. Takes effect at once.",
+                new ConfigDescription("How many MeadWorks notices show at once. The newest sits at the top. Further notices wait until a space opens. Local to this player. Takes effect at once. Crucible.UI owns this local player setting.",
                     new AcceptableValueRange<int>(KitNoticeStack.MinVisible, KitNoticeStack.MaxVisibleLimit)));
             StackedNotices.SettingChanged += SettingChanged;
             Position.SettingChanged += SettingChanged;

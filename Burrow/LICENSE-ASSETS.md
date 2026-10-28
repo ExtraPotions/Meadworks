@@ -8,5 +8,5 @@ Official license: https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 Complete terms are included in `licenses/CC-BY-NC-SA-4.0.txt`. Provide appropriate attribution, indicate modifications, use only for noncommercial purposes and license adapted material under the required compatible terms. The unmodified license terms govern.
 
-The current 256 x 256 icon is the approved Meadworks Burrow artwork (SHA256 39E8EB7B53BA9F0B117B107DB30137E8905E076F1BD82FA53F204FEC7F7D67EB). Third-party trademarks and retained license/source notices keep their applicable rights and are outside this original-artwork grant.
+The package `icon.png` is original MeadWorks artwork created on 2026-10-28 with an AI image tool from MeadWorks' own prompts in `validation/postrelease-execution-20261026/icons-codex-1/prompts.json`; the user approved it on 2026-10-28. It is a 256 x 256 PNG with SHA256 `A772C0006D120EBAD156B65A0B0070BB50AE4990356ACDE66F5C6A286622CC72` under this repository's existing original-artwork license, CC BY-NC-SA 4.0. Third-party trademarks and retained license/source notices keep their applicable rights and remain outside this original-artwork grant.
 

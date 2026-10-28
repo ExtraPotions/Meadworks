@@ -1,3 +1,7 @@
+## 0.1.6 (2026-10-28)
+
+- If a trade rollback cannot return every coin or item immediately, Barter keeps the remaining amounts pending and retries them when that inventory changes or another trade checks it.
+
 ## 0.1.5 (2026-10-26)
 
 - A host world saved before Barter was added gets a new authority key automatically when its Barter folder is empty, with one warning in the log. Any leftover authority file still requires the explicit reset and is never replaced.

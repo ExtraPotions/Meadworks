@@ -1,10 +1,10 @@
-## Changes in 0.1.15
+## Changes in 0.1.16
 
-- Guard world object creation, removal and nearby queries when scene or world-object services are unavailable.
+- Delve now replaces an existing world file in one step, so an interrupted replacement leaves the previous file intact. On the first save, Delve loads the temporary file on the next start if the main file was not created.
 
 # Delve
 
-Version 0.1.15. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.16. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Sets dungeon sizes and brings back loot, resources, the Queen and cleared creatures on timers you choose.
 

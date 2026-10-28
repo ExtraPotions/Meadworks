@@ -1,3 +1,9 @@
+## 0.1.27 (2026-10-28)
+
+- If a nearby-chest salvage drop returns without creating an item, Kindle keeps that reward for another attempt. If the drop call throws after it may have created the item, Kindle marks the reward complete to avoid a duplicate.
+- A damaged salvage recovery record is set aside, with its data kept, so salvage keeps working.
+- The crafting panel no longer reads the language setting on every frame, a small saving whenever the inventory is open.
+
 ## 0.1.26 (2026-10-26)
 
 - The Craft button caption is written only when it changes.

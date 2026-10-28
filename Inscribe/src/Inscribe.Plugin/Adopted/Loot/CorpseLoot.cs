@@ -29,6 +29,7 @@ namespace ExtraPotions.Inscribe.Adopted.Loot
 
         private static readonly List<ItemDrop.ItemData> Held = new List<ItemDrop.ItemData>();
         private static bool _open;
+        private static bool _spawnExceptionWarned;
         private static Vector3 _center;
 
         /// <summary>Opens the window for one death; <paramref name="center"/> is where held items drop if no ragdoll takes them.</summary>
@@ -59,7 +60,16 @@ namespace ExtraPotions.Inscribe.Adopted.Loot
             {
                 return;
             }
-            ragdoll.m_nview.GetZDO().Set(KeyHash, Encode(Held));
+            ZDO zdo = ragdoll.m_nview.GetZDO();
+            byte[] payload = Encode(Held);
+            try
+            {
+                zdo.Set(KeyHash, payload);
+            }
+            catch
+            {
+                if (!Same(zdo.GetByteArray(KeyHash), payload)) throw;
+            }
             Held.Clear();
         }
 
@@ -71,14 +81,32 @@ namespace ExtraPotions.Inscribe.Adopted.Loot
                 return;
             }
             _open = false;
-            foreach (ItemDrop.ItemData item in Held)
-            {
-                LootSpawner.Drop(item, item.m_stack, _center);
-            }
+            // Each item is attempted on its own, so one failure never discards the rest. An exception from the game's
+            // drop call counts as spawned (no retry); a refusal means the item's prefab is missing, and with no ragdoll
+            // there is nothing left to carry it.
+            List<ItemDrop.ItemData> items = new List<ItemDrop.ItemData>(Held);
             Held.Clear();
+            foreach (ItemDrop.ItemData item in items)
+            {
+                try
+                {
+                    if (!LootSpawner.Drop(item, item.m_stack, _center))
+                    {
+                        Log.Warn($"creature drop {item.m_dropPrefab?.name ?? item.m_shared?.m_name} could not be spawned");
+                    }
+                }
+                catch (Exception error)
+                {
+                    if (!_spawnExceptionWarned)
+                    {
+                        _spawnExceptionWarned = true;
+                        Log.Warn($"creature drop threw after spawn was requested; treating it as spawned: {error.GetType().Name}");
+                    }
+                }
+            }
         }
 
-        /// <summary>Spawns the items a dissolving ragdoll carries at the game's own loot spot for it, then clears them.</summary>
+        /// <summary>Spawns the items a dissolving ragdoll carries at the game's own loot spot, retaining refused drops for retry.</summary>
         public static void SpawnFrom(Ragdoll ragdoll, Vector3 center)
         {
             ZDO zdo = ragdoll.m_nview.GetZDO();
@@ -87,11 +115,43 @@ namespace ExtraPotions.Inscribe.Adopted.Loot
             {
                 return;
             }
-            zdo.Set(KeyHash, Array.Empty<byte>());   // once, even if the game's own spawn throws and the ragdoll retries
-            foreach (ItemDrop.ItemData item in Decode(data))
+            List<ItemDrop.ItemData> items = Decode(data);
+            for (int index = 0; index < items.Count; index++)
             {
-                LootSpawner.Drop(item, item.m_stack, center + Vector3.up * LootOffset);
+                ItemDrop.ItemData item = items[index];
+                bool spawned;
+                try
+                {
+                    spawned = LootSpawner.Drop(item, item.m_stack, center + Vector3.up * LootOffset);
+                }
+                catch (Exception error)
+                {
+                    spawned = true;
+                    if (!_spawnExceptionWarned)
+                    {
+                        _spawnExceptionWarned = true;
+                        Log.Warn($"corpse loot drop threw after spawn was requested; treating it as spawned: {error.GetType().Name}");
+                    }
+                }
+                if (!spawned)
+                {
+                    zdo.Set(KeyHash, Encode(items.GetRange(index, items.Count - index)));
+                    return;
+                }
+                zdo.Set(KeyHash, index + 1 < items.Count
+                    ? Encode(items.GetRange(index + 1, items.Count - index - 1))
+                    : Array.Empty<byte>());
             }
+        }
+
+        private static bool Same(byte[] left, byte[] right)
+        {
+            if (left == null || right == null || left.Length != right.Length) return false;
+            for (int index = 0; index < left.Length; index++)
+            {
+                if (left[index] != right[index]) return false;
+            }
+            return true;
         }
 
         private static byte[] Encode(List<ItemDrop.ItemData> items)

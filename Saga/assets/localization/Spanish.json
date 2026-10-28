@@ -556,6 +556,7 @@
     "crafting_makers_mark": "Marca del creador: hasta +{0}% de durabilidad en equipo fabricado",
     "crafting_sturdy_build": "Construcción sólida: hasta +{0}% de salud en piezas construidas con martillo",
     "crafting_thrifty": "Ahorro: hasta un {0}% de probabilidad de recuperar un material consumido",
+    "crafting_thrifty_saved": "Ahorro: recuperación de {0} × {1}",
     "crafting_journeyman": "Oficial: el banco de trabajo y la forja cuentan 1 nivel más para fabricación, mejoras y reparación",
     "crafting_journeyman_locked": "Oficial se desbloquea con Fabricación 75",
     "sneak_vanish": "Desvanecerse: agacharse en silencio durante 3 s sin enemigos cerca detiene la persecución",

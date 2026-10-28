@@ -556,6 +556,7 @@
     "crafting_makers_mark": "Maker's Mark: up to +{0}% durability on equipable crafted items",
     "crafting_sturdy_build": "Sturdy Build: up to +{0}% piece health on hammer constructions",
     "crafting_thrifty": "Thrifty: up to {0}% chance to refund a consumed crafting material",
+    "crafting_thrifty_saved": "Thrifty: refunded {0} × {1}",
     "crafting_journeyman": "Journeyman: workbench and forge count +1 level higher for crafting, upgrading, and repair",
     "crafting_journeyman_locked": "Journeyman unlocks at Crafting 75",
     "sneak_vanish": "Vanish: crouching quietly for 3 s without nearby foes breaks pursuit",

@@ -1,6 +1,10 @@
+## Changes in 0.3.12
+
+- After a portal trip starts, Threshold verifies the fuel removal. A fuel-removal error no longer prevents arrival protection from being set up.
+
 # Threshold
 
-Version 0.3.11. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.12. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Choose destinations from the integrated map/list, use a named-portal selector with an explicit Teleport action, or keep native tag pairing.
 

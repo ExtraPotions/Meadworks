@@ -57,6 +57,7 @@ namespace ExtraPotions.Keel.Runtime
         private static readonly Dictionary<KeelShip, Built> built = new Dictionary<KeelShip, Built>();
         private static readonly Dictionary<string, Built> byPrefab = new Dictionary<string, Built>(StringComparer.Ordinal);
         private static readonly Dictionary<string, float> vanillaSailForce = new Dictionary<string, float>(StringComparer.Ordinal);
+        private static readonly Dictionary<string, float> vanillaForwardDrag = new Dictionary<string, float>(StringComparer.Ordinal);
         private static readonly Dictionary<string, float> vanillaRudderSpeed = new Dictionary<string, float>(StringComparer.Ordinal);
         private static readonly Dictionary<ConfigEntryBase, KeelShip> watched = new Dictionary<ConfigEntryBase, KeelShip>();
         private static readonly HashSet<KeelShip> dirty = new HashSet<KeelShip>();
@@ -119,6 +120,11 @@ namespace ExtraPotions.Keel.Runtime
             if (byPrefab.TryGetValue(prefab ?? "", out var ship)) prefab = ship.Type.BaseHull;
             return vanillaSailForce.TryGetValue(prefab ?? "", out sailForce);
         }
+        public static bool TryVanillaForwardDrag(string prefab, out float forwardDrag)
+        {
+            if (byPrefab.TryGetValue(prefab ?? "", out var ship)) prefab = ship.Type.BaseHull;
+            return vanillaForwardDrag.TryGetValue(prefab ?? "", out forwardDrag);
+        }
         internal static bool TryVanillaRudderSpeed(string prefab, out float speed) => vanillaRudderSpeed.TryGetValue(prefab, out speed);
 
         /// <summary>Every frame: re-applies changed ships and refreshes the hammer when the session or settings change.</summary>
@@ -160,7 +166,12 @@ namespace ExtraPotions.Keel.Runtime
             foreach (var name in VanillaShips)
             {
                 var ship = PrefabManager.Instance.GetPrefab(name)?.GetComponent<Ship>();
-                if (ship != null) { vanillaSailForce[name] = ship.m_sailForceFactor; vanillaRudderSpeed[name] = ship.m_rudderSpeed; }
+                if (ship != null)
+                {
+                    vanillaSailForce[name] = ship.m_sailForceFactor;
+                    vanillaForwardDrag[name] = ship.m_dampingForward;
+                    vanillaRudderSpeed[name] = ship.m_rudderSpeed;
+                }
             }
             if (SteppedAside || Plugin.Settings == null) return;
             foreach (var type in ShipCatalog.All) Guard("clone " + type.Prefab, () => Create(type));

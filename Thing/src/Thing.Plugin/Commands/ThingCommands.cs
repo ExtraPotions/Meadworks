@@ -159,7 +159,11 @@ namespace ExtraPotions.Thing.Runtime
                 case ThingAction.Warn:
                     if (!target.HasValue) { yield return ThingText.Format(ThingTextKeys.CommandUnknownPlayer, parsed.Target); yield break; }
                     if (parsed.Action == ThingAction.Kick) ThingServer.Kick(target.Value, admin, parsed.Text);
-                    else ThingServer.Warn(target.Value, admin, parsed.Text);
+                    else if (!ThingServer.WarnWithPersistence(target.Value, admin, parsed.Text))
+                    {
+                        yield return PersistenceFailed(parsed.Action, target.Value.Actor);
+                        yield break;
+                    }
                     yield return Done(parsed.Action, target.Value.Actor);
                     yield break;
                 case ThingAction.Ban:
@@ -168,13 +172,15 @@ namespace ExtraPotions.Thing.Runtime
                         // Offline players are banned by platform ID only; a name never stands for an ID.
                         var actor = target?.Actor ?? (LooksLikeId(parsed.Target) ? new Actor(parsed.Target, "") : (Actor?)null);
                         if (!actor.HasValue) { yield return ThingText.Format(ThingTextKeys.CommandUnknownPlayer, parsed.Target); yield break; }
-                        ThingServer.Ban(actor.Value, target, admin, parsed.Text, parsed.Action == ThingAction.TempBan ? parsed.Duration : null);
-                        yield return Done(parsed.Action, actor.Value);
+                        var result = ThingServer.BanWithPersistence(actor.Value, target, admin, parsed.Text,
+                            parsed.Action == ThingAction.TempBan ? parsed.Duration : null);
+                        yield return result.Saved ? Done(parsed.Action, actor.Value) : PersistenceFailed(parsed.Action, actor.Value);
                         yield break;
                     }
                 case ThingAction.Unban:
-                    ThingServer.Unban(parsed.Target, admin);
-                    yield return Done(parsed.Action, new Actor(parsed.Target, ""));
+                    var unban = ThingServer.UnbanWithPersistence(parsed.Target, admin);
+                    yield return unban.Saved ? Done(parsed.Action, new Actor(parsed.Target, ""))
+                        : PersistenceFailed(parsed.Action, new Actor(parsed.Target, ""));
                     yield break;
                 case ThingAction.Mute:
                     if (!target.HasValue) { yield return ThingText.Format(ThingTextKeys.CommandUnknownPlayer, parsed.Target); yield break; }
@@ -225,6 +231,9 @@ namespace ExtraPotions.Thing.Runtime
         static string MuteReply(MuteWriteResult result, ThingAction action, Actor target) => result == MuteWriteResult.Saved
             ? Done(action, target) : result == MuteWriteResult.LiveOnly ? ThingText.Text("mute_persistence_unknown")
             : ThingText.Text("refused_product_off");
+
+        static string PersistenceFailed(ThingAction action, Actor target) => ThingText.Format(ThingTextKeys.CommandFailed,
+            ActionCatalog.Info(action).Verb + " " + (target.Name.Length > 0 ? target.Name : target.Id));
 
         static string Done(ThingAction action, Actor target) =>
             ThingText.Format(ThingTextKeys.CommandDone, ActionCatalog.Info(action).Verb + " " + (target.Name.Length > 0 ? target.Name + " (" + target.Id + ")" : target.Id));

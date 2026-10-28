@@ -294,7 +294,9 @@ namespace ExtraPotions.Delve.Runtime
                 var source = w.m_fileSource == FileHelpers.FileSource.Cloud ? FileHelpers.FileSource.Local : w.m_fileSource;
                 var root = SaveSystem.GetWorldsSaveRootPath(source);
                 sidecarPath = Path.Combine(root, w.m_name + ".delve.json");
-                var text = File.Exists(sidecarPath) ? File.ReadAllText(sidecarPath) : null;
+                var tmp = sidecarPath + ".tmp";
+                // A finished .tmp without a sidecar is a save that stopped before its publish step.
+                var text = File.Exists(sidecarPath) ? File.ReadAllText(sidecarPath) : File.Exists(tmp) ? File.ReadAllText(tmp) : null;
                 Sidecar = Sidecar.Parse(text, out var errors);
                 foreach (var e in errors) Log.Warning("Delve " + Path.GetFileName(sidecarPath) + ": " + e + ".");
             }
@@ -322,8 +324,9 @@ namespace ExtraPotions.Delve.Runtime
                 long publishStart = DelveCheckTiming.Start(CheckTiming);
                 try
                 {
-                    if (File.Exists(sidecarPath)) File.Delete(sidecarPath);
-                    File.Move(tmp, sidecarPath);
+                    // Replace in one step: deleting first would leave no sidecar if the game stops in between.
+                    if (File.Exists(sidecarPath)) File.Replace(tmp, sidecarPath, null);
+                    else File.Move(tmp, sidecarPath);
                 }
                 finally { CheckTiming?.Stage("sidecar_publish", publishStart); }
                 sidecarDirty = false;

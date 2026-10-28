@@ -10,7 +10,7 @@ namespace ExtraPotions.Meadworks.Crucible {
     public sealed class Plugin:BaseUnityPlugin {
         public const string Guid="com.meadworks.crucible";
         public const string Name="ExtraPotions Meadworks: Crucible";
-        public const string Version="0.3.35";
+        public const string Version="0.3.36";
         public static ProductRegistry Services { get; private set; }=null!;
         public static bool IsReady { get; private set; }
         internal static BepInEx.Logging.ManualLogSource? Log { get; private set; }
@@ -38,11 +38,11 @@ namespace ExtraPotions.Meadworks.Crucible {
             Services=new ProductRegistry();Services.Operations.RemoteProtocol=PeerProtocol.Version;
             MeadworksSettingTiers.Install(Services,Logger);
             registration=Services.Register(new ProductMetadata(Guid,Name,new System.Version(Version),new System.Version(0,1),new System.Version(0,1),MultiplayerPolicy.RequiredOnAllPeers));
-            var helloTimeout=MeadworksConfig.Bind(Config,"Authority","VanillaServerTimeoutSeconds",10f,"Seconds a client waits for the server's Crucible Hello before treating the server as vanilla (cheats locked, required products off).",ConfigScope.Local,new BepInEx.Configuration.AcceptableValueRange<float>(2f,120f));
+            var helloTimeout=MeadworksConfig.Bind(Config,"Authority","VanillaServerTimeoutSeconds",10f,"Seconds a client waits for the server's Crucible Hello before treating the server as vanilla (cheats locked, required products off). Crucible owns this local installation setting.",ConfigScope.Local,new BepInEx.Configuration.AcceptableValueRange<float>(2f,120f));
             ServerPresence=new ServerPresenceTimer(Math.Max(2f,Math.Min(120f,helloTimeout.Value)));
             helloTimeout.SettingChanged+=(_,_)=>ServerPresence.TimeoutSeconds=Math.Max(2f,Math.Min(120f,helloTimeout.Value));
             sessions=new NativeSessionAdapter(Services);dispatcher=new RequestDispatcher();transport=new NativeRequestTransport(Services,sessions,dispatcher,ServerPresence);RequestClient=new NativeRequestClient(Services,sessions,transport);
-            PeerClassHandshake=transport.PeerClassHandshake=MeadworksConfig.Bind(Config,"Network","PeerClassHandshake",true,"Checks MeadWorks versions when a player joins: the server turns away clients missing a required MeadWorks mod or running a different major.minor version, and a client turns off required mods the server lacks. On by default; turn it off only to diagnose join problems. Restart the game after changing this setting.").Value;
+            PeerClassHandshake=transport.PeerClassHandshake=MeadworksConfig.Bind(Config,"Network","PeerClassHandshake",true,"Checks MeadWorks versions when a player joins: the server turns away clients missing a required MeadWorks mod or running a different major.minor version, and a client turns off required mods the server lacks. On by default; turn it off only to diagnose join problems. Restart the game after changing this setting. Crucible owns this local installation setting.").Value;
             MeadworksAdmission.Bind(Config);MeadworksAdmission.Register(registration);MeadworksBuildHashes.Register(registration);
             MeadworksAdmission.Report();
             if(PeerClassHandshake)NativePeerJoin.Install(Services);

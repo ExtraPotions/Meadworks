@@ -1,12 +1,12 @@
-## Changes in 0.1.25
+## Changes in 0.1.26
 
-- The "did not retain the requested serialized value" warning now names the config file, section, key, write route and the requested and kept values, so the setting involved can be identified. Text values are left out of the log.
+- Enabling Remember Window now saves the mod currently being viewed.
 
 # Almanac
 
 One in-game settings book for every installed mod's configuration, aware of server locks.
 
-Version 0.1.25. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.26. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -28,7 +28,7 @@ The Advanced switch in the header controls specialist settings. Pin/Unpin manage
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2 (installed with Crucible)
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.33 or a later 0.3.x, which includes Crucible.UI 0.3.22 (the shared Meadworks interface kit)
 
 ## Installation
 

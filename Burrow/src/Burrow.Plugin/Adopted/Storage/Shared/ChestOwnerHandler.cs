@@ -33,6 +33,11 @@ namespace Burrow.Shared
                 return;
             }
             ItemDrop.ItemData taken = ChestOps.Take(inventory, item, granted);
+            if (taken == null)
+            {
+                Deny(container, sender, header, ChestRequests.Denied);
+                return;
+            }
             // The detached plan is saved only after its durable decision.
             ZPackage payload = new ZPackage();
             ItemPacket.Write(payload, taken);
@@ -119,7 +124,9 @@ namespace Burrow.Shared
                 int units = ExtraPotions.Burrow.SharedChestArbiter.PartialTake(item?.m_shared.m_name, item?.m_stack ?? 0, name, amount);
                 if (units <= 0)
                     continue;
-                taken.Add(ChestOps.Take(inventory, item, units));
+                ItemDrop.ItemData entry = ChestOps.Take(inventory, item, units);
+                if (entry != null)
+                    taken.Add(entry);
             }
             return taken;
         }

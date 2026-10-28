@@ -1,8 +1,14 @@
+## Changes in 0.2.9
+
+- Taking runes or essence from a Rune Table restores any amount that the inventory could not accept. Destroying a Rune Table removes a stored stack only after that stack is created on the ground.
+- Creature loot is checked before the ragdoll clears its saved list. Unknown items do not stop other drops. An item the game refuses to spawn stays on the ragdoll for another try, and an item whose spawn fails partway counts as dropped, so it is never duplicated.
+- A creature without a loot-carrying ragdoll drops each item separately, so one failed drop no longer loses the rest.
+
 # Inscribe
 
 Item rarity, inscriptions, runes that reshape your gear, gems and sockets.
 
-Version 0.2.8. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.9. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -11,10 +17,10 @@ Version 0.2.8. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CH
 - A rune on a pickaxe, tool or fishing rod moves prefix slots that pool cannot fill onto suffixes, so Ascension can reach Epic and Legendary on those items. Dropped gear keeps its own limits.
 - Gems and sockets: the Dvergr Chisel cuts up to three sockets in weapons, pickaxes, staves, armor, shields and backpacks, and eleven gems fill them. A gem in a pickaxe gives its weapon stat. Other tools, fishing rods and torches take no sockets.
 - Worn items in the inventory and hotbar show a thin parchment ring at the cell edge. While Inscribe is drawing item rarity, the game's blue equipped fill is hidden, so a worn magic item keeps its rarity color and a worn ordinary item does not look Rare. When that display is not drawn, the blue fill comes back.
-- Rune Table: a buildable table that stores runes, turns trophies into essence and applies runes; an essence chooses what the Ascension Rune adds.
+- Rune Table: a buildable table that stores runes, turns trophies into essence and applies runes; an essence chooses what the Ascension Rune adds. Taking runes out keeps the balance when an inventory add fails. Destroying the table drops every stored stack it can create.
 - Recasting at the Rune Table can focus one prefix or suffix on Offense, Defense or Utility. It still costs one Recasting Rune; effect values and the other inscriptions use the usual rolls. Keep Any category for the original behavior. Your focus and side choices are saved locally. If the item cannot receive a complete result with that focus, no rune is consumed.
 - Enhancement levels (+1 to +20) and enhancement scrolls were removed in 0.2.0. Existing enhanced items and scrolls convert once, when carried or when their chest is opened: each enhancement level becomes Honing steps that raise the item's inscriptions (up to what the item's level allows), and the rest becomes Honing Runes; scrolls become Honing Runes and Essence. The old item data is kept.
-- Creatures and bosses can drop runes and magic equipment; world chests can hold runes and magic equipment.
+- Creatures and bosses can drop runes and magic equipment; world chests can hold runes and magic equipment. Saved creature loot skips unknown items without stopping the other drops. An item that fails to spawn is not kept for retry.
 - Item identification keeps rarity color and etched tier marks, the game's own quality number and socket markers separate across item surfaces. Tooltips summarize these properties before the item details.
 - Magic drops retain their rarity glow and loot beam; Legendary drops also have a small bronze and ivory ground glint. Item models, materials and inventory layout stay native.
 - Tooltips taller than the screen scroll with the mouse wheel or right stick.

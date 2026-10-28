@@ -1,8 +1,12 @@
+## Changes in 0.1.6
+
+- An interrupted winter harvest resumes its saved item plan. If a drop call throws after it may have created an item, Solstice skips that item on retry to avoid a duplicate.
+
 # Solstice
 
 Four seasons for Valheim: spring, summer, fall and winter follow the world calendar and change how the world works.
 
-Version 0.1.5. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.6. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -12,7 +16,7 @@ Version 0.1.5. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CH
 - A season status outdoors (not in the Ashlands or the Deep North), and overheating from too many warm clothes in summer unless you eat Eyescream, the weather is cold, or you are sheltered or indoors. Ripe crops on a server list can freeze and perish in a winter that stops growth. A crop that fails its winter survival roll drops its normal harvest once after the full freeze grace. Sleep and time skips do not shorten the grace.
 - Works with Tempest: while a Tempest blizzard or thunderstorm reaches you, or a weather is forced, Solstice never resets the sky under it. Cairn, Tempest and other mods can read the current season from Solstice.
 - On your own screen: grass, leaves and the ground take the season's color, and both maps tint with them. In winter, Meadows, Black Forest, Swamp and Plains ground takes the game's mountain snow, a little under full white, grass thins and frosts, leaves and small ground plants take a light snow and trunks stay brown. Materials that already know snow can still raise it. On the frozen days, shallow water tints toward icy blue and stays partly transparent. A small plate shows the season and day, with a season mark. Winter keeps that mark on the status when season icons are off. A heat meter shows warm-clothes heat in a hot season, and one of the game's own tracks can follow the season. These are yours to switch off, and they do not change the world for anyone else. There is no snow mesh and no ice you can walk on.
-- A short message when a new season starts, and a console command: `solstice` shows the season and day.
+- A winter harvest interrupted before a drop resumes the same planned items and stack sizes. An entry is not retried if the game's drop call throws. A short message when a new season starts, and a console command: `solstice` shows the season and day.
 - A cheat, off by default: Season Override holds the world in one season.
 
 ## Requirements

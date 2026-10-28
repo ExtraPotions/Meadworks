@@ -8,7 +8,7 @@ All original Threshold code, including Threshold.Core, is GPL-3.0-or-later. Copy
 
 ## Original artwork and documentation
 
-Original documentation and artwork use CC BY-NC-SA 4.0, with complete terms in licenses/CC-BY-NC-SA-4.0.txt; see LICENSE-ASSETS.md. icon.png is the byte-identical approved Threshold product artwork by expDARE (SHA256 87ba96a5c1d5266589fa72d0c0dba38d051ec0e731a3a6551fbf656ff9ef280c).
+Original documentation and artwork use CC BY-NC-SA 4.0, with complete terms in licenses/CC-BY-NC-SA-4.0.txt; see LICENSE-ASSETS.md. icon.png is the byte-identical approved Threshold product artwork by expDARE (SHA256 106b441ab27cb0d61e74f60930c400c4810afdd6d408cbaf1ee5cb8dab7d707f).
 
 ## Adopted source and preserved notice
 

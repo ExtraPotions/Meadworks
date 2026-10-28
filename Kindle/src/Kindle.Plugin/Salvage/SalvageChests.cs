@@ -20,6 +20,8 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
     internal static class SalvageChests
     {
         const string ItemsId = "meadworks.storage.chest_items", TakeId = "meadworks.storage.chest_take";
+        const string RecoveryKey = "Kindle.pendingChestSalvage";
+        const string RecoveryQuarantineKey = "Kindle.quarantinedChestSalvage";
         static readonly System.Version ContractVersion = new System.Version(1, 0);
         static readonly CapabilityLink<Func<IReadOnlyList<Tuple<object, object>>>> items =
             new CapabilityLink<Func<IReadOnlyList<Tuple<object, object>>>>(ItemsId, ContractVersion);
@@ -31,6 +33,7 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         {
             internal Container Chest = null!; internal ItemDrop.ItemData Item = null!; internal Player Player = null!;
             internal List<SalvageReturn> Returns = null!; internal ChestTakeRetry Retry = null!; internal Action Done = null!;
+            internal bool Taken;
         }
         static Pending? pending;
 
@@ -46,7 +49,7 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         }
 
         /// <summary>A chest salvage is waiting for Burrow.</summary>
-        internal static bool Busy => pending != null;
+        internal static bool Busy => pending != null || Player.m_localPlayer?.m_customData.ContainsKey(RecoveryKey) == true;
 
         /// <summary>The (chest, item) pairs Burrow lists now; empty without Burrow, when off, or when Burrow fails.</summary>
         internal static List<KeyValuePair<Container, ItemDrop.ItemData>> Items()
@@ -116,8 +119,8 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         /// <summary>Asks Burrow again for a waiting salvage. Main thread, every frame.</summary>
         internal static void Tick()
         {
-            if (pending == null) return;
-            if (!KindleSalvage.Ready || pending.Player != Player.m_localPlayer || !pending.Chest) { pending = null; Messages.Center(SalvageWords.ChestBusy); return; }
+            if (pending == null) { Recover(); return; }
+            if (!KindleSalvage.Ready || pending.Player != Player.m_localPlayer || (!pending.Taken && !pending.Chest)) { pending = null; Messages.Center(SalvageWords.ChestBusy); return; }
             Attempt();
         }
 
@@ -127,29 +130,33 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
         static bool Attempt()
         {
             var job = pending!;
+            if (job.Taken)
+                return FinishDelivery(job);
             bool delivered = false;
             int code;
             try
             {
                 code = take.TryGet(Registry, out var run) && run != null
-                    ? run(job.Chest, job.Item, () => { delivered = true; Deliver(job.Player, job.Returns); })
+                    ? run(job.Chest, job.Item, () => { job.Taken = true; SaveRecovery(job.Player, job.Returns); delivered = Deliver(job.Player, job.Returns); })
                     : ChestTakeCodes.Unavailable;
             }
             catch (Exception) { code = ChestTakeCodes.Unavailable; }
+            if (job.Taken)
+                return delivered ? Complete(job) : false;
             switch (job.Retry.Next(code, delivered, Time.realtimeSinceStartupAsDouble))
             {
                 case ChestTakeStep.Retry: return false;
-                case ChestTakeStep.Done: pending = null; Guard(job.Done); return true;
+                case ChestTakeStep.Done: return Complete(job);
                 case ChestTakeStep.Changed: pending = null; Messages.Center(SalvageWords.ChestChanged); KindleSalvage.Rebuild(); return true;
                 default: pending = null; Messages.Center(SalvageWords.ChestBusy); KindleSalvage.Rebuild(); return true;
             }
         }
 
         /// <summary>The materials go into the player's inventory with the game's AddItem; what it refuses drops at the player's feet.</summary>
-        internal static void Deliver(Player player, List<SalvageReturn> returns)
+        internal static bool Deliver(Player player, List<SalvageReturn> returns)
         {
             var inventory = player.GetInventory();
-            int dropped = SalvageDelivery.Deliver(returns.Select(entry => (entry, entry.Amount, entry.MaxStack)),
+            List<(SalvageReturn Material, int Amount, int MaxStack)> outstanding = SalvageDelivery.DeliverConfirmed(returns.Select(entry => (entry, entry.Amount, entry.MaxStack)),
                 (entry, chunk) =>
                 {
                     var stack = SalvageInventory.NewStack(entry.Item, chunk);
@@ -163,12 +170,61 @@ namespace ExtraPotions.Kindle.Runtime.Salvage
                     {
                         Transform at = player.transform;
                         var drop = ItemDrop.DropItem(SalvageInventory.NewStack(entry.Item, count), count, at.position + at.forward + at.up, at.rotation);
-                        if (drop != null) drop.OnPlayerDrop();
+                        if (drop == null) return false;
+                        try { drop.OnPlayerDrop(); } catch (Exception error) { KindleSalvage.Warn("Salvage drop notice: " + error.GetType().Name); }
+                        return true;
                     }
-                    catch (Exception error) { KindleSalvage.Warn("Salvage drop: " + error.GetType().Name); }
+                    catch (Exception error) { KindleSalvage.Warn("Salvage drop may already exist: " + error.GetType().Name); throw; }
                 },
-                entry => Stacked(inventory, entry));
-            if (dropped > 0) Messages.Center(SalvageWords.Dropped);
+                out int dropped, entry => Stacked(inventory, entry), dropExceptionMayHaveDelivered: true);
+            returns.Clear();
+            returns.AddRange(outstanding.Select(entry => new SalvageReturn(entry.Material.Item, entry.Amount)));
+            SaveRecovery(player, returns);
+            if (dropped > 0) Guard(() => Messages.Center(SalvageWords.Dropped));
+            return returns.Count == 0;
+        }
+
+        static bool FinishDelivery(Pending job) => Deliver(job.Player, job.Returns) && Complete(job);
+
+        static bool Complete(Pending job)
+        {
+            pending = null;
+            Guard(job.Done);
+            return true;
+        }
+
+        static void SaveRecovery(Player player, List<SalvageReturn> returns)
+        {
+            if (returns.Count == 0) { player.m_customData.Remove(RecoveryKey); return; }
+            player.m_customData[RecoveryKey] = SalvageRecovery.Encode(returns.Select(entry => (entry.Item.gameObject.name, entry.Amount)));
+        }
+
+        static void Recover()
+        {
+            Player player = Player.m_localPlayer;
+            if (!KindleSalvage.Ready || player == null || !player.m_customData.TryGetValue(RecoveryKey, out string text)) return;
+            // Item lookups below quarantine a record whose prefab is missing; wait until the item database is filled.
+            if (ObjectDB.instance == null || ObjectDB.instance.m_items == null || ObjectDB.instance.m_items.Count == 0) return;
+            if (!SalvageRecovery.TryDecode(text, out var saved)) { Quarantine(player, text, "Chest salvage recovery record is invalid"); return; }
+            var returns = new List<SalvageReturn>();
+            foreach (var entry in saved)
+            {
+                GameObject prefab = ObjectDB.instance?.GetItemPrefab(entry.Prefab);
+                ItemDrop drop = prefab != null ? prefab.GetComponent<ItemDrop>() : null;
+                if (drop == null) { Quarantine(player, text, "Chest salvage recovery prefab is unavailable: " + entry.Prefab); return; }
+                returns.Add(new SalvageReturn(drop, entry.Amount));
+            }
+            Deliver(player, returns);
+        }
+
+        static void Quarantine(Player player, string text, string warning)
+        {
+            string key = RecoveryQuarantineKey;
+            for (int suffix = 2; player.m_customData.ContainsKey(key); suffix++)
+                key = RecoveryQuarantineKey + "." + suffix;
+            player.m_customData[key] = text;
+            player.m_customData.Remove(RecoveryKey);
+            KindleSalvage.Warn(warning + "; moved to " + key);
         }
 
         /// <summary>Units of the return's prefab currently in the inventory, so a throw after a partial merge is not counted as nothing.</summary>

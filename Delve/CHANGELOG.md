@@ -1,3 +1,7 @@
+## 0.1.16 (2026-10-28)
+
+- Delve now replaces an existing world file in one step, so an interrupted replacement leaves the previous file intact. On the first save, Delve loads the temporary file on the next start if the main file was not created.
+
 ## 0.1.15
 
 - Guard world object creation, removal and nearby queries when scene or world-object services are unavailable.

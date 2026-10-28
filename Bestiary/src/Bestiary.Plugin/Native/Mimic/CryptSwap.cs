@@ -1,9 +1,11 @@
 // Portions Copyright (C) 2026 Gerald Glasgow. EliteCreaturesPack 0.7.2 at ad278ecf323901c3645eb1f9f6fac6833a0f8cb1.
 // Changed by expDARE, 2026: Bestiary namespace, owned Crucible settings, rebuilt-only bundles and lifecycle adapters.
 // SPDX-License-Identifier: GPL-3.0-or-later
+using System;
 using System.Reflection;
 using ExtraPotions.Bestiary.Fixes;
 using ExtraPotions.Bestiary.Runtime.Native.Adapters;
+using ExtraPotions.Bestiary.Runtime.Native.Core;
 using HarmonyLib;
 using UnityEngine;
 
@@ -31,7 +33,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
         /// <summary>OWNER, first fill. True when the chest becomes a mimic, so it must not be filled.</summary>
         public static bool Claim(Container chest)
         {
-            if (AllowFill || !MimicSettings.On || !IsListed(chest) || Random.value >= MimicSettings.Chance)
+            if (AllowFill || !MimicSettings.On || !IsListed(chest) || UnityEngine.Random.value >= MimicSettings.Chance)
             {
                 return false;
             }
@@ -71,6 +73,7 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
     public class CryptSwapper : MonoBehaviour
     {
         private static readonly MethodInfo? FillItems = AccessTools.Method(typeof(Container), "AddDefaultItems");
+        private bool spawnFailed;
 
         private void Update() => Guard.Run("CryptSwapper.Swap", Step);
 
@@ -141,14 +144,41 @@ namespace ExtraPotions.Bestiary.Runtime.Native.Mimic
 
         private void Spawn(ZNetView chest, GameObject prefab)
         {
+            if (prefab.GetComponent<ZNetView>() == null)
+            {
+                RejectSpawn(chest, "the mimic prefab has no ZNetView");
+                return;
+            }
             GameObject mimic = Instantiate(prefab, transform.position, transform.rotation);
             ZNetView view = mimic.GetComponent<ZNetView>();
-            if (view != null && view.GetZDO() != null)
+            if (view == null || !view.IsValid() || view.GetZDO() == null)
             {
-                view.GetZDO().Set(CryptSwap.ChestKey, Utils.GetPrefabName(gameObject));
+                Destroy(mimic);
+                RejectSpawn(chest, "the spawned mimic has no valid ZDO");
+                return;
             }
+            view.GetZDO().Set(CryptSwap.ChestKey, Utils.GetPrefabName(gameObject));
             enabled = false;
             ZNetScene.instance.Destroy(gameObject);
+        }
+
+        private void RejectSpawn(ZNetView chest, string reason)
+        {
+            if (spawnFailed) return;
+            spawnFailed = true;
+            enabled = false;
+            Log.Warn("Crypt Mimic swap rejected once: " + reason + "; the chest keeps its normal loot.");
+            var container = GetComponent<Container>();
+            if (container != null && FillItems != null)
+            {
+                try { Fill(container, chest); }
+                catch (Exception error)
+                {
+                    CryptSwap.Clear(chest.GetZDO());
+                    Log.Warn("Crypt Mimic chest fill failed after spawn rejection: " + error.GetType().Name);
+                }
+            }
+            else CryptSwap.Clear(chest.GetZDO());
         }
     }
 }

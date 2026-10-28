@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6 (2026-10-28)
+
+- An interrupted winter harvest resumes its saved item plan. If a drop call throws after it may have created an item, Solstice skips that item on retry to avoid a duplicate.
+
 ## Unreleased
 
 - If legacy settings cannot be copied, initialization stops before saving defaults and retries on the next start. Existing settings and backups are preserved.

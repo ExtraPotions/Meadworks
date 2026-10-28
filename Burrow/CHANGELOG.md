@@ -1,3 +1,10 @@
+## 0.3.32 (2026-10-28)
+
+- Two pickup chests owned by different players can no longer both store the same ground drop. A chest asks for the drop the way the game's own pickup does, and two equally near chests always agree which one takes it.
+- Moving items between chests and inventories (Reach pull, shared chests) removes only what reached the destination, and a partial move still moves what fits.
+- If Burrow adds items to the destination but cannot remove the full amount from the source, it takes back only the extra items it just added and leaves other inventory changes alone.
+- A locked or unreadable station settings file no longer interrupts world startup.
+
 ## 0.3.31 (2026-10-26)
 
 - A payment waiting on a chest that is not loaded or not owned is retried with a backoff up to five seconds instead of every frame, and right away when a chest loads. The warning repeats at most every five minutes.

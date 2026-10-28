@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.36 (2026-10-28)
+
+- Crucible's and Crucible.UI's settings now have translated names and help in all seven languages, and each says who owns it and whether it is local or set by the server.
+- A setting already saved to disk no longer switches back in memory when the save could not be re-read afterwards.
+
 ## 0.3.35 (2026-10-26)
 
 - The HUD layout editor is translated into all seven supported languages: title, buttons, side names, status messages and help.

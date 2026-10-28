@@ -1,6 +1,6 @@
 {
   "name": "Beacon",
-  "version_number": "0.1.14",
+  "version_number": "0.1.15",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Beacon",
   "description": "Meadworks saved servers: join without the password prompt, passwords in protected storage, saved servers in Join Game favorites, optional auto-join and reconnect (a server can turn reconnect off), AutoConnector import. Client-optional.",
   "dependencies": [

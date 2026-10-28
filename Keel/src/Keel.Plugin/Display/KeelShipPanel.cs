@@ -189,8 +189,10 @@ namespace ExtraPotions.Keel.Runtime
             }
             if (titleShown.Changed(name)) title!.text = name;
             var unit = settings.Get(KeelSettings.Display.SpeedUnit);
-            var vanilla = KeelCatalog.TryVanillaSailForce(Utils.GetPrefabName(ship.gameObject), out var v) ? v : 0f;
-            var factor = PanelModel.SpeedFactor(ship.m_sailForceFactor, vanilla, HelmFactor(settings, ship));
+            var prefab = Utils.GetPrefabName(ship.gameObject);
+            var vanillaSailForce = KeelCatalog.TryVanillaSailForce(prefab, out var sailForce) ? sailForce : 0f;
+            var vanillaForwardDrag = KeelCatalog.TryVanillaForwardDrag(prefab, out var forwardDrag) ? forwardDrag : 0f;
+            var factor = PanelModel.SpeedFactor(ship.m_sailForceFactor, vanillaSailForce, ship.m_dampingForward, vanillaForwardDrag, HelmFactor(settings, ship));
             var shown = PanelModel.Lines(ship.GetSpeed(), unit, factor, KeelExplore.PanelRadius(), CultureInfo.CurrentCulture).ToList();
             for (var i = 0; i < Lines && i < shown.Count; i++)
             {

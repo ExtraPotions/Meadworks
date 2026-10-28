@@ -26,12 +26,14 @@ namespace ExtraPotions.Almanac.Runtime.UI
         string[] displayedKeys=Array.Empty<string>();
         float rightWidth=760,leftWidth=290;TMP_Text? measure;
         string lastSelected="";
+        bool rememberWindow;
         public string SelectedPlugin=>selected;
         public event Action<string>? ToolRequested;
         public void ConfigurePreferences(AlmanacPreferences value)
         {
             preferences=value??throw new ArgumentNullException(nameof(value));showAdvanced=value.ShowAdvanced.Value;
-            if(value.RememberWindow.Value)selected=LegacyPluginIds.Current(value.LastPlugin.Value);
+            rememberWindow=value.RememberWindow.Value;
+            if(rememberWindow)selected=LegacyPluginIds.Current(value.LastPlugin.Value);
             if(window?.Panel!=null)Reflow(window.Panel.rect.size);dirty=true;
         }
         void Preference<T>(ConfigEntry<T> entry,T value)
@@ -50,6 +52,9 @@ namespace ExtraPotions.Almanac.Runtime.UI
         {
             if(preferences==null||window?.Panel==null)return;
             if(showAdvanced!=preferences.ShowAdvanced.Value){showAdvanced=preferences.ShowAdvanced.Value;advanced?.SetValue(showAdvanced);dirty=true;}
+            var remember=preferences.RememberWindow.Value;
+            if(!rememberWindow&&remember&&selected.Length>0)Preference(preferences.LastPlugin,selected);
+            rememberWindow=remember;
             var group=window.Panel.GetComponent<CanvasGroup>()??window.Panel.gameObject.AddComponent<CanvasGroup>();group.alpha=preferences.WindowOpacity.Value;
             Fit();
             float desired=PaneWidth(window.Panel.rect.width);

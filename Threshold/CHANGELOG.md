@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.12 (2026-10-28)
+
+- After a portal trip starts, Threshold verifies the fuel removal. A fuel-removal error no longer prevents arrival protection from being set up.
+
 ## 0.3.11 (2026-10-26)
 
 - If map pins fail to draw, they stay off until the large map is closed instead of retrying and logging every frame.

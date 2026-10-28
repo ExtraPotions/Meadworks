@@ -556,6 +556,7 @@
     "crafting_makers_mark": "장인의 표식: 제작 장비 내구도 최대 +{0}%",
     "crafting_sturdy_build": "견고한 건축: 망치로 설치한 구조물 내구도 최대 +{0}%",
     "crafting_thrifty": "절약: 제작 시 소비된 재료 1개를 돌려받을 확률 최대 {0}%",
+    "crafting_thrifty_saved": "절약: {0} × {1} 반환",
     "crafting_journeyman": "숙련공: 작업대와 대장간이 제작, 강화, 수리 시 레벨 +1로 취급됨",
     "crafting_journeyman_locked": "숙련공은 제작 75에 해제",
     "sneak_vanish": "소멸: 근처에 적이 없는 상태에서 3초 동안 웅크리면 추적 해제",

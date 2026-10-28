@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework Condition="'$(TargetFramework)' == ''">netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion><Nullable>enable</Nullable><Deterministic>true</Deterministic>
-    <Version>0.1.5</Version><Authors>expDARE</Authors><Company>ExtraPotions</Company><Copyright>Copyright (C) 2026 expDARE (ExtraPotions Meadworks)</Copyright>
+    <Version>0.1.6</Version><Authors>expDARE</Authors><Company>ExtraPotions</Company><Copyright>Copyright (C) 2026 expDARE (ExtraPotions Meadworks)</Copyright>
     <GameDir Condition="'$(GameDir)' == ''">$(VALHEIM_DIR)</GameDir>
     <!-- Managed game assemblies: the client ships valheim_Data, the dedicated server valheim_server_Data. The client folder wins when both exist. -->
     <ValheimManagedDir Condition="'$(ValheimManagedDir)' == '' And '$(GameDir)' != '' And Exists('$(GameDir)/valheim_Data/Managed')">$(GameDir)/valheim_Data/Managed</ValheimManagedDir>

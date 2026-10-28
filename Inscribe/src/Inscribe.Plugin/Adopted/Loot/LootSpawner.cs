@@ -24,14 +24,15 @@ namespace ExtraPotions.Inscribe.Adopted.Loot
         private static readonly HashSet<string> MissingPrefabs = new HashSet<string>(System.StringComparer.Ordinal);
 
         /// <summary>Spawns <paramref name="amount"/> of the item near <paramref name="center"/>, or holds it for the ragdoll during a death.</summary>
-        public static void Drop(ItemDrop.ItemData item, int amount, Vector3 center)
+        public static bool Drop(ItemDrop.ItemData item, int amount, Vector3 center)
         {
             if (CorpseLoot.Hold(item, amount))
             {
-                return;
+                return true;
             }
             Quaternion rotation = Quaternion.Euler(0f, Random.Range(0, 360), 0f);
             ItemDrop drop = ItemDrop.DropItem(item, amount, center + Random.insideUnitSphere * DropArea, rotation);
+            if (drop == null) return false;
             Rigidbody body = drop.GetComponent<Rigidbody>();
             if (body != null)
             {
@@ -39,6 +40,7 @@ namespace ExtraPotions.Inscribe.Adopted.Loot
                 direction.y = Mathf.Abs(direction.y);
                 body.AddForce(direction * Push, ForceMode.VelocityChange);
             }
+            return true;
         }
 
         /// <summary>Drops the planned stones, one world stack per stone kind (split at the stack size). Returns how many.</summary>

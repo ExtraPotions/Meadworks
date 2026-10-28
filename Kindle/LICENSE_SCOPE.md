@@ -6,7 +6,7 @@ Product author: expDARE. ExtraPotions Meadworks.
 
 Original Kindle code is GPL-3.0-or-later. Copyright (C) 2026 expDARE. Complete terms: `licenses/GPL-3.0.txt` and `LICENSE-CODE.md`.
 
-Original documentation and artwork use CC BY-NC-SA 4.0. Complete terms: `licenses/CC-BY-NC-SA-4.0.txt` and `LICENSE-ASSETS.md`. No approved package icon is present yet.
+Original documentation and artwork use CC BY-NC-SA 4.0. Complete terms: `licenses/CC-BY-NC-SA-4.0.txt` and `LICENSE-ASSETS.md`. The approved package icon uses this original-artwork license.
 
 ## Adopted sources and preserved legal notices
 

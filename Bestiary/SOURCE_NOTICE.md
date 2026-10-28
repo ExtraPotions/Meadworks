@@ -11,8 +11,8 @@ CreatureManager 1.2.5 workshop code at 47e45a6e8c3b389a51e42fc7387d1a4fb90af473 
 Adoption correction (2026-10-15): Triple Strike and its configuration were removed to match EliteCreaturesPack 0.11.0 commit 9866479d148af07d3bcd32a4fc0106d547ee5924. The current build contains no BearClaws runtime or flurry Harmony patches. Existing configuration files are not edited by this removal.
 
 
-## Corresponding source for Bestiary 0.1.22
+## Corresponding source for Bestiary 0.1.23
 
 This source archive contains the source snapshot for the paired runtime assemblies. SOURCE-SNAPSHOT.json records exact member identities; BUILD-RECIPES records the frozen source-member map used for the successful builds, runtime hashes, normalized build commands and scoped test-evidence hashes. Existing third-party notices and accepted art are retained. Machine paths and raw private test/authentication records are omitted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.22/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.23/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.

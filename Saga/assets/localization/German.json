@@ -556,6 +556,7 @@
     "crafting_makers_mark": "Zeichen des Meisters: bis zu +{0}% Haltbarkeit auf hergestellte Ausrüstung",
     "crafting_sturdy_build": "Solider Bau: bis zu +{0}% Bauteil-Gesundheit auf Hammerkonstruktionen",
     "crafting_thrifty": "Sparsam: bis zu {0}% Chance auf Erstattung eines verbrauchten Werkstoffs",
+    "crafting_thrifty_saved": "Sparsam: {0} × {1} zurückerstattet",
     "crafting_journeyman": "Geselle: Werkbank und Schmiede zählen 1 Stufe höher für Herstellung, Verbesserung und Reparatur",
     "crafting_journeyman_locked": "Geselle wird mit Handwerk 75 freigeschaltet",
     "sneak_vanish": "Verschwinden: 3 s stilles Schleichen ohne nahe Gegner bricht die Verfolgung ab",

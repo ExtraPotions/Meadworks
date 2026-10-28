@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using ExtraPotions.Larder.Cooking;
 using HarmonyLib;
 using UnityEngine;
@@ -11,7 +13,8 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
     internal static class StationAddTransactions
     {
         const string AddRpc = "larder_AddReserved_v1", ResultRpc = "larder_AddReservedResult_v1";
-        const string EscrowKey = "larder.stationEscrow.v1", SequenceKey = "larder.stationSequence.v1";
+        const string EscrowKey = "larder.stationEscrow.v1", EscrowBackupKey = "larder.stationEscrow.backup.v1";
+        const string SequenceKey = "larder.stationSequence.v1";
         const string ParkedKey = "larder.stationEscrow.parked.v1", HoldKey = "larder.stationHold.v1";
         const string ReceiptsKey = "larder_add_receipts_v1";
         const string AttemptKey = "larder_add_attempt_v1";
@@ -44,8 +47,11 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             internal static Escrow Load(string value)
             {
                 var p = new ZPackage(value);
-                return new Escrow { World = p.ReadLong(), Character = p.ReadLong(), Sequence = p.ReadLong(),
+                var result = new Escrow { World = p.ReadLong(), Character = p.ReadLong(), Sequence = p.ReadLong(),
                     Station = p.ReadZDOID(), Item = p.ReadString(), Level = p.ReadSingle(), Rejected = p.ReadBool() };
+                if (result.Character == 0 || result.Sequence <= 0 || string.IsNullOrEmpty(result.Item))
+                    throw new FormatException("Invalid station-add escrow.");
+                return result;
             }
         }
 
@@ -136,7 +142,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             created.Add(escrow.Sequence);
             unsaved.Add(escrow.Sequence);
             player.m_customData[SequenceKey] = escrow.Sequence.ToString(CultureInfo.InvariantCulture);
-            player.m_customData[EscrowKey] = escrow.Save();
+            SetActive(player, escrow);
             // Mutate before Changed so a reentrant character save sees the debit and reservation together.
             var carried = player.GetInventory();
             item.m_stack--;
@@ -175,10 +181,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             ParkIfStationUnloaded(player);
             ActivateParked(player);
             ReconcileHolds(player);
-            if (!player.m_customData.TryGetValue(EscrowKey, out string saved)) return;
-            Escrow escrow;
-            try { escrow = Escrow.Load(saved); }
-            catch (Exception error) { NativeCooking.Report("Escrow load: " + error.Message); return; }
+            if (!TryLoadActive(player, out var escrow)) return;
             if (escrow.Character != player.GetPlayerID() || escrow.World != ZNet.instance.GetWorldUID()) return;
             if (unsaved.Contains(escrow.Sequence))
             {
@@ -207,7 +210,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         static void CommitProven(Player player, Escrow escrow)
         {
             proven.Add(escrow.Sequence);
-            player.m_customData.Remove(EscrowKey);
+            ClearActive(player);
             DropHold(player, escrow);
             Persist(player);
         }
@@ -219,7 +222,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             bool added = !holds.Exists(h => h.World == escrow.World && h.Character == escrow.Character && h.Sequence == escrow.Sequence);
             if (added) holds.Add(escrow);
             player.m_customData[HoldKey] = SaveMany(holds);
-            bool removed = player.m_customData.Remove(EscrowKey);
+            bool removed = ClearActive(player);
             if (added || removed) Persist(player);
         }
 
@@ -235,8 +238,8 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         {
             string next = escrow.Save();
             bool changed = !player.m_customData.TryGetValue(EscrowKey, out string prior) || prior != next;
-            player.m_customData[EscrowKey] = next;
-            if (TryGive(player, escrow, () => player.m_customData.Remove(EscrowKey))) changed = true;
+            SetActive(player, escrow);
+            if (TryGive(player, escrow, () => ClearActive(player))) changed = true;
             if (changed) Persist(player);
         }
 
@@ -262,7 +265,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             parked.RemoveAll(e => e.World == escrow.World && e.Character == escrow.Character && e.Sequence == escrow.Sequence);
             parked.Add(escrow);
             player.m_customData[ParkedKey] = SaveMany(parked);
-            player.m_customData.Remove(EscrowKey);
+            ClearActive(player);
             Persist(player);
         }
 
@@ -276,7 +279,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             if (index < 0) return;
             var mine = parked[index];
             parked.RemoveAt(index);
-            player.m_customData[EscrowKey] = mine.Save();
+            SetActive(player, mine);
             if (parked.Count == 0) player.m_customData.Remove(ParkedKey);
             else player.m_customData[ParkedKey] = SaveMany(parked);
             Persist(player);
@@ -300,12 +303,21 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
                     holds.RemoveAt(i);
                     changed = true;
                 }
-                else if (decision != StationAddDecision.Stale && TryGive(player, hold, () =>
+                else if (decision != StationAddDecision.Stale)
                 {
-                    holds.RemoveAt(i);
-                    if (holds.Count == 0) player.m_customData.Remove(HoldKey);
-                    else player.m_customData[HoldKey] = SaveMany(holds);
-                })) changed = true;
+                    var remaining = new List<Escrow>(holds);
+                    remaining.RemoveAt(i);
+                    string saved = remaining.Count == 0 ? null : SaveMany(remaining);
+                    if (TryGive(player, hold, () =>
+                    {
+                        if (saved == null) player.m_customData.Remove(HoldKey);
+                        else player.m_customData[HoldKey] = saved;
+                    }))
+                    {
+                        holds.RemoveAt(i);
+                        changed = true;
+                    }
+                }
             }
             if (!changed) return;
             if (holds.Count == 0) player.m_customData.Remove(HoldKey);
@@ -317,8 +329,73 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         {
             escrow = null;
             if (!player.m_customData.TryGetValue(EscrowKey, out string saved)) return false;
-            try { escrow = Escrow.Load(saved); return true; }
-            catch (Exception error) { NativeCooking.Report("Escrow load: " + error.Message); return false; }
+            bool backupValid = TryLoadBackup(player, out string backup, out Escrow backupEscrow);
+            if (backupValid && backup != saved)
+            {
+                NativeCooking.Report("Escrow active record differed from its validated backup; backup restored.");
+                player.m_customData[EscrowKey] = backup;
+                Persist(player);
+                escrow = backupEscrow;
+                return true;
+            }
+            try
+            {
+                escrow = Escrow.Load(saved);
+                if (!backupValid)
+                {
+                    player.m_customData[EscrowBackupKey] = Protect(saved);
+                    Persist(player);
+                }
+                return true;
+            }
+            catch (Exception error)
+            {
+                NativeCooking.Report("Escrow load: " + error.Message);
+                return false;
+            }
+        }
+
+        static void SetActive(Player player, Escrow escrow)
+        {
+            string saved = escrow.Save();
+            Escrow.Load(saved);
+            player.m_customData[EscrowKey] = saved;
+            player.m_customData[EscrowBackupKey] = Protect(saved);
+        }
+
+        static bool ClearActive(Player player)
+        {
+            bool changed = player.m_customData.Remove(EscrowKey);
+            return player.m_customData.Remove(EscrowBackupKey) || changed;
+        }
+
+        static string Protect(string saved)
+        {
+            using var hash = SHA256.Create();
+            string digest = BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(saved))).Replace("-", "");
+            return digest + ":" + saved;
+        }
+
+        static bool TryLoadBackup(Player player, out string saved, out Escrow escrow)
+        {
+            saved = null; escrow = null;
+            if (!player.m_customData.TryGetValue(EscrowBackupKey, out string protectedValue)) return false;
+            int separator = protectedValue.IndexOf(':');
+            if (separator != 64) return false;
+            string candidate = protectedValue.Substring(separator + 1);
+            if (!string.Equals(protectedValue.Substring(0, separator), Protect(candidate).Substring(0, separator),
+                StringComparison.OrdinalIgnoreCase)) return false;
+            try
+            {
+                escrow = Escrow.Load(candidate);
+                saved = candidate;
+                return true;
+            }
+            catch (Exception error)
+            {
+                NativeCooking.Report("Escrow backup: " + error.Message);
+                return false;
+            }
         }
 
         static List<Escrow> LoadMany(Player player, string key)
@@ -410,7 +487,15 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
             item.m_gridPos = pos;
             // An empty cell preserves quality, custom data and provenance instead of merging unlike native stacks.
             inventory.m_inventory.Add(item);
-            commit();
+            try
+            {
+                commit();
+            }
+            catch
+            {
+                inventory.m_inventory.Remove(item);
+                throw;
+            }
             try { inventory.Changed(); }
             catch (Exception error) { NativeCooking.Report("Escrow inventory notification: " + error.Message); }
             return true;
@@ -519,8 +604,7 @@ namespace ExtraPotions.Larder.Runtime.Adopted.GrindstoneCooking
         {
             var player = Player.m_localPlayer;
             if (!Local(player) || sender != station.m_nview.GetZDO().GetOwner() ||
-                !player.m_customData.TryGetValue(EscrowKey, out string saved)) return;
-            var escrow = Escrow.Load(saved);
+                !TryLoadActive(player, out var escrow)) return;
             long world = p.ReadLong(), character = p.ReadLong(), sequence = p.ReadLong();
             bool accepted = p.ReadBool();
             if (world != ZNet.instance.GetWorldUID() || escrow.World != world || escrow.Character != character ||

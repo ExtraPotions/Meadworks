@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.15 (2026-10-28)
+
+- A damaged line in the saved-password file is kept (its text unchanged; only the line ending is normalized) instead of being erased the next time you save or forget a password.
+
 ## 0.1.14 (2026-10-21)
 
 - Thunderstore republish of the release 8 build; no code changes.

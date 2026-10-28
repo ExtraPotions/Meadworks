@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.14 (2026-10-28)
+
+- Edge starts with its built-in combat rules if it cannot create or read its rule folder.
+- If Edge cannot remove all extra ammunition for an overcharged bomb, it restores any ammunition already removed, cancels the attack and removes the projectiles it spawned.
+
 ## 0.2.13 (2026-10-26)
 
 - A sticky charge follows the creature or object it stuck to without being parented to it. When that target is destroyed first, the charge is removed through the game's network cleanup, which ends the NullReferenceException logged every frame afterwards.

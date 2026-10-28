@@ -27,10 +27,8 @@ namespace Mantle.Slots
                 if (!__instance.CanAddItem(copy))
                     copy.m_stack = System.Math.Min(copy.m_stack, Mantle.Layout.MainCells.FreeStackSpace(__instance, copy));
                 if (copy.m_stack <= 0) continue;
-                int before = __instance.GetAllItems().Sum(i => i.m_stack);
-                __instance.AddItem(copy);
-                int moved = System.Math.Min(item.m_stack, __instance.GetAllItems().Sum(i => i.m_stack) - before);
-                if (moved > 0) __0.RemoveItem(item, moved);
+                int moved = copy.m_stack;
+                InventoryTransfer.Move(__0, item, moved, __instance, copy, __instance.AddItem);
             }
             return false;
         }

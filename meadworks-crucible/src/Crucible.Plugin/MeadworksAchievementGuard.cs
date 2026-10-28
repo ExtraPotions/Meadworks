@@ -80,8 +80,8 @@ namespace ExtraPotions.Meadworks.Crucible {
 
         internal static void Install(ConfigFile config,ManualLogSource logger){
             Log=MeadworksLog.For(logger,"Crucible");
-            syncPastStats=MeadworksConfig.Bind(config,"Achievements","SyncPastStats",true,"Copy stats the game counted while achievements were not tracked into the achievement table when a clean character loads (never for characters that used cheats unless Hex allows it). Off while AchievementSync is installed.",ConfigScope.Local);
-            resyncKey=MeadworksConfig.Bind(config,"Achievements","ResyncKey",KeyboardShortcut.Empty,"Key that rechecks your saved game statistics and grants any MeadWorks achievements already earned. Unassigned by default.",ConfigScope.Local);
+            syncPastStats=MeadworksConfig.Bind(config,"Achievements","SyncPastStats",true,"When a character that has not used cheats loads, copy the stats the game recorded while achievements were not tracked into the achievement table. Characters that used cheats are never copied unless Hex allows it. Disabled while AchievementSync is installed. Crucible owns this local installation setting.",ConfigScope.Local);
+            resyncKey=MeadworksConfig.Bind(config,"Achievements","ResyncKey",KeyboardShortcut.Empty,"Key that rechecks your saved game statistics and grants any MeadWorks achievements already earned. Unassigned by default. Crucible owns this local installation setting.",ConfigScope.Local);
             harmony=new Harmony(Plugin.Guid+".achievements");
             Patch(AccessTools.Method(typeof(Inventory),"FindFreeStackItem",new[]{typeof(string),typeof(int),typeof(float)}),postfix:nameof(FindFreeStackPostfix));
             foreach(var overload in new[]{new[]{typeof(ItemDrop.ItemData)},new[]{typeof(ItemDrop.ItemData),typeof(Vector2i)}})

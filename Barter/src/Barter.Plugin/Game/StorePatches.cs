@@ -295,6 +295,7 @@ namespace ExtraPotions.Barter.Runtime
 
         private static void Postfix(Inventory __instance)
         {
+            SafeTradeInventory.Recover(__instance);
             if (__instance != null && !__instance.m_temoraryInventory && Player.m_localPlayer != null && __instance == Player.m_localPlayer.GetInventory())
                 StoreUi.InventoryChanged();
         }

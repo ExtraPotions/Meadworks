@@ -1,14 +1,13 @@
-## Changes in 0.3.31
+## Changes in 0.3.32
 
-- A payment waiting on a chest that is not loaded or not owned is retried with a backoff up to five seconds instead of every frame, and right away when a chest loads. The warning repeats at most every five minutes.
-- A waiting payment can take over an idle chest nobody has open, then completes once. An open chest or one held by another payment is left alone.
-- Finished Shared Materials and chest-salvage payments are archived once per game run, after a verified backup of the journal, so they no longer count toward the 4096-record limit. Nothing is deleted.
-- Shared transfers back off up to five seconds while waiting instead of running every frame, and a journal that cannot open is retried from five seconds up to a minute.
-- Reach counts are cached for the frame while staying live for payments, and a chest slot from the network outside the chest is ignored.
+- Two pickup chests owned by different players can no longer both store the same ground drop. A chest asks for the drop the way the game's own pickup does, and two equally near chests always agree which one takes it.
+- Moving items between chests and inventories (Reach pull, shared chests) removes only what reached the destination, and a partial move still moves what fits.
+- If Burrow adds items to the destination but cannot remove the full amount from the source, it takes back only the extra items it just added and leaves other inventory changes alone.
+- A locked or unreadable station settings file no longer interrupts world startup.
 
 # Burrow
 
-Version 0.3.31. Requires Crucible 0.3.34 / Crucible.UI 0.3.23. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.32. Requires Crucible 0.3.34 / Crucible.UI 0.3.23. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Craft and build from nearby chests, preview chest contents, bigger chests, sorting, quick stacking and shared chests.
 
@@ -42,7 +41,7 @@ Craft and build from nearby chests, preview chest contents, bigger chests, sorti
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.34 or a later 0.3.x, which includes Crucible.UI 0.3.23 (the shared Meadworks interface kit)
 
 ## Installation
 

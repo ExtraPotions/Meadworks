@@ -20,7 +20,14 @@ namespace Burrow.Shared
         public static ItemDrop.ItemData Take(Inventory inventory, ItemDrop.ItemData item, int amount)
         {
             ItemDrop.ItemData taken = ItemPacket.Copy(item, amount);
-            inventory.RemoveItem(item, taken.m_stack);
+            int before = inventory.ContainsItem(item) ? item.m_stack : 0;
+            try { inventory.RemoveItem(item, taken.m_stack); }
+            catch (System.Exception) { }
+            int after = inventory.ContainsItem(item) ? item.m_stack : 0;
+            int removed = before - after;
+            if (removed <= 0 || removed > before)
+                return null;
+            taken.m_stack = removed;
             return taken;
         }
 
@@ -34,10 +41,7 @@ namespace Burrow.Shared
             if (amount <= 0 || !from.ContainsItem(item))
                 return 0;
             ItemDrop.ItemData copy = ItemPacket.Copy(item, amount);
-            int added = Add(to, copy, slot);
-            if (added > 0)
-                from.RemoveItem(item, added);
-            return added;
+            return InventoryTransferDelta.Move(from, item, amount, to, copy, moving => Add(to, moving, slot), "chest transfer", out _);
         }
 
         /// <summary>
@@ -83,17 +87,45 @@ namespace Burrow.Shared
         public static void GiveToPlayer(Player player, ItemDrop.ItemData item, Vector2i slot)
         {
             int wanted = item.m_stack;
-            int added = Add(player.GetInventory(), item, slot);
+            Inventory inventory = player.GetInventory();
+            int before = StackCount(inventory, item);
+            int added;
+            try { added = Add(inventory, item, slot); }
+            catch (System.Exception)
+            {
+                added = System.Math.Max(0, System.Math.Min(wanted, StackCount(inventory, item) - before));
+            }
             if (added >= wanted)
                 return;
             int rest = wanted - added;
             Transform at = player.transform;
-            ItemDrop drop = ItemDrop.DropItem(item, rest, at.position + at.forward + at.up, at.rotation);
-            if (drop != null)
-                drop.OnPlayerDrop();
+            ItemDrop drop;
+            try
+            {
+                drop = ItemDrop.DropItem(item, rest, at.position + at.forward + at.up, at.rotation);
+                if (drop == null)
+                    drop = ItemDrop.DropItem(item, rest, at.position + at.forward + at.up, at.rotation);
+            }
+            catch (System.Exception error)
+            {
+                Plugin.Log.LogWarning("Burrow: player grant drop may already exist: " + error.GetType().Name);
+                return;
+            }
+            if (drop == null)
+            {
+                Plugin.Log.LogWarning($"Burrow: {rest} x {item.m_shared.m_name} could not be dropped for the player");
+                return;
+            }
+            try { drop.OnPlayerDrop(); }
+            catch (System.Exception error) { Plugin.Log.LogWarning("Burrow: player grant drop notice: " + error.GetType().Name); }
             player.Message(MessageHud.MessageType.TopLeft, "$msg_dropped " + item.m_shared.m_name, rest, item.GetIcon());
             Plugin.Log.LogDebug($"Burrow: {rest} x {item.m_shared.m_name} did not fit the inventory any more and were dropped");
         }
+
+        private static int StackCount(Inventory inventory, ItemDrop.ItemData sample) => inventory.GetAllItems()
+            .Where(item => item.m_shared != null && sample.m_shared != null && item.m_shared.m_name == sample.m_shared.m_name
+                && item.m_quality == sample.m_quality && item.m_worldLevel == sample.m_worldLevel)
+            .Sum(item => item.m_stack);
 
         /// <summary>
         /// A sent copy goes into the chest: at the slot when it is free or holds the same kind with room (a
@@ -178,4 +210,5 @@ namespace Burrow.Shared
             inventory.RemoveItem(item, accepted);
         }
     }
+
 }

@@ -1,3 +1,7 @@
+## 0.1.26 (2026-10-28)
+
+- Enabling Remember Window now saves the mod currently being viewed.
+
 ## 0.1.25 (2026-10-26)
 
 - The "did not retain the requested serialized value" warning now names the config file, section, key, write route and the requested and kept values, so the setting involved can be identified. Text values are left out of the log.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.9 (2026-10-28)
+
+- Taking runes out keeps the table balance when an inventory add fails. Destroying a Rune Table drops every stored stack it can create; a stack that cannot spawn is not reported as dropped.
+- Creature loot validates its saved list before the ragdoll clears it. An unknown item is skipped without stopping the other drops. An item the game refuses to spawn stays on the ragdoll for another try; an item whose spawn call fails partway is treated as dropped, so it is never duplicated.
+- A creature without a loot-carrying ragdoll drops each item separately, so one failed drop no longer loses the rest.
+
 ## 0.2.8 (2026-10-26)
 
 - The Wet, Cold and Freezing filter for the local player now always switches off, even if the game's status update fails partway, so it cannot stay on for other characters.

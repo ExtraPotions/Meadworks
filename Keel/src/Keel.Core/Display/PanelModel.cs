@@ -69,16 +69,18 @@ namespace ExtraPotions.Keel.Display
 
         /// <summary>
         /// The top speed against the vanilla ship of this hull: the game's forward drag grows with the square of the
-        /// speed, so speed follows the square root of the sail force ratio; the helmsman's Sailing factor multiplies in.
-        /// Without a known vanilla value only the helm factor is shown.
+        /// speed, so speed follows the square root of the sail-force-to-drag ratio; the helmsman's Sailing factor multiplies in.
+        /// Without known positive vanilla and effective values only the helm factor is shown.
         /// </summary>
-        public static double SpeedFactor(float sailForce, float vanillaSailForce, float helmFactor)
+        public static double SpeedFactor(float sailForce, float vanillaSailForce, float forwardDrag, float vanillaForwardDrag, float helmFactor)
         {
             var helm = float.IsNaN(helmFactor) || float.IsInfinity(helmFactor) || helmFactor <= 0f ? 1.0 : helmFactor;
             if (float.IsNaN(sailForce) || float.IsInfinity(sailForce) || sailForce < 0f
-                || float.IsNaN(vanillaSailForce) || float.IsInfinity(vanillaSailForce) || vanillaSailForce <= 0f)
+                || float.IsNaN(vanillaSailForce) || float.IsInfinity(vanillaSailForce) || vanillaSailForce <= 0f
+                || float.IsNaN(forwardDrag) || float.IsInfinity(forwardDrag) || forwardDrag <= 0f
+                || float.IsNaN(vanillaForwardDrag) || float.IsInfinity(vanillaForwardDrag) || vanillaForwardDrag <= 0f)
                 return helm;
-            return Math.Sqrt(sailForce / (double)vanillaSailForce) * helm;
+            return Math.Sqrt((sailForce / (double)forwardDrag) / (vanillaSailForce / (double)vanillaForwardDrag)) * helm;
         }
 
         /// <summary>The Solo ship panel's rows (ShipConfig layout): speed (one decimal), speed multiplier ("x" and two decimals),

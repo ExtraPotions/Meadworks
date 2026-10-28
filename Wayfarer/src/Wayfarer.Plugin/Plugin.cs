@@ -82,12 +82,12 @@ namespace Wayfarer {
   static bool Prefix(Minimap __instance) {
    var p=Plugin.Instance;if(p==null || !p.Options.Enabled.Value || !p.State.Armed || MapUi.PortalPickerOpen(__instance) || p.Teleports == null)return true;
    try {
-    var method=AccessTools.Method(typeof(Minimap),"ScreenToWorldPoint");if(method==null){p.Report("unavailable");return false;}
+     var method=AccessTools.Method(typeof(Minimap),"ScreenToWorldPoint");if(method==null){p.State.Close();p.Report("unavailable");return true;}
     var input=AccessTools.TypeByName("ZInput");var pointer=input==null?null:AccessTools.Property(input,"pointerPosition")?.GetValue(null);
     var point=(Vector3)method.Invoke(__instance,new object[]{pointer is Vector3 v?v:Input.mousePosition});
     p.Teleports.ToMap(point);
-   }catch(Exception error){p.Error(error);}
-   return false;
+     return false;
+    }catch(Exception error){p.State.Close();p.Error(error);return true;}
   }
  }
 }

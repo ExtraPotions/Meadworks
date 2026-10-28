@@ -79,14 +79,20 @@ namespace ExtraPotions.Kindle.Runtime
                 text=caption;
             label.text=text;
         }
-        /// <summary>The plain Craft caption, localized once per language.</summary>
+        /// <summary>The plain Craft caption, localized once per language. The selected language is read from the saved
+        /// preferences, so it is checked at most once a second rather than on every frame the crafting panel is open.</summary>
         static string CraftCaption()
         {
             if(Localization.instance==null)return null;
-            string language=Localization.instance.GetSelectedLanguage();
-            if(craftCaption==null || language!=captionLanguage){craftCaption=Localization.instance.Localize("$inventory_craftbutton");captionLanguage=language;}
+            if(craftCaption==null || Time.unscaledTime>=nextLanguageCheck)
+            {
+                nextLanguageCheck=Time.unscaledTime+1f;
+                string language=Localization.instance.GetSelectedLanguage();
+                if(craftCaption==null || language!=captionLanguage){craftCaption=Localization.instance.Localize("$inventory_craftbutton");captionLanguage=language;}
+            }
             return craftCaption;
         }
+        static float nextLanguageCheck;
         internal static void Refresh(InventoryGui gui,Player player)
         {
             if(!Active){RestoreCraft();return;}

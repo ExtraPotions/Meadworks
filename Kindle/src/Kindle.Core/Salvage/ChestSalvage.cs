@@ -2,6 +2,8 @@
 // Copyright (C) 2026 expDARE (ExtraPotions Meadworks). SPDX-License-Identifier: GPL-3.0-or-later
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 
 namespace ExtraPotions.Kindle.Salvage
 {
@@ -69,10 +71,23 @@ namespace ExtraPotions.Kindle.Salvage
         /// </summary>
         public static int Deliver<T>(IEnumerable<(T Material, int Amount, int MaxStack)> returns, Func<T, int, int> add, Action<T, int> drop, Func<T, int>? stock = null)
         {
+            List<(T Material, int Amount, int MaxStack)> outstanding = DeliverConfirmed(returns, add, (material, amount) => { drop(material, amount); return true; }, out int dropped, stock);
+            if (outstanding.Count != 0) throw new InvalidOperationException("A void drop callback cannot leave salvage outstanding.");
+            return dropped;
+        }
+
+        public static List<(T Material, int Amount, int MaxStack)> DeliverConfirmed<T>(IEnumerable<(T Material, int Amount, int MaxStack)> returns, Func<T, int, int> add, Func<T, int, bool> drop, out int dropped, Func<T, int>? stock = null)
+        {
+            return DeliverConfirmed(returns, add, drop, out dropped, stock, false);
+        }
+
+        public static List<(T Material, int Amount, int MaxStack)> DeliverConfirmed<T>(IEnumerable<(T Material, int Amount, int MaxStack)> returns, Func<T, int, int> add, Func<T, int, bool> drop, out int dropped, Func<T, int>? stock, bool dropExceptionMayHaveDelivered)
+        {
             if (returns == null) throw new ArgumentNullException(nameof(returns));
             if (add == null) throw new ArgumentNullException(nameof(add));
             if (drop == null) throw new ArgumentNullException(nameof(drop));
-            int dropped = 0;
+            dropped = 0;
+            var outstanding = new List<(T Material, int Amount, int MaxStack)>();
             foreach (var (material, amount, maxStack) in returns)
             {
                 int size = Math.Max(1, maxStack);
@@ -89,13 +104,17 @@ namespace ExtraPotions.Kindle.Salvage
                     }
                     if (landed < chunk)
                     {
-                        drop(material, chunk - landed);
-                        dropped += chunk - landed;
+                        int overflow = chunk - landed;
+                        bool confirmed;
+                        try { confirmed = drop(material, overflow); }
+                        catch (Exception) { confirmed = dropExceptionMayHaveDelivered; }
+                        if (confirmed) dropped += overflow;
+                        else outstanding.Add((material, overflow, maxStack));
                     }
                     left -= chunk;
                 }
             }
-            return dropped;
+            return outstanding;
         }
 
         static int ReadStock<T>(Func<T, int>? stock, T material)
@@ -103,6 +122,43 @@ namespace ExtraPotions.Kindle.Salvage
             if (stock == null) return 0;
             try { return Math.Max(0, stock(material)); }
             catch (Exception) { return 0; }
+        }
+    }
+
+    public static class SalvageRecovery
+    {
+        public static string Encode(IEnumerable<(string Prefab, int Amount)> entries)
+        {
+            var text = new StringBuilder("1");
+            foreach (var (prefab, amount) in entries)
+            {
+                if (string.IsNullOrEmpty(prefab) || amount <= 0) continue;
+                text.Append(';').Append(amount.ToString(CultureInfo.InvariantCulture)).Append(':')
+                    .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(prefab)));
+            }
+            return text.ToString();
+        }
+
+        public static bool TryDecode(string text, out List<(string Prefab, int Amount)> entries)
+        {
+            entries = new List<(string Prefab, int Amount)>();
+            if (string.IsNullOrEmpty(text) || text.Length > 65536) return false;
+            string[] parts = text.Split(';');
+            if (parts.Length == 0 || parts[0] != "1") return false;
+            try
+            {
+                for (int i = 1; i < parts.Length; i++)
+                {
+                    int split = parts[i].IndexOf(':');
+                    if (split <= 0 || !int.TryParse(parts[i].Substring(0, split), NumberStyles.None, CultureInfo.InvariantCulture, out int amount) || amount <= 0)
+                        return false;
+                    string prefab = Encoding.UTF8.GetString(Convert.FromBase64String(parts[i].Substring(split + 1)));
+                    if (string.IsNullOrEmpty(prefab)) return false;
+                    entries.Add((prefab, amount));
+                }
+                return entries.Count > 0;
+            }
+            catch (FormatException) { entries.Clear(); return false; }
         }
     }
 }

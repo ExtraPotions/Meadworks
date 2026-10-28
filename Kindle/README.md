@@ -1,14 +1,14 @@
-## Changes in 0.1.26
+## Changes in 0.1.27
 
-- The Craft button caption is written only when it changes.
-- A tracker panel that fails to rebuild no longer throws every frame, and a Salvage tab that cannot be made is not retried every frame.
-- Repeating craft-hook warnings appear at most once a minute, and the cart crafting-station warning appears once.
+- If a nearby-chest salvage drop returns without creating an item, Kindle keeps that reward for another attempt. If the drop call throws after it may have created the item, Kindle marks the reward complete to avoid a duplicate.
+- A damaged salvage recovery record is set aside, with its data kept, so salvage keeps working.
+- The crafting panel no longer reads the language setting on every frame, a small saving whenever the inventory is open.
 
 # Kindle
 
 Recipe search and sorting, favorites, batch crafting, a recipe tracker, salvage and an optional Cart Workbench.
 
-Version 0.1.26. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.27. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

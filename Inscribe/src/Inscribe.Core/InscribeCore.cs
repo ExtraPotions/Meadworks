@@ -6,7 +6,7 @@ namespace ExtraPotions.Inscribe
     {
         public const string PluginGuid = "com.meadworks.inscribe";
         public const string ProductName = "Inscribe";
-        public const string ProductVersion = "0.2.8";
+        public const string ProductVersion = "0.2.9";
         public const string Family = "Fang";
 
         /// <summary>Localization namespace (design section 13): tokens <c>$meadworks_inscribe_&lt;key&gt;</c>.</summary>

@@ -23,6 +23,8 @@ namespace ExtraPotions.Inscribe.Adopted.Tables
     /// </summary>
     internal static class RuneStash
     {
+        private static bool _dropExceptionWarned;
+
         /// <summary>Moves every rune and pure essence in the inventory into the table; the count moved (0 without ownership).</summary>
         public static int StoreAll(TableStore store, Inventory inventory)
         {
@@ -57,35 +59,44 @@ namespace ExtraPotions.Inscribe.Adopted.Tables
                 return 0;
             }
             int count = item.m_stack;
-            if (!SafeInventory.RemoveStack(inventory, item))
+            int moved = SafeInventory.RemoveFrom(inventory, item, count);
+            if (moved <= 0)
             {
                 return 0;
             }
             if (runeId != null)
             {
-                store.AddRunes(runeId, count);
+                store.AddRunes(runeId, moved);
             }
             else
             {
-                store.AddEssence(count);
+                store.AddEssence(moved);
             }
-            return count;
+            return moved;
         }
 
         /// <summary>Up to <paramref name="amount"/> of the table's stones of one kind into the inventory, as many as fit; the count moved.</summary>
         public static int TakeOut(TableStore store, Inventory inventory, string runeId, int amount)
         {
+            GameObject? prefab = StonePrefabs.Get(runeId);
+            if (prefab == null) return 0;
             int count = store.Writable ? Mathf.Min(store.Runes(runeId), amount) : 0;
-            int moved = count > 0 ? Give(inventory, StonePrefabs.Get(runeId), count) : 0;
-            return moved > 0 && store.TakeRunes(runeId, moved) ? moved : 0;
+            if (count <= 0 || !store.TakeRunes(runeId, count)) return 0;
+            int moved = Give(inventory, prefab, count);
+            if (moved < count) store.AddRunes(runeId, count - moved);
+            return moved;
         }
 
         /// <summary>Up to <paramref name="amount"/> of the pool into the inventory as Essence items, as many as fit; the count moved.</summary>
         public static int TakeEssence(TableStore store, Inventory inventory, int amount)
         {
+            GameObject? prefab = EssenceItem.Prefab;
+            if (prefab == null) return 0;
             int count = store.Writable ? Mathf.Min(store.Essence, amount) : 0;
-            int moved = count > 0 ? Give(inventory, EssenceItem.Prefab, count) : 0;
-            return moved > 0 && store.TakeEssence(moved) ? moved : 0;
+            if (count <= 0 || !store.TakeEssence(count)) return 0;
+            int moved = Give(inventory, prefab, count);
+            if (moved < count) store.AddEssence(count - moved);
+            return moved;
         }
 
         // Adds the prefab's item in full stacks: the game's add fills partial stacks first and returns false when the rest
@@ -99,12 +110,16 @@ namespace ExtraPotions.Inscribe.Adopted.Tables
             }
             int before = RuneBag.CountPrefab(inventory, prefab!.name);
             int max = Mathf.Max(1, drop.m_itemData.m_shared.m_maxStackSize);
-            int left = count;
-            while (left > 0 && inventory.AddItem(Stack(drop, prefab, Mathf.Min(left, max))))
+            try
             {
-                left -= max;
+                int left = count;
+                while (left > 0 && inventory.AddItem(Stack(drop, prefab, Mathf.Min(left, max))))
+                {
+                    left -= max;
+                }
             }
-            return RuneBag.CountPrefab(inventory, prefab.name) - before;
+            catch { }
+            return Mathf.Min(count, Mathf.Max(0, RuneBag.CountPrefab(inventory, prefab.name) - before));
         }
 
         /// <summary>The id of a rune, the Dvergr Chisel or a gem, or null for any other item.</summary>
@@ -139,19 +154,36 @@ namespace ExtraPotions.Inscribe.Adopted.Tables
                 return;
             }
             store.MigrateLegacy();
+            var drops = new System.Collections.Generic.List<(string? RuneId, ItemDrop Drop, GameObject Prefab, int Count)>();
             foreach (string id in StoneCatalog.AllIds)
             {
                 int held = store.Runes(id);
-                if (held > 0 && store.TakeRunes(id, held))
+                AddDrop(drops, id, StonePrefabs.Get(id), held);
+            }
+            AddDrop(drops, null, EssenceItem.Prefab, store.Essence);
+            foreach (var planned in drops)
+            {
+                int max = Mathf.Max(1, planned.Drop.m_itemData.m_shared.m_maxStackSize);
+                for (int left = planned.Count; left > 0; left -= max)
                 {
-                    Drop(StonePrefabs.Get(id), held, at);
+                    int count = Mathf.Min(left, max);
+                    bool debited = planned.RuneId != null
+                        ? store.TakeRunes(planned.RuneId, count)
+                        : store.TakeEssence(count);
+                    if (!debited) break;
+                    if (Drop(planned.Drop, planned.Prefab, count, at)) continue;
+                    if (planned.RuneId != null) store.AddRunes(planned.RuneId, count);
+                    else store.AddEssence(count);
+                    break;
                 }
             }
-            int essence = store.Essence;
-            if (essence > 0 && store.TakeEssence(essence))
-            {
-                Drop(EssenceItem.Prefab, essence, at);
-            }
+        }
+
+        private static void AddDrop(System.Collections.Generic.List<(string? RuneId, ItemDrop Drop, GameObject Prefab, int Count)> plan,
+            string? runeId, GameObject? prefab, int count)
+        {
+            ItemDrop? drop = prefab != null ? prefab.GetComponent<ItemDrop>() : null;
+            if (count > 0 && drop != null) plan.Add((runeId, drop, prefab!, count));
         }
 
         // A stack of the prefab's item at the world level, so it stacks with the player's own.
@@ -164,19 +196,27 @@ namespace ExtraPotions.Inscribe.Adopted.Tables
             return item;
         }
 
-        private static void Drop(GameObject? prefab, int count, Vector3 at)
+        private static bool Drop(ItemDrop drop, GameObject prefab, int count, Vector3 at)
         {
-            ItemDrop? drop = prefab != null ? prefab.GetComponent<ItemDrop>() : null;
-            if (drop == null)
+            ItemDrop.ItemData item;
+            Vector3 position;
+            Quaternion rotation;
+            try
             {
-                return;
+                item = Stack(drop, prefab, count);
+                position = at + Vector3.up * 0.5f + Random.insideUnitSphere * 0.3f;
+                rotation = Quaternion.Euler(0f, Random.Range(0, 360), 0f);
             }
-            int max = Mathf.Max(1, drop.m_itemData.m_shared.m_maxStackSize);
-            for (int left = count; left > 0; left -= max)
+            catch { return false; }
+            try { return ItemDrop.DropItem(item, 0, position, rotation) != null; }
+            catch (System.Exception error)
             {
-                ItemDrop.ItemData item = Stack(drop, prefab!, Mathf.Min(left, max));
-                Vector3 position = at + Vector3.up * 0.5f + Random.insideUnitSphere * 0.3f;
-                ItemDrop.DropItem(item, 0, position, Quaternion.Euler(0f, Random.Range(0, 360), 0f));
+                if (!_dropExceptionWarned)
+                {
+                    _dropExceptionWarned = true;
+                    ExtraPotions.Inscribe.Adopted.Core.Log.Warn($"rune table drop threw after spawn was requested; treating it as spawned: {error.GetType().Name}");
+                }
+                return true;
             }
         }
     }

@@ -8,7 +8,7 @@ All original Barter code, including Barter.Core and Barter.Plugin, is GPL-3.0-or
 
 ## Original documentation and artwork
 
-Original documentation uses CC BY-NC-SA 4.0, with complete terms in licenses/CC-BY-NC-SA-4.0.txt; see LICENSE-ASSETS.md. `icon.png` is an icon drawn for Barter (docs/art-provenance.md), approved by the user 2026-10-10. No upstream image, model or sound is included; the TradersExtended screenshots and package images are not adopted.
+Original documentation and the approved `icon.png` use CC BY-NC-SA 4.0, with complete terms in `licenses/CC-BY-NC-SA-4.0.txt`; see `LICENSE-ASSETS.md` and `docs/art-provenance.md`. No upstream image, model, or sound is included; TradersExtended screenshots and package images are not adopted.
 
 ## Adopted source
 

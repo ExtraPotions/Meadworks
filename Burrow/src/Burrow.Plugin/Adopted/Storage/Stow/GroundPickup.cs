@@ -120,10 +120,13 @@ namespace Burrow.Stow
         private static int Take(Container container, ItemDrop drop)
         {
             ZNetView view = drop.m_nview;
+            // Ask the drop's owner, as the game's own pickup does, and take it on a later sweep once it is ours. Claiming
+            // it locally let two chest owners each believe they held the drop, and both stored it.
             if (!view.IsOwner())
-                view.ClaimOwnership();
-            if (!view.IsOwner())
+            {
+                drop.RequestOwn();
                 return 0;
+            }
             drop.Load();
             ItemDrop.ItemData data = drop.m_itemData.Clone();
             int before = data.m_stack;

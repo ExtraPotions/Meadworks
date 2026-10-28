@@ -1,11 +1,10 @@
-## Changes in 0.5.13
+## Changes in 0.5.14
 
-- Keep landing and map input safe when the teleport service is unavailable.
-- Send notices to the log when the native message HUD is unavailable.
+- If map travel cannot handle a map click, the click goes to the normal map instead of being swallowed.
 
 # Wayfarer
 
-Version 0.5.13. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.14. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Teleport from the world map: Back to Bed for everyone, plus travel cheats the server switches on, usable by admins unless the server allows others.
 

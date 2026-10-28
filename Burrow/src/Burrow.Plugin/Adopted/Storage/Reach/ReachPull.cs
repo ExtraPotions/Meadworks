@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Burrow.Core;
+using Burrow.Shared;
 using UnityEngine;
 
 namespace Burrow.Reach
 {
     /// <summary>
     /// Moves items from the reachable containers into the player's inventory (the Pull modifier and the unit a
-    /// station borrows). Only as much as fits is moved; a stack is removed from its container first and added to
-    /// the inventory with the game's <c>AddItem</c>, and whatever that did not place goes straight back into the
-    /// container. A remainder the container also refuses drops at the player's feet, so an item is never in two
-    /// places and never nowhere.
+    /// station borrows). Only as much as fits is moved; a copy is added with the game's <c>AddItem</c>, then the
+    /// source loses exactly what landed. A short source debit takes back only this transfer's destination units.
     /// </summary>
     public static class ReachPull
     {
@@ -56,32 +56,16 @@ namespace Burrow.Reach
             return moved;
         }
 
-        /// <summary>Takes from the source stack and adds a copy to the target. What the target did not place returns to the source; what the source also refuses drops at the player's feet. Returns how many landed in the target. <paramref name="keptOut"/> is how many did not return to the source.</summary>
+        /// <summary>Adds a copy to the target, then debits exactly what landed from the source. Returns the verified source debit.</summary>
         private static int Transfer(Inventory source, Inventory target, ItemDrop.ItemData item, int take, out int keptOut, out bool removed)
         {
-            keptOut = 0;
-            removed = false;
             ItemDrop.ItemData moving = item.Clone();
             moving.m_stack = take;
             moving.m_equipped = false;
-            if (!source.RemoveItem(item, take))
-                return 0;
-            removed = true;
-            if (target.AddItem(moving))
-            {
-                keptOut = take;
-                return take;
-            }
-            int leftover = moving.m_stack;
-            int unplaced = leftover;
-            if (leftover <= 0 || source.AddItem(moving))
-                unplaced = 0;
-            else
-                unplaced = moving.m_stack;
-            if (unplaced > 0)
-                DropAtFeet(moving);
-            keptOut = take - (leftover - unplaced);
-            return take - leftover;
+            int moved = InventoryTransferDelta.Move(source, item, take, target, moving,
+                added => target.AddItem(added), "Reach pull", out removed);
+            keptOut = moved;
+            return moved;
         }
 
         /// <summary>The remainder is in neither inventory. Drop it in front of the player, the way a shared chest hands over what no longer fits.</summary>
@@ -97,9 +81,25 @@ namespace Burrow.Reach
                 return;
             }
             Transform at = player.transform;
-            ItemDrop drop = ItemDrop.DropItem(item, amount, at.position + at.forward + at.up, at.rotation);
-            if (drop != null)
-                drop.OnPlayerDrop();
+            ItemDrop drop;
+            try
+            {
+                drop = ItemDrop.DropItem(item, amount, at.position + at.forward + at.up, at.rotation);
+                if (drop == null)
+                    drop = ItemDrop.DropItem(item, amount, at.position + at.forward + at.up, at.rotation);
+            }
+            catch (Exception error)
+            {
+                Plugin.Log.LogWarning("Burrow: return drop may already exist: " + error.GetType().Name);
+                return;
+            }
+            if (drop == null)
+            {
+                Plugin.Log.LogError($"Burrow: {amount} of {item.m_shared.m_name} fit neither inventory and could not be dropped");
+                return;
+            }
+            try { drop.OnPlayerDrop(); }
+            catch (Exception error) { Plugin.Log.LogWarning("Burrow: return drop notice: " + error.GetType().Name); }
             Plugin.Log.LogError($"Burrow: {amount} of {item.m_shared.m_name} fit neither inventory and were dropped at the player's feet");
         }
 
@@ -141,16 +141,31 @@ namespace Burrow.Reach
             {
                 if (!ReachRules.RuleFor(container).Accepts(unit) || !container.GetInventory().CanAddItem(unit, 1) || !ContainerScan.Claim(container))
                     continue;
-                if (!inventory.RemoveItem(item, 1))
+                int playerBefore = StackCount(inventory, unit);
+                try { inventory.RemoveItem(item, 1); }
+                catch (Exception) { }
+                int debited = playerBefore - StackCount(inventory, unit);
+                if (debited != 1)
                     return false;
                 Inventory chest = container.GetInventory();
-                int before = chest.CountItems(unit.m_shared.m_name, unit.m_quality, false);
-                if (!chest.AddItem(unit))
+                int before = StackCount(chest, unit);
+                try { chest.AddItem(unit); }
+                catch (Exception) { }
+                int added = StackCount(chest, unit) - before;
+                if (added != 1)
                 {
-                    if (chest.CountItems(unit.m_shared.m_name, unit.m_quality, false) != before)
+                    if (added > 0)
                         ContainerScan.Save(container);
-                    if (unit.m_stack > 0 && !inventory.AddItem(unit) && unit.m_stack > 0)
+                    unit.m_stack = 1;
+                    int restoreBefore = StackCount(inventory, unit);
+                    try { inventory.AddItem(unit); }
+                    catch (Exception) { }
+                    int restored = StackCount(inventory, unit) - restoreBefore;
+                    if (restored < 1)
+                    {
+                        unit.m_stack = 1 - System.Math.Max(0, restored);
                         DropAtFeet(unit);
+                    }
                     return false;
                 }
                 ContainerScan.Save(container);
@@ -179,5 +194,10 @@ namespace Burrow.Reach
             }
             return null;
         }
+
+        private static int StackCount(Inventory inventory, ItemDrop.ItemData sample) => inventory.GetAllItems()
+            .Where(item => item.m_shared != null && sample.m_shared != null && item.m_shared.m_name == sample.m_shared.m_name
+                && item.m_quality == sample.m_quality && item.m_worldLevel == sample.m_worldLevel)
+            .Sum(item => item.m_stack);
     }
 }

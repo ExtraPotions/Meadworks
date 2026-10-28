@@ -34,7 +34,8 @@ namespace ExtraPotions.Inscribe.Runtime
         public static bool RemoveStack(Inventory inventory, ItemDrop.ItemData item)
         {
             if (!inventory.ContainsItem(item)) return false;
-            inventory.RemoveItem(item);
+            try { inventory.RemoveItem(item); }
+            catch { }
             return !inventory.ContainsItem(item);
         }
 
@@ -43,7 +44,8 @@ namespace ExtraPotions.Inscribe.Runtime
         {
             if (amount <= 0 || !inventory.ContainsItem(item)) return 0;
             int before = item.m_stack;
-            if (!inventory.RemoveItem(item, Math.Min(amount, before))) return 0;
+            try { inventory.RemoveItem(item, Math.Min(amount, before)); }
+            catch { }
             return inventory.ContainsItem(item) ? Math.Max(0, before - item.m_stack) : before;
         }
 
@@ -51,7 +53,8 @@ namespace ExtraPotions.Inscribe.Runtime
         public static int Removed(Func<int> count, Action remove)
         {
             int before = count();
-            remove();
+            try { remove(); }
+            catch { }
             return Math.Max(0, before - count());
         }
 

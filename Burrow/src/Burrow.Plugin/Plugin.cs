@@ -31,7 +31,7 @@ namespace Burrow
     {
         public const string PluginGuid = "com.meadworks.burrow";
         public const string PluginName = "Burrow";
-        public const string PluginVersion = "0.3.31";
+        public const string PluginVersion = "0.3.32";
         public static ManualLogSource Log { get; private set; }
         public static SyncedConfiguration Synced { get; private set; }
         public static ConfigEntry<bool> LockConfiguration { get; private set; }

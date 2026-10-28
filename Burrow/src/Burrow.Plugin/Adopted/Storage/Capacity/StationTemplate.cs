@@ -28,7 +28,24 @@ namespace Burrow.Capacity
             if (!File.Exists(path))
                 return;
             string template = ContainerTemplate.DefaultText(set);
-            if (template == null || Normalize(File.ReadAllText(path)) != Normalize(template))
+            string current;
+            try
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+                using (StreamReader reader = new StreamReader(stream, true))
+                    current = reader.ReadToEnd();
+            }
+            catch (IOException error)
+            {
+                Plugin.Log.LogWarning($"Burrow: could not read {path}: {error.GetType().Name}");
+                return;
+            }
+            catch (UnauthorizedAccessException error)
+            {
+                Plugin.Log.LogWarning($"Burrow: could not read {path}: {error.GetType().Name}");
+                return;
+            }
+            if (template == null || Normalize(current) != Normalize(template))
                 return;
             string generated = Generate(template, StationPrefabs.All());
             synced.Yaml.Replace(set, new Dictionary<string, string> { [path] = generated }, saveToDisk: true);

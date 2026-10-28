@@ -1,8 +1,13 @@
 # Saga
 
-Version 0.1.18. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+## Changes in 0.1.19
 
-Boss kills turn the Forsaken powers into permanent passives, and Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks as they level.
+- If your inventory is full, a Thrifty crafting refund drops at your feet. Saga shows the translated Thrifty message only after the item reaches your inventory or the ground.
+- Thrifty refunds only materials the craft actually removed from your inventory, so a short or refused material payment can no longer create extra materials.
+
+Version 0.1.19. Requires Crucible 0.3.28 / Crucible.UI 0.3.20. Changes are in [CHANGELOG.md](CHANGELOG.md).
+
+Boss kills turn the Forsaken powers into permanent passives, and Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks as they level. A Thrifty crafting refund is reported only after it reaches your inventory or the ground.
 
 ## Features
 

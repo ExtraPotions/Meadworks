@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.16 (2026-10-28)
+
+- Ban, unban, temporary-ban and warning commands now report a ledger save failure instead of confirming success. The live server action may already have happened.
+
 ## 0.1.15 (2026-10-26)
 
 - A dedicated server now registers the freeze acknowledgement, so freezes and unfreezes are no longer recorded as timed out.

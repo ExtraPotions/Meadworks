@@ -556,6 +556,7 @@
     "crafting_makers_mark": "Marque du maître : jusqu’à +{0}% de durabilité sur les équipements fabriqués",
     "crafting_sturdy_build": "Construction robuste : jusqu’à +{0}% de vie pour les structures au marteau",
     "crafting_thrifty": "Économe : jusqu’à {0}% de chance de récupérer un matériau consommé",
+    "crafting_thrifty_saved": "Économe : récupération de {0} × {1}",
     "crafting_journeyman": "Compagnon : l’établi et la forge comptent 1 niveau de plus pour la fabrication, l’amélioration et la réparation",
     "crafting_journeyman_locked": "Compagnon se débloque à Fabrication 75",
     "sneak_vanish": "Disparition : s’accroupir 3 s sans ennemis proches rompt la poursuite",

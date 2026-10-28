@@ -556,6 +556,7 @@
     "crafting_makers_mark": "工匠印记：制造的装备耐久度最高提升 {0}%",
     "crafting_sturdy_build": "坚固营建：使用工具锤建造的构件耐久最高提升 {0}%",
     "crafting_thrifty": "节约：制造时最高有 {0}% 概率返还消耗的材料",
+    "crafting_thrifty_saved": "节约：已返还 {0} × {1}",
     "crafting_journeyman": "熟练工：工作台和锻造台在制作、升级与修理时等级额外计为 +1",
     "crafting_journeyman_locked": "熟练工在制作等级 75 解锁",
     "sneak_vanish": "隐匿消失：在附近无敌人处保持蹲伏 3 秒可解除追击",

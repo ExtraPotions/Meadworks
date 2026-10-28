@@ -24,11 +24,11 @@ namespace ExtraPotions.Meadworks.Crucible {
             log=MeadworksLog.For(logger,"Crucible");
             foreach(var category in MischiefCategories.All){
                 var entry=MeadworksConfig.Bind(config,MischiefPolicy.Section,MischiefPolicy.SettingKey(category),MischiefPolicy.DefaultAccess,
-                    "Who may use "+category+" cheats on this server: Nobody, Admins, Listed (admins and Listed Players) or Everyone. Single player and the host always may. "+Describe(category),ConfigScope.ServerAuthoritative);
+                    "Who may use "+category+" cheats on this server: Nobody, Admins, Listed (admins and Listed Players) or Everyone. Single player and the host always may. "+Describe(category)+" Crucible owns this server setting; its value applies to joining clients.",ConfigScope.ServerAuthoritative);
                 entry.SettingChanged+=Changed;access[category]=entry;
             }
             listed=MeadworksConfig.Bind(config,MischiefPolicy.Section,MischiefPolicy.ListedKey,"",
-                "Platform user IDs granted Listed cheat categories, separated by commas (for example Steam_76561198000000000; a bare number means a Steam ID, as in adminlist.txt).",ConfigScope.ServerAuthoritative);
+                "Platform user IDs granted Listed cheat categories, separated by commas (for example Steam_76561198000000000; a bare number means a Steam ID, as in adminlist.txt). Crucible owns this server setting; its value applies to joining clients.",ConfigScope.ServerAuthoritative);
             listed.SettingChanged+=Changed;
             playerCheats=MeadworksConfig.BindHidden(config,MischiefPolicy.Section,"Players May Use","",
                 "Managed by the MeadWorks menus: cheat settings the admin lets every player use (config|Section.Key, separated by commas). Cheats not listed stay admins only.",ConfigScope.ServerAuthoritative);

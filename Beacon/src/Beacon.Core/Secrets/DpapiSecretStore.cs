@@ -22,6 +22,8 @@ namespace ExtraPotions.Beacon.Secrets
         readonly Func<string?> readFile;
         readonly Action<string> writeFile;
         readonly SortedDictionary<string, string> blobs = new SortedDictionary<string, string>(StringComparer.Ordinal);
+        // Lines Load could not parse, kept byte for byte so the next save does not erase a blob that might be repaired.
+        readonly List<string> unreadable = new List<string>();
 
         public DpapiSecretStore(Func<string?> readFile, Action<string> writeFile)
         {
@@ -90,6 +92,7 @@ namespace ExtraPotions.Beacon.Secrets
         {
             var n = blobs.Count;
             blobs.Clear();
+            unreadable.Clear();
             Save();
             return n;
         }
@@ -99,12 +102,13 @@ namespace ExtraPotions.Beacon.Secrets
             var text = readFile() ?? "";
             foreach (var raw in text.Split('\n'))
             {
-                var line = raw.Trim();
+                var preserved = raw.EndsWith("\r", StringComparison.Ordinal) ? raw.Substring(0, raw.Length - 1) : raw;
+                var line = preserved.Trim();
+                if (line.Length == 0) continue;
                 var eq = line.IndexOf('=');
-                if (eq <= 0) continue;
-                var reference = line.Substring(0, eq);
-                var blob = line.Substring(eq + 1);
-                if (!SecretReference.IsValid(reference) || !IsBase64(blob)) continue;
+                var reference = eq > 0 ? line.Substring(0, eq) : "";
+                var blob = eq > 0 ? line.Substring(eq + 1) : "";
+                if (eq <= 0 || !SecretReference.IsValid(reference) || !IsBase64(blob)) { unreadable.Add(preserved); continue; }
                 blobs[reference] = blob;
             }
         }
@@ -113,6 +117,7 @@ namespace ExtraPotions.Beacon.Secrets
         {
             var b = new StringBuilder();
             foreach (var pair in blobs) b.Append(pair.Key).Append('=').Append(pair.Value).Append('\n');
+            foreach (var line in unreadable) b.Append(line).Append('\n');
             writeFile(b.ToString());
         }
 

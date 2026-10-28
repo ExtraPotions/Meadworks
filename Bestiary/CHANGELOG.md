@@ -1,3 +1,7 @@
+## 0.1.23 (2026-10-28)
+
+- A crypt chest is left intact when its mimic cannot be spawned, and the failed spawn is not retried every frame.
+
 ## 0.1.22 (2026-10-26)
 
 - BogHook, Javelineer, Slag and Marrow templates are replaced instead of piling up each time a world loads.

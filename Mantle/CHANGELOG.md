@@ -1,3 +1,9 @@
+## 0.1.33 (2026-10-28)
+
+- Take All from a tombstone or another container moves only the amount that reached the destination, including partial stack space.
+- Backpacks and tackleboxes returning from a tombstone now leave the source copy in place unless the item reaches its reserved slot.
+- If Mantle adds items to your inventory but cannot remove the full amount from the tombstone or container, it removes only the extra items it just added and leaves other inventory changes alone.
+
 ## 0.1.32 (2026-10-26)
 
 - Tacklebox and pop-up counts are written only when they change.

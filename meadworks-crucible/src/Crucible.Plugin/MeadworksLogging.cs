@@ -27,13 +27,13 @@ namespace ExtraPotions.Meadworks.Crucible {
 
         internal static void Bind(ConfigFile config){
             stopped=false;StartCounting();
-            level=MeadworksConfig.Bind(config,"Logging","Level",LogVerbosity.Quiet,"Meadworks log level: Quiet (errors and warnings), Normal, Verbose or Debug. Also: console 'meadworks log <level> [product]'.");
-            overrides=MeadworksConfig.Bind(config,"Logging","ProductOverrides","","Per-product levels, for example 'Wildroot=Debug,Burrow=Normal'.");
-            window=MeadworksConfig.Bind(config,"Logging","RepeatWindowSeconds",60f,new ConfigDescription("Identical lines inside this window are written once and counted; 0 writes every line.",new AcceptableValueRange<float>(0f,3600f)));
-            filterEnabled=MeadworksConfig.Bind(config,"Logging","ConsoleFilterEnabled",false,"Filter the BepInEx console for all installed mods by the rules below.");
-            filterRules=MeadworksConfig.Bind(config,"Logging","ConsoleFilterRules","","Per-source console levels: 'Source=All|Info|Warning|Error|None', separated by ';'. '*' sets the level for unlisted sources.");
-            filterDisk=MeadworksConfig.Bind(config,"Logging","ConsoleFilterAppliesToDiskLog",false,"Also apply the console filter rules to BepInEx's LogOutput.log.");
-            showAll=MeadworksConfig.Bind(config,"Logging","ShowAllConsoleMessages",false,"Show every message on the BepInEx console. By default Crucible hides a short, exact list of known-harmless vanilla and Unity messages (world-generation hints, missing audio or video shaders on a dedicated server and similar); LogOutput.log always keeps everything.");
+            level=MeadworksConfig.Bind(config,"Logging","Level",LogVerbosity.Quiet,"MeadWorks log level: Quiet (errors and warnings), Normal, Verbose or Debug. Also: console 'meadworks log <level> [product]'. Crucible owns this local installation setting.");
+            overrides=MeadworksConfig.Bind(config,"Logging","ProductOverrides","","Per-product levels, for example 'Wildroot=Debug,Burrow=Normal'. Crucible owns this local installation setting.");
+            window=MeadworksConfig.Bind(config,"Logging","RepeatWindowSeconds",60f,new ConfigDescription("Identical lines inside this window are written once and counted; 0 writes every line. Crucible owns this local installation setting.",new AcceptableValueRange<float>(0f,3600f)));
+            filterEnabled=MeadworksConfig.Bind(config,"Logging","ConsoleFilterEnabled",false,"Filter the BepInEx console for all installed mods by the rules below. Crucible owns this local installation setting.");
+            filterRules=MeadworksConfig.Bind(config,"Logging","ConsoleFilterRules","","Per-source console levels: 'Source=All|Info|Warning|Error|None', separated by ';'. '*' sets the level for unlisted sources. Crucible owns this local installation setting.");
+            filterDisk=MeadworksConfig.Bind(config,"Logging","ConsoleFilterAppliesToDiskLog",false,"Also apply the console filter rules to BepInEx's LogOutput.log. Crucible owns this local installation setting.");
+            showAll=MeadworksConfig.Bind(config,"Logging","ShowAllConsoleMessages",false,"Show every message on the BepInEx console. By default Crucible hides a short, exact list of known-harmless vanilla and Unity messages (world-generation hints, missing audio or video shaders on a dedicated server and similar); LogOutput.log always keeps everything. Crucible owns this local installation setting.");
             config.SettingChanged+=(_,args)=>{if(!persisting&&args.ChangedSetting.Definition.Section=="Logging")Load();};
             Load();
             if(!showAll.Value&&Plugin.Log!=null)Plugin.Log.LogInfo("Crucible: hiding "+KnownConsoleNoise.Embedded.Rules.Count+" known-harmless vanilla console messages (full log in LogOutput.log)");

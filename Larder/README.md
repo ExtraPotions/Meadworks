@@ -1,10 +1,11 @@
-## Changes in 0.2.18
+## Changes in 0.2.19
 
-- If the cooking patches fail to install, they are not retried every frame. Switching Cooking off and on, or restarting, tries again.
+- A reserved cooking ingredient is recovered from a backup when a station's saved state is damaged.
+- If a rejected cooking ingredient is returned to you but the station's reservation can't be cleared, the returned copy is taken back, so the ingredient is never duplicated.
 
 # Larder
 
-Version 0.2.18. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.19. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Food and mead values, eating, regeneration, stamina costs, kitchen stations and Cooking skill perks.
 

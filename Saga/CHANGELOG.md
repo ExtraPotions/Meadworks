@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.19 (2026-10-28)
+
+- If your inventory is full, a Thrifty crafting refund drops at your feet. Saga shows the translated Thrifty message only after the item reaches your inventory or the ground.
+- Thrifty refunds only materials the craft actually removed from your inventory, so a short or refused material payment can no longer create extra materials.
+
 ## 0.1.18 (2026-10-26)
 
 - The "Vanished" text shown when you vanish from sight is translated into all seven supported languages.

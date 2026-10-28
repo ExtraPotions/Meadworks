@@ -28,9 +28,9 @@ namespace Mantle.Tackle
             IReadOnlyList<Vector2i> cells = InventoryState.CellsOf(SlotKind.Tacklebox);
             if (box == null || cells.Count == 0 || inventory.GetItemAt(cells[0].x, cells[0].y) != null)
                 return;
-            if (!inventory.AddItem(box, box.m_stack, cells[0].x, cells[0].y))
+            if (!InventoryTransfer.Move(grave, box, box.m_stack, inventory, box,
+                moving => inventory.AddItem(moving, moving.m_stack, cells[0].x, cells[0].y)))
                 return;
-            grave.RemoveItem(box);
             LayoutApply.Apply(InventoryState.Player, dropOverflow: true);
         }
 

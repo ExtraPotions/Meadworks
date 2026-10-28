@@ -1,10 +1,10 @@
-## Changes in 0.1.16
+## Changes in 0.1.17
 
-- A HUD part that keeps failing waits five seconds before its next try instead of being rebuilt and removed every frame. The first failure is still logged in full.
+- Ship speed multipliers now reflect Forward Drag changes.
 
 # Keel
 
-Version 0.1.16. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.17. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Tune every ship, level a Sailing skill, and build eight new ships from the vanilla hulls.
 

@@ -39,6 +39,12 @@ namespace ExtraPotions.Thing.Runtime
     }
 
     internal enum MuteWriteResult { Refused, Saved, LiveOnly }
+    internal readonly struct ModerationWriteResult
+    {
+        internal ModerationWriteResult(LedgerChange change, bool saved) { Change = change; Saved = saved; }
+        internal LedgerChange Change { get; }
+        internal bool Saved { get; }
+    }
 
     public static class ThingServer
     {
@@ -117,6 +123,9 @@ namespace ExtraPotions.Thing.Runtime
 
         /// <summary>Bans by platform ID (online or not); <paramref name="duration"/> null is permanent.</summary>
         public static LedgerChange Ban(Actor target, OnlinePlayer? online, Actor admin, string reason, TimeSpan? duration)
+            => BanWithPersistence(target, online, admin, reason, duration).Change;
+
+        internal static ModerationWriteResult BanWithPersistence(Actor target, OnlinePlayer? online, Actor admin, string reason, TimeSpan? duration)
         {
             var text = Reasons.Normalize(reason);
             var change = ledger.Ban(target, admin, text, DateTime.UtcNow, duration);
@@ -128,28 +137,39 @@ namespace ExtraPotions.Thing.Runtime
                 else ThingNotices.Send(online.Value.Peer.m_uid, ThingTextKeys.Banned, shown);
                 pendingKicks.Add((online.Value.Peer.m_uid, clock.Elapsed.TotalSeconds + KickDelaySeconds));
             }
-            SaveLedger();
-            Audit(admin, duration.HasValue ? ThingAction.TempBan : ThingAction.Ban, target, AuditOutcome.Done,
-                (duration.HasValue ? Durations.Describe(duration.Value) + ": " : "") + text);
-            return change;
+            var saved = SaveLedger();
+            Audit(admin, duration.HasValue ? ThingAction.TempBan : ThingAction.Ban, target, saved ? AuditOutcome.Done : AuditOutcome.Failed,
+                (duration.HasValue ? Durations.Describe(duration.Value) + ": " : "") + text
+                + (saved ? "" : "; native ban changed; ledger persistence uncertain"));
+            return new ModerationWriteResult(change, saved);
         }
 
         public static LedgerChange Unban(string id, Actor admin)
+            => UnbanWithPersistence(id, admin).Change;
+
+        internal static ModerationWriteResult UnbanWithPersistence(string id, Actor admin)
         {
             var change = ledger.Unban(id);
             net!.Unban(id);
-            SaveLedger();
-            Audit(admin, ThingAction.Unban, new Actor(id, ""), AuditOutcome.Done, change == LedgerChange.Removed ? "" : "not in Thing's ledger");
-            return change;
+            var saved = SaveLedger();
+            Audit(admin, ThingAction.Unban, new Actor(id, ""), saved ? AuditOutcome.Done : AuditOutcome.Failed,
+                (change == LedgerChange.Removed ? "" : "not in Thing's ledger")
+                + (saved ? "" : "; native unban changed; ledger persistence uncertain"));
+            return new ModerationWriteResult(change, saved);
         }
 
         public static void Warn(OnlinePlayer target, Actor admin, string reason)
+            => WarnWithPersistence(target, admin, reason);
+
+        internal static bool WarnWithPersistence(OnlinePlayer target, Actor admin, string reason)
         {
             var text = Reasons.Normalize(reason);
             ledger.Warn(target.Actor, admin, text, DateTime.UtcNow);
             ThingNotices.Send(target.Peer.m_uid, ThingTextKeys.Warned, text);
-            SaveLedger();
-            Audit(admin, ThingAction.Warn, target.Actor, AuditOutcome.Done, text);
+            var saved = SaveLedger();
+            Audit(admin, ThingAction.Warn, target.Actor, saved ? AuditOutcome.Done : AuditOutcome.Failed,
+                text + (saved ? "" : "; warning delivered; ledger persistence uncertain"));
+            return saved;
         }
 
         public static bool Say(Actor admin, string text, bool topLeft = false)

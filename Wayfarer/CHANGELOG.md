@@ -1,3 +1,7 @@
+## 0.5.14 (2026-10-28)
+
+- If map travel cannot handle a map click, the click goes to the normal map instead of being swallowed.
+
 ## 0.5.13
 
 - Keep landing and map input safe when the teleport service is unavailable.

@@ -2,7 +2,9 @@
 // Meadworks-original: winter freeze for ripe crops; failed survival drops their normal harvest once.
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text;
 using ExtraPotions.Solstice.Calendar;
 using ExtraPotions.Solstice.Effects;
 using ExtraPotions.Solstice.Localization;
@@ -20,6 +22,8 @@ namespace ExtraPotions.Solstice.Runtime
         static readonly int RealFreezeKey = "solstice_freeze_remaining".GetStableHashCode();
         static readonly int WindowKey = "solstice_freeze_window".GetStableHashCode();
         static readonly int SurvivedKey = "solstice_survived".GetStableHashCode();
+        static readonly int HarvestProgressKey = "solstice_harvest_progress".GetStableHashCode();
+        static readonly int HarvestPlanKey = "solstice_harvest_plan".GetStableHashCode();
         static ConditionalWeakTable<Pickable, CropFreezeTimer> timers = new ConditionalWeakTable<Pickable, CropFreezeTimer>();
         static readonly HashSet<CropWatch> watches = new HashSet<CropWatch>();
 
@@ -63,6 +67,23 @@ namespace ExtraPotions.Solstice.Runtime
                 {
                     SolsticeSeasons.LogWarning("Crop winter: " + error.GetType().Name);
                     return true;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(Pickable), "RPC_SetPicked")]
+        static class Picked
+        {
+            static void Postfix(Pickable __instance)
+            {
+                try
+                {
+                    var view = __instance.m_nview;
+                    if (view != null && view.IsValid() && view.IsOwner()) ClearHarvest(view.GetZDO());
+                }
+                catch (Exception error)
+                {
+                    SolsticeSeasons.LogWarning("Crop harvest state: " + error.GetType().Name);
                 }
             }
         }
@@ -181,9 +202,9 @@ namespace ExtraPotions.Solstice.Runtime
                     zdo.Set(FreezeKey, 0L);
                     break;
                 case CropWinterAction.Perish:
+                    Harvest(pickable, view);
                     zdo.Set(RealFreezeKey, 0L);
                     zdo.Set(FreezeKey, 0L);
-                    Harvest(pickable, view);
                     break;
                 case CropWinterAction.ClearFreeze:
                     if (zdo.GetLong(RealFreezeKey, 0L) != 0L) zdo.Set(RealFreezeKey, 0L);
@@ -195,16 +216,89 @@ namespace ExtraPotions.Solstice.Runtime
         static void Harvest(Pickable pickable, ZNetView view)
         {
             if (!view.IsOwner() || pickable.m_picked || pickable.m_itemPrefab == null) return;
-            // Mark it picked before Drop. A throw must not leave the crop free to harvest again.
-            // RPC_Pick dereferences the local player on the dedicated-server baseline.
-            pickable.m_picked = true;
+            var zdo = view.GetZDO();
+            string savedPlan = zdo.GetString(HarvestPlanKey, "");
+            List<(GameObject Prefab, int Stack)> drops;
+            if (savedPlan.Length == 0)
+            {
+                drops = Plan(pickable);
+                zdo.Set(HarvestPlanKey, Encode(drops));
+            }
+            else
+            {
+                drops = Decode(savedPlan);
+            }
+            int progress = Math.Max(0, Math.Min(drops.Count, zdo.GetInt(HarvestProgressKey, 0)));
+            for (int i = progress; i < drops.Count; i++)
+            {
+                try
+                {
+                    pickable.Drop(drops[i].Prefab, i, drops[i].Stack);
+                }
+                catch (Exception error)
+                {
+                    zdo.Set(HarvestProgressKey, i + 1);
+                    SolsticeSeasons.LogWarning("Crop harvest drop: " + error.GetType().Name);
+                    continue;
+                }
+                zdo.Set(HarvestProgressKey, i + 1);
+            }
             view.InvokeRPC(ZNetView.Everybody, "RPC_SetPicked", true);
+            pickable.m_picked = true;
+            ClearHarvest(zdo);
+        }
+
+        static List<(GameObject Prefab, int Stack)> Plan(Pickable pickable)
+        {
             int amount = pickable.m_dontScale ? pickable.m_amount
                 : Math.Max(pickable.m_minAmountScaled, Game.instance.ScaleDrops(pickable.m_itemPrefab, pickable.m_amount));
-            int offset = 0;
-            for (int i = 0; i < amount; i++) pickable.Drop(pickable.m_itemPrefab, offset++, 1);
+            var drops = new List<(GameObject Prefab, int Stack)>();
+            for (int i = 0; i < amount; i++) drops.Add((pickable.m_itemPrefab, 1));
             if (!pickable.m_extraDrops.IsEmpty())
-                foreach (var item in pickable.m_extraDrops.GetDropListItems()) pickable.Drop(item.m_dropPrefab, offset++, item.m_stack);
+                foreach (var item in pickable.m_extraDrops.GetDropListItems())
+                    if (item.m_dropPrefab == null) throw new InvalidOperationException("A winter crop drop prefab is missing.");
+                    else drops.Add((item.m_dropPrefab, item.m_stack));
+            return drops;
+        }
+
+        static string Encode(List<(GameObject Prefab, int Stack)> drops)
+        {
+            var text = new StringBuilder("1");
+            foreach (var drop in drops)
+            {
+                string name = drop.Prefab != null ? drop.Prefab.name : "";
+                if (name.Length == 0 || drop.Stack <= 0) throw new InvalidOperationException("A winter crop drop plan is invalid.");
+                text.Append('|').Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(name)))
+                    .Append(':').Append(drop.Stack.ToString(CultureInfo.InvariantCulture));
+            }
+            return text.ToString();
+        }
+
+        static List<(GameObject Prefab, int Stack)> Decode(string text)
+        {
+            string[] entries = text.Split('|');
+            if (entries.Length == 0 || entries[0] != "1") throw new InvalidOperationException("A winter crop drop plan is invalid.");
+            var drops = new List<(GameObject Prefab, int Stack)>();
+            for (int i = 1; i < entries.Length; i++)
+            {
+                int separator = entries[i].LastIndexOf(':');
+                if (separator <= 0 || !int.TryParse(entries[i].Substring(separator + 1), NumberStyles.None,
+                    CultureInfo.InvariantCulture, out int stack) || stack <= 0)
+                    throw new InvalidOperationException("A winter crop drop plan is invalid.");
+                string name;
+                try { name = Encoding.UTF8.GetString(Convert.FromBase64String(entries[i].Substring(0, separator))); }
+                catch (FormatException) { throw new InvalidOperationException("A winter crop drop plan is invalid."); }
+                GameObject prefab = ZNetScene.instance != null ? ZNetScene.instance.GetPrefab(name) : null;
+                if (prefab == null) throw new InvalidOperationException("A winter crop drop prefab is missing.");
+                drops.Add((prefab, stack));
+            }
+            return drops;
+        }
+
+        static void ClearHarvest(ZDO zdo)
+        {
+            zdo.Set(HarvestProgressKey, 0);
+            zdo.Set(HarvestPlanKey, "");
         }
 
         static string Line(CropWinterDecision decision)

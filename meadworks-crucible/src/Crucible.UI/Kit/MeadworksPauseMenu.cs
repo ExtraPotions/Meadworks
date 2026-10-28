@@ -58,7 +58,7 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         internal static void Bind(ConfigFile config)
         {
             menuKey = MeadworksConfig.Bind(config, MeadworksMenuKey.Section, MeadworksMenuKey.Name, new KeyboardShortcut(KeyCode.F8),
-                "Opens the Meadworks menu (the window list of Esc > Meadworks) from anywhere in game, except while chat, the console or a text field has the keys. Empty: no key; Esc > Meadworks still works.",
+                "Opens the MeadWorks menu (the window list of Esc > MeadWorks) from anywhere in game, except while chat, the console or a text field has the keys. Empty: no key; Esc > MeadWorks still works. Crucible.UI owns this local player setting.",
                 ConfigScope.Local);
         }
 

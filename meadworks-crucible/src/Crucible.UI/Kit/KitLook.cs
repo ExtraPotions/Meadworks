@@ -66,24 +66,24 @@ namespace ExtraPotions.Meadworks.Crucible.UI
         internal static void Bind(ConfigFile config)
         {
             Styled = MeadworksConfig.Bind(config, Section, "Styled Panels", true,
-                "The brown framed look of Meadworks panels, their cells and buttons. Off: the game's wood.");
+                "The brown framed look of MeadWorks panels, their cells and buttons. Off: the game's wood. Crucible.UI owns this local player setting.");
             PanelTheme = MeadworksConfig.Bind(config, Section, "Panel Theme", KitThemeKind.Timber,
-                "Timber: shared warm wallpaper with softly chopped, beveled wood edges. Brown: the original brown artwork. Styled Panels off restores the game's panels. Cosmetic, local to this player.");
+                "Timber: shared warm wallpaper with softly chopped, beveled wood edges. Brown: the original brown artwork. Styled Panels off restores the game's panels. Cosmetic, local to this player. Crucible.UI owns this local player setting.");
             FrameWidth = MeadworksConfig.Bind(config, Section, "Timber Border Width", TimberGeometry.DefaultWidth,
-                new ConfigDescription("How thick the wooden edge of Meadworks panels is.",
+                new ConfigDescription("How thick the wooden edge of MeadWorks panels is. Crucible.UI owns this local player setting.",
                     new AcceptableValueRange<float>(TimberGeometry.MinWidth, TimberGeometry.MaxWidth), new ConfigurationManagerAttributes()));
             FrameJaggedness = MeadworksConfig.Bind(config, Section, "Timber Border Jaggedness", TimberGeometry.DefaultJaggedness,
-                new ConfigDescription("How roughly the wooden edge of Meadworks panels is cut.",
+                new ConfigDescription("How roughly the wooden edge of MeadWorks panels is cut. Crucible.UI owns this local player setting.",
                     new AcceptableValueRange<float>(TimberGeometry.MinJaggedness, TimberGeometry.MaxJaggedness), new ConfigurationManagerAttributes()));
             NightShadeSetting = MeadworksConfig.Bind(config, Section, "Night Shade", NightShadeCurve.Default,
-                new ConfigDescription("How dark Meadworks panels get at night, as the game's own wooden panels darken with the light around you (dark weather shades them too). 1 keeps them as bright as day; 0.65 at midnight in clear weather. Gray only, never the weather's color. Cells never change.",
+                new ConfigDescription("How dark MeadWorks panels get at night, as the game's own wooden panels darken with the light around you (dark weather shades them too). 1 keeps them as bright as day; 0.65 at midnight in clear weather. Gray only, never the weather's color. Cells never change. Crucible.UI owns this local player setting.",
                     new AcceptableValueRange<float>(NightShadeCurve.Min, NightShadeCurve.Max)));
             GamePanels = MeadworksConfig.Bind(config, Section, "Theme Game Panels", KitGamePanels.Auto,
-                "Dress the game's own wood panels (crafting, character dialogs, settings) in the Timber look. Auto: when a Meadworks product that lays out the inventory asks for it. Always or Never override.");
+                "Dress the game's own wood panels (crafting, character dialogs, settings) in the Timber look. Auto: when a MeadWorks product that lays out the inventory asks for it. Always or Never override. Crucible.UI owns this local player setting.");
             MapFrames = MeadworksConfig.Bind(config, Section, KitMapFrameRules.ConfigName, KitMapFrameRules.DefaultOn,
-                "Draw Meadworks wood-and-bronze frames over the game's minimap and large map. The map itself (terrain, pins, fog) is the game's own and stays untouched. Off: the game's maps exactly as they were. Cosmetic, local to this player.");
+                "Draw MeadWorks wood-and-bronze frames over the game's minimap and large map. The map itself (terrain, pins, fog) is the game's own and stays untouched. Off: the game's maps exactly as they were. Cosmetic, local to this player. Crucible.UI owns this local player setting.");
             ScreenLayout = MeadworksConfig.Bind(config, Section, "Meadworks Screen Layout", true,
-                "Lay the inventory screen out in named regions: the grid at the top left, the equipment panel beside it, the character header and the crafting panel in a column at the right, and a dock for product panels under the equipment panel. Off: the game's own placement. Local to this player.");
+                "Lay the inventory screen out in named regions: the grid at the top left, the equipment panel beside it, the character header and the crafting panel in a column at the right, and a dock for product panels under the equipment panel. Off: the game's own placement. Local to this player. Crucible.UI owns this local player setting.");
             Styled.SettingChanged += (sender, args) => Changed?.Invoke();
             PanelTheme.SettingChanged += (sender, args) => Changed?.Invoke();
             GamePanels.SettingChanged += (sender, args) => Changed?.Invoke();

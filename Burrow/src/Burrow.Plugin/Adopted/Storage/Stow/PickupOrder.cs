@@ -26,10 +26,21 @@ namespace Burrow.Stow
             float rank = Rank(container, item, at);
             foreach (Container rival in ContainerScan.Nearby(at, StowSettings.PickupRange.Value, ContainerUse.Stow))
             {
-                if (rival != container && Rank(rival, item, at) < rank && TakesNow(rival, item))
+                if (rival == container)
+                    continue;
+                float other = Rank(rival, item, at);
+                if ((other < rank || other == rank && Before(rival, container)) && TakesNow(rival, item))
                     return false;
             }
             return true;
+        }
+
+        /// <summary>Breaks an equal rank by the chests' ids, so every owner orders the same two chests the same way.</summary>
+        private static bool Before(Container a, Container b)
+        {
+            ZDOID x = a.m_nview != null && a.m_nview.GetZDO() != null ? a.m_nview.GetZDO().m_uid : ZDOID.None;
+            ZDOID y = b.m_nview != null && b.m_nview.GetZDO() != null ? b.m_nview.GetZDO().m_uid : ZDOID.None;
+            return x.UserID != y.UserID ? x.UserID < y.UserID : x.ID < y.ID;
         }
 
         /// <summary>Holders first, then nearer first: the lower, the sooner.</summary>

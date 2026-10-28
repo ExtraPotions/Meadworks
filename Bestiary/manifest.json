@@ -1,6 +1,6 @@
 {
   "name": "Bestiary",
-  "version_number": "0.1.22",
+  "version_number": "0.1.23",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Bestiary",
   "description": "Meadworks creatures and bone arsenal: Crypt Mimic, Greydwarf Slinger, Rime Giant, Kraken, the arsenal skeletons, the Skeleton Crossbowman and the Crypt Executioner. Required on all peers.",
   "dependencies": [

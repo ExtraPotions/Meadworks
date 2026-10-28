@@ -8,4 +8,4 @@ The Corresponding Source for this version is at https://github.com/ExtraPotions/
 
 The optional four-mode ore transport policy is independently implemented from PotalMap 1.0.4's public changelog, as a behavior reference only. No PotalMap implementation was copied. The existing source-portal policy remains the default.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.11/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.12/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.

@@ -26,9 +26,9 @@ namespace Mantle.Backpacks
             IReadOnlyList<Vector2i> cells = InventoryState.CellsOf(SlotKind.Backpack);
             if (pack == null || cells.Count == 0 || inventory.GetItemAt(cells[0].x, cells[0].y) != null)
                 return;
-            if (!inventory.AddItem(pack, pack.m_stack, cells[0].x, cells[0].y))
+            if (!InventoryTransfer.Move(grave, pack, pack.m_stack, inventory, pack,
+                moving => inventory.AddItem(moving, moving.m_stack, cells[0].x, cells[0].y)))
                 return;
-            grave.RemoveItem(pack);
             LayoutApply.Apply(InventoryState.Player, dropOverflow: true);
         }
 

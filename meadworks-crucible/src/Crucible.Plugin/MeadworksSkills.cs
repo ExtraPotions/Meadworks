@@ -151,7 +151,7 @@ namespace ExtraPotions.Meadworks.Crucible {
 
         internal static void Install(ConfigFile config,ManualLogSource logger){
             Log=MeadworksLog.For(logger,"Crucible");
-            experienceSetting=MeadworksConfig.Bind(config,"Skills","ExperienceMultiplier",1f,"Multiplies experience in every Meadworks custom skill (products' own skills, not the game's). The server's value applies in multiplayer.",ConfigScope.ServerAuthoritative,new AcceptableValueRange<float>(0f,10f));
+            experienceSetting=MeadworksConfig.Bind(config,"Skills","ExperienceMultiplier",1f,"Multiplies experience in every MeadWorks custom skill (products' own skills, not the game's). The server's value applies in multiplayer. Crucible owns this server setting; its value applies to joining clients.",ConfigScope.ServerAuthoritative,new AcceptableValueRange<float>(0f,10f));
             harmony=new Harmony(Plugin.Guid+".skills");
             Patch(typeof(Skills),"Awake",postfix:nameof(AfterSkillsAwake));
             Patch(typeof(Skills),"IsSkillValid",postfix:nameof(AfterIsSkillValid));

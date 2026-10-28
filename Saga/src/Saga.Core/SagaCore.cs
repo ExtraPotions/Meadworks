@@ -6,7 +6,7 @@ namespace ExtraPotions.Saga
     {
         public const string PluginGuid = "com.meadworks.saga";
         public const string ProductName = "Saga";
-        public const string ProductVersion = "0.1.18";
+        public const string ProductVersion = "0.1.19";
         public const string Family = "Fang";
 
         /// <summary>Localization namespace (design section 12): tokens <c>$meadworks_saga_&lt;key&gt;</c>.</summary>

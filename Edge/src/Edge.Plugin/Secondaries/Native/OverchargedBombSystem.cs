@@ -26,7 +26,7 @@ internal static partial class ProjectileRuntimeSystem
         }
 
         ProjectileSecondaryBehavior projectileBehavior = (ProjectileSecondaryBehavior)definition.Behavior;
-        if (!OverchargedBombSystem.TryConsumeStackCost(attack, projectileBehavior))
+        if (!OverchargedBombSystem.CanPayStackCost(attack, projectileBehavior))
         {
             attack.m_consumeItem = false;
             return false;
@@ -44,24 +44,58 @@ internal static partial class ProjectileRuntimeSystem
         float startAngle = projectileCount > 1 ? -projectileBehavior.SpreadAngle * 0.5f : 0f;
         float angleStep = projectileCount > 1 ? projectileBehavior.SpreadAngle / (projectileCount - 1) : 0f;
         Vector3 rotationAxis = attack.m_character.transform.up;
-        for (int projectileIndex = 0; projectileIndex < projectileCount; projectileIndex++)
+        List<GameObject> createdProjectiles = new();
+        bool consumeItem = attack.m_consumeItem;
+        try
         {
-            float angleOffset = startAngle + angleStep * projectileIndex;
-            Vector3 direction = Quaternion.AngleAxis(angleOffset, rotationAxis) * aimDirection;
-            GameObject projectileObject = SpawnProjectileObject(
-                attack,
-                launchData,
-                spawnPoint,
-                direction,
-                ResolveProjectileSpeed(launchData),
-                setLastProjectile: true,
-                out Projectile? projectile);
-            if (projectileObject == null || projectile == null)
+            for (int projectileIndex = 0; projectileIndex < projectileCount; projectileIndex++)
             {
-                continue;
+                float angleOffset = startAngle + angleStep * projectileIndex;
+                Vector3 direction = Quaternion.AngleAxis(angleOffset, rotationAxis) * aimDirection;
+                GameObject projectileObject = SpawnProjectileObject(
+                    attack,
+                    launchData,
+                    spawnPoint,
+                    direction,
+                    ResolveProjectileSpeed(launchData),
+                    setLastProjectile: true,
+                    out Projectile? projectile);
+                if (projectileObject == null || projectile == null)
+                {
+                    if (projectileObject != null)
+                    {
+                        DestroyProjectileObject(projectileObject);
+                    }
+                    continue;
+                }
+
+                createdProjectiles.Add(projectileObject);
+                OverchargedBombSystem.RegisterProjectile(projectile, projectileBehavior.AoeRadiusFactor);
             }
 
-            OverchargedBombSystem.RegisterProjectile(projectile, projectileBehavior.AoeRadiusFactor);
+            if (createdProjectiles.Count == 0)
+            {
+                attack.m_consumeItem = false;
+                return true;
+            }
+
+            if (!OverchargedBombSystem.TryConsumeStackCost(attack, projectileBehavior))
+            {
+                foreach (GameObject projectileObject in createdProjectiles)
+                {
+                    DestroyProjectileObject(projectileObject);
+                }
+                attack.m_consumeItem = consumeItem;
+            }
+        }
+        catch
+        {
+            foreach (GameObject projectileObject in createdProjectiles)
+            {
+                DestroyProjectileObject(projectileObject);
+            }
+            attack.m_consumeItem = consumeItem;
+            throw;
         }
 
         return true;
@@ -70,6 +104,8 @@ internal static partial class ProjectileRuntimeSystem
 
 internal static class OverchargedBombSystem
 {
+    private static bool rollbackDropExceptionWarned;
+
     private static readonly ConditionalWeakTable<Projectile, ProjectileState> Projectiles = new();
 
     [ThreadStatic]
@@ -109,15 +145,37 @@ internal static class OverchargedBombSystem
             return false;
         }
 
-        if (!attack.m_consumeItem)
-        {
-            attack.m_consumeItem = true;
-        }
-
         int vanillaConsumeCount = 1;
         int extraConsumption = Mathf.Max(0, requiredCount - vanillaConsumeCount);
-        RemoveMatchingItems(inventory, weapon, extraConsumption, keepWeaponStack: vanillaConsumeCount);
+        bool consumeItem = attack.m_consumeItem;
+        if (!RemoveMatchingItems(inventory, weapon, extraConsumption, keepWeaponStack: vanillaConsumeCount,
+                attack.m_character.transform.position + Vector3.up))
+        {
+            attack.m_consumeItem = consumeItem;
+            return false;
+        }
+
+        attack.m_consumeItem = true;
         return true;
+    }
+
+    internal static bool CanPayStackCost(Attack attack, ProjectileSecondaryBehavior behavior)
+    {
+        ItemDrop.ItemData weapon = attack.m_weapon;
+        if (!RequiresStackCost(weapon, behavior))
+        {
+            return true;
+        }
+
+        Inventory inventory = attack.m_character.GetInventory();
+        int requiredCount = GetRequiredStackConsumption(behavior);
+        if (inventory != null && CountMatchingItems(inventory, weapon) >= requiredCount)
+        {
+            return true;
+        }
+
+        attack.m_character.Message(MessageHud.MessageType.Center, "$msg_outof " + weapon.m_shared.m_name);
+        return false;
     }
 
     internal static void RegisterProjectile(Projectile projectile, float aoeRadiusFactor)
@@ -262,32 +320,180 @@ internal static class OverchargedBombSystem
         return count;
     }
 
-    private static void RemoveMatchingItems(Inventory inventory, ItemDrop.ItemData weapon, int amount, int keepWeaponStack)
+    private static bool RemoveMatchingItems(Inventory inventory, ItemDrop.ItemData weapon, int amount, int keepWeaponStack,
+        Vector3 rollbackAt)
     {
         if (amount <= 0)
         {
-            return;
+            return true;
         }
 
         List<ItemDrop.ItemData> matchingItems = inventory.GetAllItems().FindAll(item => IsMatchingItem(item, weapon));
         matchingItems.Sort((left, right) => ReferenceEquals(left, weapon).CompareTo(ReferenceEquals(right, weapon)));
-        foreach (ItemDrop.ItemData item in matchingItems)
+        var removedStacks = new List<RemovedStack>();
+        try
         {
-            if (amount <= 0)
+            foreach (ItemDrop.ItemData item in matchingItems)
             {
-                return;
+                if (amount <= 0)
+                {
+                    return true;
+                }
+
+                int removableStack = Mathf.Max(0, item.m_stack - (ReferenceEquals(item, weapon) ? keepWeaponStack : 0));
+                int removeCount = Mathf.Min(removableStack, amount);
+                if (removeCount <= 0)
+                {
+                    continue;
+                }
+
+                int beforeStack = item.m_stack;
+                bool removed;
+                try
+                {
+                    removed = inventory.RemoveItem(item, removeCount);
+                }
+                catch
+                {
+                    RecordRemoval(inventory, item, beforeStack, removedStacks);
+                    throw;
+                }
+                int actual = RecordRemoval(inventory, item, beforeStack, removedStacks);
+                if (!removed || actual != removeCount)
+                {
+                    RestoreRemovedStacks(inventory, removedStacks, rollbackAt);
+                    return false;
+                }
+                amount -= removeCount;
             }
 
-            int removableStack = Mathf.Max(0, item.m_stack - (ReferenceEquals(item, weapon) ? keepWeaponStack : 0));
-            int removeCount = Mathf.Min(removableStack, amount);
-            if (removeCount <= 0)
+            if (amount == 0)
             {
+                return true;
+            }
+
+            RestoreRemovedStacks(inventory, removedStacks, rollbackAt);
+            return false;
+        }
+        catch
+        {
+            RestoreRemovedStacks(inventory, removedStacks, rollbackAt);
+            throw;
+        }
+    }
+
+    private static int RecordRemoval(Inventory inventory, ItemDrop.ItemData item, int beforeStack, List<RemovedStack> removedStacks)
+    {
+        int actual = ContainsExactItem(inventory, item)
+            ? Mathf.Max(0, beforeStack - item.m_stack)
+            : Mathf.Max(0, beforeStack);
+        if (actual > 0)
+        {
+            removedStacks.Add(new RemovedStack(item, actual));
+        }
+        return actual;
+    }
+
+    private static void RestoreRemovedStacks(Inventory inventory, List<RemovedStack> removedStacks, Vector3 rollbackAt)
+    {
+        while (removedStacks.Count > 0)
+        {
+            int index = removedStacks.Count - 1;
+            RemovedStack removed = removedStacks[index];
+            if (ContainsExactItem(inventory, removed.Item))
+            {
+                removed.Item.m_stack += removed.Amount;
+                removedStacks.RemoveAt(index);
                 continue;
             }
 
-            inventory.RemoveItem(item, removeCount);
-            amount -= removeCount;
+            int before = CountStackingItems(inventory, removed.Item);
+            removed.Item.m_stack = removed.Amount;
+            bool accepted = false;
+            Exception? failure = null;
+            try
+            {
+                accepted = inventory.AddItem(removed.Item);
+            }
+            catch (Exception error)
+            {
+                failure = error;
+            }
+
+            int restored = Mathf.Min(removed.Amount,
+                Mathf.Max(0, CountStackingItems(inventory, removed.Item) - before));
+            removed.Amount -= restored;
+            if (removed.Amount <= 0)
+            {
+                removedStacks.RemoveAt(index);
+                continue;
+            }
+
+            removed.Item.m_stack = removed.Amount;
+            bool dropped;
+            try
+            {
+                dropped = ItemDrop.DropItem(removed.Item, removed.Amount, rollbackAt, Quaternion.identity) != null;
+            }
+            catch (Exception error)
+            {
+                dropped = true;
+                if (!rollbackDropExceptionWarned)
+                {
+                    rollbackDropExceptionWarned = true;
+                    global::ExtraPotions.Edge.Runtime.Plugin.Log?.Warning(
+                        "Overcharged bomb ammo rollback drop threw after spawn was requested; treating it as spawned: " + error.GetType().Name);
+                }
+            }
+            if (dropped)
+            {
+                removedStacks.RemoveAt(index);
+                continue;
+            }
+
+            if (failure != null) throw new InvalidOperationException("Overcharged bomb ammo rollback threw before it completed.", failure);
+            if (!accepted) throw new InvalidOperationException("Overcharged bomb ammo rollback was refused and its ground return failed.");
+            throw new InvalidOperationException("Overcharged bomb ammo rollback and its ground return were incomplete.");
         }
+    }
+
+    private static int CountStackingItems(Inventory inventory, ItemDrop.ItemData target)
+    {
+        int count = 0;
+        foreach (ItemDrop.ItemData item in inventory.GetAllItems())
+        {
+            if (item?.m_shared != null && target?.m_shared != null &&
+                item.m_shared.m_name == target.m_shared.m_name &&
+                item.m_quality == target.m_quality && item.m_worldLevel == target.m_worldLevel)
+            {
+                count += Mathf.Max(0, item.m_stack);
+            }
+        }
+        return count;
+    }
+
+    private static bool ContainsExactItem(Inventory inventory, ItemDrop.ItemData target)
+    {
+        foreach (ItemDrop.ItemData item in inventory.GetAllItems())
+        {
+            if (ReferenceEquals(item, target))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private sealed class RemovedStack
+    {
+        internal RemovedStack(ItemDrop.ItemData item, int amount)
+        {
+            Item = item;
+            Amount = amount;
+        }
+
+        internal ItemDrop.ItemData Item { get; }
+        internal int Amount { get; set; }
     }
 
     private static bool IsMatchingItem(ItemDrop.ItemData? item, ItemDrop.ItemData weapon)

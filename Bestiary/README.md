@@ -1,12 +1,10 @@
-## Changes in 0.1.22
+## Changes in 0.1.23
 
-- BogHook, Javelineer, Slag and Marrow templates are replaced instead of piling up each time a world loads.
-- A repeating fault is logged in full the first time, then at most once a minute per source with a count of the lines held back.
-- A fault in Bestiary's scene-teardown hook can no longer skip the game's own teardown.
+- A crypt chest is left intact when its mimic cannot be spawned, and the failed spawn is not retried every frame.
 
 # Bestiary
 
-Version 0.1.22. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.23. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 New creatures with fights of their own, the bone arsenal you craft from them, and a creature workshop for server owners.
 

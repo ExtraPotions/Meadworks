@@ -1,3 +1,8 @@
+## 0.2.19 (2026-10-28)
+
+- A reserved cooking ingredient is recovered from a backup when a station's saved state is damaged.
+- If a rejected cooking ingredient is returned to you but the station's reservation can't be cleared, the returned copy is taken back, so the ingredient is never duplicated.
+
 ## 0.2.18 (2026-10-26)
 
 - If the cooking patches fail to install, they are not retried every frame. Switching Cooking off and on, or restarting, tries again.

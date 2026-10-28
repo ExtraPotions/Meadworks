@@ -9,6 +9,9 @@ using System.Text;
 using BepInEx.Configuration;
 
 namespace ExtraPotions.Meadworks.Crucible {
+    internal sealed class OwnValuePublicationException : IOException {
+        internal OwnValuePublicationException(Exception error):base("Configuration was published, but final readback failed.",error){}
+    }
     public static partial class MeadworksConfig {
         enum EditStep { Authority, Assignment, Serialize, ReadOriginal, StageCopy, Parse, Bind, Save, Flush, Reload, ReadStaged, ConflictRead, Publish, Readback, Cleanup, Count }
         [ThreadStatic] static EditTimingData? activeEditTiming;
@@ -69,7 +72,7 @@ namespace ExtraPotions.Meadworks.Crucible {
             string path=Path.GetFullPath(file.ConfigFilePath),temporary=path+".edit-"+Guid.NewGuid().ToString("N")+".tmp";
             byte[]? before;using(timing.Step(EditStep.ReadOriginal))before=File.Exists(path)?File.ReadAllBytes(path):null;
             timing.FileBytes(before?.Length??0);
-            bool reserved=false;
+            bool reserved=false,published=false;
             try{
                 using(timing.Step(EditStep.StageCopy)){
                 Directory.CreateDirectory(Path.GetDirectoryName(path)!);
@@ -98,9 +101,10 @@ namespace ExtraPotions.Meadworks.Crucible {
                     if(before==null)File.Move(temporary,path);else File.Replace(temporary,path,null);
                 }catch(IOException error){throw new IOException("Configuration atomic "+(before==null?"creation":"replacement")+" failed (HRESULT 0x"+error.HResult.ToString("X8")+"): "+error.Message,error);}
                 }
-                reserved=false;
+                reserved=false;published=true;
                 using(timing.Step(EditStep.Readback))if(!staged.SequenceEqual(File.ReadAllBytes(path)))throw new IOException("The published configuration failed readback.");
-            }finally{using(timing.Step(EditStep.Cleanup))if(reserved&&File.Exists(temporary))File.Delete(temporary);}
+            }catch(Exception error) when(published){throw new OwnValuePublicationException(error);}
+            finally{using(timing.Step(EditStep.Cleanup))if(reserved&&File.Exists(temporary))File.Delete(temporary);}
             timing.Success();
         }
 
@@ -112,7 +116,8 @@ namespace ExtraPotions.Meadworks.Crucible {
                 using(timing.Step(EditStep.Assignment))entry.Value=value;
                 if(TomlTypeConverter.ConvertToString(entry.Value,typeof(T))!=TomlTypeConverter.ConvertToString(value,typeof(T)))throw new InvalidOperationException("The mod did not retain the requested setting.");
                 PersistOwnValue(entry);
-            }catch{entry.Value=previous;throw;}
+            }catch(OwnValuePublicationException){throw;}
+            catch{entry.Value=previous;throw;}
             finally{file.SaveOnConfigSet=save;}
             timing.Success();
         }

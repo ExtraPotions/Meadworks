@@ -1,6 +1,10 @@
+## Changes in 0.1.15
+
+- A damaged line in the saved-password file is kept, with only its line ending normalized, instead of being erased the next time a password is saved or forgotten.
+
 # Beacon
 
-Version 0.1.14. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.15. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Saved servers that join without the password prompt, with passwords kept in your system's protected storage.
 

@@ -196,17 +196,34 @@ namespace ExtraPotions.Threshold.Runtime.Travel
             }
             var tames = ThresholdTames.Choose(player, settings);
             if (!player.TeleportTo(new Vector3(exit.X, exit.Y, exit.Z), Quaternion.Euler(0f, target.Yaw, 0f), true)) return false;
+            if (plan.Fuel.Outcome == FuelOutcome.Consume)
+            {
+                try { ConsumeFuel(inventory, fuelName, plan.Fuel.Amount); }
+                catch (Exception error) { Plugin.Log?.Warning("Threshold: portal fuel removal failed: " + error.GetType().Name + ": " + error.Message); }
+            }
             ThresholdJumps.Started(player);
             ThresholdArrival.Begin(player);
             ThresholdTames.Begin(tames, exit, target.Yaw);
             if (cartOutcome == CartOutcome.Bring) ThresholdCarts.Begin(cart!, exit, target.Yaw);
             else if (cartOutcome == CartOutcome.StayBusy) player.Message(MessageHud.MessageType.Center, ThresholdCarts.Message(cartOutcome));
-            if (plan.Fuel.Outcome == FuelOutcome.Consume) inventory.RemoveItem(fuelName, plan.Fuel.Amount);
             Game.instance?.IncrementPlayerStat(PlayerStatType.PortalsUsed);
             Plugin.Log?.Verbose("Threshold: trip to " + target);
             Source = null;
             CloseHost?.Invoke();
             return true;
+        }
+
+        static void ConsumeFuel(Inventory inventory, string fuelName, int amount)
+        {
+            int before = inventory.CountItems(fuelName);
+            if (before < amount)
+            {
+                Plugin.Log?.Warning("Threshold: portal fuel was unavailable at departure; no items were removed");
+                return;
+            }
+            inventory.RemoveItem(fuelName, amount);
+            if (inventory.CountItems(fuelName) != before - amount)
+                Plugin.Log?.Warning("Threshold: portal fuel removal could not be verified");
         }
 
         /// <summary>The game's inventory check with only the world's rules, widened by Teleport Listed Items (T17) while

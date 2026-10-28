@@ -62,7 +62,7 @@ namespace ExtraPotions.Threshold.Runtime.Travel
             __state = false;
             if (!pending || __instance == null || __instance != Player.m_localPlayer) return;
             if (__instance.IsTeleporting()) __state = true;
-            else pending = false; // the trip ended some other way (death, logout)
+            else Reset(); // the trip ended some other way (death, logout)
         }
 
         static void AfterStep(Player __instance, bool __state)

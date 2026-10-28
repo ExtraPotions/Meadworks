@@ -26,6 +26,7 @@ namespace ExtraPotions.Saga.Runtime {
         static float currentLevel;
         static int currentBatches;
         static bool discovering;
+        static bool refundDropExceptionWarned;
 
         // Maker's Mark & Thrifty StationCraft integration
         [HarmonyPatch(typeof(InventoryGui),nameof(InventoryGui.DoCrafting))]
@@ -54,31 +55,36 @@ namespace ExtraPotions.Saga.Runtime {
             [HarmonyPostfix]
             [HarmonyPriority(Priority.Low)]
             static void Postfix(){
-                if(currentCrafter==null)return;
-                Player player=currentCrafter;
-                if(currentMarkName!=null){
-                    foreach(var item in player.GetInventory().GetAllItems()){
-                        if(item.m_shared.m_name==currentMarkName&&!beforeCrafting.Contains(item)){
-                            item.m_customData=CraftingMarks.WithMakerLevel(item.m_customData,currentLevel);
-                            item.m_durability=item.GetMaxDurability();
-                        }
-                    }
-                }
-                // Thrifty roll per batch
-                if(paidMaterials.Count>0&&CraftingMarks.ThriftyChance(currentLevel)>0){
-                    for(int b=0;b<currentBatches;b++){
-                        if(CraftingMarks.RollThrifty(currentLevel,UnityEngine.Random.value)){
-                            var paid=paidMaterials[UnityEngine.Random.Range(0,paidMaterials.Count)];
-                            ItemDrop.ItemData shown=paid.Prefab.m_itemData;
-                            int quality=paid.Quality>0?paid.Quality:shown.m_quality;
-                            if(player.GetInventory().AddItem(paid.Prefab.gameObject.name,1,quality,shown.m_variant,0L,"",false)!=null){
-                                string name=global::Localization.instance.Localize(shown.m_shared.m_name);
-                                player.Message(MessageHud.MessageType.TopLeft,"Thrifty: 1 "+name+" saved",0,shown.GetIcon());
+                try{
+                    if(currentCrafter==null)return;
+                    Player player=currentCrafter;
+                    if(currentMarkName!=null){
+                        foreach(var item in player.GetInventory().GetAllItems()){
+                            if(item.m_shared.m_name==currentMarkName&&!beforeCrafting.Contains(item)){
+                                item.m_customData=CraftingMarks.WithMakerLevel(item.m_customData,currentLevel);
+                                item.m_durability=item.GetMaxDurability();
                             }
                         }
                     }
+                    if(paidMaterials.Count>0&&CraftingMarks.ThriftyChance(currentLevel)>0){
+                        for(int b=0;b<currentBatches;b++){
+                            if(CraftingMarks.RollThrifty(currentLevel,UnityEngine.Random.value)){
+                                var paid=paidMaterials[UnityEngine.Random.Range(0,paidMaterials.Count)];
+                                ItemDrop.ItemData shown=paid.Prefab.m_itemData;
+                                int quality=paid.Quality>0?paid.Quality:shown.m_quality;
+                                bool saved=Refund(player,paid.Prefab,quality);
+                                if(saved){
+                                    string name=global::Localization.instance.Localize(shown.m_shared.m_name);
+                                    player.Message(MessageHud.MessageType.TopLeft,SagaText.Format("crafting_thrifty_saved",1,name),0,shown.GetIcon());
+                                }
+                            }
+                        }
+                    }
+                }catch(Exception error){
+                    try{NativeSaga.Log.LogWarning("Thrifty refund failed: "+error.GetType().Name);}catch{}
+                }finally{
+                    Clear();
                 }
-                Clear();
             }
 
             [HarmonyFinalizer]
@@ -87,16 +93,57 @@ namespace ExtraPotions.Saga.Runtime {
 
         [HarmonyPatch(typeof(Inventory),nameof(Inventory.RemoveItem),new[]{typeof(string),typeof(int),typeof(int),typeof(bool)})]
         static class RemoveMaterialPatch {
-            [HarmonyPostfix]
-            static void Postfix(Inventory __instance,string name,int itemQuality){
+            [HarmonyPrefix]
+            static void Prefix(Inventory __instance,string name,int amount,int itemQuality,bool worldLevelBased,out MaterialRemovalState __state){
+                __state=default;
                 if(currentCrafter==null||currentRecipe==null||__instance!=currentCrafter.GetInventory())return;
                 foreach(var req in currentRecipe.m_resources){
                     if(req.m_resItem!=null&&req.m_resItem.m_itemData.m_shared.m_name==name){
-                        paidMaterials.Add((req.m_resItem,itemQuality));
+                        __state=new MaterialRemovalState(req.m_resItem,itemQuality,Math.Max(0,amount),
+                            __instance.CountItems(name,itemQuality,worldLevelBased));
                         return;
                     }
                 }
             }
+
+            [HarmonyPostfix]
+            static void Postfix(Inventory __instance,string name,int itemQuality,bool worldLevelBased,MaterialRemovalState __state){
+                if(__state.Prefab==null)return;
+                int removed=Math.Min(__state.Requested,Math.Max(0,__state.Before-__instance.CountItems(name,itemQuality,worldLevelBased)));
+                for(int unit=0;unit<removed;unit++)paidMaterials.Add((__state.Prefab,__state.Quality));
+            }
+        }
+
+        static bool Refund(Player player,ItemDrop prefab,int quality){
+            Inventory inventory=player.GetInventory();
+            ItemDrop.ItemData shown=prefab.m_itemData;
+            int before=inventory.CountItems(shown.m_shared.m_name,quality,false);
+            try{inventory.AddItem(prefab.gameObject.name,1,quality,shown.m_variant,0L,"",false);}
+            catch{}
+            if(inventory.CountItems(shown.m_shared.m_name,quality,false)>before)return true;
+            ItemDrop.ItemData refund=shown.Clone();
+            refund.m_stack=1;refund.m_quality=quality;refund.m_dropPrefab=prefab.gameObject;
+            try{
+                bool dropped=ItemDrop.DropItem(refund,1,player.transform.position+player.transform.forward+Vector3.up,Quaternion.identity)!=null;
+                player.Message(MessageHud.MessageType.Center,"$inventory_full");
+                return dropped;
+            }catch(Exception error){
+                if(!refundDropExceptionWarned){
+                    refundDropExceptionWarned=true;
+                    try{NativeSaga.Log.LogWarning("Thrifty refund drop threw after spawn was requested; treating it as spawned: "+error.GetType().Name);}catch{}
+                }
+                return true;
+            }
+        }
+
+        readonly struct MaterialRemovalState {
+            internal MaterialRemovalState(ItemDrop prefab,int quality,int requested,int before){
+                Prefab=prefab;Quality=quality;Requested=requested;Before=before;
+            }
+            internal ItemDrop? Prefab{get;}
+            internal int Quality{get;}
+            internal int Requested{get;}
+            internal int Before{get;}
         }
 
         static void Clear(){

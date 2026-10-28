@@ -1,6 +1,6 @@
 {
   "name": "Barter",
-  "version_number": "0.1.5",
+  "version_number": "0.1.6",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Barter",
   "description": "ExtraPotions Meadworks trader overhaul: per-trader buy and sell lists, custom currencies, a trader purse that moves prices, and a sell list. Required on all peers.",
   "dependencies": [

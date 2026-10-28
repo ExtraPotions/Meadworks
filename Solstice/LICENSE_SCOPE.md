@@ -8,7 +8,7 @@ Original Solstice code, including most of Solstice.Core and Solstice.Plugin, is 
 
 ## Original artwork and documentation
 
-Original documentation and artwork use CC BY-NC-SA 4.0, with complete terms in licenses/CC-BY-NC-SA-4.0.txt; see LICENSE-ASSETS.md. Solstice ships an icon drawn for it (approved 2026-10-10) and no other image, model or sound. The four season marks are drawn in memory at runtime. Seasonal music plays tracks that ship with Valheim. No Seasons audio file is included.
+Original documentation and artwork use CC BY-NC-SA 4.0, with complete terms in `licenses/CC-BY-NC-SA-4.0.txt`; see `LICENSE-ASSETS.md`. Solstice ships its approved 2026-10-28 package icon and no other image, model, or sound. The four season marks are drawn in memory at runtime. Seasonal music uses tracks shipped with Valheim. No Seasons audio file is included.
 
 ## Adopted sources and preserved notices
 

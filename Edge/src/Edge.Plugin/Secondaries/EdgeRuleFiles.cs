@@ -22,6 +22,7 @@ internal sealed class EdgeRuleFiles
     private readonly EdgeConfig config;
     private readonly MeadworksLog log;
     private readonly string directory;
+    private readonly Dictionary<string, string> embeddedDefaults;
     private string localStamp = "";
     private string remoteStamp = "";
     private SessionRole? previousRole;
@@ -36,17 +37,45 @@ internal sealed class EdgeRuleFiles
         RuleDiagnostics.OnInfo = log.Info;
         RuleDiagnostics.OnWarning = log.Warning;
         RuleDiagnostics.OnError = log.Error;
-        Directory.CreateDirectory(directory);
+        embeddedDefaults = ReadEmbeddedDefaults();
+        if (!Apply(embeddedDefaults, "Embedded Edge defaults rejected."))
+            throw new InvalidOperationException("Embedded Edge defaults are invalid");
+        Tick(true);
+    }
+
+    private Dictionary<string, string> ReadEmbeddedDefaults()
+    {
+        var result = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (RuleFamily family in Enum.GetValues(typeof(RuleFamily)))
         {
             var path = Path.Combine(directory, EdgeDataFiles.BaseName(family));
-            if (File.Exists(path)) continue;
             using var stream = typeof(Plugin).Assembly.GetManifestResourceStream("Edge.defaults." + EdgeDataFiles.BaseName(family))
                 ?? throw new InvalidOperationException("Missing Edge default " + family);
             using var reader = new StreamReader(stream);
-            File.WriteAllText(path, reader.ReadToEnd());
+            result[path] = reader.ReadToEnd();
         }
-        Tick(true);
+        return result;
+    }
+
+    private void MaterializeDefaults()
+    {
+        try { Directory.CreateDirectory(directory); }
+        catch (Exception error)
+        {
+            log.Warning("Rule directory unavailable; embedded defaults retained: " + directory + ": " + error.Message);
+            return;
+        }
+        foreach (var pair in embeddedDefaults)
+        {
+            try
+            {
+                if (!File.Exists(pair.Key)) File.WriteAllText(pair.Key, pair.Value);
+            }
+            catch (Exception error)
+            {
+                log.Warning("Rule default could not be written; embedded copy retained: " + pair.Key + ": " + error.Message);
+            }
+        }
     }
 
     internal void Tick(bool force = false)
@@ -66,19 +95,41 @@ internal sealed class EdgeRuleFiles
 
     private void ReadLocal(bool force)
     {
-        var paths = Directory.GetFiles(directory, "*.yml").Where(p => EdgeDataFiles.Classify(p) != null).OrderBy(p => p, StringComparer.Ordinal).ToArray();
+        MaterializeDefaults();
+        string[] paths;
+        try
+        {
+            paths = Directory.GetFiles(directory, "*.yml").Where(p => EdgeDataFiles.Classify(p) != null)
+                .OrderBy(p => p, StringComparer.Ordinal).ToArray();
+        }
+        catch (Exception error)
+        {
+            log.Warning("Rule directory could not be read; embedded defaults retained: " + directory + ": " + error.Message);
+            return;
+        }
         var stamps = paths.ToDictionary(p => p, p => Stamp(p));
-        var signature = string.Join("\n", paths.Select(p => p + ":" + stamps[p]));
-        if (!force && signature == localStamp) return;
         var files = paths.ToDictionary(p => p, File.ReadAllText);
+        foreach (var pair in embeddedDefaults)
+        {
+            RuleFamily? family = EdgeDataFiles.Classify(pair.Key);
+            if (family != null && !paths.Any(path => EdgeDataFiles.Classify(path) == family)) files[pair.Key] = pair.Value;
+        }
+        var signature = string.Join("\n", files.Keys.OrderBy(p => p, StringComparer.Ordinal)
+            .Select(p => p + ":" + (stamps.TryGetValue(p, out var stamp) ? stamp : "embedded")));
+        if (!force && signature == localStamp) return;
         if (paths.Any(p => stamps[p] != Stamp(p)) || !paths.SequenceEqual(Directory.GetFiles(directory, "*.yml")
             .Where(p => EdgeDataFiles.Classify(p) != null).OrderBy(p => p, StringComparer.Ordinal))) return;
         localStamp = signature;
+        Apply(files, "Edge YAML rejected; previous rules retained.");
+    }
+
+    private bool Apply(IReadOnlyDictionary<string, string> files, string rejection)
+    {
         if (!RuleDocuments.TryMerge(files, out var merged) || !SecondaryAttackConfigLoader.TryCompileSnapshot(revision + 1,
             new SecondaryAttackYamlTexts(merged), out var candidate))
         {
-            log.Warning("Edge YAML rejected; previous rules retained.");
-            return;
+            log.Warning(rejection);
+            return false;
         }
         var carriers = RuleDocuments.Stamp(merged);
         foreach (var pair in carriers)
@@ -88,6 +139,7 @@ internal sealed class EdgeRuleFiles
         }
         Current = candidate!; revision++;
         log.Verbose("Edge rules applied: revision " + revision + ", " + Current.Weapons.Count + " prefab entries.");
+        return true;
     }
 
     private void ReadServer()

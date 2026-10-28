@@ -1,8 +1,13 @@
 # Crucible
 
+## Changes in 0.3.36
+
+- Crucible and Crucible.UI settings now have translated names and help in all seven languages. Each setting identifies its owner and whether it is local or controlled by the server.
+- A setting that reached disk stays selected in memory if the final disk readback fails.
+
 The shared library every Meadworks mod needs. It adds no gameplay on its own.
 
-Version 0.3.35, with Crucible.UI 0.3.24. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.36, with Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
