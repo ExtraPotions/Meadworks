@@ -1,10 +1,9 @@
-## Changes in 0.5.14
-
-- If map travel cannot handle a map click, the click goes to the normal map instead of being swallowed.
+## Changes in 0.5.15
+- Live navigation and map UI updates wait until a local player exists.
 
 # Wayfarer
 
-Version 0.5.14. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.15. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Teleport from the world map: Back to Bed for everyone, plus travel cheats the server switches on, usable by admins unless the server allows others.
 
@@ -22,7 +21,7 @@ Teleport from the world map: Back to Bed for everyone, plus travel cheats the se
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

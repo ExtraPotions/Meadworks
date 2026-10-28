@@ -24,8 +24,8 @@ namespace ExtraPotions.Shepherd.Runtime
     /// process (dedicated server, C10) never builds UI.
     /// </summary>
     [BepInPlugin(Guid, Name, Version)]
-    [BepInDependency(CruciblePlugin.Guid, "0.3.32")]
-    [BepInDependency(ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin.Guid, "0.3.21")]
+    [BepInDependency(CruciblePlugin.Guid, CruciblePlugin.Version)]
+    [BepInDependency(ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin.Guid, ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin.Version)]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public sealed class Plugin : BaseUnityPlugin

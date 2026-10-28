@@ -1,3 +1,7 @@
+## 0.1.24 (2026-10-28)
+
+- New package icon.
+
 ## 0.1.23 (2026-10-26)
 
 - Husbandry, breeding, cheats, follow commands and feeding no longer retry a failed patch install every frame.

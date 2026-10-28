@@ -1,11 +1,11 @@
 {
   "name": "Solstice",
-  "version_number": "0.1.6",
+  "version_number": "0.1.7",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Solstice",
   "description": "Meadworks seasons: spring, summer, fall and winter by the world calendar, with seasonal growth, bees, food, stamina, fire, sap, rest and wind effects, and local winter snow and season colors. Cooperates with Tempest weather. Required on all peers.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.28"
+    "expDARE-Crucible-0.3.36"
   ]
 }

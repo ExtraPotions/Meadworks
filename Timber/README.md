@@ -1,11 +1,9 @@
-## Changes in 0.2.3
-
-- Circlet light search runs twice a second instead of every frame when no lit circlet is worn.
-- Removing a floor or roof piece skips the collider walk when no tag changed.
+## Changes in 0.2.4
+- New package icon.
 
 # Timber
 
-Version 0.2.3. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.4. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Building tools: a build camera, flooring options, area repair and server-controlled building cheats.
 
@@ -21,7 +19,7 @@ Building tools: a build camera, flooring options, area repair and server-control
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

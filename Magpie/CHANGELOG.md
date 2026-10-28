@@ -8,9 +8,9 @@
 
 # Changelog
 
-## Unreleased
+## 0.1.17 (2026-10-28)
 
-- Narrow host ground-stack merge searches by item identity and location. Preserve merge distance, minimum nearby count, stack priority, identity checks and merges per scan.
+- New package icon.
 
 ## 0.1.13 (2026-10-21)
 

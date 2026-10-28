@@ -1,3 +1,8 @@
+## 0.1.23 (2026-10-28)
+
+- Reduce recovery work for large planting journals by indexing placement probes during each poll while preserving live ownership, permission and lifecycle checks.
+- New package icon.
+
 ## 0.1.22 (2026-10-26)
 
 - Finished plantings are no longer reopened on every world load. That ends the "saved unfinished plantings" warning at each exit, and a finished paid plant is never replanted for free.

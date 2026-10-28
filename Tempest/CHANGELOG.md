@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.17 (2026-10-28)
+
+- New package icon.
+
 ## 0.1.16 (2026-10-26)
 
 - Blizzard warning sounds and meteor impact effects are made locally on each peer, so other players no longer see duplicate copies.

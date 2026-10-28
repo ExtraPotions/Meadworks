@@ -1,3 +1,10 @@
+## 0.1.34 (2026-10-28)
+
+- Route partial incoming stacks through legal equipment slots while preserving the remainder for the caller or main inventory.
+- Clarify Food Key behavior in all seven supported languages.
+- Preserve the release 8.14 slow-join behavior, including progress-sensitive renewal, duplicate-greeting protection and the original five-minute ceiling.
+- No art changes are included in this release.
+
 ## 0.1.33 (2026-10-28)
 
 - Take All from a tombstone or another container moves only the amount that reached the destination, including partial stack space.

@@ -67,9 +67,12 @@ namespace Wayfarer {
    try {
     State.ChangeWorld(World);State.SetAdvanced(CanAdvanced);State.SetEnabled(CanTeleport);
     if(State.Armed&&!CanUse(Category.Map))State.Close();
-    Teleports?.UpdateLanding();integration?.Update();
-    if(Time.unscaledTime>=nextScan){Catalog.Observe();nextScan=Time.unscaledTime+2;}
-    Ui?.Refresh();
+    if(Player.m_localPlayer!=null){
+     Teleports?.UpdateLanding();
+     integration?.Update();
+     if(Time.unscaledTime>=nextScan){Catalog.Observe();nextScan=Time.unscaledTime+2;}
+     Ui?.Refresh();
+    }
    }catch(Exception error){if(Time.unscaledTime>=nextError){LogError(error);nextError=Time.unscaledTime+10;}}
   }
   /// <summary>A player notice through the Crucible channel (C10): the HUD on a graphical client, otherwise the log.</summary>

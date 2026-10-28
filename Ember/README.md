@@ -1,12 +1,11 @@
-## Changes in 0.5.11
-
-- Placement ghosts of fireplaces and doors are no longer tracked as real pieces.
+## Changes in 0.5.12
+- New package icon.
 
 # Ember
 
 Faster nights when some players sleep, torches that warm you like a campfire, and doors that open as you walk up.
 
-Version 0.5.11. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.12. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -29,7 +28,7 @@ Version 0.5.11. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [C
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

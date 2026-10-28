@@ -1,3 +1,7 @@
+## 0.2.4 (2026-10-28)
+
+- New package icon.
+
 ## 0.2.3 (2026-10-26)
 
 - Circlet light search runs twice a second instead of every frame when no lit circlet is worn.

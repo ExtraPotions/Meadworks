@@ -80,7 +80,7 @@
     "cfg_2_slots__coin_purse_name": "钱袋",
     "cfg_2_slots__coin_purse_help": "装备标签页中的钱袋栏位：你捡到的钱币会放入其中，商人会像从物品栏任何位置一样从中取钱币。",
     "cfg_2_slots__food_key_name": "食物按键",
-    "cfg_2_slots__food_key_help": "在物品栏之外、手中没有工具锤、锄头或耕地钯时：从左到右吃掉食物栏位中当前可以吃的每种食物。每位玩家各自设置。",
+    "cfg_2_slots__food_key_help": "在物品栏之外、手中没有工具锤、锄头或耕地钯时：从左到右吃掉食物栏位中当前可以吃的每种食物。默认未绑定，以避免按键冲突。每位玩家各自设置。",
     "cfg_2_slots__mead_slot_1_key_name": "蜜酒栏位 1 按键",
     "cfg_2_slots__mead_slot_1_key_help": "在物品栏之外、手中没有工具锤、锄头或耕地钯时：如果当前可以饮用，则饮用蜜酒栏位 1（从左往右数）中的蜜酒。按住此按键的修饰键时（默认 Left Alt），数字键不会使用快捷栏物品。每位玩家各自设置。",
     "cfg_2_slots__mead_slot_2_key_name": "蜜酒栏位 2 按键",

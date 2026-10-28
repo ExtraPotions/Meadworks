@@ -1,11 +1,11 @@
 {
   "name": "Cairn",
-  "version_number": "0.1.20",
+  "version_number": "0.1.21",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Cairn",
   "description": "Meadworks exploration: exploration radius, Exploration skill, per-effect fog controls, time/weather/compass HUD, map marker choices and tidy pins. Imports Pathfinder, NoFogBruh, BetterFog and TimeWeatherHud settings. Client-optional.",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2351",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.33"
+    "expDARE-Crucible-0.3.36"
   ]
 }

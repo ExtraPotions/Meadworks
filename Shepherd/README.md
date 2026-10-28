@@ -1,11 +1,9 @@
-## Changes in 0.1.23
-
-- Husbandry, breeding, cheats, follow commands and feeding no longer retry a failed patch install every frame.
-- An invalid land pen recipe is not re-read every frame. After the recipe is corrected, the pen appears on the hammer without logging out.
+## Changes in 0.1.24
+- New package icon.
 
 # Shepherd
 
-Version 0.1.23. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.24. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 The ECR breeding refresh and its adoption boundaries are recorded in [docs/ecr-breeding-refresh.md](docs/ecr-breeding-refresh.md).
 
@@ -32,7 +30,7 @@ Animal keeping as part of your base: feed troughs, a Husbandry skill, and breedi
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

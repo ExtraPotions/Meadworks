@@ -89,7 +89,7 @@ namespace ExtraPotions.Wildroot.Runtime {
   internal void Update(){
    int batch=Math.Max(1,Math.Min(10000,settings.Get("Performance.BulkPlantingBatchSize",2)));
    UpdateRecovery();
-   asynchronous.Poll(batch);
+   using(PlacementProbeIndex.Begin())asynchronous.Poll(batch);
    if(recovering.Count>0)foreach(var job in recovering.Where(j=>j.Result!=null).ToArray())recovering.Remove(job);
    double now=Time.realtimeSinceStartupAsDouble;
    foreach(var job in inFlight.Count+detached.Count>0?inFlight.Concat(detached).ToArray():Array.Empty<Job>()){ // no per-frame copy while nothing is in flight

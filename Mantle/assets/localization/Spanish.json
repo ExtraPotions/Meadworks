@@ -80,7 +80,7 @@
     "cfg_2_slots__coin_purse_name": "Monedero",
     "cfg_2_slots__coin_purse_help": "Una ranura de monedero en la pestaña Equipo: las monedas que recoges van a ella, y los comerciantes toman monedas de ella como de cualquier otro lugar del inventario.",
     "cfg_2_slots__food_key_name": "Tecla de comida",
-    "cfg_2_slots__food_key_help": "Fuera del inventario, sin martillo, azada ni cultivador en la mano: come cada comida de las ranuras de comida que pueda comerse ahora, de izquierda a derecha. Por jugador.",
+    "cfg_2_slots__food_key_help": "Fuera del inventario, sin martillo, azada ni cultivador en la mano: come cada comida de las ranuras de comida que pueda comerse ahora, de izquierda a derecha. Sin asignar de forma predeterminada para evitar conflictos de teclas. Por jugador.",
     "cfg_2_slots__mead_slot_1_key_name": "Tecla de la ranura de hidromiel 1",
     "cfg_2_slots__mead_slot_1_key_help": "Fuera del inventario, sin martillo, azada ni cultivador en la mano: bebe el hidromiel de la ranura de hidromiel 1 (contando de izquierda a derecha), si puede beberse ahora. Mientras se mantienen los modificadores de esta tecla (Left Alt por defecto), las teclas numéricas no usan ningún objeto de la barra rápida. Por jugador.",
     "cfg_2_slots__mead_slot_2_key_name": "Tecla de la ranura de hidromiel 2",

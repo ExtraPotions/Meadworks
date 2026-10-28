@@ -22,10 +22,10 @@ namespace ExtraPotions.Wildroot.Runtime {
   bool Available=>actor&&actor==Player.m_localPlayer&&!actor.IsDead()&&!actor.IsTeleporting()&&NativeWorld.IsCurrent(world)&&ZNetScene.instance&&ZNetScene.instance.IsAreaReady(position);
   bool Permitted=>Available&&PrivateArea.CheckAccess(position,0,false,true)&&!Location.IsInsideNoBuildLocation(position);
   bool Matches(ZNetView view,string request){if(!view||!view.IsValid())return false;var zdo=view.GetZDO();return zdo.GetString("wildroot.request")==request&&zdo.GetString("wildroot.actor")==actor.GetPlayerID().ToString(CultureInfo.InvariantCulture)&&zdo.GetString("wildroot.world")==world.ToString(CultureInfo.InvariantCulture)&&zdo.GetString("wildroot.session")==session&&zdo.GetString("wildroot.source")==piece.name.Replace("(Clone)","");}
-  ZNetView? Receipt(string request){var matches=Instances.Values.Where(v=>v&&PrefabName(v.gameObject)==NativePlacementReceipts.Prefab&&Matches(v,request)&&Vector3.Distance(v.transform.position,position)<0.05f).ToArray();if(matches.Length>1)throw new InvalidOperationException("Conflicting placement receipts.");return matches.SingleOrDefault();}
+  ZNetView? Receipt(string request){var matches=PlacementProbeIndex.Select(request,candidates=>candidates.Where(v=>v&&PrefabName(v.gameObject)==NativePlacementReceipts.Prefab&&Matches(v,request)&&Vector3.Distance(v.transform.position,position)<0.05f).ToArray());if(matches.Length>1)throw new InvalidOperationException("Conflicting placement receipts.");return matches.SingleOrDefault();}
   public PlacementProbe Probe(PlacementCellRecord cell){
    if(!Available)return new PlacementProbe(PlacementPresence.Unavailable);
-   var tagged=Instances.Values.Where(v=>v&&v.IsValid()&&v.GetZDO().GetString("wildroot.request")==cell.RequestId&&v.GetZDO().GetString("wildroot.actor")==actor.GetPlayerID().ToString(CultureInfo.InvariantCulture)&&PrefabName(v.gameObject)!=NativePlacementReceipts.Prefab).ToArray();
+   var tagged=PlacementProbeIndex.Select(cell.RequestId,candidates=>candidates.Where(v=>v&&v.IsValid()&&v.GetZDO().GetString("wildroot.request")==cell.RequestId&&v.GetZDO().GetString("wildroot.actor")==actor.GetPlayerID().ToString(CultureInfo.InvariantCulture)&&PrefabName(v.gameObject)!=NativePlacementReceipts.Prefab).ToArray());
    if(tagged.Any(v=>!Matches(v,cell.RequestId)||PrefabName(v.gameObject)!=piece.name.Replace("(Clone)","")||Vector3.Distance(v.transform.position,position)>0.05f||!string.IsNullOrEmpty(cell.NativeId)&&v.GetZDO().GetString(NativePlacementReceipts.Instance)!=cell.NativeId))return new PlacementProbe(PlacementPresence.Ambiguous);
    var receipt=Receipt(cell.RequestId);var zdo=receipt?receipt.GetZDO():null;
    var presence=PlacementReceiptPolicy.Evaluate(true,Permitted,tagged.Length,tagged.All(v=>v.IsOwner()),receipt!=null,zdo?.GetString("wildroot.lifecycle")??"",zdo?.GetString("wildroot.native")??"",cell.NativeId,cell.Retired);
@@ -41,6 +41,7 @@ namespace ExtraPotions.Wildroot.Runtime {
    }
   }
   public IPlacementHandle Create(PlacementOperation operation){
+   using(var mutation=PlacementProbeIndex.Changing()){
    if(!Permitted||operation.Context.ActorId!=actor.GetPlayerID().ToString(CultureInfo.InvariantCulture)||operation.Context.WorldId!=world.ToString(CultureInfo.InvariantCulture))throw new InvalidOperationException("Original placement context unavailable.");
    if(harvestedSource!=null&&!NativePlanting.ReplantClear(position,harvestedSource))throw new InvalidOperationException("Replant position occupied.");
    if(recovery){var tool=PlacementController.RightItem(actor);if(harvestedSource==null&&tool?.m_dropPrefab?.name!="Cultivator"||Plugin.Instance?.Planting?.RecoveryPrefabAllowed(piece.name.Replace("(Clone)",""))!=true)throw new InvalidOperationException("Original placement tool/prefab unavailable.");}
@@ -58,6 +59,7 @@ namespace ExtraPotions.Wildroot.Runtime {
      if(receipt&&receipt.IsOwner())receipt.GetZDO().Set("wildroot.lifecycle","aborted");throw;
     }
    }
+   }
   }
   internal static string PrefabName(GameObject obj){var name=obj.name;return name.EndsWith("(Clone)",StringComparison.Ordinal)?name.Substring(0,name.Length-7):name;}
   sealed class Handle:IDurablePlacementHandle {
@@ -65,6 +67,7 @@ namespace ExtraPotions.Wildroot.Runtime {
    public string NativeId{get;}
    public Handle(PlacementBackend backend,ZNetView instance,string request){this.backend=backend;this.instance=instance;this.request=request;NativeId=instance.GetZDO().GetString(NativePlacementReceipts.Instance);}
    public void Confirm(){
+    using(var mutation=PlacementProbeIndex.Changing()){
     var receipt=backend.durable?backend.Receipt(request):null;if(receipt&&receipt.GetZDO().GetString("wildroot.lifecycle")=="removed")return;
     if(!backend.Permitted||!instance||!instance.IsValid()||!instance.IsOwner()||!backend.Matches(instance,request))throw new InvalidOperationException("Placement receipt owner/context unavailable.");
     if(backend.durable){if(!receipt)receipt=backend.EnsureReceipt(new PlacementOperation(new ResourceContext(backend.actor.GetPlayerID().ToString(CultureInfo.InvariantCulture),backend.world.ToString(CultureInfo.InvariantCulture),request),Array.Empty<ResourceCost>(),()=>false));if(!receipt.IsOwner())throw new InvalidOperationException("Placement world receipt owner unavailable.");receipt.GetZDO().Set("wildroot.native",NativeId);receipt.GetZDO().Set("wildroot.lifecycle","committed");}
@@ -72,8 +75,9 @@ namespace ExtraPotions.Wildroot.Runtime {
     Plugin.Instance?.Catalog?.AfterCommitted(instance.gameObject);
     // Farming experience for the planting (#21); a recovered placement was planted in an earlier session.
     if(!backend.recovery)try{FarmingExperience.Planted(backend.actor,backend.piece);}catch(Exception error){Debug.LogError("Wildroot planting experience failed: "+error.GetType().Name+": "+error.Message);}
+    }
    }
-   public void Compensate(){if(removed)return;if(!backend.Permitted)throw new InvalidOperationException("Placement compensation area/context unavailable.");if(instance){if(!instance.IsValid()||!instance.IsOwner()||!backend.Matches(instance,request))throw new InvalidOperationException("Placement ownership changed.");using(NativePlacementReceipts.SuppressRemoval())ZNetScene.instance.Destroy(instance.gameObject);}var receipt=backend.durable?backend.Receipt(request):null;if(receipt){if(!receipt.IsOwner())throw new InvalidOperationException("Placement receipt ownership changed.");receipt.GetZDO().Set("wildroot.lifecycle","aborted");}removed=true;}
+   public void Compensate(){using(var mutation=PlacementProbeIndex.Changing()){if(removed)return;if(!backend.Permitted)throw new InvalidOperationException("Placement compensation area/context unavailable.");if(instance){if(!instance.IsValid()||!instance.IsOwner()||!backend.Matches(instance,request))throw new InvalidOperationException("Placement ownership changed.");using(NativePlacementReceipts.SuppressRemoval())ZNetScene.instance.Destroy(instance.gameObject);}var receipt=backend.durable?backend.Receipt(request):null;if(receipt){if(!receipt.IsOwner())throw new InvalidOperationException("Placement receipt ownership changed.");receipt.GetZDO().Set("wildroot.lifecycle","aborted");}removed=true;}}
   }
  }
  internal static class NativePlacementReceipts {

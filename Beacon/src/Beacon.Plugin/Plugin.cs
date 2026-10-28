@@ -105,6 +105,13 @@ namespace ExtraPotions.Beacon.Runtime
             if (!Ready) return;
             BeaconText.Tick();
             if (!started || log == null) return;
+            if (FejdStartup.instance == null && !BeaconJoin.Joining)
+            {
+                BeaconSecrets.Tick(log);
+                BeaconSecretActions.Tick();
+                BeaconSaveOffer.Tick();
+                return;
+            }
             BeaconModules.Tick(log);
             BeaconSecrets.Tick(log);
             BeaconSecretActions.Tick();

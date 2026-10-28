@@ -27,7 +27,7 @@ namespace Mantle.Consume
         public static void Bind(SyncedConfiguration synced)
         {
             FoodKey = synced.Bind(InventorySettings.SlotsSection, "Food Key", KeyboardShortcut.Empty,
-                "Outside the inventory, with no hammer, hoe or cultivator in hand: eats every food in the Food slots that can be eaten now, left to right. Per player.", synced: false);
+                "Outside the inventory, with no hammer, hoe or cultivator in hand: eats every food in the Food slots that can be eaten now, left to right. Unbound by default to prevent key conflicts. Per player.", synced: false);
             BindMeadSlotKeys(synced);
             Bar = synced.Bind(InventorySettings.LookSection, "Food And Mead Bar", true,
                 "In the bottom-left corner of the screen, under your health: a food square with the Food Key over it, then a square per Mead slot that has a key, showing its mead with its Mead Slot key over it.", synced: false);

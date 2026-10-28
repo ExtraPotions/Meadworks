@@ -15,12 +15,9 @@
 - If an altar still cannot take an offering, the summon is cancelled: nothing is taken, no boss appears, and the altar is free for a new offering. The player sees a message in all seven languages. Previously the offering was asked for again every second, without end.
 - The log names the reason a summon payment was held, at most once a minute per summon.
 
-## Unreleased
+## 0.5.11 (2026-10-28)
 
-- Version 0.5.7. Requires Crucible 0.3.29 / Crucible.UI 0.3.21.
-- Add the server-controlled Abandoned Bosses option, off by default. A recorded altar summon at full health with no nearby player can despawn after the configured delay and return its offering at the altar once. Normal kills give no refund.
-- Save summon, timer and refund progress in a durable ledger. The altar refuses another summon while its recorded boss lives or its previous offering is still recovering. Boss aspects, twins and phantoms keep their existing behavior; one summon can return only its original offering.
-- Add abandonment settings and summon refusal messages in all seven languages.
+- New package icon.
 
 ## 0.5.6 (2026-10-22)
 

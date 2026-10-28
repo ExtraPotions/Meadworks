@@ -7,6 +7,6 @@ Solstice.Core.dll and Solstice.dll contain code and data adapted from Seasons 1.
 Local delivery must include the matching source ZIP alongside the mod ZIP. No publication or copyright transfer is inferred. The upstream Unlicense notice remains intact in THIRD_PARTY_NOTICES/Seasons-Unlicense.txt.
 
 
-Successor corresponding source: this package uses the exact member map and build receipts in SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.6/BUILD.json. The matching accepted provider-source supplements remain part of the release source inventory. No new Git commit is asserted.
+Successor corresponding source: this package uses the exact member map and build receipts in SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.7/BUILD.json. The matching accepted provider-source supplements remain part of the release source inventory. No new Git commit is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.6/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.7/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.

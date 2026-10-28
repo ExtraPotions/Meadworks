@@ -4,12 +4,9 @@
 
 - An interrupted winter harvest resumes its saved item plan. If a drop call throws after it may have created an item, Solstice skips that item on retry to avoid a duplicate.
 
-## Unreleased
+## 0.1.7 (2026-10-28)
 
-- If legacy settings cannot be copied, initialization stops before saving defaults and retries on the next start. Existing settings and backups are preserved.
-
-
-- Add Debug-only Stopwatch and GC diagnostics for multi-frame winter work and day/toggle frames. Timings retain the existing work schedule.
+- Defer player-facing season work until the local player is ready while keeping authoritative server season work active whenever the environment is available.
 
 ## 0.1.3 (2026-10-22)
 

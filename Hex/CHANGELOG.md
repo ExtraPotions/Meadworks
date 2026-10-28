@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.19 (2026-10-28)
+
+- New package icon.
+
 ## 0.1.18 (2026-10-21)
 
 - Thunderstore republish of the release 8 build; no code changes.

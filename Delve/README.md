@@ -1,10 +1,9 @@
-## Changes in 0.1.16
-
-- Delve now replaces an existing world file in one step, so an interrupted replacement leaves the previous file intact. On the first save, Delve loads the temporary file on the next start if the main file was not created.
+## Changes in 0.1.17
+- Keep the regeneration update loop idle on remote clients while localization and module state continue to refresh.
 
 # Delve
 
-Version 0.1.16. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.17. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Sets dungeon sizes and brings back loot, resources, the Queen and cleared creatures on timers you choose.
 
@@ -27,7 +26,7 @@ Sets dungeon sizes and brings back loot, resources, the Queen and cleared creatu
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

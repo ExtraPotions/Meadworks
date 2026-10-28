@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.16 (2026-10-28)
+
+- Throttle gameplay-idle menu and join work while continuing to poll pending secret stores, secret actions and the post-join save offer until they complete.
+
 ## 0.1.15 (2026-10-28)
 
 - A damaged line in the saved-password file is kept (its text unchanged; only the line ending is normalized) instead of being erased the next time you save or forget a password.

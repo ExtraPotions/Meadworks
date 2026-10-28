@@ -1,10 +1,9 @@
-## Changes in 0.1.16
-
-- Floating items no longer allocate a name every physics step, and destroyed items are dropped from the floating list once a minute.
+## Changes in 0.1.17
+- New package icon.
 
 # Magpie
 
-Version 0.1.16. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.17. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Items within range glide to you and are picked up, nearby ground stacks merge, and drops float; an optional loot multiplier is a server-controlled cheat.
 
@@ -22,7 +21,7 @@ Items within range glide to you and are picked up, nearby ground stacks merge, a
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

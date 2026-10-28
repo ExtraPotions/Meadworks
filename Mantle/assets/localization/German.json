@@ -80,7 +80,7 @@
     "cfg_2_slots__coin_purse_name": "Münzbeutel",
     "cfg_2_slots__coin_purse_help": "Ein Beutelplatz im Reiter Ausrüstung: aufgehobene Münzen wandern hinein, Händler nehmen Münzen daraus wie von überall im Inventar.",
     "cfg_2_slots__food_key_name": "Nahrungstaste",
-    "cfg_2_slots__food_key_help": "Außerhalb des Inventars, ohne Hammer, Hacke oder Pflug in der Hand: isst jede Speise in den Nahrungsplätzen, die gerade gegessen werden kann, von links nach rechts. Pro Spieler.",
+    "cfg_2_slots__food_key_help": "Außerhalb des Inventars, ohne Hammer, Hacke oder Pflug in der Hand: isst jede Speise in den Nahrungsplätzen, die gerade gegessen werden kann, von links nach rechts. Standardmäßig nicht belegt, um Tastenkonflikte zu vermeiden. Pro Spieler.",
     "cfg_2_slots__mead_slot_1_key_name": "Taste für Metplatz 1",
     "cfg_2_slots__mead_slot_1_key_help": "Außerhalb des Inventars, ohne Hammer, Hacke oder Pflug in der Hand: trinkt den Met in Metplatz 1 (von links nach rechts gezählt), wenn er gerade getrunken werden kann. Solange die Modifikatoren dieser Taste gehalten werden (standardmäßig Left Alt), benutzen die Zifferntasten keinen Gegenstand der Schnellleiste. Pro Spieler.",
     "cfg_2_slots__mead_slot_2_key_name": "Taste für Metplatz 2",

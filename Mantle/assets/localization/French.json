@@ -80,7 +80,7 @@
     "cfg_2_slots__coin_purse_name": "Bourse",
     "cfg_2_slots__coin_purse_help": "Un emplacement de bourse dans l'onglet Équipement : les piastres ramassées y vont, les marchands y prennent les piastres comme n'importe où ailleurs dans l'inventaire.",
     "cfg_2_slots__food_key_name": "Touche de nourriture",
-    "cfg_2_slots__food_key_help": "Hors de l'inventaire, sans marteau, houe ni cultivateur en main : mange chaque plat des emplacements de nourriture qui peut être mangé maintenant, de gauche à droite. Par joueur.",
+    "cfg_2_slots__food_key_help": "Hors de l'inventaire, sans marteau, houe ni cultivateur en main : mange chaque plat des emplacements de nourriture qui peut être mangé maintenant, de gauche à droite. Non attribuée par défaut pour éviter les conflits de touches. Par joueur.",
     "cfg_2_slots__mead_slot_1_key_name": "Touche de l'emplacement d'hydromel 1",
     "cfg_2_slots__mead_slot_1_key_help": "Hors de l'inventaire, sans marteau, houe ni cultivateur en main : boit l'hydromel de l'emplacement d'hydromel 1 (compté de gauche à droite), s'il peut être bu maintenant. Tant que les modificateurs de cette touche sont maintenus (Left Alt par défaut), les touches numériques n'utilisent aucun objet de la barre de raccourcis. Par joueur.",
     "cfg_2_slots__mead_slot_2_key_name": "Touche de l'emplacement d'hydromel 2",

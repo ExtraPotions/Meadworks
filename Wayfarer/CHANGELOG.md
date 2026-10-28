@@ -1,3 +1,7 @@
+## 0.5.15 (2026-10-28)
+
+- Live navigation and map UI updates wait until a local player exists.
+
 ## 0.5.14 (2026-10-28)
 
 - If map travel cannot handle a map click, the click goes to the normal map instead of being swallowed.

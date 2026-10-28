@@ -80,7 +80,7 @@
     "cfg_2_slots__coin_purse_name": "Coin Purse",
     "cfg_2_slots__coin_purse_help": "A purse slot on the Gear tab: coins you pick up go into it, traders take coins from it as from anywhere in the inventory.",
     "cfg_2_slots__food_key_name": "Food Key",
-    "cfg_2_slots__food_key_help": "Outside the inventory, with no hammer, hoe or cultivator in hand: eats every food in the Food slots that can be eaten now, left to right. Per player.",
+    "cfg_2_slots__food_key_help": "Outside the inventory, with no hammer, hoe or cultivator in hand: eats every food in the Food slots that can be eaten now, left to right. Unbound by default to prevent key conflicts. Per player.",
     "cfg_2_slots__mead_slot_1_key_name": "Mead Slot 1 Key",
     "cfg_2_slots__mead_slot_1_key_help": "Outside the inventory, with no hammer, hoe or cultivator in hand: drinks the mead in Mead slot 1 (counted left to right), if it can be drunk now. While this key's modifiers are held (Left Alt by default), the number keys use no hotbar item. Per player.",
     "cfg_2_slots__mead_slot_2_key_name": "Mead Slot 2 Key",

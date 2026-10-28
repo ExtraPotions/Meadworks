@@ -1,3 +1,7 @@
+## 0.5.12 (2026-10-28)
+
+- New package icon.
+
 ## 0.5.11 (2026-10-26)
 
 - Placement ghosts of fireplaces and doors are no longer tracked as real pieces.
