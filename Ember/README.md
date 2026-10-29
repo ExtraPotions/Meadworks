@@ -1,11 +1,11 @@
-## Changes in 0.5.13
-- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+## Changes in 0.5.14
+- Dependencies updated to the latest versions (Crucible 0.3.38, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Ember
 
 Faster nights when some players sleep, torches that warm you like a campfire, and doors that open as you walk up.
 
-Version 0.5.13. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.14. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -28,7 +28,7 @@ Version 0.5.13. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [C
 
 - BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.38 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

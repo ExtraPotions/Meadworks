@@ -1,9 +1,9 @@
-## Changes in 0.3.14
-- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+## Changes in 0.3.15
+- Dependencies updated to the latest versions (Crucible 0.3.38, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Threshold
 
-Version 0.3.14. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.15. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Choose destinations from the integrated map/list, use a named-portal selector with an explicit Teleport action, or keep native tag pairing.
 
@@ -26,7 +26,7 @@ Choose destinations from the integrated map/list, use a named-portal selector wi
 
 - BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.38 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

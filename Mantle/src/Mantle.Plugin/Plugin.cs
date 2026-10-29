@@ -18,7 +18,7 @@ namespace Mantle
 {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
     // Pin the published Crucible dependency while retaining Crucible.UI's compatible native floor.
-    [BepInDependency(CruciblePlugin.Guid, "0.3.37")]
+    [BepInDependency(CruciblePlugin.Guid, "0.3.38")]
     // The Crucible.UI kit is the standard Meadworks UI (mandatory; idle on a headless server). Mantle's adopted PackPanel
     // inventory UI is the kit's own baseline and stays as adopted. A later 0.3.x still loads.
     [BepInDependency(CrucibleUiPlugin.Guid, "0.3.20")]
@@ -33,7 +33,7 @@ namespace Mantle
     {
         public const string PluginGuid = "com.meadworks.mantle";
         public const string PluginName = "Mantle";
-        public const string PluginVersion = "0.1.35";
+        public const string PluginVersion = "0.1.36";
         public static Plugin Instance { get; private set; }
         public static ManualLogSource Log { get; private set; }
         public static SyncedConfiguration Synced { get; private set; }

@@ -1,9 +1,9 @@
-## Changes in 0.2.16
-- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+## Changes in 0.2.17
+- Dependencies updated to the latest versions (Crucible 0.3.38, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Edge
 
-Version 0.2.16. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.17. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Combat additions: a secondary attack for every weapon family, a quickstep, swings that hit on slopes, and weapons back in hand after a swim.
 
@@ -25,7 +25,7 @@ Combat additions: a secondary attack for every weapon family, a quickstep, swing
 
 - BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.38 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

@@ -1,11 +1,11 @@
 # Crucible
 
-## Changes in 0.3.37
+## Changes in 0.3.38
 - Dependencies updated to the latest versions (BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 The shared library every Meadworks mod needs. It adds no gameplay on its own.
 
-Version 0.3.37, with Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.38, with Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 

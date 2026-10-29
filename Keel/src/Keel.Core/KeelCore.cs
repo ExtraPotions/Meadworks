@@ -6,7 +6,7 @@ namespace ExtraPotions.Keel
     {
         public const string PluginGuid = "com.meadworks.keel";
         public const string ProductName = "Keel";
-        public const string ProductVersion = "0.1.19";
+        public const string ProductVersion = "0.1.20";
         public const string Family = "Waystone";
 
         /// <summary>Localization namespace (design section 11): tokens <c>$meadworks_keel_&lt;key&gt;</c>.</summary>

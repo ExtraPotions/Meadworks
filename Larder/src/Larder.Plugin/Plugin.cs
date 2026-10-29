@@ -23,7 +23,7 @@ namespace ExtraPotions.Larder.Runtime
     /// Source coexistence is per module; server configuration stays bound when a reference owns gameplay.
     /// </summary>
     [BepInPlugin(Guid, Name, Version)]
-    [BepInDependency(CruciblePlugin.Guid, "0.3.37")]
+    [BepInDependency(CruciblePlugin.Guid, "0.3.38")]
     [BepInDependency(CrucibleUiPlugin.Guid, "0.3.21")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]

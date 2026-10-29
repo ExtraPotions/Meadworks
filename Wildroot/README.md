@@ -1,6 +1,6 @@
 # Wildroot
 
-Version 0.1.24. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.25. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Gardening for Valheim: plant in grids, harvest in bulk, replant automatically and plant more of the world's flora.
 
@@ -28,7 +28,7 @@ Gardening for Valheim: plant in grids, harvest in bulk, replant automatically an
 
 - BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.38 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

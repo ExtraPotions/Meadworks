@@ -34,7 +34,7 @@ namespace ExtraPotions.Magpie.Runtime
     {
         public const string Guid = MagpieCore.ProductId;
         public const string Name = "Magpie";
-        public const string Version = "0.1.18";
+        public const string Version = "0.1.19";
         public const string Family = "Hoard";
 
         private ProductRegistration? registration;

@@ -21,7 +21,7 @@ namespace ExtraPotions.Solstice.Runtime
     /// </summary>
     [BepInPlugin(Guid, Name, Version)]
     // BepInEx minimums for the published 8.0.1 kit. A later 0.3.x still loads.
-    [BepInDependency(CruciblePlugin.Guid, "0.3.37")]
+    [BepInDependency(CruciblePlugin.Guid, "0.3.38")]
     [BepInDependency(CrucibleUiPlugin.Guid, "0.3.20")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]

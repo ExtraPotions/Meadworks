@@ -10,6 +10,6 @@ The Corresponding Source for this version is at https://github.com/ExtraPotions/
 
 The tall-tooltip feature adopts Display/Tooltips/TooltipScroll.cs from the existing EliteCrafting 0.7.0 pin. It keeps the native tooltip panel, fonts and border, with a clipped body and scroll-position bar only when needed. Inscribe adds display/headless admission, existing-scroll-owner refusal, scale/topic fit invalidation and current-owned-tooltip cleanup. No additional art or source family is imported.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.11/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.12/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.11/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.12/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.

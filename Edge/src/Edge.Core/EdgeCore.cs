@@ -6,7 +6,7 @@ namespace ExtraPotions.Edge
     {
         public const string PluginGuid = "com.meadworks.edge";
         public const string ProductName = "Edge";
-        public const string ProductVersion = "0.2.16";
+        public const string ProductVersion = "0.2.17";
         public const string Family = "Fang";
 
         /// <summary>Localization namespace (design section 12): tokens <c>$meadworks_edge_&lt;key&gt;</c>.</summary>

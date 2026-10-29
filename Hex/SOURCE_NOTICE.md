@@ -25,4 +25,4 @@ Crucible, Jotunn, BepInEx, Unity and Valheim assemblies are external runtime/bui
 
 Original approved Meadworks Hex package icon.png uses CC-BY-NC-SA-4.0. Retained public-domain/MIT notices accompany the package.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.20/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.21/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.

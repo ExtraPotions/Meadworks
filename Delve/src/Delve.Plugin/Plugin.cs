@@ -17,7 +17,7 @@ namespace ExtraPotions.Delve.Runtime
     /// the Crucible.UI kit are hard dependencies; Delve itself builds no UI (design 11).
     /// </summary>
     [BepInPlugin(Guid, Name, Version)]
-    [BepInDependency(CruciblePlugin.Guid, "0.3.37")]
+    [BepInDependency(CruciblePlugin.Guid, "0.3.38")]
     [BepInDependency(CrucibleUiPlugin.Guid, "0.3.20")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [NetworkCompatibility(CompatibilityLevel.NotEnforced, VersionStrictness.None)]

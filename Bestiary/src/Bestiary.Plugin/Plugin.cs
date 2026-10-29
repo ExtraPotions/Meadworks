@@ -23,7 +23,7 @@ namespace ExtraPotions.Bestiary.Runtime
     /// </summary>
     [BepInPlugin(Guid, Name, Version)]
     // 0.1.18 requires Crucible 0.3.28. Its UI is 0.3.20, shipped in that package and idle on a headless server.
-    [BepInDependency(CruciblePlugin.Guid, "0.3.37")]
+    [BepInDependency(CruciblePlugin.Guid, "0.3.38")]
     [BepInDependency(ExtraPotions.Meadworks.Crucible.UI.CrucibleUiPlugin.Guid, "0.3.20")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]

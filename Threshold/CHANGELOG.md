@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.15 (2026-10-29)
+
+- Package files now carry this release's date, so BepInEx reloads updated mods instead of using stale cached plugin details (fixes 'missing dependency Crucible' after updating).
+
 ## 0.3.14 (2026-10-28)
 
 - Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).

@@ -1,9 +1,9 @@
-## Changes in 0.1.18
-- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+## Changes in 0.1.19
+- Dependencies updated to the latest versions (Crucible 0.3.38, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Thing
 
-Version 0.1.18. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.19. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Server administration and moderation from inside the game, checked against the server's own admin list.
 
@@ -38,7 +38,7 @@ These checks do not establish full other-player Take/Delete durability, lost-rep
 
 - BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.37 or a later compatible 0.3.x, with Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.38 or a later compatible 0.3.x, with Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

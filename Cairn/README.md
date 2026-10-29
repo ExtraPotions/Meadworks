@@ -2,7 +2,7 @@
 
 See more of the world: an exploration radius that grows on high ground and at sea and shrinks in forest, at night and in fog; an Exploration skill; per-effect fog controls; a time, weather and compass HUD; and tidy map pins.
 
-Version 0.1.22. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.23. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -22,7 +22,7 @@ Version 0.1.22. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [C
 
 - BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.38 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

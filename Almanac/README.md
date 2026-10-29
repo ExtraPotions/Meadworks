@@ -1,11 +1,11 @@
-## Changes in 0.1.28
-- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+## Changes in 0.1.29
+- Dependencies updated to the latest versions (Crucible 0.3.38, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Almanac
 
 One in-game settings book for every installed mod's configuration, aware of server locks.
 
-Version 0.1.28. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.29. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -27,7 +27,7 @@ The Advanced switch in the header controls specialist settings. Pin/Unpin manage
 
 - BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2 (installed with Crucible)
-- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.38 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

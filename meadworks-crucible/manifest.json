@@ -1,6 +1,6 @@
 {
   "name": "Crucible",
-  "version_number": "0.3.37",
+  "version_number": "0.3.38",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/meadworks-crucible",
   "description": "Meadworks shared library: product registration, server authority, the shared interface kit, localization and logging. Adds no gameplay. Required on all peers.",
   "dependencies": [

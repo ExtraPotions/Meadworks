@@ -61,4 +61,4 @@ The optional tamed-pressure policy adapts `BossTamedPressureRuntime.cs` and the 
 This adaptation is GPL-3.0-only. Reviewed source files, the unchanged license and precise hashes are retained under `docs/reference-updates/2026-10-23-tamed-pressure/BossRules` and `docs/2026-10-23-tamed-pressure-provenance.json`; the existing `THIRD_PARTY_NOTICES/BossRules-GPL-3.0.txt` remains. No additional BossRules systems or assets are adopted.
 
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.5.12/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory; a newer runtime provider does not replace those inputs. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.5.13/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory; a newer runtime provider does not replace those inputs. No new Git commit or broader native acceptance is asserted.

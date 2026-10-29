@@ -8,4 +8,4 @@ The Corresponding Source for this version is at https://github.com/ExtraPotions/
 
 The approved original Meadworks Tempest icon is included under CC-BY-NC-SA-4.0. Retained MIT notices are included; no game assets are redistributed.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.18/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.19/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.

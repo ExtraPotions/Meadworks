@@ -18,6 +18,6 @@ This prepared 0.1.14 source starts from the exact released 8.8 archive `expDARE-
 
 
 
-Successor corresponding source: this package uses the exact member map and build receipts in SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.18/BUILD.json. The matching accepted provider-source supplements remain part of the release source inventory. No new Git commit is asserted.
+Successor corresponding source: this package uses the exact member map and build receipts in SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.19/BUILD.json. The matching accepted provider-source supplements remain part of the release source inventory. No new Git commit is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.18/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.19/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.

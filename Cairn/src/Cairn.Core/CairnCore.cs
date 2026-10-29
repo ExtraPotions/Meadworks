@@ -6,7 +6,7 @@ namespace ExtraPotions.Cairn
     {
         public const string PluginGuid = "com.meadworks.cairn";
         public const string ProductName = "Cairn";
-        public const string ProductVersion = "0.1.22";
+        public const string ProductVersion = "0.1.23";
         public const string Family = "Waystone";
 
         /// <summary>Localization namespace (design section 11): tokens <c>$meadworks_cairn_&lt;key&gt;</c>.</summary>
