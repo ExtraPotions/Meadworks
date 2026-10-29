@@ -1,3 +1,7 @@
+## 0.1.37 (2026-10-29)
+
+- New configs start with 3 Utility slots instead of 5, enough to wear the Megingjord, Wishbone and Wisplight together. Existing configs keep their current value; a host can still set up to 5.
+
 ## 0.1.36 (2026-10-29)
 
 - Package files now carry this release's date, so BepInEx reloads updated mods instead of using stale cached plugin details (fixes 'missing dependency Crucible' after updating).

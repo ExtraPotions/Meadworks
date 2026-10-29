@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BepInEx.Logging;
 using ExtraPotions.Meadworks.Contracts;
 using ExtraPotions.Meadworks.Crucible;
@@ -35,7 +36,7 @@ namespace ExtraPotions.Wildroot.Runtime {
   IReadOnlyList<ExtraResourceDefinition> extras=Array.Empty<ExtraResourceDefinition>();FileSystemWatcher? watcher;
   readonly MutationLedger ledger=new MutationLedger();
   readonly LiveCatalogValues liveValues=new LiveCatalogValues();
-  readonly Dictionary<Component,HashSet<string>> liveFields=new Dictionary<Component,HashSet<string>>();
+  readonly Dictionary<Component,HashSet<string>> liveFields=new Dictionary<Component,HashSet<string>>(ComponentRef.Instance);
   /// <summary>The cultivator's own pieces before Wildroot registered anything; restored when Wildroot turns off.</summary>
   readonly HashSet<string> nativeCultivator=new HashSet<string>(StringComparer.Ordinal);
   bool lastActive;ExtraResourceOrigin lastOrigin;bool compareNeeded;readonly CatalogMismatchGate mismatch=new CatalogMismatchGate();
@@ -282,16 +283,48 @@ namespace ExtraPotions.Wildroot.Runtime {
   internal void RefreshInstance(Component instance){
    if(Restored||!settings.Active||!instance)return;
    var network=instance.GetComponentInParent<ZNetView>();var root=network?network.transform:instance.transform;
-   var prefab=PrefabManager.Instance.GetPrefab(PlacementBackend.PrefabName(root.gameObject));if(!prefab)return;
-   string path="";for(var child=instance.transform;child!=root&&child;child=child.parent)path=path.Length==0?child.name:child.name+"/"+path;
+   // Configure writes the ZNetScene prefab Jotunn returns for this name. A ZDO hash covers a loaded object whose name does not resolve.
+   var prefab=PrefabManager.Instance.GetPrefab(CatalogTimers.PrefabName(root.gameObject.name));
+   if(!prefab&&network&&network.IsValid()&&ZNetScene.instance)prefab=ZNetScene.instance.GetPrefab(network.GetZDO().GetPrefab());
+   if(!prefab)return;
+   string path=ChildPath(instance.transform,root);
    var sourceTransform=path.Length==0?prefab.transform:prefab.transform.Find(path);if(!sourceTransform)return;
    var source=sourceTransform.GetComponent(instance.GetType());
    if(!source||source==instance||!liveFields.TryGetValue(source,out var fields))return;
+   bool ownsRespawn=false,respawnChanged=false;
    foreach(var field in fields){
     var info=AccessTools.Field(instance.GetType(),field);var original=ledger.Original(source,field);if(original==null)continue;
     object? current=info.GetValue(instance),effective=info.GetValue(source);
-    if(liveValues.Apply(instance,field,current,original.Original,effective,SnapshotLiveValue))info.SetValue(instance,effective);
+    if(!liveValues.Apply(instance,field,current,original.Original,effective,SnapshotLiveValue))continue;
+    if(field=="m_respawnTimeMinutes")ownsRespawn=true;
+    if(Equals(current,effective))continue;
+    info.SetValue(instance,effective);
+    if(field=="m_respawnTimeMinutes")respawnChanged=true;
    }
+   // Picked and planted times stay in the ZDO. Only the instance duration is copied, then the game's own poll is aligned with it.
+   if(ownsRespawn&&instance is Pickable pickable)SyncRespawnWatch(pickable,respawnChanged);
+  }
+  static string ChildPath(Transform instance,Transform root){
+   string path="";
+   for(var child=instance;child!=root&&child;child=child.parent){string part=CatalogTimers.PrefabName(child.name);path=path.Length==0?part:part+"/"+path;}
+   return path;
+  }
+  /// <summary>
+  /// Pickable.Awake starts UpdateRespawn only when the minutes are already positive. A later change has to start or stop that poll.
+  /// Zero minutes must not keep polling: ShouldRespawn treats any elapsed time as ready when the threshold is zero.
+  /// An immediate call uses the stored picked time; it does not write a new one unless the game's own init roll does.
+  /// </summary>
+  static void SyncRespawnWatch(Pickable pickable,bool changed){
+   string method=CatalogTimers.RespawnMethod;
+   if(CatalogTimers.PollsRespawn(pickable.m_respawnTimeMinutes)){
+    if(!pickable.IsInvoking(method))pickable.InvokeRepeating(method,CatalogTimers.RespawnFirstDelaySeconds,CatalogTimers.RespawnRepeatSeconds);
+    if(changed)pickable.Invoke(method,0f);
+   }else if(pickable.IsInvoking(method))pickable.CancelInvoke(method);
+  }
+  sealed class ComponentRef:IEqualityComparer<Component>{
+   internal static readonly ComponentRef Instance=new ComponentRef();
+   public bool Equals(Component? x,Component? y)=>ReferenceEquals(x,y);
+   public int GetHashCode(Component obj)=>RuntimeHelpers.GetHashCode(obj);
   }
   static object? SnapshotLiveValue(object? value){
    if(!(value is DropTable table))return value;
@@ -318,7 +351,7 @@ namespace ExtraPotions.Wildroot.Runtime {
    // Only local component fields change. Plant/pick timestamps and all other ZDO data stay untouched.
    liveValues.Restore(target=>target is Component component&&component,
     (target,field)=>AccessTools.Field(target.GetType(),field).GetValue(target),
-    (target,field,value)=>AccessTools.Field(target.GetType(),field).SetValue(target,value));
+    (target,field,value)=>{AccessTools.Field(target.GetType(),field).SetValue(target,value);if(field=="m_respawnTimeMinutes"&&target is Pickable pickable)SyncRespawnWatch(pickable,true);});
    if(Restored&&ledger.Count==0)return;
    int restored=0;
    foreach(var record in ledger.Restore()){

@@ -1,3 +1,8 @@
+## 0.1.26 (2026-10-29)
+
+- Crop growth times apply even with Enable Crop Overrides off; cost, yield, scale and spacing still need the override.
+- Pickables already in the world follow respawn-time changes made in game, including turning respawn on or off.
+
 ## 0.1.25 (2026-10-29)
 
 - Package files now carry this release's date, so BepInEx reloads updated mods instead of using stale cached plugin details (fixes 'missing dependency Crucible' after updating).

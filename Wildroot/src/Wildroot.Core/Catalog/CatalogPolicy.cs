@@ -60,7 +60,7 @@ namespace ExtraPotions.Wildroot {
   public static bool VineOverrides(ICatalogSettings s)=>Flag(s,"Growth.Vines.EnableVineOverrides",false);
   /// <summary>Vine wall-attachment distance with vine overrides enabled, otherwise null (keep the native value).</summary>
   public static double? VineAttachDistance(ICatalogSettings s)=>VineOverrides(s)?Number(s,"Growth.Vines.VineAttachDistance",1.8,null):(double?)null;
-  /// <summary>Crop growth values for third-party crops: only with crop overrides and OverrideModdedCrops enabled.</summary>
+  /// <summary>Third-party crop scale, clearance, conditions and growth time: only with crop overrides and OverrideModdedCrops. Cultivator crop growth time is separate and always follows CropGrowTimeMin/Max.</summary>
   public static GrowthOverride? ModdedCrop(ICatalogSettings s){
    if(!CropOverrides(s)||!Flag(s,"Growth.Crops.OverrideModdedCrops",true))return null;
    return CropGrowth(s,new GrowthOverride(4000,5000,0.5,0.9,1.1),null);
@@ -91,9 +91,11 @@ namespace ExtraPotions.Wildroot {
      costs=Cost(costs,Number(s,prefix+stem+"Cost",FirstAmount(costs),warnings),ref enabled);
      yield=(int)Number(s,prefix+stem+"Return",yield,warnings);respawn=Number(s,prefix+stem+"RespawnTime",respawn/60,warnings)*60;
      if(section==CatalogSection.Debris&&!debris)enabled=false;break;}
-    case CatalogSection.Crops:if(crops&&stem.Length>0){
-     costs=Cost(costs,Number(s,"Catalog.Vanilla.Crops."+stem+"Cost",FirstAmount(costs),warnings),ref enabled);yield=(int)Number(s,"Catalog.Vanilla.Crops."+stem+"Return",yield,warnings);
-     var g=CropGrowth(s,new GrowthOverride(growMin,growMax,radius,scaleMin,scaleMax),warnings);growMin=g.GrowMin;growMax=g.GrowMax;radius=g.Radius;scaleMin=g.ScaleMin;scaleMax=g.ScaleMax;}break;
+    case CatalogSection.Crops:if(stem.Length>0){
+     // Growth time is the timer the cultivator settings name. Cost, yield, scale and clearance stay behind the override so the vanilla preset does not rewrite them.
+     if(crops){costs=Cost(costs,Number(s,"Catalog.Vanilla.Crops."+stem+"Cost",FirstAmount(costs),warnings),ref enabled);yield=(int)Number(s,"Catalog.Vanilla.Crops."+stem+"Return",yield,warnings);
+      var g=CropGrowth(s,new GrowthOverride(growMin,growMax,radius,scaleMin,scaleMax),warnings);growMin=g.GrowMin;growMax=g.GrowMax;radius=g.Radius;scaleMin=g.ScaleMin;scaleMax=g.ScaleMax;}
+     else{growMin=Number(s,"Growth.Crops.CropGrowTimeMin",growMin,warnings);growMax=Math.Max(growMin,Number(s,"Growth.Crops.CropGrowTimeMax",growMax,warnings));}}break;
     case CatalogSection.Saplings:if(stem.Length>0){
      growMin=growMax=Math.Max(MinimumSaplingGrowth,Number(s,"Growth.Saplings."+stem+"GrowthTime",growMin,warnings));radius=Number(s,"Growth.Saplings."+stem+"GrowRadius",radius,warnings);
      scaleMin=Number(s,"Growth.Saplings."+stem+"MinScale",scaleMin,warnings,1e-6);scaleMax=Math.Max(scaleMin,Number(s,"Growth.Saplings."+stem+"MaxScale",scaleMax,warnings,1e-6));}break;

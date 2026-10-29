@@ -96,7 +96,7 @@ namespace Mantle.Core
                 "Gear in the Gear tab is worn. Right click armor, a cape, a utility or a trinket in an open chest to wear it (the piece in its slot moves to a free cell of your inventory first; with none, nothing changes); a piece that lands in its slot any other way is put on too. A worn piece taken off moves into a free cell of your inventory; with none it comes off in its slot and stays off until you put it on again; it is never dropped. A piece that breaks while worn stays in its slot and goes back on once repaired. Off: a piece that lands in its slot unworn stays unworn, and a right click in a chest does nothing.");
             InstantEquip = synced.Bind(SlotsSection, "Instant Equip", false,
                 "Weapons, tools, shields and armor go on and come off at once, with no equipping bar. Off: the game's equip time.");
-            UtilitySlots = synced.Bind(SlotsSection, "Utility Slots", 5,
+            UtilitySlots = synced.Bind(SlotsSection, "Utility Slots", 3,
                 "Utility slots (belts, the wishbone, the wisplight...) when Slots Per Group is 0. Every utility item in a slot is worn at once, so up to this many work together. 0: none, the game's single utility item.",
                 acceptableValues: new AcceptableValueRange<int>(0, MaxGroup));
             TrinketSlot = synced.Bind(SlotsSection, "Trinket Slot", true,

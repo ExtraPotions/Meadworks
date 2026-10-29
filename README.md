@@ -24,7 +24,7 @@ Crucible is the shared library every product requires. The Meadworks modpack dep
 | [Kindle](Kindle/) | 0.1.30 | Meadworks crafting: recipe search, sorting, favorites, list/grid views, batch crafting, recipe tracking, salvage and Cart Workbench. Client-optional. |
 | [Larder](Larder/) | 0.2.22 | Meadworks food and kitchen: food and mead values, eating, regeneration, stamina costs, kitchen stations and Cooking perks. Required on all peers. |
 | [Magpie](Magpie/) | 0.1.19 | Meadworks loot handling: magnet pickup, ground-stack merging, floating drops and a server-controlled loot multiplier cheat. Required on all peers. |
-| [Mantle](Mantle/) | 0.1.36 | Meadworks inventory and equipment: configurable grid, gear, ring and belt slots, backpacks, key ring, tacklebox and a Swap loadout button. Required on all peers (same version). |
+| [Mantle](Mantle/) | 0.1.37 | Meadworks inventory and equipment: configurable grid, gear, ring and belt slots, backpacks, key ring, tacklebox and a Swap loadout button. Required on all peers (same version). |
 | [Saga](Saga/) | 0.1.22 | Meadworks progression: boss kills turn the Forsaken powers into permanent passives, Defense, Sneak, Woodcutting, Mining, Foraging and Fishing gain perks, and one skill book shows every skill. Required on all peers. |
 | [Shepherd](Shepherd/) | 0.1.26 | Meadworks animal husbandry: feed troughs, the Husbandry skill, breeding with sires, star inheritance, twins, herd limits and lineage. Required on all peers. |
 | [Solstice](Solstice/) | 0.1.9 | Meadworks seasons: spring, summer, fall and winter by the world calendar, with seasonal growth, bees, food, stamina, fire, sap, rest and wind effects, and local winter snow and season colors. Cooperates with Tempest weather. Required on all peers. |
@@ -34,7 +34,7 @@ Crucible is the shared library every product requires. The Meadworks modpack dep
 | [Timber](Timber/) | 0.2.6 | Meadworks building: build camera, flooring options and area repair, with server-controlled cheats. Required on all peers. |
 | [Wayfarer](Wayfarer/) | 0.5.17 | Meadworks map travel: Back to Bed for everyone, plus Stones, Anywhere, Boat, Grave and Player travel cheats the server switches on, usable by admins unless the server allows others. Required on all peers. |
 | [Wildblood](Wildblood/) | 0.5.13 | Meadworks wild creatures: difficulty and stars that grow with the world, mutations and modifiers, boss aspects, loot rules and bad-luck protection. Required on all peers. |
-| [Wildroot](Wildroot/) | 0.1.25 | Meadworks gardening: grid planting, snapping, bulk harvest, replanting, a Farming skill with perks, seed crafting and more plantable flora. Required on all peers. |
+| [Wildroot](Wildroot/) | 0.1.26 | Meadworks gardening: grid planting, snapping, bulk harvest, replanting, a Farming skill with perks, seed crafting and more plantable flora. Required on all peers. |
 
 ## Building
 
@@ -46,10 +46,10 @@ Each folder carries its own license files. Original code is GPL-3.0-or-later unl
 states otherwise; original artwork and documentation are CC BY-NC-SA 4.0. Adapted third-party code keeps its notices
 in the folder's `THIRD_PARTY_NOTICES/`.
 
-<!-- release-8.18-artifacts:start -->
-## MeadWorks 8.18
+<!-- release-8.19-artifacts:start -->
+## MeadWorks 8.19
 
-[Release 8.18](https://github.com/ExtraPotions/Meadworks/releases/tag/release-8.18) | [SHA256 sums](https://github.com/ExtraPotions/Meadworks/releases/download/release-8.18/SHA256SUMS.txt)
+[Release 8.19](https://github.com/ExtraPotions/Meadworks/releases/tag/release-8.19) | [SHA256 sums](https://github.com/ExtraPotions/Meadworks/releases/download/release-8.19/SHA256SUMS.txt)
 
-27 product updates. Matching source archives are attached to the release.
-<!-- release-8.18-artifacts:end -->
+2 product updates. Matching source archives are attached to the release.
+<!-- release-8.19-artifacts:end -->
