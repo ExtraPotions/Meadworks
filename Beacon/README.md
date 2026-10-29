@@ -1,9 +1,9 @@
-## Changes in 0.1.16
-- Throttle gameplay-idle menu and join work while continuing to poll pending secret stores, secret actions and the post-join save offer until they complete.
+## Changes in 0.1.17
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Beacon
 
-Version 0.1.16. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.17. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Saved servers that join without the password prompt, with passwords kept in your system's protected storage.
 
@@ -22,9 +22,9 @@ Saved servers that join without the password prompt, with passwords kept in your
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

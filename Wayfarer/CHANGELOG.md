@@ -1,3 +1,7 @@
+## 0.5.16 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.5.15 (2026-10-28)
 
 - Live navigation and map UI updates wait until a local player exists.

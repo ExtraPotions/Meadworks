@@ -1,9 +1,9 @@
-## Changes in 0.5.15
-- Live navigation and map UI updates wait until a local player exists.
+## Changes in 0.5.16
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Wayfarer
 
-Version 0.5.15. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.5.16. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Teleport from the world map: Back to Bed for everyone, plus travel cheats the server switches on, usable by admins unless the server allows others.
 
@@ -19,9 +19,9 @@ Teleport from the world map: Back to Bed for everyone, plus travel cheats the se
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

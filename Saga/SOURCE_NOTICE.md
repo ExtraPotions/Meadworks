@@ -15,10 +15,10 @@ Successful-backstab authentication (2026-10-15): the retained SecondaryAttacks B
 Forsaken power wheel (2026-10-21): the hold-to-choose timing in `src/Saga.Core/Powers/PowerWheel.cs` is adapted from BossRules 1.1.8 `ForsakenPowerShortcutInput` (GPL-3.0, Copyright (C) 2026 sighsorry, snapshot `assets/references/thunderstore-20261019/sighsorry-BossRules-1.1.8`). The wheel is drawn with Crucible.UI. The native Valheim radial renderer is not copied.
 
 
-Successor corresponding source: this package uses the exact member map and build receipts in SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.20/BUILD.json. The matching accepted provider-source supplements remain part of the release source inventory. No new Git commit is asserted.
+Successor corresponding source: this package uses the exact member map and build receipts in SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.21/BUILD.json. The matching accepted provider-source supplements remain part of the release source inventory. No new Git commit is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.20/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.21/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.20/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.21/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.20/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.1.21/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.

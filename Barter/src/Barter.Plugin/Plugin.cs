@@ -24,7 +24,7 @@ namespace ExtraPotions.Barter.Runtime
     /// </summary>
     [BepInPlugin(Guid, Name, Version)]
     // BepInEx minimums for the published 8.0.1 kit. A later 0.3.x still loads.
-    [BepInDependency(CruciblePlugin.Guid, "0.3.28")]
+    [BepInDependency(CruciblePlugin.Guid, "0.3.37")]
     [BepInDependency(CrucibleUiPlugin.Guid, "0.3.20")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
@@ -32,7 +32,7 @@ namespace ExtraPotions.Barter.Runtime
     {
         public const string Guid = BarterCore.ProductId;
         public const string Name = "Barter";
-        public const string Version = "0.1.7";
+        public const string Version = "0.1.8";
         public const string Family = "Hoard";
 
         internal const string SourceModGuid = "shudnal.TradersExtended";

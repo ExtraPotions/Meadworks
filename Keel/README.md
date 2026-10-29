@@ -1,10 +1,9 @@
-## Changes in 0.1.18
-
-- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+## Changes in 0.1.19
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Keel
 
-Version 0.1.18. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.19. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Tune every ship, level a Sailing skill, and build eight new ships from the vanilla hulls.
 
@@ -22,9 +21,9 @@ Tune every ship, level a Sailing skill, and build eight new ships from the vanil
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

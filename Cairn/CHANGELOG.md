@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.22 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.1.20 (2026-10-26)
 
 - The HUD compass no longer hides and re-shows every tick, mark and marker on each redraw, which caused stutter while turning the camera.

@@ -1,11 +1,11 @@
 {
   "name": "Beacon",
-  "version_number": "0.1.16",
+  "version_number": "0.1.17",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Beacon",
   "description": "Meadworks saved servers: join without the password prompt, passwords in protected storage, saved servers in Join Game favorites, optional auto-join and reconnect (a server can turn reconnect off), AutoConnector import. Client-optional.",
   "dependencies": [
-    "denikson-BepInExPack_Valheim-5.4.2351",
+    "denikson-BepInExPack_Valheim-5.4.2360",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.36"
+    "expDARE-Crucible-0.3.37"
   ]
 }

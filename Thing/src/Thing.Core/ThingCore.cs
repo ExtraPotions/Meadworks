@@ -6,7 +6,7 @@ namespace ExtraPotions.Thing
     {
         public const string PluginGuid = "com.meadworks.thing";
         public const string ProductName = "Thing";
-        public const string ProductVersion = "0.1.17";
+        public const string ProductVersion = "0.1.18";
         public const string Family = "Runestone";
 
         /// <summary>Localization namespace (design section 11): tokens <c>$meadworks_thing_&lt;key&gt;</c>.</summary>

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.17 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.1.16 (2026-10-28)
 
 - Throttle gameplay-idle menu and join work while continuing to poll pending secret stores, secret actions and the post-join save offer until they complete.

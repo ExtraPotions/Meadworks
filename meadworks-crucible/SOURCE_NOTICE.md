@@ -25,10 +25,12 @@ Successor corresponding source: this package uses the exact member map and build
 Private candidate revision 3: trusted active first-party LOCAL Clause metadata registration. Only Crucible.dll changes runtime bytes; Core, Contracts and UI retain their prior bytes. Managed source-linked controls and actual build inputs are pinned in the clause-registration build recipe. Native Census/Cold acceptance is pending and is not implied by these source records. Historical pre-Clause compiler references and corresponding source are retained separately for unchanged consumers; no compiler hashes are rewritten.
 
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.36/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory; a newer runtime provider does not replace those inputs. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.37/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory; a newer runtime provider does not replace those inputs. No new Git commit or broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.36/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.37/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.36/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.37/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.36/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.37/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.37/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.

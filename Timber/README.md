@@ -1,9 +1,9 @@
-## Changes in 0.2.4
-- New package icon.
+## Changes in 0.2.5
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Timber
 
-Version 0.2.4. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.5. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Building tools: a build camera, flooring options, area repair and server-controlled building cheats.
 
@@ -17,9 +17,9 @@ Building tools: a build camera, flooring options, area repair and server-control
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

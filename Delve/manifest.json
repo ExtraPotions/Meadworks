@@ -1,11 +1,11 @@
 {
   "name": "Delve",
-  "version_number": "0.1.17",
+  "version_number": "0.1.18",
   "website_url": "https://github.com/ExtraPotions/Meadworks/tree/main/Delve",
   "description": "Meadworks world regeneration: dungeon sizes, chest refills, dungeon resources, the Queen and camp creatures come back on timers, never near players or their buildings. Server-only.",
   "dependencies": [
-    "denikson-BepInExPack_Valheim-5.4.2351",
+    "denikson-BepInExPack_Valheim-5.4.2360",
     "ValheimModding-Jotunn-2.30.2",
-    "expDARE-Crucible-0.3.36"
+    "expDARE-Crucible-0.3.37"
   ]
 }

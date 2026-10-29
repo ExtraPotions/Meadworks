@@ -1,3 +1,7 @@
+## 0.1.24 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.1.23 (2026-10-28)
 
 - Reduce recovery work for large planting journals by indexing placement probes during each poll while preserving live ownership, permission and lifecycle checks.

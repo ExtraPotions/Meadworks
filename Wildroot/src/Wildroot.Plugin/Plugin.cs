@@ -17,7 +17,7 @@ namespace ExtraPotions.Wildroot.Runtime {
  [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod,VersionStrictness.Minor)]
  public sealed class Plugin:BaseUnityPlugin {
   public const string Guid=WildrootSettings.ProductId;
-  public const string Version="0.1.23";
+  public const string Version="0.1.24";
   ProductRegistration? registration;
   Harmony? harmony;
   readonly int unityThread=Thread.CurrentThread.ManagedThreadId;

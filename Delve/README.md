@@ -1,9 +1,9 @@
-## Changes in 0.1.17
-- Keep the regeneration update loop idle on remote clients while localization and module state continue to refresh.
+## Changes in 0.1.18
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Delve
 
-Version 0.1.17. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.18. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Sets dungeon sizes and brings back loot, resources, the Queen and cleared creatures on timers you choose.
 
@@ -24,9 +24,9 @@ Sets dungeon sizes and brings back loot, resources, the Queen and cleared creatu
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

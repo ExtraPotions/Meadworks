@@ -1,3 +1,7 @@
+## 0.1.25 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.1.24 (2026-10-28)
 
 - New package icon.
@@ -17,10 +21,6 @@
 - Preserve husbandry registration ownership and activation-failure rollback.
 
 # Changelog
-
-## Unreleased
-
-- Hide the ignored Tamed Stars setting while retaining its saved value and local scope. Wildblood continues to control creature stars.
 
 ## 0.1.18 (2026-10-22)
 

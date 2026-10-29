@@ -1,12 +1,11 @@
-## Changes in 0.1.7
-
-- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+## Changes in 0.1.8
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Barter
 
 Traders you can shape: per-trader buy and sell lists, custom currencies, prices that follow the trader's purse, and a sell list built on the Meadworks interface kit.
 
-Version 0.1.7. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.8. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -31,9 +30,9 @@ The mechanics follow shudnal's TradersExtended (public domain), so lists written
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

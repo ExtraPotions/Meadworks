@@ -30,10 +30,12 @@ Headless input correction for the unpublished 0.3.29 candidate: source/build sna
 Private candidate shutdown correction: Poll rethrows ThreadAbortException without a false YAML IO diagnostic. Ordinary errors remain logged; polling and main-thread reload scheduling remain active. Current actual output/source/compiler/PDB proof is in BUILD-RECIPES/shutdown-fix-0.3.29/BUILD.json. The prior headless recipe is retained as historical evidence; its DLL hashes are superseded. No native cold acceptance is inferred from this package metadata.
 
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.33/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory; a newer runtime provider does not replace those inputs. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.34/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory; a newer runtime provider does not replace those inputs. No new Git commit or broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.33/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.34/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.33/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.34/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.33/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.34/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.
+
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.3.34/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.

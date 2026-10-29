@@ -10,7 +10,7 @@ namespace ExtraPotions.Meadworks.Crucible {
     public sealed class Plugin:BaseUnityPlugin {
         public const string Guid="com.meadworks.crucible";
         public const string Name="ExtraPotions Meadworks: Crucible";
-        public const string Version="0.3.36";
+        public const string Version="0.3.37";
         public static ProductRegistry Services { get; private set; }=null!;
         public static bool IsReady { get; private set; }
         internal static BepInEx.Logging.ManualLogSource? Log { get; private set; }

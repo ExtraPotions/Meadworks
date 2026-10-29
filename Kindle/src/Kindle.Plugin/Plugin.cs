@@ -17,7 +17,7 @@ namespace ExtraPotions.Kindle.Runtime
     /// A headless process never builds UI; installed overlapping source mods retain their own crafting behavior.
     /// </summary>
     [BepInPlugin(Guid, Name, Version)]
-    [BepInDependency(CruciblePlugin.Guid, "0.3.32")]
+    [BepInDependency(CruciblePlugin.Guid, "0.3.37")]
     [BepInDependency(CrucibleUiPlugin.Guid, "0.3.21")]
     [BepInDependency(Jotunn.Main.ModGuid, "2.30.2")]
     [NetworkCompatibility(CompatibilityLevel.VersionCheckOnly, VersionStrictness.Minor)]
@@ -25,7 +25,7 @@ namespace ExtraPotions.Kindle.Runtime
     {
         public const string Guid = "com.meadworks.kindle";
         public const string Name = "Kindle";
-        public const string Version = "0.1.28";
+        public const string Version = "0.1.29";
         public const string Family = "Forge";
 
         private ProductRegistration? registration;

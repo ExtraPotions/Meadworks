@@ -1,11 +1,11 @@
-## Changes in 0.1.7
-- Defer player-facing season work until the local player is ready while keeping authoritative server season work active whenever the environment is available.
+## Changes in 0.1.8
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Solstice
 
 Four seasons for Valheim: spring, summer, fall and winter follow the world calendar and change how the world works.
 
-Version 0.1.7. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.8. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -20,9 +20,9 @@ Version 0.1.7. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CH
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

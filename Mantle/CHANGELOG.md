@@ -1,3 +1,7 @@
+## 0.1.35 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.1.34 (2026-10-28)
 
 - Route partial incoming stacks through legal equipment slots while preserving the remainder for the caller or main inventory.

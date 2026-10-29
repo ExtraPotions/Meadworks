@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.8 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.1.6 (2026-10-28)
 
 - An interrupted winter harvest resumes its saved item plan. If a drop call throws after it may have created an item, Solstice skips that item on retry to avoid a duplicate.

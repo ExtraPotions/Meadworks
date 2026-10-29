@@ -1,3 +1,7 @@
+## 0.1.8 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.1.7 (2026-10-28)
 
 - Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
@@ -18,16 +22,6 @@
 - Guard trader world snapshots during scene teardown.
 
 # Changelog
-
-## Unreleased
-
-- If legacy settings cannot be copied, initialization stops before saving defaults and retries on the next start. Existing settings and backups are preserved.
-
-
-- Reuse proven authority-record paths during receipt scans and direct reads. Every fresh key read, record authentication, recovery and durable prune remains in place.
-- Read small authority records without allocating the full 4 MB size limit. File bounds, authentication and durable trade/refill writes remain enforced.
-- Resolve repeated world prefabs once per morning purse-refill pass. Each trader's current rules, pending balance and durable refill commits are still checked separately.
-- 0.1.3: Add Debug-only morning refill timing for the world scan, authenticated authority reads and writes, local and cloud storage, forced flushes and cloud completion. Refill rules, durable commits and the morning trigger are unchanged.
 
 ## 0.1.2 (2026-10-22)
 

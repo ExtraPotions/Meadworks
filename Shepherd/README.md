@@ -1,9 +1,9 @@
-## Changes in 0.1.24
-- New package icon.
+## Changes in 0.1.25
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Shepherd
 
-Version 0.1.24. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.25. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 The ECR breeding refresh and its adoption boundaries are recorded in [docs/ecr-breeding-refresh.md](docs/ecr-breeding-refresh.md).
 
@@ -28,9 +28,9 @@ Animal keeping as part of your base: feed troughs, a Husbandry skill, and breedi
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

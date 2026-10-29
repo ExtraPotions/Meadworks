@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.14 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.3.13 (2026-10-28)
 
 - Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).

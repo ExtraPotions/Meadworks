@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.11 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.2.10 (2026-10-28)
 
 - Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
@@ -13,14 +17,6 @@
 ## 0.2.8 (2026-10-26)
 
 - The Wet, Cold and Freezing filter for the local player now always switches off, even if the game's status update fails partway, so it cannot stay on for other characters.
-
-## Unreleased
-
-- The Rune Table can focus one new Recasting inscription on Offense, Defense or Utility, with a choice of prefix or suffix. Other inscriptions roll normally at the same rune cost. Any category keeps the unrestricted roll; an impossible result spends nothing.
-- Recasting category and side choices are saved locally and restored when the table opens again.
-- Recasting controls and help are available in all seven supported languages.
-
-- The identification check that runs in a normal game now follows Common, Uncommon, Rare, Epic and Legendary, including the Legendary ground glint. It no longer checks enhancement levels, the +N badge, enhancement scrolls or the Enhance tab, which Inscribe 0.2.0 removed.
 
 ## 0.2.5 (2026-10-21)
 

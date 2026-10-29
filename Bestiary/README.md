@@ -1,10 +1,9 @@
-## Changes in 0.1.24
-
-- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible). Requires Wildblood 0.5.11 so mod managers install the current Wildblood.
+## Changes in 0.1.25
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
 
 # Bestiary
 
-Version 0.1.24. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.25. Requires Crucible 0.3.37 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 New creatures with fights of their own, the bone arsenal you craft from them, and a creature workshop for server owners.
 
@@ -19,10 +18,10 @@ New creatures with fights of their own, the bone arsenal you craft from them, an
 
 ## Requirements
 
-- BepInExPack Valheim 5.4.2351
+- BepInExPack Valheim 5.4.2360
 - Jotunn 2.30.2
-- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
-- Wildblood 0.5.11 or later
+- Crucible 0.3.37 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
+- Wildblood 0.5.12 or later
 
 ## Installation
 

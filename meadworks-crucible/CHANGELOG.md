@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.37 (2026-10-28)
+
+- Dependencies updated to the latest versions (BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.3.36 (2026-10-28)
 
 - Crucible's and Crucible.UI's settings now have translated names and help in all seven languages, and each says who owns it and whether it is local or set by the server.
@@ -12,17 +16,6 @@
 - A client connected to a server without Crucible probes it once a second for 15 seconds, then backs off to at most every 30 seconds.
 - A settings tab that keeps failing, or an unreadable translation override file, is reported once instead of every frame or every two seconds.
 - Connected clients no longer copy the peer list every frame.
-
-## Unreleased
-
-- Verify a saved setting with a targeted native-compatible readback instead of parsing every setting a second time. Initial disk parsing, unrelated saved values, forced flush, conflict detection and atomic publication remain unchanged.
-- Reuse request-router snapshots while membership is unchanged, avoiding per-frame copies of completed request history. Reentrant requests and session changes retain their existing dispatch and recovery behavior.
-
-- Crucible 0.3.31 always requires MeadWorks clients. The retired AllowVanilla setting is hidden; existing config values remain intact, with one startup diagnostic explaining that Strict applies.
-
-- Crucible 0.3.31 adds Debug-only timings for settings edits, including staging, parsing, saving, forced flush, conflict checks and readback.
-
-- Added prepared native TestBridge scenarios for Wildblood 0.5.7 boss abandonment, exact offering refunds, multiplayer contention, group deaths and reload identities. Native execution remains pending.
 
 ## 0.3.30 (2026-10-22)
 

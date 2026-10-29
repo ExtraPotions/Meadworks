@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.18 (2026-10-28)
+
+- Dependencies updated to the latest versions (Crucible 0.3.37, BepInExPack_Valheim 5.4.2360, Jotunn 2.30.2).
+
 ## 0.1.17 (2026-10-28)
 
 - New package icon.
