@@ -1,10 +1,10 @@
-## Changes in 0.3.12
+## Changes in 0.3.13
 
-- After a portal trip starts, Threshold verifies the fuel removal. A fuel-removal error no longer prevents arrival protection from being set up.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Threshold
 
-Version 0.3.12. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.13. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Choose destinations from the integrated map/list, use a named-portal selector with an explicit Teleport action, or keep native tag pairing.
 
@@ -27,7 +27,7 @@ Choose destinations from the integrated map/list, use a named-portal selector wi
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

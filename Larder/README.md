@@ -1,11 +1,10 @@
-## Changes in 0.2.19
+## Changes in 0.2.20
 
-- A reserved cooking ingredient is recovered from a backup when a station's saved state is damaged.
-- If a rejected cooking ingredient is returned to you but the station's reservation can't be cleared, the returned copy is taken back, so the ingredient is never duplicated.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Larder
 
-Version 0.2.19. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.20. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Food and mead values, eating, regeneration, stamina costs, kitchen stations and Cooking skill perks.
 
@@ -25,7 +24,7 @@ Food and mead values, eating, regeneration, stamina costs, kitchen stations and 
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

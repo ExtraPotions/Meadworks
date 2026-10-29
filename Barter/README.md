@@ -1,12 +1,12 @@
-## Changes in 0.1.6
+## Changes in 0.1.7
 
-- If a trade rollback cannot return every coin or item immediately, Barter keeps the remaining amounts pending and retries them when that inventory changes or another trade checks it.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Barter
 
 Traders you can shape: per-trader buy and sell lists, custom currencies, prices that follow the trader's purse, and a sell list built on the Meadworks interface kit.
 
-Version 0.1.6. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.7. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -33,7 +33,7 @@ The mechanics follow shudnal's TradersExtended (public domain), so lists written
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

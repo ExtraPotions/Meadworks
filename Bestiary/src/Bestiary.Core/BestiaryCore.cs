@@ -10,7 +10,7 @@ namespace ExtraPotions.Bestiary
         public const string ProductId = "com.meadworks.bestiary";
         public const string ProductName = "Bestiary";
         public const string Family = "Fang";
-        public const string Version = "0.1.23";
+        public const string Version = "0.1.24";
 
         /// <summary>Game build the design was written against (design header).</summary>
         public const string GameBuild = "1.0.17";

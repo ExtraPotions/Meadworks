@@ -1,3 +1,7 @@
+## 0.3.33 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.3.32 (2026-10-28)
 
 - Two pickup chests owned by different players can no longer both store the same ground drop. A chest asks for the drop the way the game's own pickup does, and two equally near chests always agree which one takes it.

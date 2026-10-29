@@ -1,3 +1,7 @@
+## 0.1.28 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.1.27 (2026-10-28)
 
 - If a nearby-chest salvage drop returns without creating an item, Kindle keeps that reward for another attempt. If the drop call throws after it may have created the item, Kindle marks the reward complete to avoid a duplicate.

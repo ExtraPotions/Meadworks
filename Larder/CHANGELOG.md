@@ -1,3 +1,7 @@
+## 0.2.20 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.2.19 (2026-10-28)
 
 - A reserved cooking ingredient is recovered from a backup when a station's saved state is damaged.

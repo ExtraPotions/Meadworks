@@ -1,3 +1,7 @@
+## 0.1.7 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.1.6 (2026-10-28)
 
 - If a trade rollback cannot return every coin or item immediately, Barter keeps the remaining amounts pending and retries them when that inventory changes or another trade checks it.

@@ -1,13 +1,10 @@
-## Changes in 0.3.32
+## Changes in 0.3.33
 
-- Two pickup chests owned by different players can no longer both store the same ground drop. A chest asks for the drop the way the game's own pickup does, and two equally near chests always agree which one takes it.
-- Moving items between chests and inventories (Reach pull, shared chests) removes only what reached the destination, and a partial move still moves what fits.
-- If Burrow adds items to the destination but cannot remove the full amount from the source, it takes back only the extra items it just added and leaves other inventory changes alone.
-- A locked or unreadable station settings file no longer interrupts world startup.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Burrow
 
-Version 0.3.32. Requires Crucible 0.3.34 / Crucible.UI 0.3.23. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.3.33. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Craft and build from nearby chests, preview chest contents, bigger chests, sorting, quick stacking and shared chests.
 
@@ -41,7 +38,7 @@ Craft and build from nearby chests, preview chest contents, bigger chests, sorti
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.34 or a later 0.3.x, which includes Crucible.UI 0.3.23 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

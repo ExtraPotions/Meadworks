@@ -1,10 +1,10 @@
-## Changes in 0.1.16
+## Changes in 0.1.17
 
-- Ban, unban, temporary-ban and warning commands now report a ledger save failure instead of confirming success. The live server action may already have happened.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Thing
 
-Version 0.1.16. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.17. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Server administration and moderation from inside the game, checked against the server's own admin list.
 
@@ -39,7 +39,7 @@ These checks do not establish full other-player Take/Delete durability, lost-rep
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.33 or a later compatible 0.3.x, with Crucible.UI 0.3.22 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later compatible 0.3.x, with Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

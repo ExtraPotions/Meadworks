@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.10 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.2.9 (2026-10-28)
 
 - Taking runes out keeps the table balance when an inventory add fails. Destroying a Rune Table drops every stored stack it can create; a stack that cannot spawn is not reported as dropped.

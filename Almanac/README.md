@@ -1,12 +1,12 @@
-## Changes in 0.1.26
+## Changes in 0.1.27
 
-- Enabling Remember Window now saves the mod currently being viewed.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Almanac
 
 One in-game settings book for every installed mod's configuration, aware of server locks.
 
-Version 0.1.26. Requires Crucible 0.3.33 / Crucible.UI 0.3.22. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.27. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -28,7 +28,7 @@ The Advanced switch in the header controls specialist settings. Pin/Unpin manage
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2 (installed with Crucible)
-- Crucible 0.3.33 or a later 0.3.x, which includes Crucible.UI 0.3.22 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

@@ -1,3 +1,7 @@
+## 0.1.24 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible). Requires Wildblood 0.5.11 so mod managers install the current Wildblood.
+
 ## 0.1.23 (2026-10-28)
 
 - A crypt chest is left intact when its mimic cannot be spawned, and the failed spawn is not retried every frame.

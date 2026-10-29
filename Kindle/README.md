@@ -1,14 +1,12 @@
-## Changes in 0.1.27
+## Changes in 0.1.28
 
-- If a nearby-chest salvage drop returns without creating an item, Kindle keeps that reward for another attempt. If the drop call throws after it may have created the item, Kindle marks the reward complete to avoid a duplicate.
-- A damaged salvage recovery record is set aside, with its data kept, so salvage keeps working.
-- The crafting panel no longer reads the language setting on every frame, a small saving whenever the inventory is open.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Kindle
 
 Recipe search and sorting, favorites, batch crafting, a recipe tracker, salvage and an optional Cart Workbench.
 
-Version 0.1.27. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.28. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -24,7 +22,7 @@ Version 0.1.27. Requires Crucible 0.3.32 / Crucible.UI 0.3.21. Changes are in [C
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.32 or a later 0.3.x, which includes Crucible.UI 0.3.21 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

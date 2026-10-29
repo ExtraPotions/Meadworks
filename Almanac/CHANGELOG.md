@@ -1,3 +1,7 @@
+## 0.1.27 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.1.26 (2026-10-28)
 
 - Enabling Remember Window now saves the mod currently being viewed.

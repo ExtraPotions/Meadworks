@@ -1,11 +1,10 @@
-## Changes in 0.2.14
+## Changes in 0.2.15
 
-- Edge starts with its built-in combat rules if it cannot create or read its rule folder.
-- If Edge cannot remove all extra ammunition for an overcharged bomb, it restores any ammunition already removed, cancels the attack and removes the projectiles it spawned.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Edge
 
-Version 0.2.14. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.15. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Combat additions: a secondary attack for every weapon family, a quickstep, swings that hit on slopes, and weapons back in hand after a swim.
 
@@ -27,7 +26,7 @@ Combat additions: a secondary attack for every weapon family, a quickstep, swing
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 

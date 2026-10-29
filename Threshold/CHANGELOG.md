@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.13 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.3.12 (2026-10-28)
 
 - After a portal trip starts, Threshold verifies the fuel removal. A fuel-removal error no longer prevents arrival protection from being set up.

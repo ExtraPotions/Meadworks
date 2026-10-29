@@ -18,4 +18,6 @@ Build instructions are in the repository's root `BUILDING.md`. The publicizer at
 
 Keep Crossbow Loaded (src/Edge.Plugin/Equipment/LoadedWeapons.cs, LoadedWeaponPatch.cs) is adapted from EliteCreaturesReborn 3.21.0 (Gerald Glasgow) at 9da28eb58adbe065be1e4baef779a448acd38e0f in geraldjglasgow/ValheimMods, GPL-3.0-or-later; original copyright retained and license text, byte-identical to EliteCreaturesReborn/LICENSE at the pin, in THIRD_PARTY_NOTICES/EliteCreaturesReborn-GPL-3.0-or-later.txt.
 
-Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.14/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.15/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No new Git commit or broader native acceptance is asserted.
+
+Corresponding source for this build is identified by SOURCE-SNAPSHOT.json and BUILD-RECIPES/code-release-0.2.15/BUILD.json. Historical compiler-reference source and DLL supplements remain part of the release source inventory. No broader native acceptance is asserted.

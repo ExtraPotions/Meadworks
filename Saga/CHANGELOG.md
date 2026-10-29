@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.20 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.1.19 (2026-10-28)
 
 - If your inventory is full, a Thrifty crafting refund drops at your feet. Saga shows the translated Thrifty message only after the item reaches your inventory or the ground.

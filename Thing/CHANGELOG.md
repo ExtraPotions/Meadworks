@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.17 (2026-10-28)
+
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
+
 ## 0.1.16 (2026-10-28)
 
 - Ban, unban, temporary-ban and warning commands now report a ledger save failure instead of confirming success. The live server action may already have happened.

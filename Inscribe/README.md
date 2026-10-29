@@ -1,14 +1,12 @@
-## Changes in 0.2.9
+## Changes in 0.2.10
 
-- Taking runes or essence from a Rune Table restores any amount that the inventory could not accept. Destroying a Rune Table removes a stored stack only after that stack is created on the ground.
-- Creature loot is checked before the ragdoll clears its saved list. Unknown items do not stop other drops. An item the game refuses to spawn stays on the ragdoll for another try, and an item whose spawn fails partway counts as dropped, so it is never duplicated.
-- A creature without a loot-carrying ragdoll drops each item separately, so one failed drop no longer loses the rest.
+- Requires Crucible 0.3.36 (dependency pin updated so mod managers install the current Crucible).
 
 # Inscribe
 
 Item rarity, inscriptions, runes that reshape your gear, gems and sockets.
 
-Version 0.2.9. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.2.10. Requires Crucible 0.3.36 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
@@ -30,7 +28,7 @@ Version 0.2.9. Requires Crucible 0.3.26 / Crucible.UI 0.3.19. Changes are in [CH
 
 - BepInExPack Valheim 5.4.2351
 - Jotunn 2.30.2
-- Crucible 0.3.26 or a later 0.3.x, which includes Crucible.UI 0.3.19 (the shared Meadworks interface kit)
+- Crucible 0.3.36 or a later 0.3.x, which includes Crucible.UI 0.3.25 (the shared Meadworks interface kit)
 
 ## Installation
 
