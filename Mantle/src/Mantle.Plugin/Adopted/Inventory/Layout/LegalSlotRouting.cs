@@ -1,5 +1,6 @@
 using HarmonyLib;
 using Mantle.Core;
+using Mantle.Crafting;
 using Mantle.Slots;
 
 namespace Mantle.Layout
@@ -13,7 +14,7 @@ namespace Mantle.Layout
             if (!__runOriginal || item == null || !InventoryState.Manages(__instance)) return true;
             var layout = InventoryState.Layout;
             var next = MainCells.FindEmpty(__instance, layout, false);
-            if (next.y > 0 || next.x >= 8) return true;
+            if (next.y > 0 || next.x >= 8 || (next.x >= 0 && InPlaceUpgrade.IsCrafting)) return true;
             var legal = MainCells.LegalExtraCells(layout, item);
             if (legal.Count == 0) return true;
             int initial = item.m_stack;

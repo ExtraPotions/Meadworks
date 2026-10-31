@@ -100,6 +100,7 @@ namespace Burrow.Resources {
             try{
                 for(int i=0;i<pair.Before.Length;i++){
                     var reservedImage=pair.Before[i];
+                    if(UnchangedPlayer(source,reservedImage)){rebasedBefore[i]=reservedImage.Copy();rebasedAfter[i]=pair.After[i].Copy();continue;}
                     if(EntryConfirmed(source,reservedImage))return false;
                     var current=Bytes(Inventory(reservedImage));
                     if(current.SequenceEqual(reservedImage.Data)){rebasedBefore[i]=reservedImage.Copy();rebasedAfter[i]=pair.After[i].Copy();continue;}
@@ -125,7 +126,15 @@ namespace Burrow.Resources {
             if(!pair.Before.All(e=>EntryConfirmed(source,e)))return false;
             confirmed.Add(source);return true;
         }
-        bool EntryConfirmed(string source,NativeImage image){if(confirmed.Contains(source))return true;string key="burrow.receipt."+source;return image.Id=="player:"+actor?!unsavedPlayerReceipts.Contains(source)&&Actor&&Actor.m_customData.TryGetValue(key,out var receipt)&&receipt=="1":Chest(image.Id)&&Chest(image.Id).m_nview.GetZDO().GetString(key)=="1";}
+        // Shared-material bundles include the player even when only a chest pays. Equal images need no player write or
+        // receipt: recovery must never replace that unchanged inventory. Restrict this to single-phase payments;
+        // a transfer's no-op settlement receipt can prove an earlier debit and must still be saved with the character.
+        bool UnchangedPlayer(string source,NativeImage image){
+            if(!rebaseUnpaid||image.Id!="player:"+actor||!bindings.TryGetValue(source,out var pair))return false;
+            int index=Array.FindIndex(pair.Before,e=>e.Id==image.Id);
+            return index>=0&&pair.Before[index].Data.SequenceEqual(pair.After[index].Data);
+        }
+        bool EntryConfirmed(string source,NativeImage image){if(confirmed.Contains(source)||UnchangedPlayer(source,image))return true;string key="burrow.receipt."+source;return image.Id=="player:"+actor?!unsavedPlayerReceipts.Contains(source)&&Actor&&Actor.m_customData.TryGetValue(key,out var receipt)&&receipt=="1":Chest(image.Id)&&Chest(image.Id).m_nview.GetZDO().GetString(key)=="1";}
         public void Save(string source){
             if(!IsBound(source))throw new InvalidOperationException("Native source changed before save.");RequireForeignUnlocked(source);var pair=bindings[source];string key="burrow.receipt."+source;
             foreach(var image in pair.After.Where(e=>e.Id.StartsWith("chest:",StringComparison.Ordinal)&&!EntryConfirmed(source,e))){var chest=Chest(image.Id);chest.Save();if(!chest.m_nview.GetZDO().GetByteArray(ZDOVars.s_items).SequenceEqual(image.Data))throw new IOException("Native chest save did not retain payment.");WriteKeys(chest,zdo=>zdo.Set(key,"1"));}

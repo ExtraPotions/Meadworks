@@ -1,9 +1,9 @@
-## Changes in 0.1.37
+## Changes in 0.1.38
 - New configs start with 3 Utility slots instead of 5, enough to wear the Megingjord, Wishbone and Wisplight together. Existing configs keep their current value; a host can still set up to 5.
 
 # Mantle
 
-Version 0.1.37. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.38. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 A configurable inventory grid, dedicated gear slots, and wearable backpacks.
 

@@ -24,8 +24,9 @@ namespace ExtraPotions.Burrow
 
     public static class InventoryHoldRules
     {
-        /// <summary>The Inventory methods the guard patches.</summary>
-        public static readonly string[] Guarded = { "AddItem", "RemoveItem", "RemoveAll", "RemoveOneItem", "RemoveItemByName", "MoveItemToThis", "MoveAll" };
+        /// <summary>The Inventory methods the guard patches. <c>StackAll</c> (the game's Place stacks) adds to the chest and then
+        /// removes from the player: with the player held the removal was refused after the add, so the stack was in both (2026-10-29).</summary>
+        public static readonly string[] Guarded = { "AddItem", "RemoveItem", "RemoveAll", "RemoveOneItem", "RemoveItemByName", "MoveItemToThis", "MoveAll", "StackAll" };
 
         /// <summary>Most removals kept at once. Beyond it a void removal runs at once (logged): the hold's commit then sees a
         /// changed inventory and rolls back or waits for recovery, which never deducts twice or overwrites the change.</summary>

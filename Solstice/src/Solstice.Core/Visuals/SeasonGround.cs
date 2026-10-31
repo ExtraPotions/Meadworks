@@ -33,6 +33,9 @@ namespace ExtraPotions.Solstice.Visuals
 
         public const double ChunkSliceMs = 12;
 
+        /// <summary>Main-thread milliseconds for the material scan on one frame; the rest continues on the next.</summary>
+        public const double ScanSliceMs = 4;
+
         /// <summary>0 leaves the mask alone. The cap is the mountain mask at 0.8. Other biomes are not changed.</summary>
         public static void Paint(int biome, ref byte r, ref byte g, ref byte b, ref byte a, float amount)
         {
@@ -99,6 +102,10 @@ namespace ExtraPotions.Solstice.Visuals
             if (doneThisFrame > 0 && elapsedMs >= ChunkSliceMs) return 0;
             return 1;
         }
+
+        /// <summary>True when another material fits this frame. The first one is allowed so a slow frame still advances.</summary>
+        public static bool NextScan(int doneThisFrame, double elapsedMs, int remaining) =>
+            remaining > 0 && (doneThisFrame == 0 || elapsedMs < ScanSliceMs);
 
         /// <summary>
         /// RGBA8 bytes. Every source alpha byte is copied through, including partial cutout values.

@@ -31,7 +31,7 @@ namespace Burrow
     {
         public const string PluginGuid = "com.meadworks.burrow";
         public const string PluginName = "Burrow";
-        public const string PluginVersion = "0.3.35";
+        public const string PluginVersion = "0.3.36";
         public static ManualLogSource Log { get; private set; }
         public static SyncedConfiguration Synced { get; private set; }
         public static ConfigEntry<bool> LockConfiguration { get; private set; }
@@ -101,7 +101,7 @@ namespace Burrow
             Logger.LogInfo("Burrow " + PluginVersion + " | Hoard | expDARE | storage modules loaded");
         }
         private void Start() => EpicLootLink.Register();
-        private void Update(){Integration.StowRowYield.Tick();Transfers?.Tick();Resources?.Tick();Burrow.Resources.NativeInventoryGuards.DrainDeaths();Burrow.Resources.NativeInventoryGuards.DrainRemovals();Burrow.Stacks.PackPanelKeys.Tick(UnityEngine.Time.unscaledTime);Guard.Run("chest preview",Burrow.Capacity.ChestPreview.Tick);}
+        private void Update(){Integration.StowRowYield.Tick();Transfers?.Tick();Resources?.Tick();Burrow.Resources.NativeInventoryGuards.DrainDeaths();Burrow.Resources.NativeInventoryGuards.DrainRemovals();Guard.Run("chest takes waiting for a hold",Burrow.Shared.ChestWriter.Tick);Burrow.Stacks.PackPanelKeys.Tick(UnityEngine.Time.unscaledTime);Guard.Run("chest preview",Burrow.Capacity.ChestPreview.Tick);}
         private void OnDestroy()
         {
             Shared.ChestOps.NativeItemRouting = null;

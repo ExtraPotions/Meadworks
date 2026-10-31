@@ -1,3 +1,8 @@
+## 0.1.38 (2026-10-30)
+
+- Crafted items go into free main inventory cells first; a dedicated slot is used only when the main grid is full.
+- A transfer no longer removes an item that is already gone from its source.
+
 ## 0.1.37 (2026-10-29)
 
 - New configs start with 3 Utility slots instead of 5, enough to wear the Megingjord, Wishbone and Wisplight together. Existing configs keep their current value; a host can still set up to 5.

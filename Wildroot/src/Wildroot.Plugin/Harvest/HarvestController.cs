@@ -16,6 +16,7 @@ namespace ExtraPotions.Wildroot.Runtime {
   public bool Executing{get;private set;}
   public HarvestBatchHandle? LastSubmission{get;private set;}
   readonly NativeHarvestService native;
+  float nextReplantNotice;
   internal HarvestController(WildrootConfig settings,ManualLogSource log,PrefabRegistrar catalog,PlacementController planting,ProductRegistration registration){this.settings=settings;this.log=log;this.catalog=catalog;this.planting=planting;native=new NativeHarvestService(settings,registration);}
   static bool Permission(Vector3 position)=>ZNetScene.instance&&ZNetScene.instance.IsAreaReady(position)&&PrivateArea.CheckAccess(position,0,false,true);
   static bool Ready(Component target){if(!target)return false;if(target is Pickable p)return (bool)NativeFields.CanBePicked.Invoke(p,Array.Empty<object>());if(target is Beehive hive)return Honey(hive)>0;return false;}
@@ -89,16 +90,20 @@ namespace ExtraPotions.Wildroot.Runtime {
     else if(Time.unscaledTime-job.Started>15){job.Cancellation.Cancel();awaiting.RemoveAt(i);Complete(job,false,"AcknowledgementTimeout");}
    }
   }
-  bool ReplantInFlight(Job job){foreach(var other in awaiting)if(other!=job&&other.ReplantAsync!=null&&other.ReplantAsync.Result==null&&!other.ReplantAsync.NeedsRecovery)return true;return false;}
+  // A replant whose payment answer is still uncertain may hold the carried inventory, so it stays in flight until it settles or detaches.
+  bool ReplantInFlight(Job job){foreach(var other in awaiting)if(other!=job&&other.ReplantAsync!=null&&other.ReplantAsync.Result==null)return true;return false;}
+  // Shared seed payments hold the carried inventory, so finish bulk collection before reserving any seeds.
+  bool CollectionInFlight(){if(queue.Count>0)return true;foreach(var other in awaiting)if(!other.Single&&(!other.Confirmed||other.Drops.Count>0&&Time.unscaledTime-other.ConfirmedAt<15))return true;return false;}
   internal bool HasSource(Component source){var view=source?source.GetComponent<ZNetView>():null;return view&&view.IsValid()&&jobs.ContainsKey(view.GetZDO().m_uid.ToString());}
   /// <summary>Locally loaded plants protect against an already replicated replacement.</summary>
   bool TryReplant(Job job){
    if(job.ReplantAsync!=null){
     var result=job.ReplantAsync.Result;
-    if(result==null){if(!job.ReplantAsync.NeedsRecovery)return false;job.ReplantAsync.Cancel();job.Batch.Record(job.Id+":ReplantRecoveryRequired");log.LogWarning("Shared replant settling in the background: "+job.Id);return true;}
+    if(result==null){if(job.ReplantWait.Check(false,job.ReplantAsync.NeedsRecovery,Time.unscaledTime)==ReplantWaitState.Waiting)return false;job.ReplantAsync.Cancel();job.Batch.Record(job.Id+":ReplantRecoveryRequired");if(Time.unscaledTime>=nextReplantNotice){nextReplantNotice=Time.unscaledTime+60;log.LogInfo("Shared replant settling in the background: "+job.Id);}return true;}
     job.Batch.Record(job.Id+":Replant"+result.Kind);if(result.Kind==PlacementResultKind.Committed)job.Batch.Replanted++;return true;
    }
    if(job.ReplantAttempted||string.IsNullOrEmpty(job.Original))return true;
+   if(CollectionInFlight())return false;
    if(!ZNetScene.instance||!ZNetScene.instance.IsAreaReady(job.Position)){if(Time.unscaledTime-job.ConfirmedAt<15)return false;job.ReplantAttempted=true;job.Batch.Record(job.Id+":ReplantAreaNotReady");return true;}
    // One shared replant payment at a time: concurrent reservations on the same carried inventory contend (the provider holds it until
    // the first settles) and the later one could time out as insufficient while seeds exist. The rest wait their turn, unpaid.
@@ -130,7 +135,7 @@ namespace ExtraPotions.Wildroot.Runtime {
   }
   internal void CancelAll(){while(queue.Count>0)Complete(queue.Dequeue(),false);foreach(var job in awaiting){job.Cancellation.Cancel();job.ReplantAsync?.Cancel();Complete(job,false);}awaiting.Clear();reserved.Clear();jobs.Clear();actor=null;world=0;}
   public void Dispose(){CancelAll();native.Dispose();}
-  sealed class Job {public readonly float RequesterRadius;public readonly Vector3 PrimaryOrigin;public Job(float requesterRadius,Vector3 primaryOrigin){RequesterRadius=requesterRadius;PrimaryOrigin=primaryOrigin;}public string Id="";public Component Target=null!;public HarvestBatchHandle Batch=null!;public float Started,QueuedAt,ConfirmedAt;public bool Confirmed,ReplantAttempted,AutoReplant,Single;public CropInfo? Crop;public Vector3 Position;public Quaternion Rotation;public string Original="",Selected="",Resource="";public AsyncPlacementJob? ReplantAsync;public NativeHarvestRequest? Request;public Task<OperationResult<NativeHarvestReceipt>>? Harvest;public readonly CancellationTokenSource Cancellation=new CancellationTokenSource();public readonly List<NativeHarvestDrop> Drops=new List<NativeHarvestDrop>();}
+  sealed class Job {public readonly float RequesterRadius;public readonly Vector3 PrimaryOrigin;public Job(float requesterRadius,Vector3 primaryOrigin){RequesterRadius=requesterRadius;PrimaryOrigin=primaryOrigin;}public string Id="";public Component Target=null!;public HarvestBatchHandle Batch=null!;public float Started,QueuedAt,ConfirmedAt;public bool Confirmed,ReplantAttempted,AutoReplant,Single;public CropInfo? Crop;public Vector3 Position;public Quaternion Rotation;public string Original="",Selected="",Resource="";public AsyncPlacementJob? ReplantAsync;public readonly ReplantSettling ReplantWait=new ReplantSettling();public NativeHarvestRequest? Request;public Task<OperationResult<NativeHarvestReceipt>>? Harvest;public readonly CancellationTokenSource Cancellation=new CancellationTokenSource();public readonly List<NativeHarvestDrop> Drops=new List<NativeHarvestDrop>();}
  }
  [HarmonyPatch]
  static class HarvestInteractionPatch {

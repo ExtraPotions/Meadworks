@@ -25,8 +25,10 @@ namespace Burrow.Stow
             int height = inventory.GetHeight();
             if (player == null || inventory != player.GetInventory())
                 return height;
-            if (player != Player.m_localPlayer || !Burrow.Plugin.IsReady
-                || Burrow.Resources.NativeChestIdentity.World == 0) return 0;
+            if (player != Player.m_localPlayer || !Burrow.Plugin.IsReady) return 0;
+            // Before the world id is known only an owner that may still turn on keeps the grid empty (MainGridRules).
+            if (ExtraPotions.Burrow.MainGridRules.WaitsForWorld(Burrow.Resources.NativeChestIdentity.World != 0,
+                PackPanelLink.OwnerPresent, PackPanelLink.OwnerLaysOut)) return 0;
             if (PackPanelLink.LaysOutInventory)
             {
                 if (!PackPanelGrid.TryRead(player, out _, out int mainRows, out _)) return 0;

@@ -43,6 +43,7 @@ namespace Burrow.SharedTransfers {
         bool disposed,opening,fault,held=true,evaluated;
         readonly TransferRetry retry=new TransferRetry();
         readonly TransferPassGate passes=new TransferPassGate();
+        readonly TransferPassGate reopen=new TransferPassGate();
         long seenGeneration=-1;
         long retrySession=-1;
         double nextWarning,callbackAt;
@@ -54,14 +55,22 @@ namespace Burrow.SharedTransfers {
             if(disposed||opening||!Player.m_localPlayer||loadingProfiles.Contains(Player.m_localPlayer))return false;
             var current=Player.m_localPlayer;var currentWorld=NativeChestIdentity.World;
             if(currentWorld==0||current.GetPlayerID()==0)return false;
-            if(ReferenceEquals(current,player)&&currentWorld==world&&Actor(current)==actor)return ledger!=null&&!fault;
-            Close();player=current;world=currentWorld;actor=Actor(current);held=true;opening=true;
+            if(ReferenceEquals(current,player)&&currentWorld==world&&Actor(current)==actor){
+                if(!fault)return ledger!=null;
+                if(!reopen.Due(Time.realtimeSinceStartupAsDouble,false))return false;
+                // A failed append may have reached disk without updating the cached intents. Reopen every journal;
+                // never clear the hold from the old cache. Keep the request id, callbacks and any in-flight reply.
+                ledger?.Dispose();ledger=null;stores.Clear();bound.Clear();verified.Clear();evaluated=false;held=true;
+            }else{Close();player=current;world=currentWorld;actor=Actor(current);held=true;}
+            opening=true;
             try{
                 string scope=TransferWire.Hash(world.ToString(CultureInfo.InvariantCulture)+"\n"+actor);
                 ledger=new TransferClientLedger(Path.Combine(Paths.BepInExRootPath,"Burrow.shared-transfers",scope));
                 foreach(var intent in ledger.All)if(intent.Request.Actor!=actor||intent.Request.World!=world)throw new InvalidDataException("Requester journal scope mismatch.");
+                if(fault)Plugin.Log?.LogWarning("Burrow shared transfer journal reopened; reconciling durable intents before releasing inventory.");
+                fault=false;passes.Wake();
                 return true;
-            }catch(Exception error){fault=true;Warn(error);return false;}
+            }catch(Exception error){Fault(error);return false;}
             finally{opening=false;}
         }
         internal bool IsLocked(Inventory inventory){
@@ -86,7 +95,7 @@ namespace Burrow.SharedTransfers {
                     held=true;return;
                 }
                 if(callbackRoot.Length==0)held=ledger.Incomplete.Count>0;
-            }catch(Exception error){held=true;Warn(error);}
+            }catch(Exception error){Fault(error);}
         }
         internal bool IsPending(Container container,Vector2i slot)=>Player.m_localPlayer&&IsLocked(Player.m_localPlayer.GetInventory());
         internal void Send(Container container,string rpc,Vector2i slot,Action<ZPackage> writeBody,Action<ZPackage> onGranted,Action<string> onRefused,Vector2i? targetSlot=null){
@@ -117,7 +126,7 @@ namespace Burrow.SharedTransfers {
             }catch(Exception error){
                 // Append failure can be uncertain. Retain the hold if a raw intent
                 // was written; never tell the UI it was denied after admission.
-                if(writingIntent||ledger.Incomplete.Count>0){fault=true;held=true;Warn(error);}
+                if(writingIntent||ledger.Incomplete.Count>0){Fault(error);}
                 else Refuse(onRefused,ChestRequests.Bad);
             }
         }
@@ -145,6 +154,7 @@ namespace Burrow.SharedTransfers {
             int verifiedBefore=verified.Count,incompleteBefore=ledger.Incomplete.Count;
             Pass();
             if(ledger==null)return;
+            if(!fault)reopen.Wake();
             if(!held||pending!=null||callbackRoot.Length>0||verified.Count!=verifiedBefore||ledger.Incomplete.Count!=incompleteBefore)passes.Working(now);
             else passes.Stalled(now,retry.NextAt);
         }
@@ -175,7 +185,7 @@ namespace Burrow.SharedTransfers {
                     Poll(intent);return;
                 }
                 held=ledger.Incomplete.Count>0;
-            }catch(Exception error){held=true;Warn(error);}
+            }catch(Exception error){Fault(error);}
         }
         void Poll(TransferClientIntent intent){
             var now=Time.realtimeSinceStartupAsDouble;
@@ -225,7 +235,8 @@ namespace Burrow.SharedTransfers {
             callback?.Invoke(reason);
         }
         void Warn(Exception error){if(Time.realtimeSinceStartupAsDouble<nextWarning)return;nextWarning=Time.realtimeSinceStartupAsDouble+10;Plugin.Log?.LogWarning("Burrow shared transfer retained for recovery: "+error.GetType().Name);}
-        void Close(){ledger?.Dispose();ledger=null;stores.Clear();bound.Clear();verified.Clear();player=null;world=0;actor="";pending=null;pendingRoot="";callbackRoot="";granted=null;refused=null;fault=false;held=true;evaluated=false;retry.Reset();retrySession=-1;passes.Wake();seenGeneration=-1;}
+        void Fault(Exception error){fault=true;held=true;reopen.Stalled(Time.realtimeSinceStartupAsDouble,double.PositiveInfinity);Warn(error);}
+        void Close(){ledger?.Dispose();ledger=null;stores.Clear();bound.Clear();verified.Clear();player=null;world=0;actor="";pending=null;pendingRoot="";callbackRoot="";granted=null;refused=null;fault=false;held=true;evaluated=false;retry.Reset();retrySession=-1;passes.Wake();reopen.Wake();seenGeneration=-1;}
         public void Dispose(){disposed=true;Close();}
     }
 

@@ -1,3 +1,8 @@
+## 0.1.27 (2026-10-30)
+
+- Bulk harvest collects every drop before replant seeds are paid for.
+- Harvest replants wait out a short shared-payment recovery instead of cancelling it.
+
 ## 0.1.26 (2026-10-29)
 
 - Crop growth times apply even with Enable Crop Overrides off; cost, yield, scale and spacing still need the override.

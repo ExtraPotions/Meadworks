@@ -69,6 +69,20 @@ namespace Burrow.Resources {
             // A death another mod's earlier prefix already cancelled is not kept, so it is never replayed.
             static bool Prefix(Player __instance,bool __runOriginal){if(!__runOriginal)return false;if(__instance!=Player.m_localPlayer||!Held(__instance.GetInventory()))return true;deferredDeaths.Add(__instance);return false;}
         }
+        /// <summary>
+        /// A pickup while the local player's inventory is held waits on the ground. The held add answers false, which the
+        /// game's Humanoid.Pickup reports as "no room" with free cells left; skipped here before that, it stays silent, and
+        /// auto pickup, Magpie and Wildroot's bulk harvest try the drop again once the hold ends.
+        /// </summary>
+        [HarmonyPatch(typeof(Humanoid),nameof(Humanoid.Pickup))]
+        internal static class PickupWait {
+            [HarmonyPriority(Priority.High)]
+            static bool Prefix(Humanoid __instance,ref bool __result,bool __runOriginal){
+                if(!__runOriginal)return false;
+                if(__instance==null||__instance!=Player.m_localPlayer||!Held(__instance.GetInventory()))return true;
+                __result=false;return false;
+            }
+        }
         internal static bool ForeignHold(ZNetView view){
             if(!view||!view.IsValid())return false;var zdo=view.GetZDO();if(string.IsNullOrEmpty(zdo.GetString(NativeBundleStore.HoldKey)))return false;
             long until=zdo.GetLong(NativeBundleStore.HoldUntil);return until==0||DateTime.UtcNow.Ticks<until;
@@ -124,6 +138,53 @@ namespace Burrow.Resources {
                 }
                 // Refuse: the skipped method answers false (bool) or null (added item); nothing changed. Neutral: neither side moved.
                 return false;
+            }
+        }
+        /// <summary>
+        /// A drag and drop that touches a held inventory does not run. The game's swap (a whole stack dropped on a different
+        /// item) removes the dragged item first and then makes two moves; with the target held the moves were skipped after the
+        /// removal and the item was lost. Answering false keeps the item on the cursor and in its inventory; the drop works again
+        /// once the hold ends. A viewed shared chest's drop is routed by PanelRouting before this runs.
+        /// </summary>
+        [HarmonyPatch(typeof(InventoryGrid),nameof(InventoryGrid.DropItem))]
+        internal static class DropWait {
+            [HarmonyPriority(Priority.VeryHigh)]
+            static bool Prefix(InventoryGrid __instance,Inventory fromInventory,ItemDrop.ItemData item,ref int amount,Vector2i pos,ref bool __result,bool __runOriginal){
+                if(!__runOriginal)return false;
+                if(fromInventory!=null&&item!=null&&!fromInventory.ContainsItem(item)){__result=false;return false;}
+                if(Applying||!Held(__instance.GetInventory())&&!Held(fromInventory))return true;
+                var player=Player.m_localPlayer;var chest=InventoryGui.instance?.m_currentContainer;
+                if(player&&chest&&fromInventory==chest.GetInventory()&&__instance.GetInventory()==player.GetInventory()){
+                    int wanted=amount;amount=0;
+                    Burrow.Shared.ChestWriter.TakeTo(chest,item,wanted,pos,null);
+                    __result=true;return false;
+                }
+                __result=false;return false;
+            }
+        }
+        // Owned chests use vanilla moves instead of PanelRouting. Keep their take actions too, before a guarded move
+        // can silently fail. Shared/view-only chests retain PanelRouting's authority checks.
+        [HarmonyPatch(typeof(InventoryGui),nameof(InventoryGui.OnSelectedItem))]
+        internal static class TakeWait {
+            [HarmonyPriority(Priority.VeryHigh)]
+            static bool Prefix(InventoryGui __instance,InventoryGrid grid,ItemDrop.ItemData item,InventoryGrid.Modifier mod,bool __runOriginal){
+                if(!__runOriginal)return false;
+                var player=Player.m_localPlayer;var chest=__instance.m_currentContainer;
+                if(!player||!chest||__instance.m_dragGo!=null||item==null||item.m_shared.m_questItem||mod!=InventoryGrid.Modifier.Move
+                    ||grid.GetInventory()!=chest.GetInventory()||Burrow.Shared.SharedState.IsViewing(chest)
+                    ||!Held(player.GetInventory())&&!Held(chest.GetInventory()))return true;
+                Burrow.Shared.ChestWriter.Take(chest,item,item.m_stack,null);return false;
+            }
+        }
+        [HarmonyPatch(typeof(InventoryGui),nameof(InventoryGui.OnTakeAll))]
+        internal static class TakeAllWait {
+            [HarmonyPriority(Priority.VeryHigh)]
+            static bool Prefix(InventoryGui __instance,bool __runOriginal){
+                if(!__runOriginal)return false;
+                var player=Player.m_localPlayer;var chest=__instance.m_currentContainer;
+                if(!player||!chest||Burrow.Shared.SharedState.IsViewing(chest)
+                    ||!Held(player.GetInventory())&&!Held(chest.GetInventory()))return true;
+                __instance.SetupDragItem(null,null,1);Burrow.Shared.ChestWriter.TakeAll(chest,null);return false;
             }
         }
         [HarmonyPatch(typeof(ZNetView),nameof(ZNetView.ClaimOwnership))]

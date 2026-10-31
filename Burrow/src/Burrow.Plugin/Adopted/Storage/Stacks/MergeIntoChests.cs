@@ -73,7 +73,7 @@ namespace Burrow.Stacks
                     fromInventory.Changed();
                     return true;
                 }
-                if (item.m_stack <= 0)
+                if (item.m_stack <= 0 && fromInventory.ContainsItem(item))
                     fromInventory.RemoveItem(item);
                 else
                     fromInventory.Changed();
@@ -87,7 +87,8 @@ namespace Burrow.Stacks
                 if (!StacksSettings.Enabled.Value || !StacksSettings.MergeIntoChests.Value)
                     return false;
                 Container open = OpenContainer(target);
-                if (item == null || fromInventory == null || fromInventory == target || open == null || item.m_shared.m_maxStackSize <= 1)
+                if (item == null || fromInventory == null || !fromInventory.ContainsItem(item)
+                    || fromInventory == target || open == null || item.m_shared.m_maxStackSize <= 1)
                     return false;
                 return !SharedState.IsViewing(open) && !ChestWriter.IsShared(open);
             }

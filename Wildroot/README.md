@@ -1,6 +1,6 @@
 # Wildroot
 
-Version 0.1.26. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
+Version 0.1.27. Requires Crucible 0.3.38 / Crucible.UI 0.3.25. Changes are in [CHANGELOG.md](CHANGELOG.md).
 
 Gardening for Valheim: plant in grids, harvest in bulk, replant automatically and plant more of the world's flora.
 

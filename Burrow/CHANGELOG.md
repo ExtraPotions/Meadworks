@@ -1,3 +1,13 @@
+## 0.3.36 (2026-10-30)
+
+- Picking up an item while an inventory change is still settling no longer reports "no room"; the item stays where it is and is picked up again afterwards.
+- Taking from a chest while another transfer is settling waits up to two seconds and retries instead of failing.
+- Chest transfers right after joining a world use your real inventory rows.
+- Storage recovers on its own after a journal error instead of staying faulted until you restart.
+- Payments that only touch chests no longer write a character save.
+- A bare left or right mouse button bound to a Burrow hotkey is ignored, so it no longer fires on every click.
+- Taking from a chest no longer errors on an item that is already gone from its source.
+
 ## 0.3.35 (2026-10-29)
 
 - Package files now carry this release's date, so BepInEx reloads updated mods instead of using stale cached plugin details (fixes 'missing dependency Crucible' after updating).

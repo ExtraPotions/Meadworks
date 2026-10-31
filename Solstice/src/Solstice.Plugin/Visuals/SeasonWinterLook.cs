@@ -35,7 +35,8 @@ namespace ExtraPotions.Solstice.Runtime
         sealed class SourceImage
         {
             public string Name;
-            public Color32[] Pixels;
+            /// <summary>RGBA8, row by row. Read only once stored: bake workers frost their own copy.</summary>
+            public byte[] Rgba;
             public int Width;
             public int Height;
             public TextureWrapMode Wrap;
@@ -63,7 +64,7 @@ namespace ExtraPotions.Solstice.Runtime
             public FrostKey Key;
             public bool Leaves;
             public Texture2D Texture;
-            public Color32[] Pixels;
+            public byte[] Pixels;
             public int Generation;
             public int Phase;
             public string Error;
@@ -79,6 +80,11 @@ namespace ExtraPotions.Solstice.Runtime
         static readonly Dictionary<int, ClutterBase> bases = new Dictionary<int, ClutterBase>();
         static readonly List<Heightmap> maps = new List<Heightmap>();
         static readonly List<FrostKey> dropKeys = new List<FrostKey>();
+        // Slice the scan so material name reads do not all land on the pass's first frame.
+        static Material[] scanMaterials;
+        static int scanIndex;
+        static readonly HashSet<int> scanSeen = new HashSet<int>();
+        static readonly List<int> scanDrop = new List<int>();
         static readonly object gate = new object();
 
         struct ClutterBase
@@ -149,8 +155,9 @@ namespace ExtraPotions.Solstice.Runtime
                 }
                 long phaseStart = debugLog ? Stopwatch.GetTimestamp() : 0;
                 Cover = cover;
-                bool cluttered = false;
-                if (clutterMilli != coverMilli)
+                // The frame that starts a pass already holds the material lookup; clutter and textures wait for the next one.
+                bool cluttered = changed;
+                if (!changed && clutterMilli != coverMilli)
                 {
                     if (!(coverMilli <= 0 && bases.Count == 0)) ApplyClutter(cover);
                     clutterMilli = coverMilli;
@@ -160,7 +167,8 @@ namespace ExtraPotions.Solstice.Runtime
                 if (!cluttered)
                 {
                     if (debugLog) phaseStart = Stopwatch.GetTimestamp();
-                    if (!TexturesIdle()) PumpTextures();
+                    if (scanMaterials != null) ContinueScan(frame);
+                    else if (!TexturesIdle()) PumpTextures();
                     if (debugLog)
                     {
                         textureTicks += Stopwatch.GetTimestamp() - phaseStart;
@@ -178,6 +186,7 @@ namespace ExtraPotions.Solstice.Runtime
                 dirty = false;
                 clutterMilli = targetMilli;
                 terrainMilli = targetMilli;
+                CancelScan();
                 pending.Clear();
                 waiting.Clear();
                 if (warned) return;
@@ -230,6 +239,7 @@ namespace ExtraPotions.Solstice.Runtime
             Cover = cover;
             if (step <= 0)
             {
+                CancelScan();
                 RestoreTextures();
                 DropFrost();
                 saved.Clear();
@@ -238,20 +248,13 @@ namespace ExtraPotions.Solstice.Runtime
                 return;
             }
             painted = true;
-            Scan();
-            if (saved.Count == 0 && !loggedNone)
-            {
-                loggedNone = true;
-                log?.Info("Snow cover found no grass or leaf texture. Ground snow is still the terrain mesh.");
-            }
             pending.Clear();
             waiting.Clear();
-            AssignReady();
-            EnqueueMissing();
+            StartScan();
             ResetTerrain();
         }
 
-        static bool TexturesIdle() => desiredStep <= 0 || (pending.Count == 0 && active == null);
+        static bool TexturesIdle() => desiredStep <= 0 || (scanMaterials == null && pending.Count == 0 && active == null);
 
         static void ClearActive(bool immediate)
         {
@@ -260,6 +263,7 @@ namespace ExtraPotions.Solstice.Runtime
             Cover = 0f;
             desiredStep = 0;
             targetMilli = 0;
+            CancelScan();
             RestoreTextures();
             DropFrost();
             saved.Clear();
@@ -285,46 +289,89 @@ namespace ExtraPotions.Solstice.Runtime
             logging = false;
         }
 
-        static void Scan()
+        static void StartScan()
         {
-            var materials = Resources.FindObjectsOfTypeAll<Material>();
-            var seen = new HashSet<int>();
-            if (materials == null)
+            scanSeen.Clear();
+            scanIndex = 0;
+            scanMaterials = Resources.FindObjectsOfTypeAll<Material>();
+            if (scanMaterials == null)
             {
                 saved.Clear();
+                FinishScan();
+            }
+        }
+
+        static void CancelScan()
+        {
+            scanMaterials = null;
+            scanIndex = 0;
+            scanSeen.Clear();
+        }
+
+        static void ContinueScan(Stopwatch frame)
+        {
+            var materials = scanMaterials;
+            int done = 0;
+            while (SeasonGround.NextScan(done, frame.Elapsed.TotalMilliseconds, materials.Length - scanIndex))
+            {
+                ScanOne(materials[scanIndex]);
+                scanIndex++;
+                done++;
+            }
+            if (scanIndex < materials.Length) return;
+            if (scanSeen.Count != saved.Count)
+            {
+                scanDrop.Clear();
+                foreach (var id in saved.Keys)
+                    if (!scanSeen.Contains(id)) scanDrop.Add(id);
+                for (int i = 0; i < scanDrop.Count; i++) saved.Remove(scanDrop[i]);
+                scanDrop.Clear();
+            }
+            FinishScan();
+        }
+
+        static void FinishScan()
+        {
+            CancelScan();
+            if (saved.Count == 0 && !loggedNone)
+            {
+                loggedNone = true;
+                log?.Info("Snow cover found no grass or leaf texture. Ground snow is still the terrain mesh.");
+            }
+            AssignReady();
+            EnqueueMissing();
+        }
+
+        static void ScanOne(Material material)
+        {
+            if (material == null) return;
+            var shader = material.shader;
+            if (shader == null) return;
+            int id = material.GetInstanceID();
+            bool hasMain = material.HasProperty(mainTexId);
+            var shown = hasMain ? material.GetTexture(mainTexId) : null;
+            if (!hasMain) return;
+            bool showingFrost = shown != null && IsFrost(shown);
+            string textureName = shown != null && !showingFrost ? shown.name : null;
+            if (!SeasonVisualSelection.FrostTexture(shader.name, material.name, textureName, out bool leaves))
+            {
                 return;
             }
-            for (int i = 0; i < materials.Length; i++)
+            scanSeen.Add(id);
+            if (saved.TryGetValue(id, out var kept) && kept.Original != null)
             {
-                var material = materials[i];
-                if (material == null || material.shader == null) continue;
-                if (!material.HasProperty(mainTexId)) continue;
-                var shown = material.GetTexture(mainTexId);
-                bool showingFrost = shown != null && IsFrost(shown);
-                string textureName = shown != null && !showingFrost ? shown.name : null;
-                if (!SeasonVisualSelection.FrostTexture(material.shader.name, material.name, textureName, out bool leaves)) continue;
-                int id = material.GetInstanceID();
-                seen.Add(id);
-                if (saved.TryGetValue(id, out var kept) && kept.Original != null)
-                {
-                    kept.Material = material;
-                    if (!showingFrost || leaves) kept.Leaves = leaves;
-                    continue;
-                }
-                if (shown == null || showingFrost) continue;
-                saved[id] = new Kept
-                {
-                    Material = material,
-                    Original = shown,
-                    SourceId = shown.GetInstanceID(),
-                    Leaves = leaves
-                };
+                kept.Material = material;
+                if (!showingFrost || leaves) kept.Leaves = leaves;
+                return;
             }
-            if (seen.Count == saved.Count) return;
-            var drop = new List<int>();
-            foreach (var id in saved.Keys)
-                if (!seen.Contains(id)) drop.Add(id);
-            for (int i = 0; i < drop.Count; i++) saved.Remove(drop[i]);
+            if (shown == null || showingFrost) return;
+            saved[id] = new Kept
+            {
+                Material = material,
+                Original = shown,
+                SourceId = shown.GetInstanceID(),
+                Leaves = leaves
+            };
         }
 
         static void EnqueueMissing()
@@ -364,7 +411,7 @@ namespace ExtraPotions.Solstice.Runtime
             if (active != null)
             {
                 int phase, gen;
-                Color32[] pixels;
+                byte[] pixels;
                 string error;
                 lock (gate)
                 {
@@ -447,12 +494,12 @@ namespace ExtraPotions.Solstice.Runtime
                 readable.wrapMode = source.wrapMode;
                 readable.filterMode = filter;
                 readable.hideFlags = HideFlags.HideAndDontSave;
+                // Only the CPU copy is read here; the frost upload applies this texture later.
                 readable.ReadPixels(new Rect(0f, 0f, bakeWidth, bakeHeight), 0, 0);
-                readable.Apply(false, false);
                 originals[job.Key.Source] = new SourceImage
                 {
                     Name = source.name,
-                    Pixels = readable.GetPixels32(),
+                    Rgba = readable.GetPixelData<byte>(0).ToArray(),
                     Width = bakeWidth,
                     Height = bakeHeight,
                     Wrap = source.wrapMode,
@@ -483,12 +530,12 @@ namespace ExtraPotions.Solstice.Runtime
 
         static void StartWorker(BakeJob job)
         {
-            if (!originals.TryGetValue(job.Key.Source, out var image) || image.Pixels == null)
+            if (!originals.TryGetValue(job.Key.Source, out var image) || image.Rgba == null)
             {
                 active = null;
                 return;
             }
-            var source = (Color32[])image.Pixels.Clone();
+            var source = image.Rgba;
             float amount = SeasonGround.FrostAmount(job.Key.Step);
             bool leaves = job.Leaves;
             int gen;
@@ -508,11 +555,12 @@ namespace ExtraPotions.Solstice.Runtime
             }
         }
 
-        static void FinishJob(BakeJob job, Color32[] source, float amount, bool leaves, int gen)
+        static void FinishJob(BakeJob job, byte[] source, float amount, bool leaves, int gen)
         {
             try
             {
-                var pixels = FrostPixels(source, amount, leaves);
+                var pixels = (byte[])source.Clone();
+                SeasonGround.Frost(pixels, amount, leaves);
                 lock (gate)
                 {
                     if (gen != generation) return;
@@ -531,24 +579,7 @@ namespace ExtraPotions.Solstice.Runtime
             }
         }
 
-        static Color32[] FrostPixels(Color32[] source, float amount, bool leaves)
-        {
-            var bytes = new byte[source.Length * 4];
-            for (int i = 0; i < source.Length; i++)
-            {
-                bytes[i * 4] = source[i].r;
-                bytes[i * 4 + 1] = source[i].g;
-                bytes[i * 4 + 2] = source[i].b;
-                bytes[i * 4 + 3] = source[i].a;
-            }
-            SeasonGround.Frost(bytes, amount, leaves);
-            var pixels = new Color32[source.Length];
-            for (int i = 0; i < pixels.Length; i++)
-                pixels[i] = new Color32(bytes[i * 4], bytes[i * 4 + 1], bytes[i * 4 + 2], bytes[i * 4 + 3]);
-            return pixels;
-        }
-
-        static void Upload(BakeJob job, Color32[] pixels)
+        static void Upload(BakeJob job, byte[] pixels)
         {
             long start = debugLog ? Stopwatch.GetTimestamp() : 0;
             try { UploadCore(job, pixels); }
@@ -562,7 +593,7 @@ namespace ExtraPotions.Solstice.Runtime
                 }
             }
         }
-        static void UploadCore(BakeJob job, Color32[] pixels)
+        static void UploadCore(BakeJob job, byte[] pixels)
         {
             if (pixels == null || !originals.TryGetValue(job.Key.Source, out var image)) return;
             var texture = job.Texture;
@@ -574,8 +605,8 @@ namespace ExtraPotions.Solstice.Runtime
                 texture.filterMode = image.Filter;
                 texture.hideFlags = HideFlags.HideAndDontSave;
             }
-            NoteSample(job.Key.Source, image.Name, image.Pixels, pixels);
-            texture.SetPixels32(pixels);
+            NoteSample(job.Key.Source, image.Name, image.Rgba, pixels);
+            texture.SetPixelData(pixels, 0);
             texture.Apply(true, true);
             job.Texture = null;
             Remember(job.Key, texture);
@@ -783,7 +814,7 @@ namespace ExtraPotions.Solstice.Runtime
             }
         }
 
-        static void NoteSample(int sourceId, string textureName, Color32[] source, Color32[] frost)
+        static void NoteSample(int sourceId, string textureName, byte[] source, byte[] frost)
         {
             if (!WorthSample(textureName)) return;
             if (!MeanOpaque(source, out int sr, out int sg, out int sb, out int count)) return;
@@ -816,17 +847,18 @@ namespace ExtraPotions.Solstice.Runtime
             return textureName ?? "";
         }
 
-        static bool MeanOpaque(Color32[] pixels, out int r, out int g, out int b, out int count)
+        static bool MeanOpaque(byte[] rgba, out int r, out int g, out int b, out int count)
         {
             r = g = b = count = 0;
-            if (pixels == null || pixels.Length == 0) return false;
+            if (rgba == null || rgba.Length < 4) return false;
             long sr = 0, sg = 0, sb = 0;
-            for (int i = 0; i < pixels.Length; i++)
+            int last = rgba.Length - (rgba.Length % 4);
+            for (int i = 0; i < last; i += 4)
             {
-                if (pixels[i].a == 0) continue;
-                sr += pixels[i].r;
-                sg += pixels[i].g;
-                sb += pixels[i].b;
+                if (rgba[i + 3] == 0) continue;
+                sr += rgba[i];
+                sg += rgba[i + 1];
+                sb += rgba[i + 2];
                 count++;
             }
             if (count == 0) return false;
@@ -936,6 +968,7 @@ namespace ExtraPotions.Solstice.Runtime
             {
                 log?.Warning("Season winter look scene: " + error.GetType().Name);
             }
+            CancelScan();
             saved.Clear();
             bases.Clear();
             painted = false;

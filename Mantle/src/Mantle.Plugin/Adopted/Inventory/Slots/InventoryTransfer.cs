@@ -29,8 +29,10 @@ namespace Mantle.Slots
                 return false;
 
             int before = source.ContainsItem(item) ? item.m_stack : 0;
-            try { source.RemoveItem(item, added); }
-            catch (Exception) { }
+            // An item already gone from the source is not removed again (the game logs "Item is not in this container").
+            if (before > 0)
+                try { source.RemoveItem(item, added); }
+                catch (Exception) { }
             if (!SourceDebit(source, item, before, added, out int debited))
             {
                 Warn();

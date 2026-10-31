@@ -19,6 +19,8 @@ namespace Burrow.Shared
         /// <summary>Removes <paramref name="amount"/> units of the stack and returns a copy holding exactly them.</summary>
         public static ItemDrop.ItemData Take(Inventory inventory, ItemDrop.ItemData item, int amount)
         {
+            if (item == null || amount <= 0 || !inventory.ContainsItem(item))
+                return null;
             ItemDrop.ItemData taken = ItemPacket.Copy(item, amount);
             int before = inventory.ContainsItem(item) ? item.m_stack : 0;
             try { inventory.RemoveItem(item, taken.m_stack); }

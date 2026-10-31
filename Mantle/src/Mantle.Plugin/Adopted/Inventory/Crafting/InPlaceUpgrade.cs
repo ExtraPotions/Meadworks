@@ -32,6 +32,7 @@ namespace Mantle.Crafting
 
         /// <summary>Inside the game's craft button press or craft: the two places that ask whether the new item fits.</summary>
         private static bool crafting;
+        internal static bool IsCrafting => crafting;
 
         /// <summary>The old item set aside during the game's craft, and the slot cell it came from.</summary>
         private static ItemDrop.ItemData old;
@@ -102,12 +103,20 @@ namespace Mantle.Crafting
             return false;
         }
 
-        /// <summary>Inventory.FindEmptySlot: during the game's craft the emptied slot is the free cell, or an empty dedicated slot.</summary>
+        /// <summary>Inventory.FindEmptySlot: during the in-place upgrade of a backpack or tacklebox the emptied slot is the free cell.</summary>
         public static bool FreeSlot(Inventory inventory, out Vector2i cell)
         {
             cell = slot;
-            if ((old != null || upgrading) && inventory.GetItemAt(slot.x, slot.y) == null)
-                return true;
+            return (old != null || upgrading) && inventory.GetItemAt(slot.x, slot.y) == null;
+        }
+
+        /// <summary>
+        /// Inventory.FindEmptySlot when the main grid has no free cell: during the game's craft an empty dedicated slot
+        /// that takes the crafted item is the free cell, so a full grid does not stop the craft (<see cref="Fits"/>).
+        /// </summary>
+        public static bool SlotWhenFull(Inventory inventory, out Vector2i cell)
+        {
+            cell = Aside;
             if (crafting && InventoryState.Layout != null && InventoryGui.instance != null)
             {
                 var gui = InventoryGui.instance;

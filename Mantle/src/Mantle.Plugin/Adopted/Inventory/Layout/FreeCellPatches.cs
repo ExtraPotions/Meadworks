@@ -22,8 +22,11 @@ namespace Mantle.Layout
             {
                 if (!InventoryState.Manages(__instance))
                     return true;
-                if (!InPlaceUpgrade.FreeSlot(__instance, out __result))
-                    __result = MainCells.FindEmpty(__instance, InventoryState.Layout, topFirst);
+                if (InPlaceUpgrade.FreeSlot(__instance, out __result))
+                    return false;
+                __result = MainCells.FindEmpty(__instance, InventoryState.Layout, topFirst);
+                if (__result.x < 0 && InPlaceUpgrade.SlotWhenFull(__instance, out Vector2i cell))
+                    __result = cell;
                 return false;
             }
         }

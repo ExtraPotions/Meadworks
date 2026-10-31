@@ -10,6 +10,8 @@ namespace Burrow.Shared
         {
             sourceChanged = false;
             int sourceBeforeTransfer = source.ContainsItem(item) ? item.m_stack : 0;
+            if (sourceBeforeTransfer <= 0)
+                return 0;
             AddedDelta destinationDelta = new AddedDelta(destination, moving, amount);
             try { add(moving); }
             catch (Exception) { }
@@ -28,7 +30,7 @@ namespace Burrow.Shared
                 return 0;
 
             int before = source.ContainsItem(item) ? item.m_stack : 0;
-            try { source.RemoveItem(item, added); }
+            try { if (before > 0) source.RemoveItem(item, added); }
             catch (Exception) { }
             sourceChanged = !source.ContainsItem(item) || item.m_stack != sourceBeforeTransfer;
 

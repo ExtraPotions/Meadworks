@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.10 (2026-10-30)
+
+- Snow cover work is spread over several frames and allocates less, which should reduce hitching while snow forms.
+- Stale snow scans are cancelled and material names are reconsidered when they change.
+
 ## 0.1.9 (2026-10-29)
 
 - Package files now carry this release's date, so BepInEx reloads updated mods instead of using stale cached plugin details (fixes 'missing dependency Crucible' after updating).

@@ -82,6 +82,13 @@ namespace ExtraPotions.Burrow
             public string OldDefault { get; }
         }
 
+        /// <summary>
+        /// Plain left/right clicks already operate inventory controls. Treating them as hotkeys also ran bulk actions
+        /// on every click (Feed Source Key = Mouse0 in the reported config). Modified and side-button bindings still work.
+        /// </summary>
+        public static bool IgnoredBareClick(string? mainKey, bool hasModifiers) =>
+            !hasModifiers && (string.Equals(mainKey, "Mouse0", StringComparison.Ordinal) || string.Equals(mainKey, "Mouse1", StringComparison.Ordinal));
+
         private static KeyValuePair<string, string> Pair(string section, string key) => new KeyValuePair<string, string>(section, key);
     }
 }

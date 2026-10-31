@@ -26,9 +26,23 @@ namespace Burrow.Core
             KeyboardShortcut shortcut = key.Value;
             if (shortcut.MainKey == KeyCode.None)
                 return false;
+            if (ExtraPotions.Burrow.HotkeyDefaults.IgnoredBareClick(shortcut.MainKey.ToString(), HasModifiers(shortcut)))
+            {
+                WarnBareClick(key);
+                return false;
+            }
             if (HasModifiers(shortcut))
                 return Input.GetKeyDown(shortcut.MainKey) && shortcut.Modifiers.All(KeyHeld) && !OtherModifierHeld(shortcut);
             return Input.GetKeyDown(shortcut.MainKey) && !ModifierHeld(shortcut.MainKey);
+        }
+
+        private static readonly System.Collections.Generic.HashSet<string> warnedBareClicks = new System.Collections.Generic.HashSet<string>();
+
+        private static void WarnBareClick(ConfigEntry<KeyboardShortcut> key)
+        {
+            string name = key.Definition.Section + " / " + key.Definition.Key;
+            if (warnedBareClicks.Add(name))
+                global::Burrow.Plugin.Log?.LogWarning($"Burrow: {name} is bound to a plain {key.Value.MainKey} click and is ignored; bind another key or add a modifier.");
         }
 
         /// <summary>

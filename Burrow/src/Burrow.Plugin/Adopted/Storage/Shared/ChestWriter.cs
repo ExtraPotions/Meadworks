@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Burrow.Core;
 
 namespace Burrow.Shared
@@ -11,9 +12,26 @@ namespace Burrow.Shared
     /// owning client and applies the answer when it comes (<see cref="ChestAsk"/>). Every call reports through
     /// <c>done(bool ok)</c>, synchronously or when the reply arrives; every refusal shows the centre message.
     /// A chest that is neither writable now nor shared refuses with "The chest cannot be changed right now".
+    /// A take while the local player's inventory is held (a shared payment or transfer settling) waits quietly
+    /// and runs again once the hold ends, at most <see cref="HoldWaitSeconds"/>; after that it answers false.
     /// </summary>
     public static class ChestWriter
     {
+        /// <summary>The longest a take waits for the player's inventory hold to end.</summary>
+        internal const double HoldWaitSeconds = 2.0;
+
+        private struct Waiting
+        {
+            public double Until;
+            public Player Player;
+            public Container Chest;
+            public Action Again;
+            public Action<bool> Done;
+        }
+
+        private static readonly List<Waiting> waiting = new List<Waiting>();
+
+        internal static int WaitingTakes => waiting.Count;
         /// <summary>True when the local client may change the chest synchronously (owner, or claimable because nobody uses it).</summary>
         public static bool CanWriteNow(Container c)
         {
@@ -41,6 +59,9 @@ namespace Burrow.Shared
                 done(false);
                 return;
             }
+            Action<bool> answer = done;
+            if (WaitForHold(player, c, () => TakeTo(c, item, amount, slot, answer), done))
+                return;
             if (CanWriteNow(c))
                 done(ChestSync.Take(c, item, amount, player, slot));
             else if (Shared(c))
@@ -93,6 +114,9 @@ namespace Burrow.Shared
                 done(false);
                 return;
             }
+            Action<bool> answer = done;
+            if (WaitForHold(player, c, () => TakeAll(c, answer), done))
+                return;
             if (CanWriteNow(c))
                 done(ChestSync.TakeAll(c, player));
             else if (Shared(c))
@@ -116,6 +140,46 @@ namespace Burrow.Shared
                 ChestAsk.StackAll(c, player, done);
             else
                 done(false);
+        }
+
+        private static bool Held(Player player, Container chest) =>
+            Burrow.Resources.NativeInventoryGuards.Held(player.GetInventory())
+            || Burrow.Resources.NativeInventoryGuards.Held(chest.GetInventory());
+
+        private static bool WaitForHold(Player player, Container chest, Action again, Action<bool> done)
+        {
+            if (!Held(player, chest))
+                return false;
+            if (waiting.Count >= 128) { done(false); return true; }
+            waiting.Add(new Waiting { Until = UnityEngine.Time.realtimeSinceStartupAsDouble + HoldWaitSeconds,
+                Player = player, Chest = chest, Again = again, Done = done });
+            return true;
+        }
+
+        /// <summary>Runs waiting takes once their holds end; expires them without changing either inventory.</summary>
+        internal static void Tick()
+        {
+            if (waiting.Count == 0)
+                return;
+            double now = UnityEngine.Time.realtimeSinceStartupAsDouble;
+            Waiting[] due = waiting.ToArray();
+            waiting.Clear();
+            foreach (Waiting take in due)
+            {
+                try
+                {
+                    // A queued UI action belongs to this character and chest. Recheck after each take: a shared take
+                    // can acquire a new hold before the next one. Expiry never runs a partially guarded transfer.
+                    if (take.Player != Player.m_localPlayer || !Ready(take.Chest, out _) || take.Player.IsDead()
+                        || take.Player.IsTeleporting() || now >= take.Until)
+                        take.Done(false);
+                    else if (Held(take.Player, take.Chest))
+                        waiting.Add(take);
+                    else
+                        take.Again();
+                }
+                catch (Exception e) { Plugin.Log.LogWarning($"Burrow: a chest take kept during an inventory hold failed: {e.GetType().Name}"); }
+            }
         }
 
         private static bool Ready(Container c, out Player player)
